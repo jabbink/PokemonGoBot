@@ -1,5 +1,6 @@
 package ink.abb.pogo.scraper
 
+import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Inventory.ItemIdOuterClass
 import POGOProtos.Map.Fort.FortDataOuterClass
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
@@ -11,6 +12,7 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.auth.PTCLogin
 import com.pokegoapi.exceptions.NoSuchItemException
 import okhttp3.OkHttpClient
@@ -90,6 +92,7 @@ fun main(args: Array<String>) {
     go.setLocation(lat.get() + randomLatLng(), lng.get() + randomLatLng(), 0.0)
     println("Getting map of ${lat.get()} ${lng.get()}")
 
+    go.pokebank.pokemons.map { "Got ${it.pokemonId.name} with ${it.cp} CP" }.forEach { println(it) }
 
     var reply = go.map.mapObjects
 
@@ -97,7 +100,8 @@ fun main(args: Array<String>) {
     fixedRateTimer("GetMapObjects", false, 5000, 5000, action = {
         thread(block = {
             // query a small area to keep alive
-            println("Getting map of ${lat.get()} ${lng.get()}")
+            //println("Getting map of ${lat.get()} ${lng.get()}")
+            go.setLocation(lat.get() + randomLatLng(), lng.get() + randomLatLng(), 0.0)
             reply = go.map.getMapObjects(0)
             processMapObjects(go, reply)
         })
@@ -108,7 +112,7 @@ fun randomLatLng(): Double {
     return Math.random() * 0.0001 - 0.00005
 }
 
-val speed = 2.778 * 5
+val speed = 2.778 * 1
 
 var walking = false
 
@@ -132,13 +136,12 @@ fun walk(end: S2LatLng, speed: Double) {
 
     var remainingSteps = stepsRequired
 
-
     fixedRateTimer("Walk", false, 0, timeout, action = {
         lat.addAndGet(deltaLat)
         lng.addAndGet(deltaLng)
         remainingSteps--
         if (remainingSteps <= 0) {
-            println("destination reached")
+            //println("destination reached")
             walking = false
             cancel()
         }
@@ -230,6 +233,26 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
                     println("Portal out of range; distance: ${distance}")
                 }
                 else -> println(result.result)
+            }
+            return
+        }
+        val player = api.getPlayerProfile(true)
+        if (player != null) {
+            // TODO: The API allows to release pokemon in batches, the app does not
+            var transferredPokemon = false
+            val groupedPokemon = api.pokebank.pokemons.groupBy { it.pokemonId }
+            groupedPokemon.forEach {
+                val sorted = it.value.sortedByDescending { it.cp }
+                for ((index, pokemon) in sorted.withIndex()) {
+                    if (index > 0) {
+                        println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
+                        pokemon.transferPokemon()
+                        transferredPokemon = true
+                    }
+                }
+            }
+            if (transferredPokemon) {
+                return
             }
         }
     }
