@@ -81,16 +81,21 @@ fun main(args: Array<String>) {
     Thread.currentThread().contextClassLoader.getResourceAsStream("config.properties").use {
         properties.load(it)
     }
+	
     lat.set(properties.getProperty("latitude").toDouble())
     lng.set(properties.getProperty("longitude").toDouble())
     val auth = (PTCLogin(http).login(properties.getProperty("username"), properties.getProperty("password")))
-
+    println("Logged in as ${properties.getProperty("username")}")
+	
+	print("Get default data from pogo server ")
     val go = PokemonGo(auth, http)
     while (profile == null) {
         profile = go.playerProfile
+		print(".")
         Thread.sleep(1000)
     }
-    println("Logged in as ${profile!!.username}")
+	println(".")
+	
     println("Pokecoin: ${profile!!.currencies.get(PlayerProfile.Currency.POKECOIN)}")
     println("Stardust: ${profile!!.currencies.get(PlayerProfile.Currency.STARDUST)}")
     println("Level ${profile!!.stats.level}, Experience ${profile!!.stats.experience}")
@@ -127,9 +132,9 @@ val lng = AtomicDouble()
 var profile: PlayerProfile? = null
 
 fun walk(end: S2LatLng, speed: Double) {
-    if (walking) {
+    if (walking)
         return
-    }
+    
     walking = true
     val start = S2LatLng.fromDegrees(lat.get(), lng.get())
     val diff = end.sub(start)
@@ -187,23 +192,24 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
 				throw e;
             }
 			
-			
-			
 			if (ball != null) {
-				 println("encountering pokemon ${catchablePokemon.pokemonId}")
+				println("found pokemon ${catchablePokemon.pokemonId}")
 	             api.setLocation(lat.get(), lng.get(), 0.0)
 	             val encounterResult = api.map.encounterPokemon(catchablePokemon)
 	             if (encounterResult.status == EncounterResponseOuterClass.EncounterResponse.Status.ENCOUNTER_SUCCESS) {
 					 
+	            	 println("encountering pokemon ${catchablePokemon.pokemonId}")
 	            	 val result = api.map.catchPokemon(catchablePokemon, 1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, pokeballItems.get(ball)!!)
 	                 
 					 if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) 
 	                	 println("Caught a ${catchablePokemon.pokemonId} using a ${ball}")
-	                 
+					 else
+						 println("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
 	             }
 			 }
              
         }
+		
         val sortedPokestops = pokestops?.sortedWith(Comparator { a, b ->
             val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)
             val locationB = S2LatLng.fromDegrees(b.latitude, b.longitude)
@@ -222,10 +228,10 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
 		
         val nearestUnused = sortedPokestops.filter {
             usedPokestops.getOrElse(it.id, { 0 }) < System.currentTimeMillis()
-        }
+        }?.first()
 		
-		if (nearestUnused.size > 0) 
-			 walk(S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), speed)
+		if (nearestUnused != null) 
+			 walk(S2LatLng.fromDegrees(nearestUnused.latitude, nearestUnused.longitude), speed)
 		
         if (nearbyPokestops.size > 0) {
             println("Found nearby pokestop")
@@ -238,7 +244,9 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
             }
             when (result.result) {
                 Result.SUCCESS -> println("Activated portal ${closest.id}")
-                Result.INVENTORY_FULL -> println("Activated portal ${closest.id}, but inventory is full")
+                Result.INVENTORY_FULL -> {
+					println("Activated portal ${closest.id}, but inventory is full")
+				}
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
                     var self = S2LatLng.fromDegrees(lat.get(), lng.get())
@@ -249,13 +257,16 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
             }
             return
         }
-        val player = api.getPlayerProfile()
+		
+        val player = api.getPlayerProfile(true)
+		println("Profile update : ${player.stats.experience} XP on LVL ${player.stats.level}")
         if (player != null) {
             // TODO: The API allows to release pokemon in batches, the app does not
             var transferredPokemon = false
             val groupedPokemon = api.pokebank.pokemons.groupBy { it.pokemonId }
             groupedPokemon.forEach {
                 val sorted = it.value.sortedByDescending { it.cp }
+				
                 for ((index, pokemon) in sorted.withIndex()) {
                     if (index > 0 && pokemon.cp < 400) {
                         println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
@@ -264,9 +275,8 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
                     }
                 }
             }
-            if (transferredPokemon) {
+            if (transferredPokemon) 
                 return
-            }
         }
     }
 }
