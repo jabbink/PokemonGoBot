@@ -5,6 +5,7 @@ import POGOProtos.Map.Fort.FortDataOuterClass
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass
+import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import com.google.common.geometry.S2LatLng
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
@@ -215,22 +216,20 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
             val closest = nearbyPokestops.first()
             api.setLocation(lat.get(), lng.get(), 0.0)
             val result = api.map.searchFort(closest)
-            if (result.result == FortSearchResponseOuterClass.FortSearchResponse.Result.SUCCESS) {
-                usedPokestops.put(closest.id, result.cooldownCompleteTimestampMs)
-            } else if (result.result == FortSearchResponseOuterClass.FortSearchResponse.Result.IN_COOLDOWN_PERIOD) {
-                usedPokestops.put(closest.id, System.currentTimeMillis() + 5 * 60 * 1000)
+            when (result.result) {
+                Result.SUCCESS, Result.INVENTORY_FULL -> usedPokestops.put(closest.id, result.cooldownCompleteTimestampMs)
+                Result.IN_COOLDOWN_PERIOD -> usedPokestops.put(closest.id, System.currentTimeMillis() + 5 * 60 * 1000)
             }
-            if (result.result == FortSearchResponseOuterClass.FortSearchResponse.Result.SUCCESS) {
-                println("Activated portal ${closest.id}")
-            } else if (result.result == FortSearchResponseOuterClass.FortSearchResponse.Result.INVENTORY_FULL) {
-                println("Activated portal ${closest.id}, but inventory is full")
-            } else if (result.result == FortSearchResponseOuterClass.FortSearchResponse.Result.OUT_OF_RANGE) {
-                val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
-                var self = S2LatLng.fromDegrees(lat.get(), lng.get())
-                val distance = self.getEarthDistance(location)
-                println("Portal out of range; distance: ${distance}")
-            } else {
-                println("${result.result}")
+            when (result.result) {
+                Result.SUCCESS -> println("Activated portal ${closest.id}")
+                Result.INVENTORY_FULL -> println("Activated portal ${closest.id}, but inventory is full")
+                Result.OUT_OF_RANGE -> {
+                    val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
+                    var self = S2LatLng.fromDegrees(lat.get(), lng.get())
+                    val distance = self.getEarthDistance(location)
+                    println("Portal out of range; distance: ${distance}")
+                }
+                else -> println(result.result)
             }
         }
     }
