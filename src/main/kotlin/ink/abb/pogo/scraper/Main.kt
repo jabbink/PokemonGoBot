@@ -119,13 +119,7 @@ fun main(args: Array<String>) {
             properties.getProperty("ignoredPokemon").split(",").forEach{ip ->
                 ignoredPokemon.add(ip)
             }
-            val rempk = mutableListOf<String>()
-            ignoredPokemon.forEach{ ip ->
-                if (ip.startsWith("#",true)){
-                    rempk.add(ip)
-                }
-            }
-            ignoredPokemon.removeAll(rempk)
+            ignoredPokemon.forEach { ip -> ip.trim() }
             println("Not transferring:")
             ignoredPokemon.forEach { ip -> println(ip) }
         } catch (e: Exception){
