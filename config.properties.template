@@ -14,6 +14,7 @@ autotransfer=true
 maxCP = 400
 # if autotransfer = true and you dont want some of the pokemon to not be transferred just uncomment the line of the pokemon
 # the names must be divided by a ","
+# if you all pokemon to be transferred just leave it blank
 ignoredPokemon= EEVEE,MEWTWO,CHARMENDER
 #List of pokemon names
 #MISSINGNO
