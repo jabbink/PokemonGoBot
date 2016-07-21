@@ -1,5 +1,6 @@
 # PTC Login credentials
 username=
 password=
-latitude=52.010747
-longitude=4.359482
+latitude=
+longitude=
+prefered_ball=ITEM_POKE_BALL
