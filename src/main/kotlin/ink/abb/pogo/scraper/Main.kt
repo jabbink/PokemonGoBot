@@ -9,9 +9,10 @@
 package ink.abb.pogo.scraper
 
 import POGOProtos.Inventory.ItemIdOuterClass
+import POGOProtos.Inventory.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
+import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
 import com.google.common.geometry.S2LatLng
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
@@ -27,16 +28,11 @@ import java.security.cert.X509Certificate
 import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
-import javax.net.ssl.SSLSession
 import javax.net.ssl.TrustManager
 import javax.security.cert.CertificateException
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
-
-import POGOProtos.Inventory.ItemIdOuterClass.ItemId
-import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
 
 
 val properties = Properties()
@@ -69,14 +65,10 @@ fun allowProxy(builder: OkHttpClient.Builder) {
     val sslContext = SSLContext.getInstance("SSL")
     sslContext.init(null, trustAllCerts, java.security.SecureRandom())
     // Create an ssl socket factory with our all-trusting manager
-    val sslSocketFactory = sslContext.getSocketFactory()
+    val sslSocketFactory = sslContext.socketFactory
 
     builder.sslSocketFactory(sslSocketFactory);
-    builder.hostnameVerifier(object : HostnameVerifier {
-        override fun verify(hostname: String, session: SSLSession): Boolean {
-            return true
-        }
-    })
+    builder.hostnameVerifier { hostname, session -> true }
 }
 
 fun main(args: Array<String>) {
@@ -182,7 +174,7 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
 
             var ball: ItemIdOuterClass.ItemId? = null
             try {
-                var preferedBall = ItemIdOuterClass.ItemId.valueOf(properties.getProperty("prefered_ball", "ITEM_POKE_BALL"));
+                val preferedBall = ItemIdOuterClass.ItemId.valueOf(properties.getProperty("prefered_ball", "ITEM_POKE_BALL"));
                 var item = api.bag.getItem(preferedBall)
 
                 // if we dont have our prefered pokeball, try fallback to other
@@ -221,7 +213,7 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
         val sortedPokestops = pokestops?.sortedWith(Comparator { a, b ->
             val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)
             val locationB = S2LatLng.fromDegrees(b.latitude, b.longitude)
-            var self = S2LatLng.fromDegrees(lat.get(), lng.get())
+            val self = S2LatLng.fromDegrees(lat.get(), lng.get())
             val distanceA = self.getEarthDistance(locationA)
             val distanceB = self.getEarthDistance(locationB)
             distanceA.compareTo(distanceB)
@@ -256,9 +248,9 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
                 }
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
-                    var self = S2LatLng.fromDegrees(lat.get(), lng.get())
+                    val self = S2LatLng.fromDegrees(lat.get(), lng.get())
                     val distance = self.getEarthDistance(location)
-                    println("Portal out of range; distance: ${distance}")
+                    println("Portal out of range; distance: $distance")
                 }
                 else -> println(result.result)
             }
@@ -291,7 +283,7 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
     }
 }
 
-val uselessItems = setOf<ItemId>(ItemId.ITEM_REVIVE, ItemId.ITEM_MAX_REVIVE, ItemId.ITEM_POTION, ItemId.ITEM_SUPER_POTION, ItemId.ITEM_HYPER_POTION, ItemId.ITEM_MAX_POTION)
+val uselessItems = setOf(ItemId.ITEM_REVIVE, ItemId.ITEM_MAX_REVIVE, ItemId.ITEM_POTION, ItemId.ITEM_SUPER_POTION, ItemId.ITEM_HYPER_POTION, ItemId.ITEM_MAX_POTION)
 
 fun dropUselessItems(api: PokemonGo) {
     uselessItems.forEach {
