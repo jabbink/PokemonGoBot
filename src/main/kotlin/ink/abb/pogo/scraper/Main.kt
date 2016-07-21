@@ -10,6 +10,7 @@ package ink.abb.pogo.scraper
 
 import POGOProtos.Inventory.ItemIdOuterClass
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
@@ -20,6 +21,7 @@ import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PTCLogin
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
@@ -86,7 +88,14 @@ fun main(args: Array<String>) {
 
     lat.set(properties.getProperty("latitude").toDouble())
     lng.set(properties.getProperty("longitude").toDouble())
-    val auth = (PTCLogin(http).login(properties.getProperty("username"), properties.getProperty("password")))
+
+    val username = properties.getProperty("username")
+    var auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
+    if (username.contains('@')) {
+        auth = GoogleLogin(http).login(username, properties.getProperty("password"))
+    } else {
+        auth = PTCLogin(http).login(username, properties.getProperty("password"))
+    }
     println("Logged in as ${properties.getProperty("username")}")
 
     print("Get default data from pogo server")
