@@ -21,11 +21,13 @@ import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PTCLogin
 import okhttp3.OkHttpClient
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.tasks.Release
+import java.awt.List
 import java.io.FileInputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -205,9 +207,9 @@ fun walk(end: S2LatLng, speed: Double) {
 }
 
 fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
-    if (api.map.catchablePokemon.size > 0) {
-        val catchablePokemon = api.map.catchablePokemon.first()
-
+    val pokemon = api.map.catchablePokemon
+    if (pokemon.isNotEmpty()) {
+        val catchablePokemon = pokemon.first()
         var ball: ItemIdOuterClass.ItemId? = null
         try {
             val preferred_ball = ItemIdOuterClass.ItemId.valueOf(properties.getProperty("preferred_ball", "ITEM_POKE_BALL"));
