@@ -1,6 +1,8 @@
 # PTC/Google login credentials
 username=
+# Choose plaintext or base64'd password
 password=
+base64_password=
 latitude=
 longitude=
 preferred_ball=ITEM_POKE_BALL

@@ -42,7 +42,7 @@ class Settings(val properties: Properties) {
     }
 
     fun getPassword(): String {
-        return String(Base64.getDecoder().decode(properties.getProperty("password")))
+        return String(Base64.getDecoder().decode(if(properties.containsKey("pt asassword")) properties.getProperty("password") else properties.getProperty("base64_password")))
     }
 
     fun getSpeed(): Double {
