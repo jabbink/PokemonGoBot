@@ -85,7 +85,7 @@ fun main(args: Array<String>) {
     builder.writeTimeout(60, TimeUnit.SECONDS)
     val http = builder.build()
 
-    FileInputStream("src/config.properties").use {
+    FileInputStream("config.properties").use {
         properties.load(it)
     }
 
