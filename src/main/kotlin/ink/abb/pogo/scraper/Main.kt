@@ -9,9 +9,10 @@
 package ink.abb.pogo.scraper
 
 import POGOProtos.Inventory.ItemIdOuterClass
+import POGOProtos.Inventory.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
+import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
 import com.google.common.geometry.S2LatLng
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
@@ -21,6 +22,7 @@ import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.auth.PTCLogin
 import okhttp3.OkHttpClient
+import java.io.FileInputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.security.cert.X509Certificate
@@ -34,9 +36,6 @@ import javax.net.ssl.TrustManager
 import javax.security.cert.CertificateException
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
-
-import POGOProtos.Inventory.ItemIdOuterClass.ItemId
-import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
 
 
 val properties = Properties()
@@ -87,7 +86,7 @@ fun main(args: Array<String>) {
     builder.writeTimeout(60, TimeUnit.SECONDS)
     val http = builder.build()
 
-    Thread.currentThread().contextClassLoader.getResourceAsStream("config.properties").use {
+    FileInputStream("config.properties").use {
         properties.load(it)
     }
 
@@ -291,18 +290,29 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
     }
 }
 
-val uselessItems = setOf<ItemId>(ItemId.ITEM_REVIVE, ItemId.ITEM_MAX_REVIVE, ItemId.ITEM_POTION, ItemId.ITEM_SUPER_POTION, ItemId.ITEM_HYPER_POTION, ItemId.ITEM_MAX_POTION)
+val uselessItems = mapOf<ItemId, Int>(
+        Pair(ItemId.ITEM_REVIVE, 8),
+        Pair(ItemId.ITEM_MAX_REVIVE, 8),
+        Pair(ItemId.ITEM_POTION, 5),
+        Pair(ItemId.ITEM_SUPER_POTION, 5),
+        Pair(ItemId.ITEM_HYPER_POTION, 5),
+        Pair(ItemId.ITEM_MAX_POTION, 5),
+        Pair(ItemId.ITEM_POKE_BALL, 20),
+        Pair(ItemId.ITEM_GREAT_BALL, 20),
+        Pair(ItemId.ITEM_ULTRA_BALL, 20),
+        Pair(ItemId.ITEM_MASTER_BALL, 20)
+)
 
 fun dropUselessItems(api: PokemonGo) {
     uselessItems.forEach {
-        val item = api.bag.getItem(it)
-        val count = item.count
+        val item = api.bag.getItem(it.key)
+        val count = item.count - it.value
         if (count > 0) {
-            val result = api.bag.removeItem(it, count)
+            val result = api.bag.removeItem(it.key, count)
             if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
-                println("Dropped ${count}x ${it.name}")
+                println("Dropped ${count}x ${it.key.name}")
             } else {
-                println("Failed to drop ${count}x ${it.name}: ${result}")
+                println("Failed to drop ${count}x ${it.key.name}: ${result}")
             }
         }
     }
