@@ -9,10 +9,12 @@ import ink.abb.pogo.scraper.Task
 class Release : Task {
     override fun run(context: Context?) {
         val groupedPokemon = context!!.api.pokebank.pokemons.groupBy { it.pokemonId }
+        val ignoredPokemon = context.ignoredPokemon
+        val maxCP = context.maxCP
         groupedPokemon.forEach {
             val sorted = it.value.sortedByDescending { it.cp }
             for ((index, pokemon) in sorted.withIndex()) {
-                if (index > 0 && pokemon.cp < 400) {
+                if (index > 0 && pokemon.cp < maxCP && (if(!ignoredPokemon.isEmpty()) (!ignoredPokemon.contains(pokemon.pokemonId.name)) else (true))) {
                     println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
                     pokemon.transferPokemon()
                 }

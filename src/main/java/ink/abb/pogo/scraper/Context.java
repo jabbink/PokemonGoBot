@@ -7,6 +7,8 @@ import com.pokegoapi.api.map.MapObjects;
 import com.pokegoapi.api.player.PlayerProfile;
 import okhttp3.OkHttpClient;
 
+import java.util.List;
+
 /**
  * Created by TimD on 7/21/2016.
  */
@@ -17,9 +19,11 @@ public class Context {
     private AtomicDouble lng = new AtomicDouble();
     private PlayerProfile profile;
     private double speed;
+    private int maxCP;
     private boolean walking;
     private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo;
     private MapObjects mapObjects;
+    private List<String> ignoredPokemon;
 
     public Context(PokemonGo go, AtomicDouble lat, AtomicDouble lng, PlayerProfile profile, double speed, boolean walking, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo, OkHttpClient http) {
         this.go = go;
@@ -30,6 +34,19 @@ public class Context {
         this.walking = walking;
         this.authInfo = authInfo;
         this.http = http;
+    }
+
+    public Context(PokemonGo go, AtomicDouble lat, AtomicDouble lng, PlayerProfile profile, double speed, boolean walking, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo, OkHttpClient http, List<String> ignoredPokemon, int maxCP) {
+        this.go = go;
+        this.lat = lat;
+        this.lng = lng;
+        this.profile = profile;
+        this.speed = speed;
+        this.walking = walking;
+        this.authInfo = authInfo;
+        this.http = http;
+        this.ignoredPokemon = ignoredPokemon;
+        this.maxCP = maxCP;
     }
 
     public MapObjects getMapObjects() {
@@ -102,5 +119,21 @@ public class Context {
 
     public void setAuthInfo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo) {
         this.authInfo = authInfo;
+    }
+
+    public List<String> getIgnoredPokemon() {
+        return ignoredPokemon;
+    }
+
+    public void setIgnoredPokemon(List<String> ignoredPokemon) {
+        this.ignoredPokemon = ignoredPokemon;
+    }
+
+    public int getMaxCP() {
+        return maxCP;
+    }
+
+    public void setMaxCP(int maxCP) {
+        this.maxCP = maxCP;
     }
 }

@@ -21,13 +21,10 @@ import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
-import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PTCLogin
-import okhttp3.OkHttpClient
-import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.tasks.Release
-import java.awt.List
+import okhttp3.OkHttpClient
 import java.io.FileInputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -106,9 +103,34 @@ fun main(args: Array<String>) {
     }
 
     try {
+        maxCP = properties.getProperty("maxCP").toInt()
+    } catch (e: Exception) {
+        println("No minimum CP specified, defaulting to $maxCP")
+    }
+
+    try {
         autotransfer = properties.getProperty("autotransfer").toBoolean()
     } catch (e: Exception) {
         println("No autotransfer specified, defaulting to $autotransfer")
+    }
+
+    if (autotransfer){
+        try{
+            properties.getProperty("ignoredPokemon").split(",").forEach{ip ->
+                ignoredPokemon.add(ip)
+            }
+            val rempk = mutableListOf<String>()
+            ignoredPokemon.forEach{ ip ->
+                if (ip.startsWith("#",true)){
+                    rempk.add(ip)
+                }
+            }
+            ignoredPokemon.removeAll(rempk)
+            println("Ignoring:")
+            ignoredPokemon.forEach { ip -> println(ip) }
+        } catch (e: Exception){
+            println("No list of ignored pokemon found, transfering all pokemons")
+        }
     }
 
     var shouldDropItems = false
@@ -134,7 +156,7 @@ fun main(args: Array<String>) {
         print(".")
         Thread.sleep(1000)
     }
-    context = Context(go, lat, lng, profile, speed, walking, auth, http)
+    context = Context(go, lat, lng, profile, speed, walking, auth, http, ignoredPokemon.toList(), maxCP)
     println("Context built!")
 
     println("Pokecoin: ${profile!!.currencies.get(PlayerProfile.Currency.POKECOIN)}")
@@ -177,9 +199,10 @@ fun randomLatLng(): Double {
 }
 
 var speed = 2.778
+var maxCP = 400
 var autotransfer = false
 var walking = false
-
+var ignoredPokemon = mutableListOf<String>()
 val lat = AtomicDouble()
 val lng = AtomicDouble()
 var profile: PlayerProfile? = null
