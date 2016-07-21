@@ -93,7 +93,7 @@ fun main(args: Array<String>) {
     val auth = (PTCLogin(http).login(properties.getProperty("username"), properties.getProperty("password")))
     println("Logged in as ${properties.getProperty("username")}")
 
-    print("Get default data from pogo server ")
+    print("Get default data from pogo server")
     val go = PokemonGo(auth, http)
     while (profile == null) {
         profile = go.playerProfile
@@ -109,7 +109,7 @@ fun main(args: Array<String>) {
     go.setLocation(lat.get() + randomLatLng(), lng.get() + randomLatLng(), 0.0)
     println("Getting map of ${lat.get()} ${lng.get()}")
 
-    go.pokebank.pokemons.map { "Got ${it.pokemonId.name} with ${it.cp} CP" }.forEach { println(it) }
+    go.pokebank.pokemons.map { "Got ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP" }.forEach { println(it) }
 
     var reply = go.map.mapObjects
 
@@ -227,10 +227,18 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
             it.canLoot()
         }
 
-        val nearestUnused = sortedPokestops.first()
+        val nearestUnused = sortedPokestops.filter {
+            it.canLoot(true)
+        }.first()
 
-        if (nearestUnused != null)
+        if (nearestUnused != null) {
             walk(S2LatLng.fromDegrees(nearestUnused.latitude, nearestUnused.longitude), speed)
+
+            /*val pokestop = com.pokegoapi.google.common.geometry.S2LatLng.fromDegrees(nearestUnused.latitude, nearestUnused.longitude)
+            val player = com.pokegoapi.google.common.geometry.S2LatLng.fromDegrees(api.latitude, api.longitude)
+            val distance = pokestop.getEarthDistance(player)
+            println("CanLoot: ${nearestUnused.canLoot()}; distance: $distance; timestamp: ${nearestUnused.cooldownCompleteTimestampMs}")*/
+        }
 
         if (nearbyPokestops.size > 0) {
             println("Found nearby pokestop")
