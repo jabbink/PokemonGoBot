@@ -126,10 +126,10 @@ fun main(args: Array<String>) {
                 }
             }
             ignoredPokemon.removeAll(rempk)
-            println("Ignoring:")
+            println("Not transferring:")
             ignoredPokemon.forEach { ip -> println(ip) }
         } catch (e: Exception){
-            println("No list of ignored pokemon found, transfering all pokemons")
+            println("No list of ignored pokemon found, transferring all pokemons")
         }
     }
 
