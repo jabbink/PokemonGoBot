@@ -35,6 +35,9 @@ import javax.security.cert.CertificateException
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
+import POGOProtos.Inventory.ItemIdOuterClass.ItemId
+import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
+
 
 val properties = Properties()
 
@@ -121,6 +124,7 @@ fun main(args: Array<String>) {
             go.setLocation(lat.get() + randomLatLng(), lng.get() + randomLatLng(), 0.0)
             reply = go.map.getMapObjects(0)
             processMapObjects(go, reply)
+            dropUselessItems(go)
         })
     })
 }
@@ -283,6 +287,23 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
             }
             if (transferredPokemon)
                 return
+        }
+    }
+}
+
+val uselessItems = setOf<ItemId>(ItemId.ITEM_REVIVE, ItemId.ITEM_MAX_REVIVE, ItemId.ITEM_POTION, ItemId.ITEM_SUPER_POTION, ItemId.ITEM_HYPER_POTION, ItemId.ITEM_MAX_POTION)
+
+fun dropUselessItems(api: PokemonGo) {
+    uselessItems.forEach {
+        val item = api.bag.getItem(it)
+        val count = item.count
+        if (count > 0) {
+            val result = api.bag.removeItem(it, count)
+            if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
+                println("Dropped ${count}x ${it.name}")
+            } else {
+                println("Failed to drop ${count}x ${it.name}: ${result}")
+            }
         }
     }
 }
