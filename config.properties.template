@@ -15,7 +15,9 @@ maxCP = 400
 # if autotransfer = true and you dont want some of the pokemon to not be transferred just uncomment the line of the pokemon
 # the names must be divided by a ","
 # if you want all pokemons to be transferred just leave it blank
-ignoredPokemon= EEVEE,MEWTWO,CHARMENDER
+ignoredPokemon=EEVEE,MEWTWO,CHARMENDER
+# list of pokemon you always want to transfer regardless of CP
+obligatoryTransfer=DODUO,RATTATA,CATERPIE,PIDGEY
 #List of pokemon names
 #MISSINGNO
 #BULBASAUR

@@ -24,6 +24,7 @@ public class Context {
     private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo;
     private MapObjects mapObjects;
     private List<String> ignoredPokemon;
+    private List<String> obligatoryTransfer;
 
     public Context(PokemonGo go, AtomicDouble lat, AtomicDouble lng, PlayerProfile profile, double speed, boolean walking, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo, OkHttpClient http) {
         this.go = go;
@@ -36,7 +37,16 @@ public class Context {
         this.http = http;
     }
 
-    public Context(PokemonGo go, AtomicDouble lat, AtomicDouble lng, PlayerProfile profile, double speed, boolean walking, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo, OkHttpClient http, List<String> ignoredPokemon, int maxCP) {
+    public Context(PokemonGo go,
+                   AtomicDouble lat,
+                   AtomicDouble lng,
+                   PlayerProfile profile,
+                   double speed, boolean walking,
+                   RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo,
+                   OkHttpClient http,
+                   List<String> ignoredPokemon,
+                   int maxCP,
+                   List<String> obligatoryTransfer) {
         this.go = go;
         this.lat = lat;
         this.lng = lng;
@@ -47,6 +57,7 @@ public class Context {
         this.http = http;
         this.ignoredPokemon = ignoredPokemon;
         this.maxCP = maxCP;
+        this.obligatoryTransfer = obligatoryTransfer;
     }
 
     public MapObjects getMapObjects() {
@@ -135,5 +146,13 @@ public class Context {
 
     public void setMaxCP(int maxCP) {
         this.maxCP = maxCP;
+    }
+
+    public List<String> getObligatoryTransfer() {
+        return obligatoryTransfer;
+    }
+
+    public void setObligatoryTransfer(List<String> obligatoryTransfer) {
+        this.obligatoryTransfer = obligatoryTransfer;
     }
 }

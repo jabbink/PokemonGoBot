@@ -114,16 +114,24 @@ fun main(args: Array<String>) {
         println("No autotransfer specified, defaulting to $autotransfer")
     }
 
-    if (autotransfer){
-        try{
-            properties.getProperty("ignoredPokemon").split(",").forEach{ip ->
+    if (autotransfer) {
+        try {
+            properties.getProperty("ignoredPokemon").split(",").forEach { ip ->
                 ignoredPokemon.add(ip)
             }
             ignoredPokemon.forEach { ip -> ip.trim() }
             println("Not transferring:")
             ignoredPokemon.forEach { ip -> println(ip) }
-        } catch (e: Exception){
-            println("No list of ignored pokemon found, transferring all pokemons")
+            properties.getProperty("obligatoryTransfer").split(",").forEach { ip ->
+                obligatoryTransfer.add(ip)
+            }
+            obligatoryTransfer.forEach { ip -> ip.trim() }
+            println("Always Transferring:")
+            obligatoryTransfer.forEach { ip ->
+                println(ip)
+            }
+        } catch (e: Exception) {
+            println("No list of ignored or obligatory pokemon found, transferring all pokemons")
         }
     }
 
@@ -150,7 +158,7 @@ fun main(args: Array<String>) {
         print(".")
         Thread.sleep(1000)
     }
-    context = Context(go, lat, lng, profile, speed, walking, auth, http, ignoredPokemon.toList(), maxCP)
+    context = Context(go, lat, lng, profile, speed, walking, auth, http, ignoredPokemon.toList(), maxCP, obligatoryTransfer.toList())
     println("Context built!")
 
     println("Pokecoin: ${profile!!.currencies.get(PlayerProfile.Currency.POKECOIN)}")
@@ -197,6 +205,7 @@ var maxCP = 400
 var autotransfer = false
 var walking = false
 var ignoredPokemon = mutableListOf<String>()
+var obligatoryTransfer = mutableListOf<String>()
 val lat = AtomicDouble()
 val lng = AtomicDouble()
 var profile: PlayerProfile? = null
