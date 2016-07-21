@@ -21,9 +21,13 @@ import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PTCLogin
 import okhttp3.OkHttpClient
+import ink.abb.pogo.scraper.Context
+import ink.abb.pogo.scraper.tasks.Release
+import java.awt.List
 import java.io.FileInputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -44,6 +48,7 @@ val pokeballItems = mapOf(Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, Pokeball.
         Pair(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
         Pair(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
         Pair(ItemIdOuterClass.ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
+var context: Context? = null
 
 /**
  * Allow all certificate to debug with https://github.com/bettse/mitmdump_decoder
@@ -123,7 +128,8 @@ fun main(args: Array<String>) {
         print(".")
         Thread.sleep(1000)
     }
-    println(".")
+    context = Context(go, lat, lng, profile, speed, walking, auth, http)
+    println("Context built!")
 
     println("Pokecoin: ${profile!!.currencies.get(PlayerProfile.Currency.POKECOIN)}")
     println("Stardust: ${profile!!.currencies.get(PlayerProfile.Currency.STARDUST)}")
@@ -201,9 +207,9 @@ fun walk(end: S2LatLng, speed: Double) {
 }
 
 fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
-    if (api.map.catchablePokemon.size > 0) {
-        val catchablePokemon = api.map.catchablePokemon.first()
-
+    val pokemon = api.map.catchablePokemon
+    if (pokemon.isNotEmpty()) {
+        val catchablePokemon = pokemon.first()
         var ball: ItemIdOuterClass.ItemId? = null
         try {
             val preferred_ball = ItemIdOuterClass.ItemId.valueOf(properties.getProperty("preferred_ball", "ITEM_POKE_BALL"));
@@ -225,7 +231,7 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
         }
 
         if (ball != null) {
-            val usedPokeball = pokeballItems.get(ball)
+            val usedPokeball = pokeballItems[ball]
             println("found pokemon ${catchablePokemon.pokemonId}")
             api.setLocation(lat.get(), lng.get(), 0.0)
             val encounterResult = catchablePokemon.encounterPokemon()
@@ -296,21 +302,7 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
     println("Profile update : ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP (${ratio}%) to LVL ${player.stats.level + 1}")
     if (player != null) {
         // TODO: The API allows to release pokemon in batches, the app does not
-        var transferredPokemon = false
-        val groupedPokemon = api.pokebank.pokemons.groupBy { it.pokemonId }
-        groupedPokemon.forEach {
-            val sorted = it.value.sortedByDescending { it.cp }
-
-            for ((index, pokemon) in sorted.withIndex()) {
-                if (index > 0 && pokemon.cp < 400) {
-                    println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
-                    pokemon.transferPokemon()
-                    transferredPokemon = true
-                }
-            }
-        }
-        if (transferredPokemon)
-            return
+        Release().run(context)
     }
 }
 
