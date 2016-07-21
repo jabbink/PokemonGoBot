@@ -9,14 +9,15 @@
 package ink.abb.pogo.scraper
 
 import POGOProtos.Inventory.ItemIdOuterClass
-import POGOProtos.Map.Fort.FortDataOuterClass
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import com.google.common.geometry.S2LatLng
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
+import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.MapObjects
+import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.auth.PTCLogin
 import okhttp3.OkHttpClient
@@ -37,10 +38,10 @@ import kotlin.concurrent.thread
 
 val properties = Properties()
 
-val pokeballItems = mapOf(Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, ItemIdOuterClass.ItemId.ITEM_POKE_BALL_VALUE),
-        Pair(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL, ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL_VALUE),
-        Pair(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL, ItemIdOuterClass.ItemId.ITEM_GREAT_BALL_VALUE),
-        Pair(ItemIdOuterClass.ItemId.ITEM_MASTER_BALL, ItemIdOuterClass.ItemId.ITEM_MASTER_BALL_VALUE))
+val pokeballItems = mapOf(Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
+        Pair(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
+        Pair(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
+        Pair(ItemIdOuterClass.ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
 
 /**
  * Allow all certificate to debug with https://github.com/bettse/mitmdump_decoder
@@ -164,9 +165,7 @@ fun walk(end: S2LatLng, speed: Double) {
     })
 }
 
-var usedPokestops = HashMap<String, Long>()
-
-var pokestops: Collection<FortDataOuterClass.FortData>? = null
+var pokestops: Collection<Pokestop>? = null
 
 fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
     if ((pokestops != null && pokestops!!.size < mapObjects?.pokestops?.size ?: 0) || (pokestops == null && mapObjects != null && mapObjects.pokestops != null)) {
@@ -175,7 +174,7 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
 
     if (mapObjects != null) {
         if (mapObjects.catchablePokemons.size > 0) {
-            val catchablePokemon = mapObjects.catchablePokemons.first()
+            val catchablePokemon = api.map.catchablePokemon.first()
 
             var ball: ItemIdOuterClass.ItemId? = null
             try {
@@ -198,13 +197,13 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
             }
 
             if (ball != null) {
+                val usedPokeball = pokeballItems.get(ball)
                 println("found pokemon ${catchablePokemon.pokemonId}")
                 api.setLocation(lat.get(), lng.get(), 0.0)
-                val encounterResult = api.map.encounterPokemon(catchablePokemon)
-                if (encounterResult.status == EncounterResponseOuterClass.EncounterResponse.Status.ENCOUNTER_SUCCESS) {
-
-                    println("encountering pokemon ${catchablePokemon.pokemonId}")
-                    val result = api.map.catchPokemon(catchablePokemon, 1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, pokeballItems.get(ball)!!)
+                val encounterResult = catchablePokemon.encounterPokemon()
+                if (encounterResult.wasSuccessful()) {
+                    println("encountered pokemon ${catchablePokemon.pokemonId}")
+                    val result = catchablePokemon.catchPokemon(usedPokeball)
 
                     if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS)
                         println("Caught a ${catchablePokemon.pokemonId} using a ${ball}")
@@ -225,15 +224,10 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
         })!!
 
         val nearbyPokestops = sortedPokestops.filter {
-            val location = S2LatLng.fromDegrees(it.latitude, it.longitude)
-            var self = S2LatLng.fromDegrees(lat.get(), lng.get())
-            val distance = self.getEarthDistance(location)
-            distance < 30 && usedPokestops.getOrElse(it.id, { 0 }) < System.currentTimeMillis()
+            it.canLoot()
         }
 
-        val nearestUnused = sortedPokestops.filter {
-            usedPokestops.getOrElse(it.id, { 0 }) < System.currentTimeMillis()
-        }?.first()
+        val nearestUnused = sortedPokestops.first()
 
         if (nearestUnused != null)
             walk(S2LatLng.fromDegrees(nearestUnused.latitude, nearestUnused.longitude), speed)
@@ -242,11 +236,7 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
             println("Found nearby pokestop")
             val closest = nearbyPokestops.first()
             api.setLocation(lat.get(), lng.get(), 0.0)
-            val result = api.map.searchFort(closest)
-            when (result.result) {
-                Result.SUCCESS, Result.INVENTORY_FULL -> usedPokestops.put(closest.id, result.cooldownCompleteTimestampMs)
-                Result.IN_COOLDOWN_PERIOD -> usedPokestops.put(closest.id, System.currentTimeMillis() + 5 * 60 * 1000)
-            }
+            val result = closest.loot()
             when (result.result) {
                 Result.SUCCESS -> println("Activated portal ${closest.id}")
                 Result.INVENTORY_FULL -> {
