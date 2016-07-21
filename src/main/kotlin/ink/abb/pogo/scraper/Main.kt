@@ -105,6 +105,12 @@ fun main(args: Array<String>) {
         println("No speed specified, defaulting to $speed")
     }
 
+    try {
+        autotransfer = properties.getProperty("autotransfer").toBoolean()
+    } catch (e: Exception) {
+        println("No autotransfer specified, defaulting to $autotransfer")
+    }
+
     var shouldDropItems = false
     try {
         shouldDropItems = properties.getProperty("drop_items").toBoolean()
@@ -171,7 +177,7 @@ fun randomLatLng(): Double {
 }
 
 var speed = 2.778
-
+var autotransfer = false
 var walking = false
 
 val lat = AtomicDouble()
@@ -300,7 +306,7 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
     val curLevelXP = player.stats.experience - player.stats.prevLevelXp
     val ratio = DecimalFormat("##.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
     println("Profile update : ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP (${ratio}%) to LVL ${player.stats.level + 1}")
-    if (player != null) {
+    if (player != null && autotransfer) {
         // TODO: The API allows to release pokemon in batches, the app does not
         Release().run(context)
     }
