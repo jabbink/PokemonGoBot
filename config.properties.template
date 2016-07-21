@@ -1,6 +1,10 @@
-# PTC Login credentials
+# PTC/Google login credentials
 username=
 password=
 latitude=
 longitude=
-prefered_ball=ITEM_POKE_BALL
+preferred_ball=ITEM_POKE_BALL
+# should the bot EVER drop items (true/false)
+drop_items=true
+# Meters per second
+speed=2.778
