@@ -23,6 +23,7 @@ import okhttp3.OkHttpClient
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.security.cert.X509Certificate
+import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.HostnameVerifier
@@ -263,7 +264,10 @@ fun processMapObjects(api: PokemonGo, mapObjects: MapObjects?) {
         }
 
         val player = api.getPlayerProfile(true)
-        println("Profile update : ${player.stats.experience} XP on LVL ${player.stats.level}")
+        val nextXP = player.stats.nextLevelXp - player.stats.prevLevelXp
+        val curLevelXP = player.stats.experience - player.stats.prevLevelXp
+        val ratio = DecimalFormat("##.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
+        println("Profile update : ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP (${ratio}%) to LVL ${player.stats.level + 1}")
         if (player != null) {
             // TODO: The API allows to release pokemon in batches, the app does not
             var transferredPokemon = false
