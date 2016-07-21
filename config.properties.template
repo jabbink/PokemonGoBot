@@ -4,9 +4,25 @@ password=
 latitude=
 longitude=
 preferred_ball=ITEM_POKE_BALL
+
 # should the bot EVER drop items (true/false)
 drop_items=true
+
+# max number of each item that the bot should keep if "drop_items" is ennabled
+# use -1 in a item to never drop this specific item
+item_revive=8
+item_max_revive=8
+item_potion=5
+item_super_potion=5
+item_hyper_potion=5
+item_max_potion=5
+item_poke_ball=20
+item_great_ball=20
+item_ultra_ball=20
+item_master_ball=20
+
 # Meters per second
 speed=2.778
+
 # should the bot auto transfer duplicate pokemon
 autotransfer=false

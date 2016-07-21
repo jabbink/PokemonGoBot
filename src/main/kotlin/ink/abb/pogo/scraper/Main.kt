@@ -118,6 +118,23 @@ fun main(args: Array<String>) {
         println("No item drop policy specified, defaulting to $shouldDropItems")
     }
 
+    if(shouldDropItems){
+        HashMap(uselessItems).forEach {
+            val itemName = it.key.name.toLowerCase()
+
+            try {
+                val newValue = properties.getProperty(itemName).toInt()
+
+                if(newValue < -1)
+                    println("Max item specified for $itemName is invalid, defaulting to ${uselessItems.get(it.key)}")
+
+                uselessItems.put(it.key, newValue)
+            } catch (e: Exception) {
+                println("No max item for $itemName specified, defaulting to ${uselessItems.get(it.key)}")
+            }
+        }
+    }
+
     val username = properties.getProperty("username")
     var auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
     if (username.contains('@')) {
@@ -312,7 +329,7 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
     }
 }
 
-val uselessItems = mapOf(
+val uselessItems = mutableMapOf(
         Pair(ItemId.ITEM_REVIVE, 8),
         Pair(ItemId.ITEM_MAX_REVIVE, 8),
         Pair(ItemId.ITEM_POTION, 5),
@@ -329,7 +346,7 @@ fun dropUselessItems(api: PokemonGo) {
     uselessItems.forEach {
         val item = api.bag.getItem(it.key)
         val count = item.count - it.value
-        if (count > 0) {
+        if (it.value != -1 && count > 0) {
             val result = api.bag.removeItem(it.key, count)
             if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
                 println("Dropped ${count}x ${it.key.name}")
