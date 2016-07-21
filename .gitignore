@@ -74,4 +74,4 @@ crashlytics-build.properties
 fabric.properties
 
 # PTC Login credentials
-src/main/resources/config.properties
+config.properties
