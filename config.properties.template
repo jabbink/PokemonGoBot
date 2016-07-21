@@ -10,3 +10,5 @@ drop_items=true
 speed=2.778
 # should the bot auto transfer duplicate pokemon
 autotransfer=false
+# Minimum CP to keep a pokemon
+transfer_cp_threshold=400
