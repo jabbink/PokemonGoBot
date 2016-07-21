@@ -86,8 +86,26 @@ fun main(args: Array<String>) {
         properties.load(it)
     }
 
-    lat.set(properties.getProperty("latitude").toDouble())
-    lng.set(properties.getProperty("longitude").toDouble())
+    try {
+        lat.set(properties.getProperty("latitude").toDouble())
+        lng.set(properties.getProperty("longitude").toDouble())
+    } catch (e: Exception) {
+        println("Starting location not set in config.properties")
+        System.exit(1)
+    }
+
+    try {
+        speed = properties.getProperty("speed").toDouble()
+    } catch (e: Exception) {
+        println("No speed specified, defaulting to $speed")
+    }
+
+    var shouldDropItems = false
+    try {
+        shouldDropItems = properties.getProperty("drop_items").toBoolean()
+    } catch (e: Exception) {
+        println("No item drop policy specified, defaulting to $shouldDropItems")
+    }
 
     val username = properties.getProperty("username")
     var auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
@@ -135,7 +153,9 @@ fun main(args: Array<String>) {
             go.setLocation(lat.get() + randomLatLng(), lng.get() + randomLatLng(), 0.0)
             reply = go.map.getMapObjects(0)
             processMapObjects(go, pokestops)
-            dropUselessItems(go)
+            if (shouldDropItems) {
+                dropUselessItems(go)
+            }
         })
     })
 }
@@ -144,7 +164,7 @@ fun randomLatLng(): Double {
     return Math.random() * 0.0001 - 0.00005
 }
 
-val speed = 2.778 * 5
+var speed = 2.778
 
 var walking = false
 
@@ -186,20 +206,20 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
 
         var ball: ItemIdOuterClass.ItemId? = null
         try {
-            val preferedBall = ItemIdOuterClass.ItemId.valueOf(properties.getProperty("prefered_ball", "ITEM_POKE_BALL"));
-            var item = api.bag.getItem(preferedBall)
+            val preferred_ball = ItemIdOuterClass.ItemId.valueOf(properties.getProperty("preferred_ball", "ITEM_POKE_BALL"));
+            var item = api.bag.getItem(preferred_ball)
 
             // if we dont have our prefered pokeball, try fallback to other
             if (item == null || item.count == 0)
                 for (other in pokeballItems) {
-                    if (preferedBall == other) continue
+                    if (preferred_ball == other) continue
 
                     item = api.bag.getItem(other.key);
                     if (item != null && item.count > 0)
                         ball = other.key
                 }
             else
-                ball = preferedBall
+                ball = preferred_ball
         } catch (e: Exception) {
             throw e;
         }
