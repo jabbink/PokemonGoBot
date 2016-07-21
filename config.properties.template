@@ -7,4 +7,6 @@ preferred_ball=ITEM_POKE_BALL
 # should the bot EVER drop items (true/false)
 drop_items=true
 # Meters per second
-speed=2.778
+speed=3
+# should the bot auto transfer duplicate pokemon
+autotransfer=false
