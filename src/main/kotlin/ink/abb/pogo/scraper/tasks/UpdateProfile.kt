@@ -20,6 +20,6 @@ class UpdateProfile : Task {
         val nextXP = player.stats.nextLevelXp - player.stats.prevLevelXp
         val curLevelXP = player.stats.experience - player.stats.prevLevelXp
         val ratio = DecimalFormat("##.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
-        println("Profile update : ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
+        Log.normal("Profile update : ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
     }
 }
