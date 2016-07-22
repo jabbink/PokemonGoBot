@@ -111,45 +111,11 @@ fun main(args: Array<String>) {
         println("No autotransfer specified, defaulting to $autotransfer")
     }
 
+    var shouldDropItems = false
     try {
         shouldDropItems = properties.getProperty("drop_items").toBoolean()
     } catch (e: Exception) {
         println("No item drop policy specified, defaulting to $shouldDropItems")
-    }
-
-    try {
-        walkingNearestUnused = properties.getProperty("display_walking_nearest_unused").toBoolean()
-    } catch (e: Exception) {
-        println("No display_walking_nearest_unused policy specified, defaulting to $walkingNearestUnused")
-    }
-
-    try {
-        displayPokestopRewards = properties.getProperty("display_pokestop_rewards").toBoolean()
-    } catch (e: Exception) {
-        println("No display_pokestop_rewards policy specified, defaulting to $displayPokestopRewards")
-    }
-
-    try {
-        displayPokemonCatchRewards = properties.getProperty("display_pokemon_catch_rewards").toBoolean()
-    } catch (e: Exception) {
-        println("No display_pokemon_catch_rewards policy specified, defaulting to $displayPokemonCatchRewards")
-    }
-
-    if(shouldDropItems){
-        HashMap(uselessItems).forEach {
-            val itemName = it.key.name.toLowerCase()
-
-            try {
-                val newValue = properties.getProperty(itemName).toInt()
-
-                if(newValue < -1)
-                    println("Max item specified for $itemName is invalid, defaulting to ${uselessItems.get(it.key)}")
-
-                uselessItems.put(it.key, newValue)
-            } catch (e: Exception) {
-                println("No max item for $itemName specified, defaulting to ${uselessItems.get(it.key)}")
-            }
-        }
     }
 
     val username = properties.getProperty("username")
@@ -210,13 +176,9 @@ fun randomLatLng(): Double {
     return Math.random() * 0.0001 - 0.00005
 }
 
-var shouldDropItems = false
 var speed = 2.778
 var autotransfer = false
 var walking = false
-var walkingNearestUnused = false
-var displayPokestopRewards = false
-var displayPokemonCatchRewards = false
 
 val lat = AtomicDouble()
 val lng = AtomicDouble()
@@ -243,7 +205,7 @@ fun walk(end: S2LatLng, speed: Double) {
         lng.addAndGet(deltaLng)
         remainingSteps--
         if (remainingSteps <= 0) {
-            println("Destination reached")
+            println("destination reached")
             walking = false
             cancel()
         }
@@ -276,25 +238,18 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
 
         if (ball != null) {
             val usedPokeball = pokeballItems[ball]
-            println("### Found pokemon ${catchablePokemon.pokemonId}")
+            println("found pokemon ${catchablePokemon.pokemonId}")
             api.setLocation(lat.get(), lng.get(), 0.0)
             val encounterResult = catchablePokemon.encounterPokemon()
             if (encounterResult.wasSuccessful()) {
-                println("Encountered pokemon ${catchablePokemon.pokemonId}")
+                println("encountered pokemon ${catchablePokemon.pokemonId}")
                 val result = catchablePokemon.catchPokemon(usedPokeball)
 
                 if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS)
                     println("Caught a ${catchablePokemon.pokemonId} using a ${ball}")
-                    if(displayPokemonCatchRewards) {
-                        println("Catch Rewards:")
-                        println(" - ${result.xpList.sum()}x XP")
-                        println(" - ${result.candyList.sum()}x Candy")
-                        println(" - ${result.stardustList.sum()}x Stardust")
-                    }
                 else
                     println("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
             }
-            println("###")
         }
 
     }
@@ -317,10 +272,6 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
     }
 
     if (nearestUnused.size > 0) {
-        val pokestopName = nearestUnused.first().details.name
-
-        if (walkingNearestUnused)
-            println("Walking to pokestop \"$pokestopName\"")
         walk(S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), speed)
 
         /*val pokestop = com.pokegoapi.google.common.geometry.S2LatLng.fromDegrees(nearestUnused.latitude, nearestUnused.longitude)
@@ -330,40 +281,23 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
     }
 
     if (nearbyPokestops.size > 0) {
-        println("### Found nearby pokestop")
+        println("Found nearby pokestop")
         val closest = nearbyPokestops.first()
         api.setLocation(lat.get(), lng.get(), 0.0)
         val result = closest.loot()
         when (result.result) {
-            Result.SUCCESS -> {
-                println("Activated pokestop \"${closest.details.name}\"")
-                if(displayPokestopRewards) {
-                    println("Pokestop Rewards:")
-                    println(" - ${result.experience}x XP")
-                    val rewardsMap = HashMap<ItemId, Int>()
-                    result.itemsAwarded.forEach {
-                        if (!rewardsMap.containsKey(it.itemId))
-                            rewardsMap.put(it.itemId, 0)
-                        rewardsMap.put(it.itemId, rewardsMap.get(it.itemId)!!.plus(it.itemCount))
-                    }
-
-                    rewardsMap.forEach {
-                        println(" - ${it.value}x ${it.key}")
-                    }
-                }
-            }
+            Result.SUCCESS -> println("Activated portal ${closest.id}")
             Result.INVENTORY_FULL -> {
-                println("Activated pokestop ${closest.details.name}, but inventory is full")
+                println("Activated portal ${closest.id}, but inventory is full")
             }
             Result.OUT_OF_RANGE -> {
                 val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
                 val self = S2LatLng.fromDegrees(lat.get(), lng.get())
                 val distance = self.getEarthDistance(location)
-                println("Pokestop out of range; distance: $distance")
+                println("Portal out of range; distance: $distance")
             }
             else -> println(result.result)
         }
-        println("###")
         return
     }
 
@@ -378,7 +312,7 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
     }
 }
 
-val uselessItems = mutableMapOf(
+val uselessItems = mapOf(
         Pair(ItemId.ITEM_REVIVE, 8),
         Pair(ItemId.ITEM_MAX_REVIVE, 8),
         Pair(ItemId.ITEM_POTION, 5),
@@ -395,7 +329,7 @@ fun dropUselessItems(api: PokemonGo) {
     uselessItems.forEach {
         val item = api.bag.getItem(it.key)
         val count = item.count - it.value
-        if (it.value != -1 && count > 0) {
+        if (count > 0) {
             val result = api.bag.removeItem(it.key, count)
             if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
                 println("Dropped ${count}x ${it.key.name}")
