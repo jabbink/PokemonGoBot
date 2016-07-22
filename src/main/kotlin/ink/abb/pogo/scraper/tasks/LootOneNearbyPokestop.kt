@@ -29,11 +29,16 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
             val result = closest.loot()
             when (result.result) {
                 Result.SUCCESS -> {
-                    val items = result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }
-                    println("Looted pokestop ${closest.id}: $items")
+                    print("Looted pokestop ${closest.id}")
+                    if(settings.shouldDisplayPokestopSpinRewards)
+                        print(": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}")
+                    print("\n")
                 }
                 Result.INVENTORY_FULL -> {
-                    println("Looted pokestop ${closest.id}, but inventory is full")
+                    print("Looted pokestop ${closest.id}, but inventory is full")
+                    if(settings.shouldDisplayPokestopSpinRewards)
+                        print(": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}")
+                    print("\n")
                 }
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)

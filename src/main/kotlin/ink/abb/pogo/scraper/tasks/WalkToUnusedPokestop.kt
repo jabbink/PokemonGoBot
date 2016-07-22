@@ -33,6 +33,8 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
         }
 
         if (nearestUnused.size > 0) {
+            if (settings.shouldDisplayWalkingToNearestUnused)
+                println("Walking to pokestop \"${nearestUnused.first().details.name}\"")
             walk(ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed)
         }
     }
