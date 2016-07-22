@@ -46,12 +46,12 @@ class Settings(val properties: Properties) {
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
     val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
     val ignoredPokemon = if (shouldAutoTransfer) {
-        getPropertyIfSet("Never transfer these Pokemon", "ignoredPokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",")
+        getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",")
     } else {
         listOf()
     }
     val obligatoryTransfer = if (shouldAutoTransfer) {
-        getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatoryTransfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
+        getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
     } else {
         listOf()
     }
