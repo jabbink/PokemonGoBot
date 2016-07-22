@@ -24,7 +24,7 @@ class DropUselessItems : Task {
         settings.uselessItems.forEach {
             val item = ctx.api.inventories.itemBag.getItem(it.key)
             val count = item.count - it.value
-            if (count > 0) {
+            if (it.value != -1 &&count > 0) {
                 val result = ctx.api.inventories.itemBag.removeItem(it.key, count)
                 if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
                     ctx.itemStats.second.getAndAdd(count)
