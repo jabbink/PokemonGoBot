@@ -14,7 +14,7 @@ speed=2.778
 autotransfer=false
 # Minimum CP to keep a pokemon
 transfer_cp_threshold=400
-# if autotransfer = true and you dont want some of the pokemon to not be transferred just uncomment the line of the pokemon
+# list of pokemon you don't want to transfer regardless of CP
 # the names must be divided by a ","
 # if you want all pokemons to be transferred just leave it blank
 ignoredPokemon=EEVEE,MEWTWO,CHARMENDER
