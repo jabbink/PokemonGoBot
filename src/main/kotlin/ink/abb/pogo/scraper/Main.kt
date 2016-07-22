@@ -72,22 +72,15 @@ fun main(args: Array<String>) {
     builder.readTimeout(60, TimeUnit.SECONDS)
     builder.writeTimeout(60, TimeUnit.SECONDS)
     val http = builder.build()
-    val properties = Properties()
-    val settings = Settings(properties)
 
+    val properties = Properties()
     FileInputStream("config.properties").use {
         properties.load(it)
     }
 
-    try {
-        settings.getLatitude()
-        settings.getLongitude()
-    } catch (e: Exception) {
-        println("Starting latitude/longitude location not set in config.properties")
-        System.exit(1)
-    }
+    val settings = Settings(properties)
 
-    val username = settings.getUsername()
+    val username = settings.username
     val password = settings.getPassword()
 
     val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
@@ -96,45 +89,41 @@ fun main(args: Array<String>) {
     } else {
         auth = PTCLogin(http).login(username, password)
     }
-    println("Logged in as ${username}")
+    println("Logged in as $username")
+    val go = PokemonGo(auth, http)
 
-    Bot(auth, http, settings).run()
+    print("Getting default data from pogo server")
+    while (go.playerProfile == null) {
+        print(".")
+        Thread.sleep(1000)
+    }
+    println(".")
+
+    Bot(go, settings).run()
 }
 
-class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http: OkHttpClient, val settings: Settings) {
-    val lat = AtomicDouble(settings.getLatitude())
-    val lng = AtomicDouble(settings.getLongitude())
+class Bot(val go: PokemonGo, val settings: Settings) {
 
-    val shouldDropItems = settings.shouldDropItems()
-    val speed = settings.getSpeed()
-    val autotransfer = settings.shouldAutoTransfer()
-
-    var walking = false
-    var profile: PlayerProfile? = null
-    var context: Context? = null
+    var ctx = Context(
+        go,
+        go.playerProfile,
+        AtomicDouble(settings.startingLatitude),
+        AtomicDouble(settings.startingLongitude)
+    )
 
     fun run() {
-        print("Get default data from pogo server")
-        val go = PokemonGo(auth, http)
-        while (profile == null) {
-            profile = go.playerProfile
-            print(".")
-            Thread.sleep(1000)
-        }
-        println(".")
-        context = Context(go, lat, lng, profile, speed, walking, auth, http)
 
         println()
-        println("Name: ${profile!!.username}")
-        println("Team: ${profile!!.team}")
-        println("Pokecoin: ${profile!!.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        println("Pokecoin: ${profile!!.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        println("Stardust: ${profile!!.currencies.get(PlayerProfile.Currency.STARDUST)}")
-        println("Level ${profile!!.stats.level}, Experience ${profile!!.stats.experience}")
+        println("Name: ${ctx.profile.username}")
+        println("Team: ${ctx.profile.team}")
+        println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
+        println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
+        println("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
+        println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
         println()
 
-        go.setLocation(lat.get() + randomLatLng(), lng.get() + randomLatLng(), 0.0)
-        println("Getting map of ${lat.get()} ${lng.get()}")
+        go.setLocation(ctx.lat.get() + randomLatLng(), ctx.lng.get() + randomLatLng(), 0.0)
+        println("Getting map of ${ctx.lat.get()} ${ctx.lng.get()}")
 
         go.pokebank.pokemons.map { "Got ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP" }.forEach { println(it) }
 
@@ -153,11 +142,11 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
         fixedRateTimer("GetMapObjects", false, 5000, 5000, action = {
             thread(block = {
                 // query a small area to keep alive
-                println("Getting map of ${lat.get()} ${lng.get()}")
-                go.setLocation(lat.get() + randomLatLng(), lng.get() + randomLatLng(), 0.0)
+                println("Getting map of ${ctx.lat.get()} ${ctx.lng.get()}")
+                go.setLocation(ctx.lat.get() + randomLatLng(), ctx.lng.get() + randomLatLng(), 0.0)
                 reply = go.map.getMapObjects(0)
                 processMapObjects(go, pokestops)
-                if (shouldDropItems) {
+                if (settings.shouldDropItems) {
                     dropUselessItems(go)
                 }
             })
@@ -169,11 +158,11 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
     }
 
     fun walk(end: S2LatLng, speed: Double) {
-        if (walking)
+        if (ctx.walking)
             return
 
-        walking = true
-        val start = S2LatLng.fromDegrees(lat.get(), lng.get())
+        ctx.walking = true
+        val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
         val timeout = 200L
@@ -185,12 +174,12 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
         var remainingSteps = stepsRequired
 
         fixedRateTimer("Walk", false, 0, timeout, action = {
-            lat.addAndGet(deltaLat)
-            lng.addAndGet(deltaLng)
+            ctx.lat.addAndGet(deltaLat)
+            ctx.lng.addAndGet(deltaLng)
             remainingSteps--
             if (remainingSteps <= 0) {
                 println("destination reached")
-                walking = false
+                ctx.walking = false
                 cancel()
             }
         })
@@ -202,7 +191,7 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
             val catchablePokemon = pokemon.first()
             var ball: ItemIdOuterClass.ItemId? = null
             try {
-                val preferred_ball = settings.getPreferredBall()
+                val preferred_ball = settings.preferredBall
                 var item = api.bag.getItem(preferred_ball)
 
                 // if we dont have our prefered pokeball, try fallback to other
@@ -223,7 +212,7 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
             if (ball != null) {
                 val usedPokeball = settings.pokeballItems[ball]
                 println("found pokemon ${catchablePokemon.pokemonId}")
-                api.setLocation(lat.get(), lng.get(), 0.0)
+                api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
                 val encounterResult = catchablePokemon.encounterPokemon()
                 if (encounterResult.wasSuccessful()) {
                     println("encountered pokemon ${catchablePokemon.pokemonId}")
@@ -241,7 +230,7 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
         val sortedPokestops = pokestops.sortedWith(Comparator { a, b ->
             val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)
             val locationB = S2LatLng.fromDegrees(b.latitude, b.longitude)
-            val self = S2LatLng.fromDegrees(lat.get(), lng.get())
+            val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
             val distanceA = self.getEarthDistance(locationA)
             val distanceB = self.getEarthDistance(locationB)
             distanceA.compareTo(distanceB)
@@ -256,13 +245,13 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
         }
 
         if (nearestUnused.size > 0) {
-            walk(S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), speed)
+            walk(S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed)
         }
 
         if (nearbyPokestops.size > 0) {
             println("Found nearby pokestop")
             val closest = nearbyPokestops.first()
-            api.setLocation(lat.get(), lng.get(), 0.0)
+            api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
             val result = closest.loot()
             when (result.result) {
                 Result.SUCCESS -> println("Activated portal ${closest.id}")
@@ -271,7 +260,7 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
                 }
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
-                    val self = S2LatLng.fromDegrees(lat.get(), lng.get())
+                    val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                     val distance = self.getEarthDistance(location)
                     println("Portal out of range; distance: $distance")
                 }
@@ -285,9 +274,8 @@ class Bot(val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo, val http
         val curLevelXP = player.stats.experience - player.stats.prevLevelXp
         val ratio = DecimalFormat("##.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
         println("Profile update : ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP (${ratio}%) to LVL ${player.stats.level + 1}")
-        if (player != null && autotransfer) {
-            // TODO: The API allows to release pokemon in batches, the app does not
-            Release().run(context)
+        if (player != null && settings.shouldAutoTransfer) {
+            Release().run(ctx)
         }
     }
 

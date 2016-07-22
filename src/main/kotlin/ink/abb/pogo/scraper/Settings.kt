@@ -29,40 +29,31 @@ class Settings(val properties: Properties) {
             Pair(ItemId.ITEM_RAZZ_BERRY, 50)
     )
 
-    fun getLatitude(): Double {
-        return properties.getProperty("latitude").toDouble()
-    }
+    val startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble)
+    val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
 
-    fun getLongitude(): Double {
-        return properties.getProperty("longitude").toDouble()
-    }
-
-    fun getUsername(): String {
-        return properties.getProperty("username")
-    }
+    val username = properties.getProperty("username")
+    val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
+    val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
+    val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
+    val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
 
     fun getPassword(): String {
-        return String(Base64.getDecoder().decode(if(properties.containsKey("pt asassword")) properties.getProperty("password") else properties.getProperty("base64_password")))
+        return String(Base64.getDecoder().decode(if(properties.containsKey("password")) properties.getProperty("password") else properties.getProperty("base64_password")))
     }
 
-    fun getSpeed(): Double {
-        return getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
-    }
+    private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
+        val settingString = "$description setting (\"$property\")"
 
-    fun shouldDropItems(): Boolean {
-        return getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
-    }
+        if(!properties.containsKey(property)) {
+            println("$settingString not specified in config.properties!")
+            System.exit(1)
+        }
 
-    fun getPreferredBall(): ItemId {
-        return getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
-    }
-
-    fun shouldAutoTransfer(): Boolean {
-        return getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
+        return conversion(properties.getProperty(property))
     }
 
     private fun <T> getPropertyIfSet(description: String, property: String, default: T, conversion: (String) -> T): T {
-
         val settingString = "$description setting (\"$property\")"
         val defaulting = "defaulting to \"$default\""
 
