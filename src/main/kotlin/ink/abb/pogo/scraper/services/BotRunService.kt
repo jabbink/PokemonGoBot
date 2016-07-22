@@ -79,13 +79,13 @@ class BotRunService {
     private fun save(settings: Settings) {
         root.mkdirs()
 
-        File(root, "${settings.name}-bot.json").bufferedWriter().use {
+        File(root, "${settings.name}.json").bufferedWriter().use {
             it.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(settings))
         }
     }
 
     fun load(name: String): Settings {
-        val save = File(root, "$name-bot.json")
+        val save = File(root, "$name.json")
         if(!save.isFile) {
             throw IllegalArgumentException("No save file found for name: $name")
         }

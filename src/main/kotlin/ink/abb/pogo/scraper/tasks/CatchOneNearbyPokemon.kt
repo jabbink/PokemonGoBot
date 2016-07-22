@@ -10,12 +10,19 @@ package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Inventory.ItemIdOuterClass
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
+import com.pokegoapi.api.inventory.Pokeball
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 
 class CatchOneNearbyPokemon : Task {
+
+    val pokeballItems: Map<ItemIdOuterClass.ItemId, Pokeball> = mapOf(Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
+        Pair(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
+        Pair(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
+        Pair(ItemIdOuterClass.ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val pokemon = ctx.api.map.catchablePokemon
 
@@ -28,7 +35,7 @@ class CatchOneNearbyPokemon : Task {
 
                 // if we dont have our prefered pokeball, try fallback to other
                 if (item == null || item.count == 0)
-                    for (other in settings.pokeballItems) {
+                    for (other in pokeballItems) {
                         if (preferred_ball == other) continue
 
                         item = ctx.api.bag.getItem(other.key);
@@ -42,7 +49,7 @@ class CatchOneNearbyPokemon : Task {
             }
 
             if (ball != null) {
-                val usedPokeball = settings.pokeballItems[ball]
+                val usedPokeball = pokeballItems[ball]
                 println("Found pokemon ${catchablePokemon.pokemonId}")
                 ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
                 val encounterResult = catchablePokemon.encounterPokemon()

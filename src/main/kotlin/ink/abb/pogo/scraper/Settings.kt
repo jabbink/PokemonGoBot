@@ -1,14 +1,14 @@
 package ink.abb.pogo.scraper
 
-import POGOProtos.Inventory.ItemIdOuterClass
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.pokegoapi.api.inventory.Pokeball
 
 /**
  * @author Andrew Potter (ddcapotter)
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Settings(
     val name: String,
     val startingLatitude: Double,
@@ -24,11 +24,6 @@ data class Settings(
     val transferCPThreshold: Int,
     val ignoredPokemon: List<String>,
     val obligatoryTransfer: List<String>,
-
-    val pokeballItems: Map<ItemId, Pokeball> = mapOf(Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
-        Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
-        Pair(ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
-        Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL)),
 
     val uselessItems: Map<ItemId, Int> = mapOf(
         Pair(ItemId.ITEM_REVIVE, 20),
@@ -49,6 +44,7 @@ data class Settings(
         JsonSubTypes.Type(value = GoogleCredentials::class, name = "google"),
         JsonSubTypes.Type(value = PokemonTrainersClubCredentials::class, name = "PTC")
     )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     interface Credentials
 
     data class GoogleCredentials(var token: String) : Credentials
