@@ -18,20 +18,23 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
         }
 
         if (nearbyPokestops.size > 0) {
-            println("Found nearby pokestop")
             val closest = nearbyPokestops.first()
+            println("Looting nearby pokestop ${closest.id}")
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
             val result = closest.loot()
             when (result.result) {
-                Result.SUCCESS -> println("Activated portal ${closest.id}")
+                Result.SUCCESS -> {
+                    val items = result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }
+                    println("Looted pokestop ${closest.id}: $items")
+                }
                 Result.INVENTORY_FULL -> {
-                    println("Activated portal ${closest.id}, but inventory is full")
+                    println("Looted pokestop ${closest.id}, but inventory is full")
                 }
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
                     val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                     val distance = self.getEarthDistance(location)
-                    println("Portal out of range; distance: $distance")
+                    println("Pokestop out of range; distance: $distance")
                 }
                 else -> println(result.result)
             }
