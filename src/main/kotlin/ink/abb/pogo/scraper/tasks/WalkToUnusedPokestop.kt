@@ -47,7 +47,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
-        println("Walking to $end in $stepsRequired steps.")
+        println("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
         fixedRateTimer("Walk", false, 0, timeout, action = {
