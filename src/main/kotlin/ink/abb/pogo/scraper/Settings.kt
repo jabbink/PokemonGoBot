@@ -46,7 +46,7 @@ class Settings(val properties: Properties) {
     val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
-    val transferIVhreshold = getPropertyIfSet("Minimum IV to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)
+    val transferIVthreshold = getPropertyIfSet("Minimum IV to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)
     val ignoredPokemon = if (shouldAutoTransfer) {
         getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",")
     } else {
