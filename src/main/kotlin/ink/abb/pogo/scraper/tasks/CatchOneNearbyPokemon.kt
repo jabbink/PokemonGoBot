@@ -55,7 +55,7 @@ class CatchOneNearbyPokemon : Task {
                         var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} using $ball"
 
                         if(settings.shouldDisplayPokemonCatchRewards)
-                            message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy,${result.stardustList.sum()}x Stardust]"
+                            message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy, ${result.stardustList.sum()}x Stardust]"
                         Log.green(message)
 
                     }else
