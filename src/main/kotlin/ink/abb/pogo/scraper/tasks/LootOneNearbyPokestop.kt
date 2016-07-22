@@ -24,17 +24,20 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
 
         if (nearbyPokestops.size > 0) {
             val closest = nearbyPokestops.first()
-            println("Looting nearby pokestop ${closest.id}")
+            Log.normal("Looting nearby pokestop ${closest.id}")
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
             val result = closest.loot()
             when (result.result) {
                 Result.SUCCESS -> {
+                    val items = result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }
+                    Log.normal("Looted pokestop ${closest.id}: $items")
                     print("Looted pokestop ${closest.id}")
                     if(settings.shouldDisplayPokestopSpinRewards)
                         print(": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}")
                     print("\n")
                 }
                 Result.INVENTORY_FULL -> {
+                    Log.red("Looted pokestop ${closest.id}, but inventory is full")
                     print("Looted pokestop ${closest.id}, but inventory is full")
                     if(settings.shouldDisplayPokestopSpinRewards)
                         print(": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}")
@@ -44,7 +47,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
                     val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                     val distance = self.getEarthDistance(location)
-                    println("Pokestop out of range; distance: $distance")
+                    Log.red("Pokestop out of range; distance: $distance")
                 }
                 else -> println(result.result)
             }

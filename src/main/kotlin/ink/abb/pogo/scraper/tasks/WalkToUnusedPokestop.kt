@@ -49,7 +49,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
-        println("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
+        Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
         fixedRateTimer("Walk", false, 0, timeout, action = {
@@ -57,7 +57,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
             ctx.lng.addAndGet(deltaLng)
             remainingSteps--
             if (remainingSteps <= 0) {
-                println("Destination reached.")
+                Log.normal("Destination reached.")
                 ctx.walking.set(false)
                 cancel()
             }
