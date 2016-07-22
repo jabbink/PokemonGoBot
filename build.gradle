@@ -21,8 +21,8 @@ mainClassName = 'ink.abb.pogo.scraper.MainKt'
 sourceCompatibility = 1.5
 
 repositories {
-    mavenCentral()
     maven { url "https://jitpack.io" }
+    maven { url "http://uk.maven.org/maven2" }
 }
 
 dependencies {
