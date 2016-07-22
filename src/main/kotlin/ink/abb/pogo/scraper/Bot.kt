@@ -37,7 +37,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
         println("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
         println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        println()
+        println("Pokebank ${ctx.api.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
+        //println("Inventory bag ${ctx.api.bag}")
 
         api.pokebank.pokemons.map {
             var IV = ((it.individualStamina + it.individualAttack + it.individualDefense) * 100) / 45
