@@ -27,6 +27,10 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
             Log.normal("Looting nearby pokestop ${closest.id}")
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
             val result = closest.loot()
+
+            if (result?.itemsAwarded != null) {
+                ctx.itemStats.first.getAndAdd(result.itemsAwarded.size)
+            }
             when (result.result) {
                 Result.SUCCESS -> {
                     var message = "Looted pokestop ${closest.id}"

@@ -51,14 +51,16 @@ class CatchOneNearbyPokemon : Task {
                     val result = catchablePokemon.catchPokemon(usedPokeball)
 
                     if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                        ctx.pokemonStats.first.andIncrement
                         var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} using $ball"
 
                         if(settings.shouldDisplayPokemonCatchRewards)
                             message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy,${result.stardustList.sum()}x Stardust]"
-
                         Log.green(message)
+
                     }else
                         Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+                    }
                 }
             }
 

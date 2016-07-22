@@ -12,6 +12,8 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.tasks.*
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
@@ -21,7 +23,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             api,
             api.playerProfile,
             AtomicDouble(settings.startingLatitude),
-            AtomicDouble(settings.startingLongitude)
+            AtomicDouble(settings.startingLongitude),
+            AtomicLong(api.playerProfile.stats.experience),
+            Pair(AtomicInteger(0), AtomicInteger(0)),
+            Pair(AtomicInteger(0), AtomicInteger(0))
     )
 
     fun run() {
