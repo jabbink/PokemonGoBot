@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.*
+
 class Log {
 
     companion object {
@@ -9,28 +12,30 @@ class Log {
         private val white_ = "\u001B[37m"
         private val reset = "\u001B[0m"
 
+        var format = SimpleDateFormat("dd MMM HH:mm:ss")
+
         fun green(text: String) {
-            println(green_ + text + reset)
+            println("$green_${format.format(Date())}: $text $reset")
         }
 
         fun normal(text: String) {
-            println(text)
+            println("${format.format(Date())}: $text")
         }
 
         fun red(text: String) {
-            println(red_ + text + reset)
+            println("$red_${format.format(Date())}: $text $reset")
         }
 
         fun yellow(text: String) {
-            println(yellow_ + text + reset)
+            println("$yellow_${format.format(Date())}: $text $reset")
         }
 
         fun white(text: String) {
-            println(white_ + text + reset)
+            println("$white_${format.format(Date())}: $text $reset")
         }
 
         fun black(text: String) {
-            println(black_ + text + reset)
+            println("$black_${format.format(Date())}: $text $reset")
         }
     }
 }
