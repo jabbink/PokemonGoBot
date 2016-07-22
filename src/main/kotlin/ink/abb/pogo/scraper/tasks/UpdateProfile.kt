@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -21,7 +22,7 @@ class UpdateProfile : Task {
             1350000, 1650000, 2000000, 2500000, 3000000, 3750000, 4750000, 6000000, 7500000, 9500000, 12000000, 15000000, 20000000)
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val player = ctx.api.getPlayerProfile(true)
+        val player = ctx.api.playerProfile
         val nextXP = requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]
         val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
         val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)

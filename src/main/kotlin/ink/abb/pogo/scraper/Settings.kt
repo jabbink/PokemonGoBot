@@ -8,17 +8,16 @@
 
 package ink.abb.pogo.scraper
 
-import POGOProtos.Inventory.ItemIdOuterClass
-import POGOProtos.Inventory.ItemIdOuterClass.ItemId
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.pokegoapi.api.inventory.Pokeball
 import java.util.*
 
 class Settings(val properties: Properties) {
 
-    val pokeballItems = mapOf(Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
-            Pair(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
-            Pair(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
-            Pair(ItemIdOuterClass.ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
+    val pokeballItems = mapOf(Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
+            Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
+            Pair(ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
+            Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
 
     val uselessItems = mapOf(
             Pair(ItemId.ITEM_REVIVE, 20),
