@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import POGOProtos.Inventory.ItemIdOuterClass
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
 import ink.abb.pogo.scraper.Bot
