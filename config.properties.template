@@ -46,10 +46,16 @@ display_pokemon_catch_rewards=true
 ## Pokemon Transfer
 # should the bot auto transfer duplicate pokemon
 autotransfer=false
+<<<<<<< HEAD
 
 # Minimum CP to keep a pokemon
 transfer_cp_threshold=400
 
+=======
+# Minimum IV percentage to keep a pokemon
+# between 0 and 100, suggested 80
+transfer_iv_threshold=80
+>>>>>>> 2ae467a8ee7bed0a22b17d70ae2a59721f8dd86b
 # list of pokemon you don't want to transfer regardless of CP
 # the names must be divided by a ","
 # if you want all pokemons to be transferred just leave it blank
