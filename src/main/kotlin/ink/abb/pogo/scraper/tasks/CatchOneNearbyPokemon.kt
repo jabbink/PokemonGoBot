@@ -50,10 +50,12 @@ class CatchOneNearbyPokemon : Task {
                     Log.green("Encountered pokemon ${catchablePokemon.pokemonId}")
                     val result = catchablePokemon.catchPokemon(usedPokeball)
 
-                    if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS)
+                    if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                        ctx.pokemonStats.first.andIncrement
                         Log.green("Caught a ${catchablePokemon.pokemonId} using $ball")
-                    else
+                    } else {
                         Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+                    }
                 }
             }
 
