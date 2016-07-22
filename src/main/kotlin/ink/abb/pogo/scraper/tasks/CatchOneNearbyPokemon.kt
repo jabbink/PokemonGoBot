@@ -8,7 +8,8 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import POGOProtos.Inventory.ItemIdOuterClass
+import Log
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
@@ -21,17 +22,17 @@ class CatchOneNearbyPokemon : Task {
 
         if (pokemon.isNotEmpty()) {
             val catchablePokemon = pokemon.first()
-            var ball: ItemIdOuterClass.ItemId? = null
+            var ball: ItemId? = null
             try {
                 val preferred_ball = settings.preferredBall
-                var item = ctx.api.bag.getItem(preferred_ball)
+                var item = ctx.api.inventories.itemBag.getItem(preferred_ball)
 
                 // if we dont have our prefered pokeball, try fallback to other
                 if (item == null || item.count == 0)
                     for (other in settings.pokeballItems) {
                         if (preferred_ball == other) continue
 
-                        item = ctx.api.bag.getItem(other.key);
+                        item = ctx.api.inventories.itemBag.getItem(other.key);
                         if (item != null && item.count > 0)
                             ball = other.key
                     }

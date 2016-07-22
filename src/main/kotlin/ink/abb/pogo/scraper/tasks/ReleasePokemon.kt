@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -18,7 +19,7 @@ class ReleasePokemon : Task {
         if (!settings.shouldAutoTransfer) {
             return
         }
-        val groupedPokemon = ctx.api.pokebank.pokemons.groupBy { it.pokemonId }
+        val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
         val maxCP = settings.transferCPThreshold
