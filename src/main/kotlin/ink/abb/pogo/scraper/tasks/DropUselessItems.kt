@@ -26,9 +26,10 @@ class DropUselessItems : Task {
             if (count > 0) {
                 val result = ctx.api.bag.removeItem(it.key, count)
                 if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
-                    println("Dropped ${count}x ${it.key.name}")
+                    ctx.itemStats.second.getAndAdd(count)
+                    Log.yellow("Dropped ${count}x ${it.key.name}")
                 } else {
-                    println("Failed to drop ${count}x ${it.key.name}: $result")
+                    Log.red("Failed to drop ${count}x ${it.key.name}: $result")
                 }
             }
         }

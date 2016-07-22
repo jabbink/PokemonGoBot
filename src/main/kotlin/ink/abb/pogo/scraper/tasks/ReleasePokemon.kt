@@ -33,7 +33,8 @@ class ReleasePokemon : Task {
                 val ivPercentage = iv/45*100
                 if (index > 0 && (ivPercentage < maxIV || obligatoryTransfer.contains(pokemon.pokemonId.name)) &&
                         (!ignoredPokemon.contains(pokemon.pokemonId.name))) {
-                    println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp} and IV $iv")
+                    ctx.pokemonStats.second.andIncrement
+                    Log.yellow("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp} and IV $iv")
                     pokemon.transferPokemon()
                 }
             }
