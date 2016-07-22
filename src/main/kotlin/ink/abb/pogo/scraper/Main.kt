@@ -23,7 +23,7 @@ import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.auth.GoogleLogin
-import com.pokegoapi.auth.PTCLogin
+import com.pokegoapi.auth.PtcLogin
 import okhttp3.OkHttpClient
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.tasks.Release
@@ -123,7 +123,7 @@ fun main(args: Array<String>) {
     if (username.contains('@')) {
         auth = GoogleLogin(http).login(username, properties.getProperty("password"))
     } else {
-        auth = PTCLogin(http).login(username, properties.getProperty("password"))
+        auth = PtcLogin(http).login(username, properties.getProperty("password"))
     }
     println("Logged in as ${properties.getProperty("username")}")
 
@@ -213,6 +213,24 @@ fun walk(end: S2LatLng, speed: Double) {
 }
 
 fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
+
+    val wild_pokemons = api.map.mapObjects.wildPokemons
+
+    val sorted_wild_pokemons = wild_pokemons.sortedWith(Comparator { a, b ->
+        val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)
+        val locationB = S2LatLng.fromDegrees(b.latitude, b.longitude)
+        val self = S2LatLng.fromDegrees(lat.get(), lng.get())
+        val distanceA = self.getEarthDistance(locationA)
+        val distanceB = self.getEarthDistance(locationB)
+        distanceA.compareTo(distanceB)
+    })
+
+    if (sorted_wild_pokemons.isNotEmpty()) {
+        val wild_pokemon = wild_pokemons.first()
+        println("found wild pokemon ${wild_pokemon.pokemonData.pokemonId}")
+        walk(S2LatLng.fromDegrees(wild_pokemons.first().latitude, wild_pokemons.first().longitude), speed)
+    }
+
     val pokemon = api.map.catchablePokemon
     if (pokemon.isNotEmpty()) {
         val catchablePokemon = pokemon.first()
@@ -250,6 +268,7 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
                 else
                     println("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
             }
+            return //always catch more
         }
 
     }
@@ -313,16 +332,16 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
 }
 
 val uselessItems = mapOf(
-        Pair(ItemId.ITEM_REVIVE, 8),
+        Pair(ItemId.ITEM_REVIVE, 30),
         Pair(ItemId.ITEM_MAX_REVIVE, 8),
         Pair(ItemId.ITEM_POTION, 5),
-        Pair(ItemId.ITEM_SUPER_POTION, 5),
-        Pair(ItemId.ITEM_HYPER_POTION, 5),
+        Pair(ItemId.ITEM_SUPER_POTION, 50),
+        Pair(ItemId.ITEM_HYPER_POTION, 50),
         Pair(ItemId.ITEM_MAX_POTION, 5),
         Pair(ItemId.ITEM_POKE_BALL, 20),
-        Pair(ItemId.ITEM_GREAT_BALL, 20),
-        Pair(ItemId.ITEM_ULTRA_BALL, 20),
-        Pair(ItemId.ITEM_MASTER_BALL, 20)
+        Pair(ItemId.ITEM_GREAT_BALL, 200),
+        Pair(ItemId.ITEM_ULTRA_BALL, 200),
+        Pair(ItemId.ITEM_MASTER_BALL, 200)
 )
 
 fun dropUselessItems(api: PokemonGo) {
