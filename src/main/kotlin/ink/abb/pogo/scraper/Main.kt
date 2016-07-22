@@ -13,8 +13,9 @@ import ink.abb.pogo.scraper.services.BotRunService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import java.io.FileInputStream
-import java.util.*
+import java.io.File
+import java.util.Base64
+import java.util.Properties
 import javax.annotation.PostConstruct
 
 /**
@@ -31,8 +32,13 @@ open class Main {
         val names = botRunService.getSaveNames()
 
         if(names.size < 1) {
+            val configProperties = File("config.properties")
+            if(!configProperties.isFile) {
+                throw IllegalStateException("No bot saves found and no config.properties to convert!")
+            }
+
             val properties = Properties()
-            FileInputStream("config.properties").use {
+            configProperties.reader().use {
                 properties.load(it)
             }
 
