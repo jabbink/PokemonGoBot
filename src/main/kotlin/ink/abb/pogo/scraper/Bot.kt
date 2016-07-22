@@ -17,37 +17,41 @@ import kotlin.concurrent.thread
 
 class Bot(val api: PokemonGo, val settings: Settings) {
 
-    var ctx = Context(
+    lateinit var ctx: Context
+
+    val keepalive = GetMapRandomDirection()
+    val drop = DropUselessItems()
+    val profile = UpdateProfile()
+    val catch = CatchOneNearbyPokemon()
+    val release = ReleasePokemon()
+    lateinit var process: ProcessPokestops
+
+    fun init() {
+        ctx = Context(
             api,
             api.playerProfile,
             AtomicDouble(settings.startingLatitude),
             AtomicDouble(settings.startingLongitude)
-    )
-
-    fun run() {
+        )
 
         println()
         println("Name: ${ctx.profile.username}")
         println("Team: ${ctx.profile.team}")
-        println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        println("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
+        println("Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}")
+        println("Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
         println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
         println()
 
         api.pokebank.pokemons.map { "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP" }.forEach { println(it) }
 
-        val keepalive = GetMapRandomDirection()
-        val drop = DropUselessItems()
-        val profile = UpdateProfile()
-        val catch = CatchOneNearbyPokemon()
-        val release = ReleasePokemon()
-
         task(keepalive)
         println("Getting initial pokestops...")
         // TODO: Figure out why pokestops are only showing up the first time api.map.mapObjects is called (???)
         val reply = api.map.mapObjects
-        val process = ProcessPokestops(reply.pokestops)
+        process = ProcessPokestops(reply.pokestops)
+    }
 
+    fun run() {
         fixedRateTimer("BotLoop", false, 0, 5000, action = {
             thread(block = {
                 task(keepalive)
