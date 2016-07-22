@@ -3,7 +3,7 @@
 ## Usage (from source)
 
 1. Clone this repo
-2. Copy `src/main/resources/config.properties.template` to `src/main/resources/config.properties`
+2. Copy `./config.properties.template` to `src/main/resources/config.properties`
 3. Add your PTC username, password and starting location in `src/main/resources/config.properties`
 4. Run `Main.kt`
 
@@ -43,4 +43,3 @@ Known issue in the used Java API; fix is being worked on.
 ## I get a RemoteServerException or something about "502"
 
 The Pokemon Go servers are offline/too busy. Check IsPokemonGoDownOrNot.com
-
