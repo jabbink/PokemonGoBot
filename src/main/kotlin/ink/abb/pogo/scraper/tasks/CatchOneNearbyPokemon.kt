@@ -60,7 +60,6 @@ class CatchOneNearbyPokemon : Task {
 
                     }else
                         Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
-                    }
                 }
             }
 
