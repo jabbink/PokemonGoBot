@@ -32,7 +32,7 @@ class ReleasePokemon : Task {
                 if (index > 0 && (pokemon.cp < maxCP || obligatoryTransfer.contains(pokemon.pokemonId.name)) &&
                         (!ignoredPokemon.contains(pokemon.pokemonId.name))) {
                     ctx.pokemonStats.second.andIncrement
-                    println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
+                    Log.yellow("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
                     pokemon.transferPokemon()
                 }
             }
