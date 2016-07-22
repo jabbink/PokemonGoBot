@@ -33,14 +33,22 @@ class Settings(val properties: Properties) {
     val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
 
     val username = properties.getProperty("username")
+    val password = if(properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
     val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
     val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
-
-    fun getPassword(): String {
-        return if(properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
+    val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
+    val ignoredPokemon = if (shouldAutoTransfer) {
+        getPropertyIfSet("Never transfer these Pokemon", "ignoredPokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",")
+    } else {
+        listOf()
+    }
+    val obligatoryTransfer = if (shouldAutoTransfer) {
+        getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatoryTransfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
+    } else {
+        listOf()
     }
 
     private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {

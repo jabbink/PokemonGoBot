@@ -13,10 +13,10 @@ import kotlin.concurrent.thread
 class Bot(val api: PokemonGo, val settings: Settings) {
 
     var ctx = Context(
-        api,
-        api.playerProfile,
-        AtomicDouble(settings.startingLatitude),
-        AtomicDouble(settings.startingLongitude)
+            api,
+            api.playerProfile,
+            AtomicDouble(settings.startingLatitude),
+            AtomicDouble(settings.startingLongitude)
     )
 
     fun run() {

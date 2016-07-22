@@ -73,10 +73,11 @@ fun main(args: Array<String>) {
     val settings = Settings(properties)
 
     val username = settings.username
-    val password = settings.getPassword()
+    val password = settings.password
 
     println("Logging in to game server...")
     val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
+
     if (username.contains('@')) {
         auth = GoogleLogin(http).login(username, password)
     } else {

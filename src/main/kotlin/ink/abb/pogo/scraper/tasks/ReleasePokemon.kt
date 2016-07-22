@@ -10,16 +10,22 @@ import ink.abb.pogo.scraper.Task
  */
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if(!settings.shouldAutoTransfer) {
+        if (!settings.shouldAutoTransfer) {
             return
         }
-
-        // TODO: The API allows to release pokemon in batches, the app does not
         val groupedPokemon = ctx.api.pokebank.pokemons.groupBy { it.pokemonId }
+        val ignoredPokemon = settings.ignoredPokemon
+        val obligatoryTransfer = settings.obligatoryTransfer
+        val maxCP = settings.transferCPThreshold
+
         groupedPokemon.forEach {
             val sorted = it.value.sortedByDescending { it.cp }
             for ((index, pokemon) in sorted.withIndex()) {
-                if (index > 0 && pokemon.cp < 400) {
+                // never transfer highest rated Pokemon
+                // never transfer > maxCP, unless set in obligatoryTransfer
+                // stop releasing when pokemon is set in ignoredPokemon
+                if (index > 0 && (pokemon.cp < maxCP || obligatoryTransfer.contains(pokemon.pokemonId.name)) &&
+                        (!ignoredPokemon.contains(pokemon.pokemonId.name))) {
                     println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
                     pokemon.transferPokemon()
                 }
