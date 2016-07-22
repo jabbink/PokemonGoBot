@@ -22,7 +22,7 @@ import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.auth.GoogleLogin
-import com.pokegoapi.auth.PTCLogin
+import com.pokegoapi.auth.PtcLogin
 import ink.abb.pogo.scraper.tasks.Release
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
@@ -147,7 +147,7 @@ fun main(args: Array<String>) {
     if (username.contains('@')) {
         auth = GoogleLogin(http).login(username, properties.getProperty("password"))
     } else {
-        auth = PTCLogin(http).login(username, properties.getProperty("password"))
+        auth = PtcLogin(http).login(username, properties.getProperty("password"))
     }
     println("Logged in as ${properties.getProperty("username")}")
 
@@ -297,7 +297,7 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
         it.canLoot(true)
     }
 
-    if (nearestUnused.size > 0) {
+    if ((pokemon == null || pokemon.size - 1 == 0) && nearestUnused.size > 0) {
         walk(S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), speed)
 
         /*val pokestop = com.pokegoapi.google.common.geometry.S2LatLng.fromDegrees(nearestUnused.latitude, nearestUnused.longitude)
