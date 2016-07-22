@@ -50,17 +50,19 @@ class CatchOneNearbyPokemon : Task {
 
             if (ball != null) {
                 val usedPokeball = pokeballItems[ball]
-                println("Found pokemon ${catchablePokemon.pokemonId}")
+                Log.green("Found pokemon ${catchablePokemon.pokemonId}")
                 ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
                 val encounterResult = catchablePokemon.encounterPokemon()
                 if (encounterResult.wasSuccessful()) {
-                    println("Encountered pokemon ${catchablePokemon.pokemonId}")
+                    Log.green("Encountered pokemon ${catchablePokemon.pokemonId}")
                     val result = catchablePokemon.catchPokemon(usedPokeball)
 
-                    if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS)
-                        println("Caught a ${catchablePokemon.pokemonId} using $ball")
-                    else
-                        println("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+                    if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                        ctx.pokemonStats.first.andIncrement
+                        Log.green("Caught a ${catchablePokemon.pokemonId} using $ball")
+                    } else {
+                        Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+                    }
                 }
             }
 

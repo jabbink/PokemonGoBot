@@ -45,7 +45,7 @@ class BotRunService {
     }
 
     private fun login(settings: Settings): PokemonGo {
-        println("Logging in to game server...")
+        Log.normal("Logging in to game server...")
         val auth = if (settings.credentials is Settings.GoogleCredentials) {
             val auth = if (settings.credentials.token.isBlank()) {
                 GoogleLogin(http).login("", "")
@@ -73,7 +73,7 @@ class BotRunService {
             throw IllegalStateException("Login failed, please check your credentials or delete your token.")
         }
 
-        println("Successfully logged in.")
+        Log.normal("Successfully logged in.")
         save(settings)
 
         return api

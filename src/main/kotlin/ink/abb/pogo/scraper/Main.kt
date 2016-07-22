@@ -76,7 +76,7 @@ open class Main {
         val settingString = "$description setting (\"$property\")"
 
         if (!properties.containsKey(property)) {
-            println("$settingString not specified in config.properties!")
+            Log.red("$settingString not specified in config.properties!")
             System.exit(1)
         }
 
@@ -88,14 +88,14 @@ open class Main {
         val defaulting = "defaulting to \"$default\""
 
         if (!properties.containsKey(property)) {
-            println("$settingString not specified, $defaulting.")
+            Log.red("$settingString not specified, $defaulting.")
             return default
         }
 
         try {
             return conversion(properties.getProperty(property))
         } catch (e: Exception) {
-            println("$settingString is invalid, defaulting to $default: ${e.message}")
+            Log.red("$settingString is invalid, defaulting to $default: ${e.message}")
             return default
         }
     }
