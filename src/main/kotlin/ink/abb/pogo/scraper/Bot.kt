@@ -34,7 +34,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
         println()
 
-        api.pokebank.pokemons.map { "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP" }.forEach { println(it) }
+        api.pokebank.pokemons.map {
+            var IV = ((it.individualStamina + it.individualAttack + it.individualDefense) * 100) / 45
+            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV"
+        }.forEach { println(it) }
 
         val keepalive = GetMapRandomDirection()
         val drop = DropUselessItems()

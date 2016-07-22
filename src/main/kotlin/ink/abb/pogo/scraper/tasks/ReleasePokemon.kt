@@ -21,7 +21,7 @@ class ReleasePokemon : Task {
         val groupedPokemon = ctx.api.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
-        val maxCP = settings.transferCPThreshold
+        val maxIV = settings.transferIVhreshold
 
         groupedPokemon.forEach {
             val sorted = it.value.sortedByDescending { it.cp }
@@ -29,9 +29,11 @@ class ReleasePokemon : Task {
                 // never transfer highest rated Pokemon
                 // never transfer > maxCP, unless set in obligatoryTransfer
                 // stop releasing when pokemon is set in ignoredPokemon
-                if (index > 0 && (pokemon.cp < maxCP || obligatoryTransfer.contains(pokemon.pokemonId.name)) &&
+                val iv = pokemon.individualAttack + pokemon.individualDefense + pokemon.individualStamina
+                val ivPercentage = iv/45*100
+                if (index > 0 && (ivPercentage < maxIV || obligatoryTransfer.contains(pokemon.pokemonId.name)) &&
                         (!ignoredPokemon.contains(pokemon.pokemonId.name))) {
-                    println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
+                    println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp} and IV $iv")
                     pokemon.transferPokemon()
                 }
             }
