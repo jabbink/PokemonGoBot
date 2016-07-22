@@ -1,8 +1,13 @@
+/**
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper
 
-/**
- * @author Andrew Potter (apottere)
- */
 import POGOProtos.Inventory.ItemIdOuterClass
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId
 import com.pokegoapi.api.inventory.Pokeball
@@ -33,7 +38,7 @@ class Settings(val properties: Properties) {
     val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
 
     val username = properties.getProperty("username")
-    val password = if(properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
+    val password = if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
     val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
     val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
@@ -54,7 +59,7 @@ class Settings(val properties: Properties) {
     private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
         val settingString = "$description setting (\"$property\")"
 
-        if(!properties.containsKey(property)) {
+        if (!properties.containsKey(property)) {
             println("$settingString not specified in config.properties!")
             System.exit(1)
         }
@@ -66,7 +71,7 @@ class Settings(val properties: Properties) {
         val settingString = "$description setting (\"$property\")"
         val defaulting = "defaulting to \"$default\""
 
-        if(!properties.containsKey(property)) {
+        if (!properties.containsKey(property)) {
             println("$settingString not specified, $defaulting.")
             return default
         }

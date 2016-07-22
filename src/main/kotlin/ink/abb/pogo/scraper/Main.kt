@@ -1,5 +1,5 @@
 /**
- * Pokemon Go Bot  Copyright (C) 2016  Jasper Abbink
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
  *
@@ -9,12 +9,9 @@
 package ink.abb.pogo.scraper
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
-import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
-import ink.abb.pogo.scraper.tasks.*
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
 import java.net.InetSocketAddress
@@ -25,8 +22,6 @@ import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.security.cert.CertificateException
-import kotlin.concurrent.fixedRateTimer
-import kotlin.concurrent.thread
 
 /**
  * Allow all certificate to debug with https://github.com/bettse/mitmdump_decoder
