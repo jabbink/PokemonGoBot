@@ -36,7 +36,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
                     var message = "Looted pokestop ${closest.id}"
                     if(settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
-                    Log.normal(message)
+                    Log.green(message)
                 }
                 Result.INVENTORY_FULL -> {
 
