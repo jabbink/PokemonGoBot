@@ -29,8 +29,8 @@ class ReleasePokemon : Task {
                 // never transfer highest rated Pokemon
                 // never transfer > maxCP, unless set in obligatoryTransfer
                 // stop releasing when pokemon is set in ignoredPokemon
-                if (index > 0 && (pokemon.cp < maxCP || obligatoryTransfer.contains(pokemon.pokemonId.name)) &&
-                        (!ignoredPokemon.contains(pokemon.pokemonId.name))) {
+                if (index > 0 && (pokemon.cp < maxCP || obligatoryTransfer.contains(pokemon.pokemonId)) &&
+                        (!ignoredPokemon.contains(pokemon.pokemonId))) {
                     println("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
                     pokemon.transferPokemon()
                 }

@@ -1,5 +1,6 @@
 package ink.abb.pogo.scraper
 
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
@@ -16,14 +17,14 @@ data class Settings(
 
     val credentials: Credentials,
 
-    val speed: Double,
-    val shouldDropItems: Boolean,
-    val preferredBall: ItemId,
-    val shouldAutoTransfer: Boolean,
-    val shouldDisplayKeepalive: Boolean,
-    val transferCPThreshold: Int,
-    val ignoredPokemon: List<String>,
-    val obligatoryTransfer: List<String>,
+    val speed: Double = 2.778,
+    val shouldDropItems: Boolean = false,
+    val preferredBall: ItemId = ItemId.ITEM_POKE_BALL,
+    val shouldAutoTransfer: Boolean = false,
+    val shouldDisplayKeepalive: Boolean = true,
+    val transferCPThreshold: Int = 400,
+    val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMENDER),
+    val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
 
     val uselessItems: Map<ItemId, Int> = mapOf(
         Pair(ItemId.ITEM_REVIVE, 20),
