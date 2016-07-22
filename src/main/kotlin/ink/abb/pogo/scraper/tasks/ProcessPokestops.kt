@@ -13,9 +13,7 @@ import java.util.*
  *
  * @author Andrew Potter (apottere)
  */
-class ProcessMapObjects(val pokestops: MutableCollection<Pokestop>) : Task {
-
-    val catch = CatchOneNearbyPokemon()
+class ProcessPokestops(val pokestops: MutableCollection<Pokestop>) : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val sortedPokestops = pokestops.sortedWith(Comparator { a, b ->
@@ -30,7 +28,6 @@ class ProcessMapObjects(val pokestops: MutableCollection<Pokestop>) : Task {
         val loot = LootOneNearbyPokestop(sortedPokestops)
         val walk = WalkToUnusedPokestop(sortedPokestops)
 
-        bot.task(catch)
         bot.task(loot)
         bot.task(walk)
     }
