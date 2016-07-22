@@ -317,10 +317,10 @@ fun processMapObjects(api: PokemonGo, pokestops: MutableCollection<Pokestop>) {
     }
 
     if (nearestUnused.size > 0) {
-        val fortName = nearestUnused.first().details.name
+        val pokestopName = nearestUnused.first().details.name
 
         if (walkingNearestUnused)
-            println("Walking to pokestop \"$fortName\"")
+            println("Walking to pokestop \"$pokestopName\"")
         walk(S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), speed)
 
         /*val pokestop = com.pokegoapi.google.common.geometry.S2LatLng.fromDegrees(nearestUnused.latitude, nearestUnused.longitude)
