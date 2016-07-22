@@ -1,7 +1,6 @@
 package ink.abb.pogo.scraper.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
@@ -26,6 +25,10 @@ class BotRunService {
     val bots: MutableList<Pair<Bot, Thread>> = mutableListOf()
     val mapper: ObjectMapper = ObjectMapper().registerKotlinModule()
     val root = File("./bot-settings").absoluteFile!!
+
+    init {
+        root.mkdirs()
+    }
 
     fun submitBot(settings: Settings) {
         val api = login(settings)
@@ -77,8 +80,6 @@ class BotRunService {
     }
 
     private fun save(settings: Settings) {
-        root.mkdirs()
-
         File(root, "${settings.name}.json").bufferedWriter().use {
             it.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(settings))
         }
@@ -91,5 +92,9 @@ class BotRunService {
         }
 
         return mapper.readValue(save, Settings::class.java)
+    }
+
+    fun getSaveNames(): List<String> {
+        return root.list().map { it.replace(Regex("\\.json$"), "") }
     }
 }

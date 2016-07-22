@@ -28,11 +28,9 @@ open class Main {
 
     @PostConstruct
     fun createBot() {
-        val name = "config-properties-conversion"
+        val names = botRunService.getSaveNames()
 
-        val settings = try {
-            botRunService.load(name)
-        } catch (e: IllegalArgumentException) {
+        if(names.size < 1) {
             val properties = Properties()
             FileInputStream("config.properties").use {
                 properties.load(it)
@@ -48,8 +46,8 @@ open class Main {
                 Settings.PokemonTrainersClubCredentials(username, password, token)
             }
 
-            Settings(
-                name = name,
+            botRunService.submitBot(Settings(
+                name = "config-properties-conversion",
                 credentials = credentials,
                 startingLatitude = getPropertyOrDie(properties, "Starting Latitude", "latitude", String::toDouble),
                 startingLongitude = getPropertyOrDie(properties, "Starting Longitude", "longitude", String::toDouble),
@@ -61,10 +59,10 @@ open class Main {
                 transferCPThreshold = getPropertyIfSet(properties, "Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt),
                 ignoredPokemon = getPropertyIfSet(properties, "Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(","),
                 obligatoryTransfer = getPropertyIfSet(properties, "list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
-            )
+            ))
+        } else {
+            names.map { botRunService.load(it) }.forEach { botRunService.submitBot(it) }
         }
-
-        botRunService.submitBot(settings)
     }
 
     private fun <T> getPropertyOrDie(properties: Properties, description: String, property: String, conversion: (String) -> T): T {
