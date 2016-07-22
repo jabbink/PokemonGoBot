@@ -29,7 +29,7 @@ class Settings(val properties: Properties) {
     val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
 
-    val uselessItems = if(shouldDropItems) {
+    val uselessItems = if (shouldDropItems) {
         mapOf(
                 Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
                 Pair(ItemId.ITEM_MAX_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_REVIVE", "item_max_revive", 10, String::toInt)),
@@ -62,11 +62,13 @@ class Settings(val properties: Properties) {
     val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
+
     val shouldDisplayWalkingToNearestUnused = getPropertyIfSet("Display Walking to nearest Unused Pokestop", "display_walking_nearest_unused", false, String::toBoolean)
     val shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean)
     val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
 
-    val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
+    val transferIVthreshold = getPropertyIfSet("Minimum IV to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)
+
     val ignoredPokemon = if (shouldAutoTransfer) {
         getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",")
     } else {

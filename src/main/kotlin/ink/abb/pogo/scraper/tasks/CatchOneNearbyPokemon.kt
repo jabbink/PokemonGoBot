@@ -10,7 +10,7 @@ package ink.abb.pogo.scraper.tasks
 
 import Log
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -51,15 +51,15 @@ class CatchOneNearbyPokemon : Task {
                     Log.green("Encountered pokemon ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp}")
                     val result = catchablePokemon.catchPokemon(usedPokeball)
 
-                    if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                    if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                         ctx.pokemonStats.first.andIncrement
                         var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} using $ball"
 
-                        if(settings.shouldDisplayPokemonCatchRewards)
+                        if (settings.shouldDisplayPokemonCatchRewards)
                             message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy, ${result.stardustList.sum()}x Stardust]"
                         Log.green(message)
 
-                    }else
+                    } else
                         Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
                 }
             }
