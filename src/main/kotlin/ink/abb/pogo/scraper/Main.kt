@@ -70,15 +70,30 @@ fun main(args: Array<String>) {
     val username = settings.username
     val password = settings.password
 
+    val token = settings.token
+
     println("Logging in to game server...")
     val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
 
-    if (username.contains('@')) {
-        auth = GoogleLogin(http).login(username, password)
+    auth = if (token.isBlank()) {
+        if (username.contains('@')) {
+            GoogleLogin(http).login(username, password)
+        } else {
+            PtcLogin(http).login(username, password)
+        }
     } else {
-        auth = PtcLogin(http).login(username, password)
+        if (token.contains("pokemon.com")) {
+            PtcLogin(http).login(token)
+        } else {
+            GoogleLogin(http).login(token)
+        }
     }
-    println("Logged in as $username")
+
+    println("Logged in as $username with token ${auth.token.contents}")
+
+    if (token.isBlank()) {
+        println("Set this token in your config to log in directly")
+    }
     val api = PokemonGo(auth, http)
 
     print("Getting profile data from pogo server")

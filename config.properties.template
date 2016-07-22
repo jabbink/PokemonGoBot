@@ -3,6 +3,8 @@ username=
 # Choose plaintext or base64'd password
 password=
 base64_password=
+# Token to login directly
+token=
 latitude=
 longitude=
 preferred_ball=ITEM_POKE_BALL
