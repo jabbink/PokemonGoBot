@@ -39,13 +39,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Pair(AtomicInteger(0), AtomicInteger(0))
         )
 
-        Log.normal()
+        Log.normal("")
         Log.normal("Name: ${ctx.profile.username}")
         Log.normal("Team: ${ctx.profile.team}")
         Log.normal("Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}")
         Log.normal("Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        Log.normal()
+        Log.normal("")
 
         api.pokebank.pokemons.map { "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP" }.forEach { Log.normal(it) }
 

@@ -34,7 +34,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
             when (result.result) {
                 Result.SUCCESS -> {
                     val items = result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }
-                    Log.normal("Looted pokestop ${closest.id}: $items")
+                    Log.green("Looted pokestop ${closest.id}: $items")
                 }
                 Result.INVENTORY_FULL -> {
                     Log.red("Looted pokestop ${closest.id}, but inventory is full")
