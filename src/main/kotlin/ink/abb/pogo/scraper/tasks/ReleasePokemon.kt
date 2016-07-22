@@ -1,15 +1,21 @@
 package ink.abb.pogo.scraper.tasks
 
+import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
+import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 
 /**
  * Created by TimD on 7/21/2016.
  */
-class Release : Task {
-    override fun run(context: Context) {
+class ReleasePokemon : Task {
+    override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        if(!settings.shouldAutoTransfer) {
+            return
+        }
+
         // TODO: The API allows to release pokemon in batches, the app does not
-        val groupedPokemon = context.api.pokebank.pokemons.groupBy { it.pokemonId }
+        val groupedPokemon = ctx.api.pokebank.pokemons.groupBy { it.pokemonId }
         groupedPokemon.forEach {
             val sorted = it.value.sortedByDescending { it.cp }
             for ((index, pokemon) in sorted.withIndex()) {

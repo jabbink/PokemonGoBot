@@ -1,8 +1,8 @@
 package ink.abb.pogo.scraper
 
 /**
- * @author Andrew Potter (ddcapotter)
+ * @author Andrew Potter (apottere)
  */
 interface Task {
-    fun run(ctx: Context)
+    fun run(bot: Bot, ctx: Context, settings: Settings)
 }

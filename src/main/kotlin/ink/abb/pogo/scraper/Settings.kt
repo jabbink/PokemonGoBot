@@ -1,7 +1,7 @@
 package ink.abb.pogo.scraper
 
 /**
- * @author Andrew Potter (ddcapotter)
+ * @author Andrew Potter (apottere)
  */
 import POGOProtos.Inventory.ItemIdOuterClass
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId
@@ -37,9 +37,10 @@ class Settings(val properties: Properties) {
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
     val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
+    val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
 
     fun getPassword(): String {
-        return String(Base64.getDecoder().decode(if(properties.containsKey("password")) properties.getProperty("password") else properties.getProperty("base64_password")))
+        return if(properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
     }
 
     private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
