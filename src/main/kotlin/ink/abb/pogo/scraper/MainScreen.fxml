@@ -15,11 +15,6 @@
                         <MenuItem mnemonicParsing="false" onAction="#exit" text="Close" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Delete" />
-                    </items>
-                </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
                         <MenuItem mnemonicParsing="false" text="About" />
@@ -89,10 +84,10 @@
                                             <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Password" GridPane.rowIndex="1" />
-                                                <TextField fx:id="tfSettingsUsername" editable="false" GridPane.columnIndex="1" />
-                                                <TextField fx:id="tfSettingsPassword" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfSettingsUsername" GridPane.columnIndex="1" />
+                                                <TextField fx:id="tfSettingsPassword" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Token" GridPane.rowIndex="2" />
-                                                <TextField fx:id="tfSettingsToken" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <TextField fx:id="tfSettingsToken" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude" GridPane.rowIndex="3" />
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude" GridPane.rowIndex="4" />
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Preferred Ball" GridPane.rowIndex="5" />
