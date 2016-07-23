@@ -21,13 +21,18 @@ mainClassName = 'ink.abb.pogo.scraper.MainKt'
 sourceCompatibility = 1.5
 
 repositories {
+    mavenCentral()
     maven { url "https://jitpack.io" }
-    maven { url "http://uk.maven.org/maven2" }
 }
 
 dependencies {
 
     //compile project(':PokeGOAPI-Java')
+
+    compile 'no.tornado:tornadofx:1.5.2'
+
+    // https://mvnrepository.com/artifact/com.lynden/GMapsFX
+    compile group: 'com.lynden', name: 'GMapsFX', version: '2.0.8'
 
     compile 'com.github.Grover-c13:PokeGOAPI-Java:master-SNAPSHOT'
 
