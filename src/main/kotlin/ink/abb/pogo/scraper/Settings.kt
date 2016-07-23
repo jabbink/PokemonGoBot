@@ -72,7 +72,7 @@ class Settings(val properties: Properties) {
     val transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)
 
     val ignoredPokemon = if (shouldAutoTransfer) {
-        getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",")
+        getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMANDER", String::toString).split(",")
     } else {
         listOf()
     }
