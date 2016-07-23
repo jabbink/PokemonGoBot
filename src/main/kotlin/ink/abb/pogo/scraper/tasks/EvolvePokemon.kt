@@ -8,11 +8,11 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import Log
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
 
 /**
  * @author Michael Meehan (Javapt)
@@ -30,19 +30,18 @@ class  EvolvePokemon : Task {
             candyNeeded != null && candyNeeded > 0 && autoEvolve.contains(it.key.name) && it.value.first().candy >= candyNeeded
         }
         if (canEvolve.isEmpty()) {
-            Log.red("Nothing to evolve")
-        } else {
-            canEvolve.forEach {
-                val sorted = it.value.sortedByDescending { it.cp }
-                val candyNeeded = settings.candyRequiredByPokemon[it.key.number]
-                if (candyNeeded != null) {
-                    for ((index, pokemon) in sorted.withIndex()) {
-                        if (pokemon.candy < candyNeeded) {
-                            break;
-                        }
-                        Log.green("Evolving ${pokemon.pokemonId.name} because we have ${pokemon.candy} candy and only need ${candyNeeded}.")
-                        pokemon.evolve()
+            return
+        }
+        canEvolve.forEach {
+            val sorted = it.value.sortedByDescending { it.cp }
+            val candyNeeded = settings.candyRequiredByPokemon[it.key.number]
+            if (candyNeeded != null) {
+                for ((index, pokemon) in sorted.withIndex()) {
+                    if (pokemon.candy < candyNeeded) {
+                        break;
                     }
+                    Log.green("Evolving ${pokemon.pokemonId.name} because we have ${pokemon.candy} candy and only need ${candyNeeded}.")
+                    pokemon.evolve()
                 }
             }
         }
