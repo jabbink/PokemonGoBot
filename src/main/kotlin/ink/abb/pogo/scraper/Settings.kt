@@ -77,7 +77,12 @@ class Settings(val properties: Properties) {
         listOf()
     }
     val obligatoryTransfer = if (shouldAutoTransfer) {
-        getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
+        getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA", String::toString).split(",")
+    } else {
+        listOf()
+    }
+    val obligatoryEvolve = if (shouldAutoTransfer) {
+        getPropertyIfSet("list of pokemon you always want to evolve regardless of CP", "obligatory_evolve", "CATERPIE,PIDGEY", String::toString).split(",")
     } else {
         listOf()
     }

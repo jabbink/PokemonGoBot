@@ -22,7 +22,7 @@ data class Context(
         val lng: AtomicDouble,
 
         val startXp: AtomicLong,
-        val pokemonStats: Pair<AtomicInteger, AtomicInteger>,
+        val pokemonStats: Triple<AtomicInteger, AtomicInteger, AtomicInteger>,
         val itemStats: Pair<AtomicInteger, AtomicInteger>,
 
         var walking: AtomicBoolean = AtomicBoolean(false)
