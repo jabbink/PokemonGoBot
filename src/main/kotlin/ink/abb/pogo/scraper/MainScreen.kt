@@ -1,5 +1,9 @@
 package ink.abb.pogo.scraper
 
+<<<<<<< HEAD
+=======
+import Log
+>>>>>>> GUI
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.lynden.gmapsfx.GoogleMapView
 import com.lynden.gmapsfx.MapComponentInitializedListener
@@ -7,19 +11,29 @@ import com.lynden.gmapsfx.javascript.`object`.*
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
+<<<<<<< HEAD
 import javafx.application.Platform
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
+=======
+import javafx.fxml.Initializable
+>>>>>>> GUI
 import javafx.scene.control.CheckBox
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
+<<<<<<< HEAD
 import javafx.stage.Stage
 import okhttp3.OkHttpClient
 import tornadofx.View
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
+=======
+import okhttp3.OkHttpClient
+import tornadofx.View
+import java.io.FileInputStream
+>>>>>>> GUI
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
@@ -32,7 +46,10 @@ import javax.security.cert.CertificateException
 
 class MainScreen : View(), MapComponentInitializedListener, Initializable {
 
+<<<<<<< HEAD
     val apRoot: AnchorPane by fxid()
+=======
+>>>>>>> GUI
     val mapView: GoogleMapView by fxid()
     val tfUsername: TextField by fxid()
     val tfXP: TextField by fxid()
@@ -41,14 +58,20 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     val tfPokecoin: TextField by fxid()
     val tfStardust: TextField by fxid()
     val taConsole: TextArea by fxid()
+<<<<<<< HEAD
     val btnStart: Button by fxid()
+=======
+>>>>>>> GUI
 
     val tfSettingsUsername: TextField by fxid()
     val tfSettingsPassword: TextField by fxid()
     val tfSettingsToken: TextField by fxid()
     val tfSettingsLatitude: TextField by fxid()
     val tfSettingsLongitude: TextField by fxid()
+<<<<<<< HEAD
 
+=======
+>>>>>>> GUI
     val tfSettingsSpeed: TextField by fxid()
     val tfSettingsTransferIVthreshold: TextField by fxid()
     val tfSettingsIgnoredPokemon: TextField by fxid()
