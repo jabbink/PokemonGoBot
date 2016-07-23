@@ -9,6 +9,7 @@ buildscript {
 
     repositories {
         mavenCentral()
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -32,11 +33,18 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+}
+
 dependencies {
 
     //compile project(':PokeGOAPI-Java')
 
-    compile 'com.github.Grover-c13:PokeGOAPI-Java:master-SNAPSHOT'
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:4f5b715380' // https://github.com/Grover-c13/PokeGOAPI-Java/issues/139
 
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
 

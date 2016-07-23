@@ -8,8 +8,10 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import POGOProtos.Inventory.ItemIdOuterClass
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
+import Log
+import POGOProtos.Inventory.Item.ItemIdOuterClass
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
 import com.pokegoapi.api.inventory.Pokeball
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
@@ -28,17 +30,17 @@ class CatchOneNearbyPokemon : Task {
 
         if (pokemon.isNotEmpty()) {
             val catchablePokemon = pokemon.first()
-            var ball: ItemIdOuterClass.ItemId? = null
+            var ball: ItemId? = null
             try {
                 val preferred_ball = settings.preferredBall
-                var item = ctx.api.bag.getItem(preferred_ball)
+                var item = ctx.api.inventories.itemBag.getItem(preferred_ball)
 
                 // if we dont have our prefered pokeball, try fallback to other
                 if (item == null || item.count == 0)
                     for (other in pokeballItems) {
                         if (preferred_ball == other) continue
 
-                        item = ctx.api.bag.getItem(other.key);
+                        item = ctx.api.inventories.itemBag.getItem(other.key);
                         if (item != null && item.count > 0)
                             ball = other.key
                     }
@@ -54,18 +56,22 @@ class CatchOneNearbyPokemon : Task {
                 ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
                 val encounterResult = catchablePokemon.encounterPokemon()
                 if (encounterResult.wasSuccessful()) {
-                    Log.green("Encountered pokemon ${catchablePokemon.pokemonId}")
+                    Log.green("Encountered pokemon ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp}")
                     val result = catchablePokemon.catchPokemon(usedPokeball)
 
-                    if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                    if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                         ctx.pokemonStats.first.andIncrement
-                        Log.green("Caught a ${catchablePokemon.pokemonId} using $ball")
+                        var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} using $ball"
+
+                        if (settings.shouldDisplayPokemonCatchRewards)
+                            message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy, ${result.stardustList.sum()}x Stardust]"
+                        Log.green(message)
+
                     } else {
                         Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
                     }
                 }
             }
-
         }
     }
 }

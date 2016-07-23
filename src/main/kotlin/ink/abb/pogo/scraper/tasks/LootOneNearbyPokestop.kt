@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
@@ -33,11 +34,18 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
             }
             when (result.result) {
                 Result.SUCCESS -> {
-                    val items = result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }
-                    Log.green("Looted pokestop ${closest.id}: $items")
+                    var message = "Looted pokestop ${closest.id}"
+                    if(settings.shouldDisplayPokestopSpinRewards)
+                        message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
+                    Log.green(message)
                 }
                 Result.INVENTORY_FULL -> {
-                    Log.red("Looted pokestop ${closest.id}, but inventory is full")
+
+                    var message = "Looted pokestop ${closest.id}, but inventory is full"
+                    if(settings.shouldDisplayPokestopSpinRewards)
+                        message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
+
+                    Log.red(message)
                 }
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)

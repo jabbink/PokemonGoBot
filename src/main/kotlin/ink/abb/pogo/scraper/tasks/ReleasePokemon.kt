@@ -8,20 +8,23 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.pokemon.getIv
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         if (!settings.shouldAutoTransfer) {
             return
         }
-        val groupedPokemon = ctx.api.pokebank.pokemons.groupBy { it.pokemonId }
+        val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
-        val maxCP = settings.transferCPThreshold
+        val maxIV = settings.transferIVThreshold
 
         groupedPokemon.forEach {
             val sorted = it.value.sortedByDescending { it.cp }
@@ -29,10 +32,12 @@ class ReleasePokemon : Task {
                 // never transfer highest rated Pokemon
                 // never transfer > maxCP, unless set in obligatoryTransfer
                 // stop releasing when pokemon is set in ignoredPokemon
-                if (index > 0 && (pokemon.cp < maxCP || obligatoryTransfer.contains(pokemon.pokemonId)) &&
+                val iv = pokemon.getIv()
+                val ivPercentage = pokemon.getIvPercentage()
+                if (index > 0 && (ivPercentage < maxIV || obligatoryTransfer.contains(pokemon.pokemonId)) &&
                         (!ignoredPokemon.contains(pokemon.pokemonId))) {
                     ctx.pokemonStats.second.andIncrement
-                    Log.yellow("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp}")
+                    Log.yellow("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp} and IV $iv%")
                     pokemon.transferPokemon()
                 }
             }

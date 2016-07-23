@@ -1,7 +1,15 @@
+/**
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
-import POGOProtos.Inventory.ItemIdOuterClass.ItemId
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
@@ -22,8 +30,12 @@ data class Settings(
     val preferredBall: ItemId = ItemId.ITEM_POKE_BALL,
     val shouldAutoTransfer: Boolean = false,
     val shouldDisplayKeepalive: Boolean = true,
-    val transferCPThreshold: Int = 400,
-    val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMENDER),
+    val shouldDisplayWalkingToNearestUnused: Boolean = true,
+    val shouldDisplayPokestopSpinRewards: Boolean = true,
+    val shouldDisplayPokemonCatchRewards: Boolean = true,
+
+    val transferIVThreshold: Int = 80,
+    val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
     val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
 
     val uselessItems: Map<ItemId, Int> = mapOf(
