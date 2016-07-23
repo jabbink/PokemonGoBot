@@ -7,17 +7,20 @@ import com.lynden.gmapsfx.javascript.`object`.*
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import javafx.application.Platform
 import javafx.fxml.Initializable
-import javafx.scene.control.Button
-import javafx.scene.control.CheckBox
-import javafx.scene.control.TextArea
-import javafx.scene.control.TextField
+import javafx.geometry.Pos
+import javafx.scene.control.*
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.FlowPane
+import javafx.scene.layout.StackPane
 import javafx.stage.Stage
 import okhttp3.OkHttpClient
 import tornadofx.View
+import tornadofx.getChildList
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -36,6 +39,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     val apRoot: AnchorPane by fxid()
     val mapView: GoogleMapView by fxid()
     val fpPokeImages: FlowPane by fxid()
+    val tabPokemon: Tab by fxid()
 
     val tfUsername: TextField by fxid()
     val tfXP: TextField by fxid()
@@ -43,6 +47,8 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     val tfTeam: TextField by fxid()
     val tfPokecoin: TextField by fxid()
     val tfStardust: TextField by fxid()
+    val tfXPGained: TextField by fxid()
+    val tfPokemon: TextField by fxid()
     val taConsole: TextArea by fxid()
     val btnStart: Button by fxid()
 
@@ -59,6 +65,8 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     //val choiceboxSettingsPreferedBall: ChoiceBox by fxid()
     val checkboxSettingsDropItems: CheckBox by fxid()
     val checkboxSettingsAutotransfer: CheckBox by fxid()
+
+    var api: PokemonGo? = null
 
 
     var map: GoogleMap? = null
@@ -153,6 +161,10 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
 
     override val root : AnchorPane by fxml("MainScreen.fxml");
 
+    init {
+        title = "PokemonGoBot"
+    }
+
     fun startBot() {
         val builder = OkHttpClient.Builder()
         // allowProxy(builder)
@@ -188,16 +200,16 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
         if (token.isBlank()) {
             taConsole.appendText("Set this token in your config to log in directly\n")
         }
-        val api = PokemonGo(auth, http)
+        api = PokemonGo(auth, http)
 
         taConsole.appendText("Getting profile data from pogo server\n")
-        while (api.playerProfile == null) {
+        while (api!!.playerProfile == null) {
             print(".")
             Thread.sleep(1000)
         }
         println(".")
 
-        Bot(api, settings!!, this).run()
+        Bot(api!!, settings!!, this).run()
     }
 
     fun saveSettings() {
@@ -219,6 +231,34 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
 
         if (tfSettingsLatitude.text != "" && tfSettingsLongitude.text != "") {
             btnStart.isDisable = false
+        }
+    }
+
+    fun refreshPokemonBag() {
+        if (tabPokemon.isSelected) {
+            if (api != null) {
+                while (fpPokeImages.getChildList().size > 0)
+                    fpPokeImages.getChildList().removeAt(0)
+
+                api!!.inventories.pokebank.pokemons.map { it }.forEach {
+                    val IV = it.getIvPercentage()
+                    val text = Label("${it.pokemonId.name} (${it.nickname}), ${it.cp} CP, IV $IV%")
+                    text.style = "-fx-background-color: #FFFFFFCC"
+
+//            val hbox = HBox()
+//            hbox.alignment = Pos.BOTTOM_CENTER
+//            hbox.children.addAll(button, text) // button will be left of text
+
+                    val image = Image(javaClass.getResourceAsStream("images/${it.pokemonId.number}.png"))
+                    val iv1 = ImageView(image)
+
+                    val stackPane = StackPane()
+                    stackPane.alignment = Pos.BOTTOM_CENTER
+                    stackPane.children.addAll(iv1, text) // hbox with button and text on top of image view
+
+                    fpPokeImages.getChildList().add(stackPane)
+                }
+            }
         }
     }
 

@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import Log
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
@@ -30,18 +29,14 @@ class UpdateProfile : Task {
             val nextXP = requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]
             val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
             val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
-            Log.normal("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
-            Log.normal("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
-                    "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
-                    "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; " +
-                    "Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}; " +
-                    "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
-        } catch (e: Exception) {
-        }
+            Log.normal("Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; " +
+                    "Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}; ")
             ctx.screen.tfLevel.text = "${player.stats.level} / 40"
             ctx.screen.tfXP.text = "$curLevelXP / $nextXP ($ratio%)"
+            ctx.screen.tfXPGained.text = "${player.stats.experience - ctx.startXp.get()}"
+            ctx.screen.tfPokemon.text = "${ctx.pokemonStats.first.get()} caught, ${ctx.pokemonStats.second.get()} transfered"
             ctx.screen.tfStardust.text = "${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}"
-            Log.normal(ctx, "XP gain: ${player.stats.experience - ctx.startXp.get()} XP; Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; Pokebank /${ctx.profile.pokemonStorage}")
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+        }
     }
 }

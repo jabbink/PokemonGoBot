@@ -12,13 +12,6 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.tasks.*
-import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
-import javafx.geometry.Pos
-import javafx.scene.control.Label
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
-import javafx.scene.layout.StackPane
-import tornadofx.getChildList
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -48,25 +41,6 @@ class Bot(val api: PokemonGo, val settings: Settings, mainScreen: MainScreen) {
         ctx.screen.tfXP.text = "${ctx.profile.stats.experience}"
         println("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
         //println("Inventory bag ${ctx.api.bag}")
-
-        api.inventories.pokebank.pokemons.map { it }.forEach {
-            val IV = it.getIvPercentage()
-            val text = Label("${it.pokemonId.name} (${it.nickname}), ${it.cp} CP, IV $IV%")
-            text.style = "-fx-background-color: #FFFFFFCC"
-
-//            val hbox = HBox()
-//            hbox.alignment = Pos.BOTTOM_CENTER
-//            hbox.children.addAll(button, text) // button will be left of text
-
-            val image = Image(javaClass.getResourceAsStream("images/${it.pokemonId.number}.png"))
-            val iv1 = ImageView(image)
-
-            val stackPane = StackPane()
-            stackPane.alignment = Pos.BOTTOM_CENTER
-            stackPane.children.addAll(iv1, text) // hbox with button and text on top of image view
-
-            ctx.screen.fpPokeImages.getChildList().add(stackPane)
-        }
 
         val keepalive = GetMapRandomDirection()
         val drop = DropUselessItems()

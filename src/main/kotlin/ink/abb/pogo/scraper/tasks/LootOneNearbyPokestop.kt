@@ -43,7 +43,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     var message = "Looted pokestop ${closest.id}; +${result.experience} XP"
                     if (settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
-                    Log.green(message)
+                    Log.normal(ctx, message)
                     lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                     //checkResult(result)
                 }
@@ -52,7 +52,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     if (settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
 
-                    Log.red(message)
+                    Log.normal(ctx, message)
                     lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                 }
                 Result.OUT_OF_RANGE -> {

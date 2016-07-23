@@ -8,10 +8,8 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import Log
 import com.lynden.gmapsfx.javascript.`object`.LatLong
 import com.lynden.gmapsfx.javascript.`object`.MapOptions
-import ink.abb.pogo.scraper.util.Log
 import com.lynden.gmapsfx.javascript.`object`.Marker
 import com.lynden.gmapsfx.javascript.`object`.MarkerOptions
 import com.pokegoapi.api.map.fort.Pokestop
@@ -20,6 +18,7 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
 import javafx.application.Platform
 import kotlin.concurrent.fixedRateTimer
 
