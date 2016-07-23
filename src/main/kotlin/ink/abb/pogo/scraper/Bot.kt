@@ -13,12 +13,19 @@ import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import javafx.geometry.Pos
+import javafx.scene.control.Label
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
+import javafx.scene.layout.StackPane
+import tornadofx.getChildList
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
-class Bot(val api: PokemonGo, val settings: Settings) {
+class Bot(val api: PokemonGo, val settings: Settings, mainScreen: MainScreen) {
 
     var ctx = Context(
             api,
@@ -27,24 +34,39 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicDouble(settings.startingLongitude),
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
-            Pair(AtomicInteger(0), AtomicInteger(0))
+            Pair(AtomicInteger(0), AtomicInteger(0)),
+            AtomicBoolean(false),
+            mainScreen
     )
 
     fun run() {
-
-        println()
-        println("Name: ${ctx.profile.username}")
-        println("Team: ${ctx.profile.team}")
-        println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        println("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
-        println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
+        ctx.screen.tfUsername.text = ctx.profile.username
+        ctx.screen.tfTeam.text = "${ctx.profile.team}"
+        ctx.screen.tfPokecoin.text = "${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}"
+        ctx.screen.tfStardust.text = "${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}"
+        ctx.screen.tfLevel.text = "${ctx.profile.stats.level} / 40"
+        ctx.screen.tfXP.text = "${ctx.profile.stats.experience}"
         println("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
         //println("Inventory bag ${ctx.api.bag}")
 
-        api.inventories.pokebank.pokemons.map {
+        api.inventories.pokebank.pokemons.map { it }.forEach {
             val IV = it.getIvPercentage()
-            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV%"
-        }.forEach { println(it) }
+            val text = Label("${it.pokemonId.name} (${it.nickname}), ${it.cp} CP, IV $IV%")
+            text.style = "-fx-background-color: #FFFFFFCC"
+
+//            val hbox = HBox()
+//            hbox.alignment = Pos.BOTTOM_CENTER
+//            hbox.children.addAll(button, text) // button will be left of text
+
+            val image = Image(javaClass.getResourceAsStream("images/${it.pokemonId.number}.png"))
+            val iv1 = ImageView(image)
+
+            val stackPane = StackPane()
+            stackPane.alignment = Pos.BOTTOM_CENTER
+            stackPane.children.addAll(iv1, text) // hbox with button and text on top of image view
+
+            ctx.screen.fpPokeImages.getChildList().add(stackPane)
+        }
 
         val keepalive = GetMapRandomDirection()
         val drop = DropUselessItems()

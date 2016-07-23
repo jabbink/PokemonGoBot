@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
@@ -37,5 +38,10 @@ class UpdateProfile : Task {
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
         } catch (e: Exception) {
         }
+            ctx.screen.tfLevel.text = "${player.stats.level} / 40"
+            ctx.screen.tfXP.text = "$curLevelXP / $nextXP ($ratio%)"
+            ctx.screen.tfStardust.text = "${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}"
+            Log.normal(ctx, "XP gain: ${player.stats.experience - ctx.startXp.get()} XP; Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; Pokebank /${ctx.profile.pokemonStorage}")
+        } catch (e: Exception) {}
     }
 }

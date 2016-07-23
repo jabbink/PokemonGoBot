@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import com.lynden.gmapsfx.GoogleMapView?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane fx:id="apRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="519.0" prefWidth="712.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#exit" text="Close" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <TabPane layoutX="6.0" layoutY="25.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+            <tabs>
+                <Tab text="Bot">
+                    <content>
+                        <AnchorPane id="mainPane" minHeight="0.0" minWidth="0.0" prefHeight="348.0" prefWidth="562.0">
+                            <children>
+                                <GridPane layoutX="14.0" prefHeight="90.0" prefWidth="479.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="220.0" AnchorPane.topAnchor="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="77.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="149.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="77.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" prefWidth="149.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="XP" GridPane.rowIndex="1" />
+                                        <TextField id="tfUsername" fx:id="tfUsername" editable="false" GridPane.columnIndex="1" />
+                                        <TextField id="tfXP" fx:id="tfXP" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Level" GridPane.rowIndex="2" />
+                                        <TextField id="tfLevel" fx:id="tfLevel" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Team" GridPane.columnIndex="2">
+                                            <GridPane.margin>
+                                                <Insets left="10.0" />
+                                            </GridPane.margin>
+                                        </Text>
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Pokecoin" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                            <GridPane.margin>
+                                                <Insets left="10.0" />
+                                            </GridPane.margin>
+                                        </Text>
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Stardust" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                            <GridPane.margin>
+                                                <Insets left="10.0" />
+                                            </GridPane.margin>
+                                        </Text>
+                                        <TextField id="tfUsername" fx:id="tfTeam" editable="false" GridPane.columnIndex="3" />
+                                        <TextField id="tfUsername" fx:id="tfPokecoin" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                        <TextField id="tfUsername" fx:id="tfStardust" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                    </children>
+                                </GridPane>
+                                <TextArea fx:id="taConsole" layoutY="100.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="130.0" />
+                                <Button fx:id="btnStart" layoutX="510.0" layoutY="312.0" mnemonicParsing="false" onAction="#startBot" text="Start" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
+                                <GoogleMapView fx:id="mapView" prefHeight="112.0" prefWidth="192.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" layoutX="360.0"/>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Settings">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <ScrollPane layoutX="56.0" layoutY="69.0" prefHeight="244.0" prefWidth="291.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <content>
+                                        <GridPane>
+                                            <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Password" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfSettingsUsername" GridPane.columnIndex="1" />
+                                                <TextField fx:id="tfSettingsPassword" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Token" GridPane.rowIndex="2" />
+                                                <TextField fx:id="tfSettingsToken" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude" GridPane.rowIndex="3" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude" GridPane.rowIndex="4" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Preferred Ball" GridPane.rowIndex="5" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Drop Items?" GridPane.rowIndex="6" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Speed" GridPane.rowIndex="7" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Transfer duplicate Pokemon?" GridPane.rowIndex="8" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Min Pokemon CP" GridPane.rowIndex="9" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Keep Pokemon" GridPane.rowIndex="10" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Always Transfer" GridPane.rowIndex="11" />
+                                                <TextField fx:id="tfSettingsLatitude" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <TextField fx:id="tfSettingsLongitude" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <TextField fx:id="tfSettingsTransferIVthreshold" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                                                <CheckBox fx:id="checkboxSettingsAutotransfer" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                                    <GridPane.margin>
+                                                        <Insets left="5.0" />
+                                                    </GridPane.margin>
+                                                </CheckBox>
+                                                <CheckBox fx:id="checkboxSettingsDropItems" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                                    <GridPane.margin>
+                                                        <Insets left="5.0" />
+                                                    </GridPane.margin>
+                                                </CheckBox>
+                                                <ChoiceBox fx:id="choiceboxSettingsPreferedBall" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <TextField fx:id="tfSettingsSpeed" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                                <TextField fx:id="tfSettingsIgnoredPokemon" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                                                <TextField fx:id="tfSettingsObligatoryTransfer" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                                            </children>
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="356.0" minWidth="0.0" prefWidth="160.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="444.0" minWidth="0.0" prefWidth="376.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <padding>
+                                                <Insets left="13.0" top="10.0" />
+                                            </padding>
+                                        </GridPane>
+                                    </content>
+                                </ScrollPane>
+                                <Button fx:id="btnSave" mnemonicParsing="false" onAction="#saveSettings" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Pokemon">
+                    <content>
+                        <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+                            <content>
+                                <FlowPane fx:id="fpPokeImages" hgap="20.0" vgap="20.0">
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </padding>
+                                </FlowPane>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</AnchorPane>
