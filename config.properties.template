@@ -19,7 +19,7 @@ speed=2.778
 # should the bot EVER drop items (true/false)
 drop_items=true
 
-# max number of each item that the bot should keep if "drop_items" is ennabled
+# max number of each item that the bot should keep if "drop_items" is enabled
 # use -1 in a item to never drop this specific item
 item_revive=20
 item_max_revive=10
