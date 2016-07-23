@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import Log
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.map.fort.PokestopLootResult
@@ -17,15 +16,17 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
+import java.util.*
 import java.util.concurrent.TimeUnit
 
-class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
+class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: HashMap<String, Long>) : Task {
 
     private var pauseDuration = 1L
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val nearbyPokestops = sortedPokestops.filter {
-            it.canLoot()
+            it.inRange() && lootTimeouts.getOrElse(it.id, { 0 }) < System.currentTimeMillis()
         }
 
         if (nearbyPokestops.size > 0) {
@@ -40,24 +41,30 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
             when (result.result) {
                 Result.SUCCESS -> {
                     var message = "Looted pokestop ${closest.id}; +${result.experience} XP"
-                    if(settings.shouldDisplayPokestopSpinRewards)
+                    if (settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
                     Log.green(message)
+                    lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                     //checkResult(result)
                 }
                 Result.INVENTORY_FULL -> {
-
                     var message = "Looted pokestop ${closest.id}; +${result.experience} XP, but inventory is full"
-                    if(settings.shouldDisplayPokestopSpinRewards)
+                    if (settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
 
                     Log.red(message)
+                    lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                 }
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
                     val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                     val distance = self.getEarthDistance(location)
                     Log.red("Pokestop out of range; distance: $distance")
+                }
+                Result.IN_COOLDOWN_PERIOD -> {
+                    val cooldownPeriod = 5
+                    lootTimeouts.put(closest.id, System.currentTimeMillis() + cooldownPeriod * 60 * 1000)
+                    Log.red("Pokestop still in cooldown mode; blacklisting for $cooldownPeriod minutes")
                 }
                 else -> println(result.result)
             }

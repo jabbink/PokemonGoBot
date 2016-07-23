@@ -8,7 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import Log
+import ink.abb.pogo.scraper.util.Log
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
@@ -17,7 +17,7 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import kotlin.concurrent.fixedRateTimer
 
-class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
+class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // don't run away when there are still Pokemon around

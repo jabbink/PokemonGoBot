@@ -6,6 +6,8 @@
  * For more information, refer to the LICENSE file in this repositories root directory
  */
 
+package ink.abb.pogo.scraper.util
+
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,7 +25,7 @@ class Log {
         var format = SimpleDateFormat("dd MMM HH:mm:ss")
 
         fun green(text: String) {
-            println("$green_${format.format(Date())}: $text $reset")
+            println("${green_}${format.format(Date())}: $text ${reset}")
         }
 
         fun normal(text: String) {
@@ -31,19 +33,19 @@ class Log {
         }
 
         fun red(text: String) {
-            println("$red_${format.format(Date())}: $text $reset")
+            println("${red_}${format.format(Date())}: $text ${reset}")
         }
 
         fun yellow(text: String) {
-            println("$yellow_${format.format(Date())}: $text $reset")
+            println("${yellow_}${format.format(Date())}: $text ${reset}")
         }
 
         fun white(text: String) {
-            println("$white_${format.format(Date())}: $text $reset")
+            println("${white_}${format.format(Date())}: $text ${reset}")
         }
 
         fun black(text: String) {
-            println("$black_${format.format(Date())}: $text $reset")
+            println("${black_}${format.format(Date())}: $text ${reset}")
         }
     }
 }

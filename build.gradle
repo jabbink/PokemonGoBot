@@ -18,7 +18,8 @@ apply plugin: 'application'
 
 mainClassName = 'ink.abb.pogo.scraper.MainKt'
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
     mavenCentral()
@@ -35,12 +36,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.isuper/s2-geometry-library-java
     compile group: 'org.isuper', name: 's2-geometry-library-java', version: '0.0.1'
-
-    // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
-    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.0.0-beta-3'
-    //compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
-
-    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.11'

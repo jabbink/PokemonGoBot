@@ -19,7 +19,7 @@ speed=2.778
 # should the bot EVER drop items (true/false)
 drop_items=true
 
-# max number of each item that the bot should keep if "drop_items" is ennabled
+# max number of each item that the bot should keep if "drop_items" is enabled
 # use -1 in a item to never drop this specific item
 item_revive=20
 item_max_revive=10
@@ -53,6 +53,9 @@ transfer_iv_threshold=80
 
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
+
+# Only walk (hatch eggs, don't collect pokemon or pokestops)
+walk_only=false
 
 # list of pokemon you don't want to transfer regardless of CP
 # the names must be divided by a ","
