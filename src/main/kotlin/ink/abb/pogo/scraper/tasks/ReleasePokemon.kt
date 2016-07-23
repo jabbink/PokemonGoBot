@@ -43,13 +43,13 @@ class ReleasePokemon : Task {
                             if (shouldRelease) {
                                 reason = "Obligatory release"
                             } else {
-                                // never transfer > maxIv, unless set in obligatoryTransfer
-                                if (ivPercentage < minIVPercentage) {
+                                // never transfer > min IV percentage (unless set to -1)
+                                if (ivPercentage < minIVPercentage || minIVPercentage == -1) {
                                     reason = "IV < minimum IV percentage"
                                     shouldRelease = true
                                 }
-                                // never transfer > maxCP, unless set in obligatoryTransfer
-                                if (pokemon.cp < minCP) {
+                                // never transfer > min CP  (unless set to -1)
+                                if (pokemon.cp < minCP || minCP == -1) {
                                     reason = "CP < minimum CP"
                                     // only set it to true, when it already was true, otherwise don't release
                                     shouldRelease = shouldRelease && true
