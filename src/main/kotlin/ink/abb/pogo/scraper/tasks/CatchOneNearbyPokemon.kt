@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import POGOProtos.Data.PokemonDataOuterClass
 import ink.abb.pogo.scraper.util.Log
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
@@ -54,9 +55,9 @@ class CatchOneNearbyPokemon : Task {
                     if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                         ctx.pokemonStats.first.andIncrement
                         var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} using $ball"
-
+                        message += "\n ${getIvDetails(encounterResult.wildPokemon.pokemonData)}"
                         if (settings.shouldDisplayPokemonCatchRewards)
-                            message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy, ${result.stardustList.sum()}x Stardust]"
+                            message += " : [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy, ${result.stardustList.sum()}x Stardust]"
                         Log.green(message)
 
                     } else
@@ -67,5 +68,11 @@ class CatchOneNearbyPokemon : Task {
             }
 
         }
+    }
+
+    fun getIvDetails(x: PokemonDataOuterClass.PokemonData): String {
+        val details = "Stamina: ${x.individualStamina} | Attack: ${x.individualAttack} | Defense: ${x.individualDefense}"
+        val iv = x.individualStamina + x.individualAttack + x.individualDefense
+        return details + "| IV: $iv (${(iv * 100 / 45)}%)"
     }
 }
