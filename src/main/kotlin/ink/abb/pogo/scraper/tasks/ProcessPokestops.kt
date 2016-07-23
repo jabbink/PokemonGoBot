@@ -35,10 +35,12 @@ class ProcessPokestops(val pokestops: MutableCollection<Pokestop>) : Task {
             distanceA.compareTo(distanceB)
         })
 
-        val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
+        if (!settings.walkOnly) {
+            val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
+            bot.task(loot)
+        }
         val walk = WalkToUnusedPokestop(sortedPokestops, lootTimeouts)
 
-        bot.task(loot)
         bot.task(walk)
     }
 }

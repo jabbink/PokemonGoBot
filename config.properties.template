@@ -54,6 +54,9 @@ transfer_iv_threshold=80
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
 
+# Only walk (hatch eggs, don't collect pokemon or pokestops)
+walk_only=false
+
 # list of pokemon you don't want to transfer regardless of CP
 # the names must be divided by a ","
 # if you want all pokemons to be transferred just leave it blank
