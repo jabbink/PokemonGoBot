@@ -15,10 +15,10 @@ import java.util.*
 class Settings(val properties: Properties) {
 
     val pokeballItems = linkedMapOf(
-            Pair(ItemIdOuterClass.ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL),
-            Pair(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
-            Pair(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
-            Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL))
+            Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL),
+            Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
+            Pair(ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
+            Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL))
 
     val startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble)
     val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
@@ -60,18 +60,9 @@ class Settings(val properties: Properties) {
         )
     }
 
-    val startingCoordinate = getPropertyOrDie("Starting coordinate", "starting_coordinate", String::toString).split(",").map { v -> v.toDouble() }
-
-    val username = properties.getProperty("username")
-    val password = if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
-    val token = properties.getProperty("token", "")
-
-    val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
-    val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
     val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
     val shouldDisplayKeepAlive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", false, String::toBoolean)
-    val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
 
     val shouldDisplayWalkingToNearestUnused = getPropertyIfSet("Display Walking to nearest Unused Pokestop", "display_walking_nearest_unused", false, String::toBoolean)
     val shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean)

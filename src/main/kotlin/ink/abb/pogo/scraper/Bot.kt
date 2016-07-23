@@ -23,8 +23,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     var ctx = Context(
             api,
             api.playerProfile,
-            AtomicDouble(settings.startingCoordinate.first()),
-            AtomicDouble(settings.startingCoordinate.last())
+            AtomicDouble(settings.startingLatitude),
+            AtomicDouble(settings.startingLongitude),
+            AtomicLong(api.playerProfile.stats.experience),
+            Pair(AtomicInteger(0), AtomicInteger(0)),
+            Pair(AtomicInteger(0), AtomicInteger(0))
     )
 
     fun run() {
