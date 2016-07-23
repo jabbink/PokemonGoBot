@@ -35,8 +35,7 @@ class Settings(val properties: Properties) {
             Pair(ItemId.ITEM_RAZZ_BERRY, 30)
     )
 
-    val startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble)
-    val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
+    val startingCoordinate = getPropertyOrDie("Starting coordinate", "starting_coordinate", String::toString).split(",").map { v -> v.toDouble() }
 
     val username = properties.getProperty("username")
     val password = if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
