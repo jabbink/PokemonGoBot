@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
