@@ -13,12 +13,13 @@ import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
-class Bot(val api: PokemonGo, val settings: Settings) {
+class Bot(val api: PokemonGo, val settings: Settings, mainScreen: MainScreen) {
 
     var ctx = Context(
             api,
@@ -27,17 +28,18 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicDouble(settings.startingLongitude),
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
-            Pair(AtomicInteger(0), AtomicInteger(0))
+            Pair(AtomicInteger(0), AtomicInteger(0)),
+            AtomicBoolean(false),
+            mainScreen
     )
 
     fun run() {
-
-        println()
-        println("Name: ${ctx.profile.username}")
-        println("Team: ${ctx.profile.team}")
-        println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        println("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
-        println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
+        ctx.screen.tfUsername.text = ctx.profile.username
+        ctx.screen.tfTeam.text = "${ctx.profile.team}"
+        ctx.screen.tfPokecoin.text = "${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}"
+        ctx.screen.tfStardust.text = "${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}"
+        ctx.screen.tfLevel.text = "${ctx.profile.stats.level} / 40"
+        ctx.screen.tfXP.text = "${ctx.profile.stats.experience}"
         println("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
         //println("Inventory bag ${ctx.api.bag}")
 

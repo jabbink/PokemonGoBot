@@ -25,5 +25,7 @@ data class Context(
         val pokemonStats: Pair<AtomicInteger, AtomicInteger>,
         val itemStats: Pair<AtomicInteger, AtomicInteger>,
 
-        var walking: AtomicBoolean = AtomicBoolean(false)
+        var walking: AtomicBoolean = AtomicBoolean(false),
+
+        val screen: MainScreen
 )
