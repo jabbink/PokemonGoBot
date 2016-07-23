@@ -8,13 +8,13 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import ink.abb.pogo.scraper.util.Log
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -53,7 +53,8 @@ class CatchOneNearbyPokemon : Task {
 
                     if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                         ctx.pokemonStats.first.andIncrement
-                        var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} using $ball"
+                        val iv = (encounterResult.wildPokemon.pokemonData.individualAttack + encounterResult.wildPokemon.pokemonData.individualDefense + encounterResult.wildPokemon.pokemonData.individualStamina) * 100 / 45
+                        var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV $iv% using $ball"
 
                         if (settings.shouldDisplayPokemonCatchRewards)
                             message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy, ${result.stardustList.sum()}x Stardust]"
