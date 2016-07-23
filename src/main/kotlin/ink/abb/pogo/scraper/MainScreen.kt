@@ -9,6 +9,7 @@ import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
 import javafx.fxml.Initializable
+import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
@@ -16,6 +17,8 @@ import javafx.scene.layout.AnchorPane
 import okhttp3.OkHttpClient
 import tornadofx.View
 import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
@@ -36,6 +39,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     val tfPokecoin: TextField by fxid()
     val tfStardust: TextField by fxid()
     val taConsole: TextArea by fxid()
+    val btnStart: Button by fxid()
 
     val tfSettingsUsername: TextField by fxid()
     val tfSettingsPassword: TextField by fxid()
