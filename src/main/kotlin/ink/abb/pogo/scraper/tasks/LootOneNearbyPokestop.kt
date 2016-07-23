@@ -39,15 +39,15 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
             }
             when (result.result) {
                 Result.SUCCESS -> {
-                    var message = "Looted pokestop ${closest.id}"
+                    var message = "Looted pokestop ${closest.id}; +${result.experience} XP"
                     if(settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
                     Log.green(message)
-                    checkResult(result)
+                    //checkResult(result)
                 }
                 Result.INVENTORY_FULL -> {
 
-                    var message = "Looted pokestop ${closest.id}, but inventory is full"
+                    var message = "Looted pokestop ${closest.id}; +${result.experience} XP, but inventory is full"
                     if(settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
 
@@ -64,6 +64,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
         }
     }
 
+    // TODO: Does not work as everything is multithread and the rest of the bot just continues
     private fun checkResult(result: PokestopLootResult) {
         if (result.experience == 0 && result.itemsAwarded.isEmpty()) {
             Log.red("Looks like a ban. Pause for $pauseDuration minute(s).")
