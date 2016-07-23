@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.util
 
+import ink.abb.pogo.scraper.Context
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,6 +31,10 @@ class Log {
 
         fun normal(text: String) {
             println("${format.format(Date())}: $text")
+        }
+
+        fun normal(ctx: Context, text: String) {
+            ctx.screen.taConsole.appendText("${format.format(Date())}: $text \n")
         }
 
         fun red(text: String) {

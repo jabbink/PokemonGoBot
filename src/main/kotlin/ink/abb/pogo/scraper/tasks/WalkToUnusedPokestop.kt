@@ -8,6 +8,9 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
+import com.lynden.gmapsfx.javascript.`object`.LatLong
+import com.lynden.gmapsfx.javascript.`object`.MapOptions
 import ink.abb.pogo.scraper.util.Log
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
@@ -15,6 +18,7 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import javafx.application.Platform
 import kotlin.concurrent.fixedRateTimer
 
 class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
@@ -59,6 +63,11 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
             remainingSteps--
             if (remainingSteps <= 0) {
                 Log.normal("Destination reached.")
+                Platform.runLater {
+                    val mapOptions = MapOptions()
+                    mapOptions.center(LatLong(end.latDegrees(), end.lngDegrees())).overviewMapControl(false).panControl(false).rotateControl(false).scaleControl(false).streetViewControl(false).zoomControl(false).zoom(12)
+                    ctx.screen.map = ctx.screen.mapView.createMap(mapOptions)
+                }
                 ctx.walking.set(false)
                 cancel()
             }

@@ -37,5 +37,9 @@ class UpdateProfile : Task {
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
         } catch (e: Exception) {
         }
+            ctx.screen.tfLevel.text = "${player.stats.level} / 40"
+            ctx.screen.tfXP.text = "$curLevelXP / $nextXP ($ratio%)"
+            Log.normal(ctx, "XP gain: ${player.stats.experience - ctx.startXp.get()} XP; Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; Pokebank /${ctx.profile.pokemonStorage}; Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
+        } catch (e: Exception) {}
     }
 }
