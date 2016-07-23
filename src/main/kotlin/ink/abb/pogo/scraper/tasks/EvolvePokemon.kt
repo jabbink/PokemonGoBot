@@ -23,7 +23,7 @@ class  EvolvePokemon : Task {
         if (settings.autoEvolve.isEmpty()) {
             return
         }
-        val groupedPokemon = ctx.api.pokebank.pokemons.groupBy { it.pokemonId }
+        val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val autoEvolve = settings.autoEvolve
         val canEvolve = groupedPokemon.filter {
             val candyNeeded = settings.candyRequiredByPokemon[it.key.number]
