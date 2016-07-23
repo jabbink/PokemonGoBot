@@ -58,6 +58,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val reply = api.map.mapObjects
         val process = ProcessPokestops(reply.pokestops)
 
+        fixedRateTimer("ProfileLoop", false, 0, 60000, action = {
+            thread(block = {
+                task(profile)
+            })
+        })
+
         fixedRateTimer("BotLoop", false, 0, 5000, action = {
             thread(block = {
                 task(keepalive)
@@ -65,7 +71,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(drop)
                 task(process)
                 task(release)
-                task(profile)
             })
         })
     }
