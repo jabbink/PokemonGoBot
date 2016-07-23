@@ -21,7 +21,18 @@ class CatchOneNearbyPokemon : Task {
         val pokemon = ctx.api.map.catchablePokemon
 
         if (pokemon.isNotEmpty()) {
-            val catchablePokemon = pokemon.first()
+            var catchablePokemon = pokemon.first()
+
+            if(settings.preferedPokemon.isNotEmpty()){
+                for(nextPokemon in pokemon){
+                    if(settings.preferedPokemon.contains(nextPokemon.pokemonId.name)){
+                        catchablePokemon = nextPokemon
+                        break
+                    }
+                }
+            }
+
+
             var ball: ItemId? = null
             try {
                 val preferred_ball = settings.preferredBall
@@ -32,7 +43,7 @@ class CatchOneNearbyPokemon : Task {
                     for (other in settings.pokeballItems) {
                         if (preferred_ball == other) continue
 
-                        item = ctx.api.inventories.itemBag.getItem(other.key);
+                        item = ctx.api.inventories.itemBag.getItem(other.key)
                         if (item != null && item.count > 0)
                             ball = other.key
                     }

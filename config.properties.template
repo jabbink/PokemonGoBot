@@ -62,6 +62,9 @@ ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
 # list of pokemon you always want to trancsfer regardless of CP
 obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
 
+# list of pokemon which are prefered to catch
+prefer_pokemon=MEWTWO,MEW,DITTO,DRAGONITE,ARTICUNO,ZAPDOS,MOLTRES,GYARADOS,LAPRAS,SNORLAX
+
 #List of pokemon names
 #MISSINGNO
 #BULBASAUR
