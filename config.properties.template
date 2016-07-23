@@ -62,8 +62,12 @@ walk_only=false
 # if you want all pokemons to be transferred just leave it blank
 ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
 
-# list of pokemon you always want to trancsfer regardless of CP
-obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
+# list of pokemon you always want to transfer regardless of CP
+obligatory_transfer=DODUO
+
+# list of pokemon you always want to evolve regardless of CP
+# (if there is not enough candies for the evolution, the pokemon will be transfered instead)
+obligatory_evolve=RATTATA,CATERPIE,PIDGEY
 
 #List of pokemon names
 #MISSINGNO
