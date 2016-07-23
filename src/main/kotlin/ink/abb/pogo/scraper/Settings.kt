@@ -20,8 +20,6 @@ class Settings(val properties: Properties) {
             Pair(ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
             Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
 
-    val candyRequiredByPokemon = getCandyByPokemon()
-
     val startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble)
     val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
 
@@ -70,10 +68,12 @@ class Settings(val properties: Properties) {
     val shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean)
     val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
 
-    val transferIVthreshold = getPropertyIfSet("Minimum IV to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)
+    val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
+
+    val transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)
 
     val ignoredPokemon = if (shouldAutoTransfer) {
-        getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",")
+        getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMANDER", String::toString).split(",")
     } else {
         listOf()
     }
@@ -82,6 +82,8 @@ class Settings(val properties: Properties) {
     } else {
         listOf()
     }
+
+    val candyRequiredByPokemon = getCandyByPokemon()
 
     val autoEvolve = getPropertyIfSet("list of pokemon you want to evolve when able to", "auto_evolve", "CATERPIE,PIDGEY,WEEDLE", String::toString).split(",")
 
