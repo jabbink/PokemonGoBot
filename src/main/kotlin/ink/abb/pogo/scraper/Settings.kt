@@ -111,4 +111,8 @@ class Settings(val properties: Properties) {
             return default
         }
     }
+
+    fun setToken(value: String){
+        properties.setProperty("token",value)
+    }
 }
