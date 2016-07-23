@@ -1,6 +1,5 @@
 package ink.abb.pogo.scraper
 
-import Log
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.lynden.gmapsfx.GoogleMapView
 import com.lynden.gmapsfx.MapComponentInitializedListener
@@ -8,11 +7,13 @@ import com.lynden.gmapsfx.javascript.`object`.*
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
+import javafx.application.Platform
 import javafx.fxml.Initializable
 import javafx.scene.control.CheckBox
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
+import javafx.stage.Stage
 import okhttp3.OkHttpClient
 import tornadofx.View
 import java.io.FileInputStream
@@ -28,6 +29,7 @@ import javax.security.cert.CertificateException
 
 class MainScreen : View(), MapComponentInitializedListener, Initializable {
 
+    val apRoot: AnchorPane by fxid()
     val mapView: GoogleMapView by fxid()
     val tfUsername: TextField by fxid()
     val tfXP: TextField by fxid()
@@ -42,6 +44,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     val tfSettingsToken: TextField by fxid()
     val tfSettingsLatitude: TextField by fxid()
     val tfSettingsLongitude: TextField by fxid()
+
     val tfSettingsSpeed: TextField by fxid()
     val tfSettingsTransferIVthreshold: TextField by fxid()
     val tfSettingsIgnoredPokemon: TextField by fxid()
@@ -124,6 +127,16 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
         tfSettingsObligatoryTransfer.text = settings!!.obligatoryTransfer.toString()
         checkboxSettingsDropItems.isSelected = settings!!.shouldDropItems
         checkboxSettingsAutotransfer.isSelected = settings!!.shouldAutoTransfer
+
+        // Close properly
+        apRoot.sceneProperty().addListener({ obs, oldScene, newScene ->
+            Platform.runLater {
+                val stage = newScene.window as Stage
+                stage.setOnCloseRequest({ e ->
+                    exit()
+                })
+            }
+        })
     }
 
     override val root : AnchorPane by fxml("MainScreen.fxml");
@@ -157,14 +170,15 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
             }
         }
 
-        Log.normal("Logged in as $username with token ${auth.token.contents}")
+        tfUsername.text = username
+        taConsole.appendText("Logged in with token ${auth.token.contents}\n")
 
         if (token.isBlank()) {
-            Log.normal("Set this token in your config to log in directly")
+            taConsole.appendText("Set this token in your config to log in directly\n")
         }
         val api = PokemonGo(auth, http)
 
-        print("Getting profile data from pogo server")
+        taConsole.appendText("Getting profile data from pogo server\n")
         while (api.playerProfile == null) {
             print(".")
             Thread.sleep(1000)
@@ -179,6 +193,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     }
 
     fun exit() {
+        Platform.exit()
         System.exit(0)
     }
 
