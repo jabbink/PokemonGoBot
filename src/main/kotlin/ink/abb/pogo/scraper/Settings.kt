@@ -15,23 +15,24 @@ import java.util.*
 
 class Settings(val properties: Properties) {
 
-    val pokeballItems = mapOf(Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
+    val pokeballItems = linkedMapOf(
+            Pair(ItemIdOuterClass.ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL),
             Pair(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
             Pair(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
-            Pair(ItemIdOuterClass.ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
+            Pair(ItemIdOuterClass.ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL))
 
     val uselessItems = mapOf(
             Pair(ItemId.ITEM_REVIVE, 20),
             Pair(ItemId.ITEM_MAX_REVIVE, 10),
             Pair(ItemId.ITEM_POTION, 0),
-            Pair(ItemId.ITEM_SUPER_POTION, 30),
+            Pair(ItemId.ITEM_SUPER_POTION, 10),
             Pair(ItemId.ITEM_HYPER_POTION, 50),
             Pair(ItemId.ITEM_MAX_POTION, 50),
             Pair(ItemId.ITEM_POKE_BALL, 50),
             Pair(ItemId.ITEM_GREAT_BALL, 50),
             Pair(ItemId.ITEM_ULTRA_BALL, 50),
-            Pair(ItemId.ITEM_MASTER_BALL, 10),
-            Pair(ItemId.ITEM_RAZZ_BERRY, 50)
+            Pair(ItemId.ITEM_MASTER_BALL, 30),
+            Pair(ItemId.ITEM_RAZZ_BERRY, 30)
     )
 
     val startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble)
@@ -45,18 +46,14 @@ class Settings(val properties: Properties) {
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
     val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
-    val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
+    val shouldDisplayKeepAlive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", false, String::toBoolean)
     val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
-    val ignoredPokemon = if (shouldAutoTransfer) {
-        getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",")
-    } else {
-        listOf()
-    }
-    val obligatoryTransfer = if (shouldAutoTransfer) {
-        getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
-    } else {
-        listOf()
-    }
+    val ignoredPokemon = if(shouldAutoTransfer) getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",").toSet() else emptySet()
+    val obligatoryTransfer = if (shouldAutoTransfer) getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",").toSet() else emptySet()
+
+    val ultraBallPrefOverride = getPropertyIfSet("Use ultra ball for the first pick before falling back to others", "ultra_ball_first", "", String::toString).split(",").toSet()
+    val greatBallPrefOverride = getPropertyIfSet("Use great ball for the first pick before falling back to others", "great_ball_first", "", String::toString).split(",").toSet()
+    val masterBallPrefOverride = getPropertyIfSet("Use master ball for the first pick before falling back to others", "master_ball_first", "", String::toString).split(",").toSet()
 
     private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
         val settingString = "$description setting (\"$property\")"

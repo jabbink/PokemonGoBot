@@ -45,7 +45,9 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         task(keepalive)
         println("Getting initial pokestops...")
         // TODO: Figure out why pokestops are only showing up the first time api.map.mapObjects is called (???)
-        val reply = api.map.mapObjects
+        val width = 9;
+        val reply = api.map.getMapObjects(width)
+        println("Found ${reply.pokestops.size} number of pokestops within width: ${width} ")
         val process = ProcessPokestops(reply.pokestops)
 
         fixedRateTimer("BotLoop", false, 0, 5000, action = {
