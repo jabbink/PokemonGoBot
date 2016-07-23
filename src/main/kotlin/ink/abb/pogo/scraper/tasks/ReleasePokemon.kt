@@ -13,7 +13,6 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class ReleasePokemon : Task {
@@ -30,7 +29,6 @@ class ReleasePokemon : Task {
                 // don't drop favourited or nicknamed pokemon
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.favorite
                 if (!isFavourite) {
-                    val iv = pokemon.getIv()
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon
                     if (index > 0) {
@@ -58,7 +56,7 @@ class ReleasePokemon : Task {
                             if (shouldRelease) {
                                 ctx.pokemonStats.second.andIncrement
                                 Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
-                                        "CP ${pokemon.cp} and IV $iv%; reason: $reason")
+                                        "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
                                 pokemon.transferPokemon()
                             }
                         }
