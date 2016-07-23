@@ -61,7 +61,9 @@ class CatchOneNearbyPokemon : Task {
 
                     } else
                         Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
-                }
+                } else {
+                    Log.red("Encounter failed with result: ${encounterResult.getStatus()}")
+                } 
             }
 
         }
