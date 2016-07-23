@@ -124,7 +124,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
             tfSettingsLatitude.text = settings!!.startingLatitude.toString()
             tfSettingsLongitude.text = settings!!.startingLongitude.toString()
             tfSettingsSpeed.text = settings!!.speed.toString()
-            tfSettingsTransferIVthreshold.text = settings!!.transferIVthreshold.toString()
+            tfSettingsTransferIVthreshold.text = settings!!.transferIVThreshold.toString()
             tfSettingsIgnoredPokemon.text = settings!!.ignoredPokemon.toString()
             tfSettingsObligatoryTransfer.text = settings!!.obligatoryTransfer.toString()
             checkboxSettingsDropItems.isSelected = settings!!.shouldDropItems
