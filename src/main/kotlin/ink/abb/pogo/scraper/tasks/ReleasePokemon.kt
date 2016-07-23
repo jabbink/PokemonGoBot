@@ -52,7 +52,7 @@ class ReleasePokemon : Task {
                                 }
                                 // never transfer > min CP  (unless set to -1)
                                 if (pokemon.cp < minCP || minCP == -1) {
-                                    cpTooLow = false
+                                    cpTooLow = true
                                 }
                                 reason = "CP < $minCP and IV < $minIVPercentage"
                                 shouldRelease = ivTooLow && cpTooLow
