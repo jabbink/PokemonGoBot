@@ -30,7 +30,6 @@ dependencies {
     //compile project(':PokeGOAPI-Java')
 
     compile 'no.tornado:tornadofx:1.5.2'
-
     // https://mvnrepository.com/artifact/com.lynden/GMapsFX
     compile group: 'com.lynden', name: 'GMapsFX', version: '2.0.8'
 
@@ -68,3 +67,4 @@ jar {
         )
     }
 }
+sourceSets.main.resources.srcDir 'src/main/kotlin'
