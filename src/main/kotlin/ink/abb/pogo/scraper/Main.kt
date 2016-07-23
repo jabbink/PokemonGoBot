@@ -8,7 +8,7 @@
 
 package ink.abb.pogo.scraper
 
-import Log
+import ink.abb.pogo.scraper.util.Log
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin

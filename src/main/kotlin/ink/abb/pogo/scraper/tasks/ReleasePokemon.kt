@@ -8,7 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import Log
+import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings

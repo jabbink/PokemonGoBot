@@ -8,7 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import Log
+import ink.abb.pogo.scraper.util.Log
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.map.fort.PokestopLootResult
