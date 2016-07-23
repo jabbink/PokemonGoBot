@@ -8,18 +8,16 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
-import ink.abb.pogo.scraper.util.pokemon.*
+import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.pokemon.getIv
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (!settings.shouldAutoTransfer) {
-            return
-        }
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
