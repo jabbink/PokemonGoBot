@@ -12,6 +12,8 @@ import Log
 import com.lynden.gmapsfx.javascript.`object`.LatLong
 import com.lynden.gmapsfx.javascript.`object`.MapOptions
 import ink.abb.pogo.scraper.util.Log
+import com.lynden.gmapsfx.javascript.`object`.Marker
+import com.lynden.gmapsfx.javascript.`object`.MarkerOptions
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
@@ -67,6 +69,12 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
                     val mapOptions = MapOptions()
                     mapOptions.center(LatLong(end.latDegrees(), end.lngDegrees())).overviewMapControl(false).panControl(false).rotateControl(false).scaleControl(false).streetViewControl(false).zoomControl(false).zoom(12)
                     ctx.screen.map = ctx.screen.mapView.createMap(mapOptions)
+
+                    val currentLocation = LatLong(end.latDegrees(), end.lngDegrees())
+                    val markerOptions1 = MarkerOptions()
+                    markerOptions1.position(currentLocation)
+                    val currentMarker = Marker(markerOptions1)
+                    ctx.screen.map!!.addMarker(currentMarker)
                 }
                 ctx.walking.set(false)
                 cancel()
