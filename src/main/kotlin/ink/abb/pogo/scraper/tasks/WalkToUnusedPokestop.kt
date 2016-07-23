@@ -34,14 +34,14 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
         }
 
         if (nearestUnused.size > 0) {
-            if (settings.shouldDisplayWalkingToNearestUnused)
-                Log.normal("Walking to pokestop \"${nearestUnused.first().details.name}\"")
-            walk(ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed, settings)
+            walk(ctx, nearestUnused.first(), settings.speed, settings)
         }
     }
 
-    fun walk(ctx: Context, end: S2LatLng, speed: Double, settings: Settings) {
+    fun walk(ctx: Context, pokestop: Pokestop, speed: Double, settings: Settings) {
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
+        val end = S2LatLng.fromDegrees(pokestop.latitude, pokestop.longitude)
+
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
         val timeout = 200L
@@ -50,7 +50,8 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
-        Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
+        if (settings.shouldDisplayWalkingToNearestUnused)
+            Log.normal("Walking to pokestop \"${pokestop.details.name}\" ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
         fixedRateTimer("Walk", false, 0, timeout, action = {
