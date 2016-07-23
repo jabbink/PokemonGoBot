@@ -46,13 +46,13 @@ class ReleasePokemon : Task {
                                 var ivTooLow = false
                                 var cpTooLow = false
 
-                                // never transfer > min IV percentage (unless set to -1)
-                                if (ivPercentage < minIVPercentage || minIVPercentage == -1) {
+                                // never transfer > min IV percentage
+                                if (ivPercentage < minIVPercentage) {
                                     ivTooLow = true
                                 }
-                                // never transfer > min CP  (unless set to -1)
-                                if (pokemon.cp < minCP || minCP == -1) {
-                                    cpTooLow = false
+                                // never transfer > min CP
+                                if (pokemon.cp < minCP) {
+                                    cpTooLow = true
                                 }
                                 reason = "CP < $minCP and IV < $minIVPercentage"
                                 shouldRelease = ivTooLow && cpTooLow
