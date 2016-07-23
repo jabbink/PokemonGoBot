@@ -45,6 +45,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val drop = DropUselessItems()
         val profile = UpdateProfile()
         val catch = CatchOneNearbyPokemon()
+        val evolve = EvolvePokemon()
         val release = ReleasePokemon()
 
         task(keepalive)
@@ -59,6 +60,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(catch)
                 task(drop)
                 task(process)
+                task(evolve)
                 task(release)
                 task(profile)
             })

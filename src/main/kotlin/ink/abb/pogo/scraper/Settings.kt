@@ -11,6 +11,7 @@ package ink.abb.pogo.scraper
 import POGOProtos.Inventory.ItemIdOuterClass
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId
 import com.pokegoapi.api.inventory.Pokeball
+import java.io.File
 import java.util.*
 
 class Settings(val properties: Properties) {
@@ -34,6 +35,8 @@ class Settings(val properties: Properties) {
             Pair(ItemId.ITEM_RAZZ_BERRY, 50)
     )
 
+    val candyRequiredByPokemon = getCandyByPokemon()
+
     val startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble)
     val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
 
@@ -56,6 +59,17 @@ class Settings(val properties: Properties) {
         getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
     } else {
         listOf()
+    }
+
+    val autoEvolve = getPropertyIfSet("list of pokemon you want to evolve when able to", "auto_evolve", "CATERPIE,PIDGEY,WEEDLE", String::toString).split(",")
+
+    //This method only exists because I wasn't sure if this data was stored somewhere else. If it is then this can be removed.
+    private fun getCandyByPokemon(): Map<Int, Int> {
+        val lines = File("pokemon-candy.csv").readLines()
+        return lines.map {
+            val split = it.split(",")
+            Pair(split[0].toInt(), split[1].toInt())
+        }.toMap()
     }
 
     private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {

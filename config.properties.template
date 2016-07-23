@@ -22,6 +22,8 @@ transfer_cp_threshold=400
 ignored_pokemon=EEVEE,MEWTWO,CHARMENDER
 # list of pokemon you always want to trancsfer regardless of CP
 obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
+# pokemon that the bot should auto evolve. Leave blank if auto evolve should remain disabled
+auto_evolve=PIDGEY
 #List of pokemon names
 #MISSINGNO
 #BULBASAUR
