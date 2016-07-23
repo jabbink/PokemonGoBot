@@ -22,7 +22,7 @@
 # Known issues
 
 ## I got `COMPILE FAILED`
-Most of the time is because the api the bot is built upon, [PokeGOAPI-Java](url:https://github.com/Grover-c13/PokeGOAPI-Java), updated and changed something.  
+Most of the time it's because the api the bot is built upon, [PokeGOAPI-Java](url:https://github.com/Grover-c13/PokeGOAPI-Java), updated and changed something.  
 Run `gradlew --refresh-dependencies clean build`.  
 If there's still a problem, open an issue.
 
