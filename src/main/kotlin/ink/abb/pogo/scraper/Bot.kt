@@ -51,12 +51,19 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val profile = UpdateProfile()
         val catch = CatchOneNearbyPokemon()
         val release = ReleasePokemon()
+        val hatchEggs = HatchEggs()
 
         task(keepalive)
         println("Getting initial pokestops...")
         // TODO: Figure out why pokestops are only showing up the first time api.map.mapObjects is called (???)
         val reply = api.map.mapObjects
         val process = ProcessPokestops(reply.pokestops)
+
+        fixedRateTimer("ProfileLoop", false, 0, 60000, action = {
+            thread(block = {
+                task(profile)
+            })
+        })
 
         fixedRateTimer("BotLoop", false, 0, 5000, action = {
             thread(block = {
@@ -65,7 +72,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(drop)
                 task(process)
                 task(release)
-                task(profile)
+                task(hatchEggs)
             })
         })
     }

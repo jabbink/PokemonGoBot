@@ -23,21 +23,40 @@ class ReleasePokemon : Task {
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
-        val maxIV = settings.transferIVthreshold
+        val maxIVPercentage = settings.transferIVThreshold
+        val maxCP = settings.transferCPThreshold
 
         groupedPokemon.forEach {
             val sorted = it.value.sortedByDescending { it.cp }
             for ((index, pokemon) in sorted.withIndex()) {
-                // never transfer highest rated Pokemon
-                // never transfer > maxCP, unless set in obligatoryTransfer
-                // stop releasing when pokemon is set in ignoredPokemon
                 val iv = pokemon.getIv()
                 val ivPercentage = pokemon.getIvPercentage()
-                if (index > 0 && (ivPercentage < maxIV || obligatoryTransfer.contains(pokemon.pokemonId.name)) &&
-                        (!ignoredPokemon.contains(pokemon.pokemonId.name))) {
-                    ctx.pokemonStats.second.andIncrement
-                    Log.yellow("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp} and IV $iv%")
-                    pokemon.transferPokemon()
+                // never transfer highest rated Pokemon
+                if (index > 0) {
+                    // stop releasing when pokemon is set in ignoredPokemon
+                    if (!ignoredPokemon.contains(pokemon.pokemonId.name)) {
+                        var shouldRelease = obligatoryTransfer.contains(pokemon.pokemonId.name)
+                        var reason = ""
+                        if (shouldRelease) {
+                            reason = "Obligatory release"
+                        } else {
+                            // never transfer > maxIv, unless set in obligatoryTransfer
+                            if (ivPercentage < maxIVPercentage) {
+                                reason = "IV < max IV"
+                                shouldRelease = true
+                            }
+                            // never transfer > maxCP, unless set in obligatoryTransfer
+                            if (pokemon.cp < maxCP) {
+                                reason = "CP < maxCP"
+                                shouldRelease = true
+                            }
+                        }
+                        if (shouldRelease) {
+                            ctx.pokemonStats.second.andIncrement
+                            Log.yellow("Going to transfer ${pokemon.pokemonId.name} with CP ${pokemon.cp} and IV $iv%; reason: $reason")
+                            pokemon.transferPokemon()
+                        }
+                    }
                 }
             }
         }
