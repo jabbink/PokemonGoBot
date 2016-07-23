@@ -61,6 +61,11 @@ class Settings(val properties: Properties) {
 
     val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
+    val shouldForceTransfer = if (shouldAutoTransfer) {
+        getPropertyIfSet("Forcetransfer", "forcetransfer", false, String::toBoolean)
+    } else {
+        false
+    }
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
 
     val shouldDisplayWalkingToNearestUnused = getPropertyIfSet("Display Walking to nearest Unused Pokestop", "display_walking_nearest_unused", false, String::toBoolean)
