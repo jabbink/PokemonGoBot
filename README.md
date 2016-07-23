@@ -1,4 +1,5 @@
 # Pokemon Go Bot
+[![Build Status](https://travis-ci.org/pratamawijaya/PokemonGoBot.svg?branch=feature%2Fadd_travis)](https://travis-ci.org/pratamawijaya/PokemonGoBot)
 
 ## Usage (from source)
 
