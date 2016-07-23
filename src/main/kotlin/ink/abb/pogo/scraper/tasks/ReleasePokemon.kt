@@ -23,8 +23,8 @@ class ReleasePokemon : Task {
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
-        val maxIVPercentage = settings.transferIVThreshold
-        val maxCP = settings.transferCPThreshold
+        val minIVPercentage = settings.transferIVThreshold
+        val minCP = settings.transferCPThreshold
 
         groupedPokemon.forEach {
             val sorted = it.value.sortedByDescending { it.cp }
@@ -41,14 +41,15 @@ class ReleasePokemon : Task {
                             reason = "Obligatory release"
                         } else {
                             // never transfer > maxIv, unless set in obligatoryTransfer
-                            if (ivPercentage < maxIVPercentage) {
-                                reason = "IV < max IV"
+                            if (ivPercentage < minIVPercentage) {
+                                reason = "IV < minimum IV percentage"
                                 shouldRelease = true
                             }
                             // never transfer > maxCP, unless set in obligatoryTransfer
-                            if (pokemon.cp < maxCP) {
-                                reason = "CP < maxCP"
-                                shouldRelease = true
+                            if (pokemon.cp < minCP) {
+                                reason = "CP < minimum CP"
+                                // only set it to true, when it already was true, otherwise don't release
+                                shouldRelease = shouldRelease && true
                             }
                         }
                         if (shouldRelease) {
