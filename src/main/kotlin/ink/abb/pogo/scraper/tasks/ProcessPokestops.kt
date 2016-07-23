@@ -23,6 +23,8 @@ import java.util.*
  */
 class ProcessPokestops(val pokestops: MutableCollection<Pokestop>) : Task {
 
+    private val lootTimeouts = HashMap<String, Long>()
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val sortedPokestops = pokestops.sortedWith(Comparator { a, b ->
             val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)
@@ -33,8 +35,8 @@ class ProcessPokestops(val pokestops: MutableCollection<Pokestop>) : Task {
             distanceA.compareTo(distanceB)
         })
 
-        val loot = LootOneNearbyPokestop(sortedPokestops)
-        val walk = WalkToUnusedPokestop(sortedPokestops)
+        val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
+        val walk = WalkToUnusedPokestop(sortedPokestops, lootTimeouts)
 
         bot.task(loot)
         bot.task(walk)
