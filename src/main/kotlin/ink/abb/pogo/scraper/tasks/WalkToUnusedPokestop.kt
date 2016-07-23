@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
@@ -33,6 +34,8 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
         }
 
         if (nearestUnused.size > 0) {
+            if (settings.shouldDisplayWalkingToNearestUnused)
+                Log.normal("Walking to pokestop \"${nearestUnused.first().details.name}\"")
             walk(ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed)
         }
     }
@@ -47,7 +50,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
-        println("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
+        Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
         fixedRateTimer("Walk", false, 0, timeout, action = {
@@ -55,7 +58,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
             ctx.lng.addAndGet(deltaLng)
             remainingSteps--
             if (remainingSteps <= 0) {
-                println("Destination reached.")
+                Log.normal("Destination reached.")
                 ctx.walking.set(false)
                 cancel()
             }

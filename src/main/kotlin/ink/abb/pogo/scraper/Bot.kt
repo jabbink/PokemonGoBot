@@ -12,6 +12,9 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.tasks.*
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
@@ -32,9 +35,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
         println("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
         println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        println()
+        println("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
+        //println("Inventory bag ${ctx.api.bag}")
 
-        api.pokebank.pokemons.map { "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP" }.forEach { println(it) }
+        api.inventories.pokebank.pokemons.map {
+            val IV = it.getIvPercentage()
+            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV%"
+        }.forEach { println(it) }
 
         val keepalive = GetMapRandomDirection()
         val drop = DropUselessItems()
@@ -50,6 +57,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         println("Found ${reply.pokestops.size} number of pokestops within width: ${width} ")
         val process = ProcessPokestops(reply.pokestops)
 
+        fixedRateTimer("ProfileLoop", false, 0, 60000, action = {
+            thread(block = {
+                task(profile)
+            })
+        })
+
         fixedRateTimer("BotLoop", false, 0, 5000, action = {
             thread(block = {
                 task(keepalive)
@@ -57,7 +70,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(drop)
                 task(process)
                 task(release)
-                task(profile)
             })
         })
     }

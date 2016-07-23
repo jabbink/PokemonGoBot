@@ -8,15 +8,21 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import com.pokegoapi.api.map.fort.Pokestop
+import com.pokegoapi.api.map.fort.PokestopLootResult
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import java.util.concurrent.TimeUnit
 
 class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
+
+    private var pauseDuration = 1L
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val nearbyPokestops = sortedPokestops.filter {
             it.canLoot()
@@ -24,25 +30,47 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
 
         if (nearbyPokestops.size > 0) {
             val closest = nearbyPokestops.first()
-            println("Looting nearby pokestop ${closest.id}")
+            Log.normal("Looting nearby pokestop ${closest.id}")
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
             val result = closest.loot()
+
+            if (result?.itemsAwarded != null) {
+                ctx.itemStats.first.getAndAdd(result.itemsAwarded.size)
+            }
             when (result.result) {
                 Result.SUCCESS -> {
-                    val items = result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }
-                    println("Looted pokestop ${closest.id}: $items")
+                    var message = "Looted pokestop ${closest.id}"
+                    if(settings.shouldDisplayPokestopSpinRewards)
+                        message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
+                    Log.green(message)
+                    checkResult(result)
                 }
                 Result.INVENTORY_FULL -> {
-                    println("Looted pokestop ${closest.id}, but inventory is full")
+
+                    var message = "Looted pokestop ${closest.id}, but inventory is full"
+                    if(settings.shouldDisplayPokestopSpinRewards)
+                        message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
+
+                    Log.red(message)
                 }
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
                     val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                     val distance = self.getEarthDistance(location)
-                    println("Pokestop out of range; distance: $distance")
+                    Log.red("Pokestop out of range; distance: $distance")
                 }
                 else -> println(result.result)
             }
+        }
+    }
+
+    private fun checkResult(result: PokestopLootResult) {
+        if (result.experience == 0 && result.itemsAwarded.isEmpty()) {
+            Log.red("Looks like a ban. Pause for $pauseDuration minute(s).")
+            Thread.sleep(TimeUnit.MINUTES.toMillis(pauseDuration))
+            pauseDuration += 1
+        } else {
+            pauseDuration = 1L
         }
     }
 }

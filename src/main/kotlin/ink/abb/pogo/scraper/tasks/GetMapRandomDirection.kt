@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import Log
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -19,7 +20,7 @@ class GetMapRandomDirection : Task {
         val lat = ctx.lat.get() + randomLatLng()
         val lng = ctx.lng.get() + randomLatLng()
 
-        if (settings.shouldDisplayKeepAlive) println("Getting map of ($lat, $lng)")
+        if (settings.shouldDisplayKeepAlive) Log.normal("Getting map of ($lat, $lng)")
         ctx.api.setLocation(lat, lng, 0.0)
     }
 

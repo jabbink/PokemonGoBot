@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper
 
+import Log
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
@@ -72,7 +73,7 @@ fun main(args: Array<String>) {
 
     val token = settings.token
 
-    println("Logging in to game server...")
+    Log.normal("Logging in to game server...")
     val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
 
     auth = if (token.isBlank()) {
@@ -89,10 +90,10 @@ fun main(args: Array<String>) {
         }
     }
 
-    println("Logged in as $username with token ${auth.token.contents}")
+    Log.normal("Logged in as $username with token ${auth.token.contents}")
 
     if (token.isBlank()) {
-        println("Set this token in your config to log in directly")
+        Log.normal("Set this token in your config to log in directly")
     }
     val api = PokemonGo(auth, http)
 

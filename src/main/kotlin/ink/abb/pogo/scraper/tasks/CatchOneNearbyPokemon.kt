@@ -8,9 +8,9 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import POGOProtos.Inventory.ItemIdOuterClass
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
-import com.pokegoapi.api.map.pokemon.CatchablePokemon
+import Log
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -26,17 +26,23 @@ class CatchOneNearbyPokemon : Task {
 
             if (ball != null) {
                 val usedPokeball = settings.pokeballItems[ball]
-                println("Found pokemon ${catchablePokemon.pokemonId}")
+                Log.green("Found pokemon ${catchablePokemon.pokemonId}")
                 ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
                 val encounterResult = catchablePokemon.encounterPokemon()
                 if (encounterResult.wasSuccessful()) {
-                    println("Encountered pokemon ${catchablePokemon.pokemonId}")
+                    Log.green("Encountered pokemon ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp}")
                     val result = catchablePokemon.catchPokemon(usedPokeball)
 
-                    if (result.status == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS)
-                        println("Caught a ${catchablePokemon.pokemonId} using $ball")
-                    else
-                        println("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+                    if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                        ctx.pokemonStats.first.andIncrement
+                        var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} using $ball"
+
+                        if (settings.shouldDisplayPokemonCatchRewards)
+                            message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy, ${result.stardustList.sum()}x Stardust]"
+                        Log.green(message)
+
+                    } else
+                        Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
                 }
             }
         }
