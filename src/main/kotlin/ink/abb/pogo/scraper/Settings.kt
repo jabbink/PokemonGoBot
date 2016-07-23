@@ -80,6 +80,8 @@ class Settings(val properties: Properties) {
         listOf()
     }
 
+    val preferedPokemon = getPropertyIfSet("Prefer these Pokemon", "prefer_pokemon", "MEWTWO,MEW,DITTO,DRAGONITE,ARTICUNO,ZAPDOS,MOLTRES,GYARADOS,LAPRAS,SNORLAX", String::toString).split(",")
+
     private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
         val settingString = "$description setting (\"$property\")"
 
