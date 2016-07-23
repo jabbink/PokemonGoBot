@@ -9,6 +9,7 @@ import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
 import javafx.application.Platform
 import javafx.fxml.Initializable
+import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
@@ -17,6 +18,8 @@ import javafx.stage.Stage
 import okhttp3.OkHttpClient
 import tornadofx.View
 import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
@@ -38,6 +41,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     val tfPokecoin: TextField by fxid()
     val tfStardust: TextField by fxid()
     val taConsole: TextArea by fxid()
+    val btnStart: Button by fxid()
 
     val tfSettingsUsername: TextField by fxid()
     val tfSettingsPassword: TextField by fxid()
@@ -110,25 +114,30 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
         mapView.addMapInializedListener(this)
 
         val properties = Properties()
-        FileInputStream("config.properties").use {
-            properties.load(it)
+        try {
+            FileInputStream("config.properties").use {
+                properties.load(it)
+            }
+
+            settings = Settings(properties)
+
+            tfSettingsUsername.text = settings!!.username
+            tfSettingsPassword.text = settings!!.password
+            tfSettingsToken.text = settings!!.token
+            tfSettingsLatitude.text = settings!!.startingLatitude.toString()
+            tfSettingsLongitude.text = settings!!.startingLongitude.toString()
+            tfSettingsSpeed.text = settings!!.speed.toString()
+            tfSettingsTransferIVthreshold.text = settings!!.transferIVthreshold.toString()
+            tfSettingsIgnoredPokemon.text = settings!!.ignoredPokemon.toString()
+            tfSettingsObligatoryTransfer.text = settings!!.obligatoryTransfer.toString()
+            checkboxSettingsDropItems.isSelected = settings!!.shouldDropItems
+            checkboxSettingsAutotransfer.isSelected = settings!!.shouldAutoTransfer
+
+        } catch (e: FileNotFoundException) {
+            btnStart.isDisable = true;
         }
 
-        settings = Settings(properties)
-
-        tfSettingsUsername.text = settings!!.username
-        tfSettingsPassword.text = settings!!.password
-        tfSettingsToken.text = settings!!.token
-        tfSettingsLatitude.text = settings!!.startingLatitude.toString()
-        tfSettingsLongitude.text = settings!!.startingLongitude.toString()
-        tfSettingsSpeed.text = settings!!.speed.toString()
-        tfSettingsTransferIVthreshold.text = settings!!.transferIVthreshold.toString()
-        tfSettingsIgnoredPokemon.text = settings!!.ignoredPokemon.toString()
-        tfSettingsObligatoryTransfer.text = settings!!.obligatoryTransfer.toString()
-        checkboxSettingsDropItems.isSelected = settings!!.shouldDropItems
-        checkboxSettingsAutotransfer.isSelected = settings!!.shouldAutoTransfer
-
-        // Close properly
+        // Close application properly
         apRoot.sceneProperty().addListener({ obs, oldScene, newScene ->
             Platform.runLater {
                 val stage = newScene.window as Stage
@@ -189,7 +198,25 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     }
 
     fun saveSettings() {
-        // TODO save the changed fields
+        val properties = Properties()
+        properties.setProperty("username", tfSettingsUsername.text)
+        properties.setProperty("password", tfSettingsPassword.text)
+        properties.setProperty("token", tfSettingsToken.text)
+        properties.setProperty("latitude", tfSettingsLatitude.text)
+        properties.setProperty("longitude", tfSettingsLongitude.text)
+        properties.setProperty("speed", tfSettingsSpeed.text)
+        properties.setProperty("transfer_iv_threshold", tfSettingsTransferIVthreshold.text)
+        properties.setProperty("drop_items", checkboxSettingsDropItems.isSelected.toString())
+        properties.setProperty("autotransfer", checkboxSettingsAutotransfer.isSelected.toString())
+        properties.setProperty("ignored_pokemon", tfSettingsIgnoredPokemon.text)
+        properties.setProperty("obligatory_transfer", tfSettingsObligatoryTransfer.text)
+        FileOutputStream("config.properties").use {
+            properties.store(it, null)
+        }
+
+        if (tfSettingsLatitude.text != "" && tfSettingsLongitude.text != "") {
+            btnStart.isDisable = false
+        }
     }
 
     fun exit() {
