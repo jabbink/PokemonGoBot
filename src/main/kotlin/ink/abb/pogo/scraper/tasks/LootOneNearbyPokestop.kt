@@ -11,13 +11,18 @@ package ink.abb.pogo.scraper.tasks
 import Log
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import com.pokegoapi.api.map.fort.Pokestop
+import com.pokegoapi.api.map.fort.PokestopLootResult
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import java.util.concurrent.TimeUnit
 
 class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
+
+    private var pauseDuration = 1L
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val nearbyPokestops = sortedPokestops.filter {
             it.canLoot()
@@ -38,6 +43,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
                     if(settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
                     Log.green(message)
+                    checkResult(result)
                 }
                 Result.INVENTORY_FULL -> {
 
@@ -55,6 +61,16 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
                 }
                 else -> println(result.result)
             }
+        }
+    }
+
+    private fun checkResult(result: PokestopLootResult) {
+        if (result.experience == 0 && result.itemsAwarded.isEmpty()) {
+            Log.red("Looks like a ban. Pause for $pauseDuration minute(s).")
+            Thread.sleep(TimeUnit.MINUTES.toMillis(pauseDuration))
+            pauseDuration += 1
+        } else {
+            pauseDuration = 1L
         }
     }
 }
