@@ -44,7 +44,7 @@ dependencies {
 
     //compile project(':PokeGOAPI-Java')
 
-    compile 'com.github.Grover-c13:PokeGOAPI-Java:4f5b715380' // https://github.com/Grover-c13/PokeGOAPI-Java/issues/139
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:master-SNAPSHOT'
 
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
 

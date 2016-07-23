@@ -33,8 +33,10 @@ data class Settings(
     val shouldDisplayWalkingToNearestUnused: Boolean = true,
     val shouldDisplayPokestopSpinRewards: Boolean = true,
     val shouldDisplayPokemonCatchRewards: Boolean = true,
+    val shouldHatchEggs: Boolean = false,
 
     val transferIVThreshold: Int = 80,
+    val transferCPThreshold: Int = 400,
     val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
     val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
 
