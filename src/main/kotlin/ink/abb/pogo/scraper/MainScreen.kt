@@ -1,6 +1,5 @@
 package ink.abb.pogo.scraper
 
-import Log
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.lynden.gmapsfx.GoogleMapView
 import com.lynden.gmapsfx.MapComponentInitializedListener
@@ -8,12 +7,15 @@ import com.lynden.gmapsfx.javascript.`object`.*
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
+import javafx.application.Platform
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.FlowPane
+import javafx.stage.Stage
 import okhttp3.OkHttpClient
 import tornadofx.View
 import java.io.FileInputStream
@@ -31,7 +33,10 @@ import javax.security.cert.CertificateException
 
 class MainScreen : View(), MapComponentInitializedListener, Initializable {
 
+    val apRoot: AnchorPane by fxid()
     val mapView: GoogleMapView by fxid()
+    val fpPokeImages: FlowPane by fxid()
+
     val tfUsername: TextField by fxid()
     val tfXP: TextField by fxid()
     val tfLevel: TextField by fxid()
@@ -46,6 +51,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     val tfSettingsToken: TextField by fxid()
     val tfSettingsLatitude: TextField by fxid()
     val tfSettingsLongitude: TextField by fxid()
+
     val tfSettingsSpeed: TextField by fxid()
     val tfSettingsTransferIVthreshold: TextField by fxid()
     val tfSettingsIgnoredPokemon: TextField by fxid()
@@ -217,6 +223,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
     }
 
     fun exit() {
+        Platform.exit()
         System.exit(0)
     }
 
