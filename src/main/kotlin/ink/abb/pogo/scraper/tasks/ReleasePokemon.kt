@@ -39,17 +39,10 @@ class ReleasePokemon : Task {
                         var reason = ""
                         if (shouldRelease) {
                             reason = "Obligatory release"
-                        } else {
-                            // never transfer > maxIv, unless set in obligatoryTransfer
-                            if (ivPercentage < maxIVPercentage) {
-                                reason = "IV < max IV"
-                                shouldRelease = true
-                            }
-                            // never transfer > maxCP, unless set in obligatoryTransfer
-                            if (pokemon.cp < maxCP) {
-                                reason = "CP < maxCP"
-                                shouldRelease = true
-                            }
+                        } else if (ivPercentage < maxIVPercentage && pokemon.cp < maxCP) {
+                            // never transfer > maxIv and > maCp, unless set in obligatoryTransfer
+                            reason = "IV < max IV and CP < maxCP"
+                            shouldRelease = true
                         }
                         if (shouldRelease) {
                             ctx.pokemonStats.second.andIncrement
