@@ -36,7 +36,8 @@ class ReleasePokemon : Task {
                     val iv = pokemon.getIv()
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon
-                    if (index > 0 || forceTransfer) {
+                    if (index > settings.keepPokemonAmount || forceTransfer) {
+
                         // stop releasing when pokemon is set in ignoredPokemon
                         if (!ignoredPokemon.contains(pokemon.pokemonId.name)) {
                             var shouldRelease = obligatoryTransfer.contains(pokemon.pokemonId.name)

@@ -9,7 +9,9 @@ base64_password=
 token=
 latitude=
 longitude=
-preferred_ball=ITEM_POKE_BALL
+
+# desired chance to catch Pokemon with 1 throw
+desired_catch_probability=0.8
 
 ## Walking
 # Meters per second
@@ -49,6 +51,9 @@ autotransfer=false
 
 # should the bot force transfer every pokemon you catch and (IMPORTANT!) already have caught (IMPORTANT!) which do net meet CP,IV,IGNORED
 forcetransfer=false
+
+# minimum amount of pokemon type to keep
+keep_pokemon_amount=1
 
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
