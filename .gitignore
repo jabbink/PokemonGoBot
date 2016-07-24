@@ -72,7 +72,6 @@ fabric.properties
 
 # PTC Login credentials
 config.properties
-bot-settings/
 
 #OS X files
 .DS_Store
