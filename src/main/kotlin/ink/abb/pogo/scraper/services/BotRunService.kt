@@ -7,6 +7,7 @@ import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Settings
+import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -48,9 +49,9 @@ class BotRunService {
         Log.normal("Logging in to game server...")
         val auth = if (settings.credentials is Settings.GoogleCredentials) {
             val auth = if (settings.credentials.token.isBlank()) {
-                GoogleLogin(http).login("", "")
+                GoogleLogin(http).login()
             } else {
-                GoogleLogin(http).login(settings.credentials.token)
+                GoogleLogin(http).refreshToken(settings.credentials.token)
             }
             settings.credentials.token = auth.token.contents
 
