@@ -37,7 +37,6 @@ class ReleasePokemon : Task {
                 // don't drop favourited or nicknamed pokemon
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.favorite
                 if (!isFavourite) {
-                    val iv = pokemon.getIv()
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon
                     if (index > settings.keepPokemonAmount || forceTransfer) {
