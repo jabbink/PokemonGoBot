@@ -51,7 +51,7 @@ class BotRunService {
             val auth = if (settings.credentials.token.isBlank()) {
                 GoogleLogin(http).login()
             } else {
-                GoogleLogin(http).refreshToken(settings.credentials.token)
+                GoogleLogin(http).login(settings.credentials.token)
             }
             settings.credentials.token = auth.token.contents
 
