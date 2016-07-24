@@ -101,7 +101,7 @@ fun main(args: Array<String>) {
 
     if (token.isBlank()) {
         Log.normal("Setting this token in your config")
-        settings.setToken(auth.token.contents)
+        settings.setToken(displayToken)
         settings.writeToken("config.properties")
     }
     val api = PokemonGo(auth, http)
