@@ -3,13 +3,14 @@
 ## Usage (from source)
 
 1. Clone this repo
-2. Copy `src/main/resources/config.properties.template` to `src/main/resources/config.properties`
-3. Add your PTC username, password and starting location in `src/main/resources/config.properties`
-4. Run `Main.kt`
+2. Run from terminal/cmd :`gradlew build` (It should download the dependencies)
+3. Rename `./config.properties.template` to `./config.properties`
+4. Modify `config.properties` as you please
+5. To run the bot directly from console run `gradlew run`
 
 ## Usage (prebuilt)
 
-1. Make sure you have Java 1.7 or higher installed (`java -version` in a command line)
+1. Make sure you have Java 1.8 or higher installed (`java -version` in a command line)
 1. Download the latest release from https://github.com/jabbink/PokemonGoBot/releases
 2. Download https://raw.githubusercontent.com/jabbink/PokemonGoBot/master/config.properties.template and save it in the same directory
 3. Rename `config.properties.template` to `config.properties` (make sure your operating system doesn't rename it to `config.properties.txt`)
@@ -19,6 +20,11 @@
 7. `java -jar pogo.scraper-all-VERSION.jar` (replace version with the downloaded one, or type `pogo.scraper-all` and press `TAB`)
 
 # Known issues
+
+## I got `COMPILE FAILED`
+Most of the time it's because the api the bot is built upon, [PokeGOAPI-Java](https://github.com/Grover-c13/PokeGOAPI-Java), updated and changed something.  
+Run `gradlew --refresh-dependencies clean build`.  
+If there's still a problem, open an issue.
 
 ## The bot doesn't catch Pokemon
 
