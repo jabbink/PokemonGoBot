@@ -25,9 +25,15 @@ class ReleasePokemon : Task {
         val obligatoryTransfer = settings.obligatoryTransfer
         val minIVPercentage = settings.transferIVThreshold
         val minCP = settings.transferCPThreshold
+        val sortByIV = settings.sortByIV
 
         groupedPokemon.forEach {
-            val sorted = it.value.sortedByDescending { it.cp }
+            var sorted = emptyList<com.pokegoapi.api.pokemon.Pokemon>()
+            if (sortByIV) {
+                sorted = it.value.sortedByDescending { it.getIv() }
+            } else {
+                sorted = it.value.sortedByDescending { it.cp }
+            }
             for ((index, pokemon) in sorted.withIndex()) {
                 // don't drop favourited or nicknamed pokemon
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.favorite
