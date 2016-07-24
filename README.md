@@ -1,5 +1,7 @@
 # Pokemon Go Bot
 
+[![Build Status](https://travis-ci.org/jabbink/PokemonGoBot.svg?branch=feature%2Fadd_travis)](https://travis-ci.org/jabbink/PokemonGoBot)
+
 ## Usage (from source)
 
 1. Clone this repo: `git clone https://github.com/jabbink/PokemonGoBot.git && cd PokemonGoBot` or download the zip
