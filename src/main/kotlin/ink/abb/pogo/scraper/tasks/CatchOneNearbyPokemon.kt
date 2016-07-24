@@ -17,6 +17,7 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.pokemon.catch
 
 class CatchOneNearbyPokemon : Task {
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val pokemon = ctx.api.map.catchablePokemon
 
@@ -32,6 +33,11 @@ class CatchOneNearbyPokemon : Task {
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
                         settings.desiredCatchProbability)!!
+
+                if (result == null) {
+                    Log.red("No Pokeballs in your inventory")
+                    return
+                }
 
                 if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                     ctx.pokemonStats.first.andIncrement
