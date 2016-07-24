@@ -22,6 +22,10 @@
 6. Use `cd` to go into the directory with your config and the downloaded `.jar`
 7. `java -jar pogo.scraper-all-VERSION.jar` (replace version with the downloaded one, or type `pogo.scraper-all` and press `TAB`)
 
+# Contributing
+If you want to help and add a new feature, you can create a pull request to merge in the `develop` branch and not in the `master`.  
+As the name says, the `develop` branch is for developing where we'll add new features, with your help; instead we'll update the `master` every now and then, and from that we'll release a new jar.
+
 # Known issues
 
 ## I got `BUILD FAILED`
