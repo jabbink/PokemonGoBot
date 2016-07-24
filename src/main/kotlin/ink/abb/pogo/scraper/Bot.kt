@@ -71,7 +71,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 if (!settings.walkOnly) {
                     task(catch)
                     task(drop)
-                    task(release)
+                    if (settings.shouldAutoTransfer) {
+                        task(release)
+                    }
+
                 }
                 task(process)
                 task(hatchEggs)

@@ -8,11 +8,12 @@
 
 package ink.abb.pogo.scraper
 
-import ink.abb.pogo.scraper.util.Log
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
+import com.pokegoapi.auth.GoogleLoginSecrets
 import com.pokegoapi.auth.PtcLogin
+import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
 import java.net.InetSocketAddress
@@ -62,9 +63,12 @@ fun main(args: Array<String>) {
     val http = builder.build()
 
     val properties = Properties()
-    FileInputStream("config.properties").use {
+
+    val input = FileInputStream("config.properties")
+    input.use {
         properties.load(it)
     }
+    input.close()
 
     val settings = Settings(properties)
 
@@ -89,11 +93,16 @@ fun main(args: Array<String>) {
             GoogleLogin(http).refreshToken(token)
         }
     }
-
-    Log.normal("Logged in as $username with token ${auth.token.contents}")
+    var displayToken = auth.token.contents
+    if (auth.provider.equals("google")) {
+        displayToken = GoogleLoginSecrets.refresh_token
+    }
+    Log.normal("Logged in as $username with token ${displayToken}")
 
     if (token.isBlank()) {
-        Log.normal("Set this token in your config to log in directly")
+        Log.normal("Setting this token in your config")
+        settings.setToken(auth.token.contents)
+        settings.writeToken("config.properties")
     }
     val api = PokemonGo(auth, http)
 
