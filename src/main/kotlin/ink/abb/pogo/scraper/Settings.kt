@@ -126,7 +126,7 @@ class Settings(val properties: Properties) {
 
         file.lines().forEach {
             if (it != null && it.startsWith("token")) {
-                propertiesText += "token = ${this.properties.getProperty("token")}\n"
+                propertiesText += "token=${this.properties.getProperty("token")}\n"
             } else if (it != null){
                 propertiesText += "$it\n"
             }
