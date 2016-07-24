@@ -1,6 +1,5 @@
 package ink.abb.pogo.scraper
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.lynden.gmapsfx.GoogleMapView
 import com.lynden.gmapsfx.MapComponentInitializedListener
 import com.lynden.gmapsfx.javascript.`object`.*
@@ -182,7 +181,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
 
         auth = if (token.isBlank()) {
             if (username.contains('@')) {
-                GoogleLogin(http).login(username, password)
+                GoogleLogin(http).login()
             } else {
                 PtcLogin(http).login(username, password)
             }
@@ -190,7 +189,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
             if (token.contains("pokemon.com")) {
                 PtcLogin(http).login(token)
             } else {
-                GoogleLogin(http).login(token)
+                GoogleLogin(http).refreshToken(token)
             }
         }
 
@@ -200,6 +199,7 @@ class MainScreen : View(), MapComponentInitializedListener, Initializable {
         if (token.isBlank()) {
             taConsole.appendText("Set this token in your config to log in directly\n")
         }
+
         api = PokemonGo(auth, http)
 
         taConsole.appendText("Getting profile data from pogo server\n")

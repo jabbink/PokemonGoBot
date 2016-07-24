@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper
 
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.pokegoapi.api.inventory.Pokeball
 import java.util.*
 
@@ -59,8 +58,9 @@ class Settings(val properties: Properties) {
         )
     }
 
-    val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
+    val desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.8, String::toDouble)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
+    val keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", 1, String::toInt)
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
 
     val shouldDisplayWalkingToNearestUnused = getPropertyIfSet("Display Walking to nearest Unused Pokestop", "display_walking_nearest_unused", false, String::toBoolean)

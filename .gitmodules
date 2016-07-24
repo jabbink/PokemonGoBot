@@ -1,0 +1,4 @@
+[submodule "lib/PokeGOAPI-Java"]
+	path = lib/PokeGOAPI-Java
+	url = https://github.com/Grover-c13/PokeGOAPI-Java.git
+	branch = Development

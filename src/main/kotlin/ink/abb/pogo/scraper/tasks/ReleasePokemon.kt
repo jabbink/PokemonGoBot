@@ -53,14 +53,14 @@ class ReleasePokemon : Task {
                                 }
                                 // never transfer > min CP  (unless set to -1)
                                 if (pokemon.cp < minCP || minCP == -1) {
-                                    cpTooLow = false
+                                    cpTooLow = true
                                 }
-                                reason = "CP < $minCP and IV < $minIVPercentage"
+                                reason = "CP < $minCP and IV < $minIVPercentage%"
                                 shouldRelease = ivTooLow && cpTooLow
                             }
                             if (shouldRelease) {
                                 ctx.pokemonStats.second.andIncrement
-                                Log.normal(ctx, "Going to transfer ${pokemon.pokemonId.name} with " +
+                                Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
                                         "CP ${pokemon.cp} and IV $iv%; reason: $reason")
                                 pokemon.transferPokemon()
                             }

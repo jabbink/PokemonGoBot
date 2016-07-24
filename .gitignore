@@ -33,6 +33,7 @@ gradle-app.setting
 
 # User-specific stuff:
 .idea/
+*.iml
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids
@@ -71,3 +72,6 @@ fabric.properties
 
 # PTC Login credentials
 config.properties
+
+#OS X files
+.DS_Store

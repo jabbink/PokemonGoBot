@@ -50,8 +50,16 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
         val timeout = 200L
+        // prevent division by 0
+        if (speed.equals(0)) {
+            return
+        }
         val timeRequired = distance / speed
         val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
+        // prevent division by 0
+        if (stepsRequired.equals(0)) {
+            return
+        }
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
