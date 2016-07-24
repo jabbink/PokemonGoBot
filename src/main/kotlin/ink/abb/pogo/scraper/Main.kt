@@ -78,7 +78,7 @@ fun main(args: Array<String>) {
 
     auth = if (token.isBlank()) {
         if (username.contains('@')) {
-            GoogleLogin(http).login()
+            GoogleLogin(http).login(username, password)
         } else {
             PtcLogin(http).login(username, password)
         }
@@ -86,7 +86,7 @@ fun main(args: Array<String>) {
         if (token.contains("pokemon.com")) {
             PtcLogin(http).login(token)
         } else {
-            GoogleLogin(http).refreshToken(token)
+            GoogleLogin(http).login(token)
         }
     }
 
