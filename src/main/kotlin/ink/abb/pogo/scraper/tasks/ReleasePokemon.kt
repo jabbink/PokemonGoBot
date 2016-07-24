@@ -27,12 +27,12 @@ class ReleasePokemon : Task {
         val sortByIV = settings.sortByIV
 
         groupedPokemon.forEach {
-            var sorted = emptyList<com.pokegoapi.api.pokemon.Pokemon>()
-            if (sortByIV) {
-                sorted = it.value.sortedByDescending { it.getIv() }
-            } else {
-                sorted = it.value.sortedByDescending { it.cp }
-            }
+            var sorted = if (forceTransfer) it.value else
+                if (sortByIV) {
+                    it.value.sortedByDescending { it.getIv() }
+                } else {
+                    it.value.sortedByDescending { it.cp }
+                }
             for ((index, pokemon) in sorted.withIndex()) {
                 // don't drop favourited or nicknamed pokemon
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.favorite
