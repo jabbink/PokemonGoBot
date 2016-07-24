@@ -3,4 +3,4 @@ sudo: required
 jdk:
 - oraclejdk8
 script:
-    - ./gradlew build -x check
+    - ./gradlew build
