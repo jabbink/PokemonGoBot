@@ -32,6 +32,7 @@ data class Settings(
     val shouldDisplayKeepalive: Boolean = true,
     val shouldDisplayWalkingToNearestUnused: Boolean = true,
     val shouldDisplayPokestopSpinRewards: Boolean = true,
+    val shouldDisplayPokestopName: Boolean = true,
     val shouldDisplayPokemonCatchRewards: Boolean = true,
     val shouldHatchEggs: Boolean = false,
 

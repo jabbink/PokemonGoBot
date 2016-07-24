@@ -35,22 +35,23 @@ class HatchEggs : Task {
                 Log.red("Failed to put egg in incubator; error: $result")
             }
         } else {
-            val result = ctx.api.inventories.hatchery.queryHatchedEggs()
-            if (result.isNotEmpty()) {
-                result.forEachIndexed { index, it ->
-                    // TODO: That proto is probably wrong and this fails.
-                    val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
-                    println(newPokemon)
-                    println(it.id)
-                    val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
-                    if (newPokemon == null) {
-                        Log.green("Hatched pokemon; $stats")
-                    } else {
-                        Log.green("Hatched ${newPokemon.pokemonId.name} with ${newPokemon.cp} CP " +
-                                "and ${newPokemon.getIvPercentage()}% IV; $stats")
-                    }
-                }
-            }
+            // TODO: This has compile errors with the latest POGO Api - possible related to the below TODO.
+//            val result = ctx.api.inventories.hatchery.queryHatchedEggs()
+//            if (result.isNotEmpty()) {
+//                result.forEachIndexed { index, it ->
+//                    // TODO: That proto is probably wrong and this fails.
+//                    val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
+//                    println(newPokemon)
+//                    println(it.id)
+//                    val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
+//                    if (newPokemon == null) {
+//                        Log.green("Hatched pokemon; $stats")
+//                    } else {
+//                        Log.green("Hatched ${newPokemon.pokemonId.name} with ${newPokemon.cp} CP " +
+//                                "and ${newPokemon.getIvPercentage()}% IV; $stats")
+//                    }
+//                }
+//            }
         }
     }
 }
