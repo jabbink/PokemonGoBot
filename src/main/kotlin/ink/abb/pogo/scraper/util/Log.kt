@@ -9,7 +9,7 @@
 package ink.abb.pogo.scraper.util
 
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 class Log {
 

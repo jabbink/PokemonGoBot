@@ -17,7 +17,6 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.pokemon.catch
 
 class CatchOneNearbyPokemon : Task {
-
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val pokemon = ctx.api.map.catchablePokemon
 
