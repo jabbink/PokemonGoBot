@@ -1,9 +1,12 @@
 # Pokemon Go Bot
 
+[![Build Status](https://travis-ci.org/jabbink/PokemonGoBot.svg?branch=develop)](https://travis-ci.org/jabbink/PokemonGoBot)
+
 ## Usage (from source)
 
 1. Clone this repo: `git clone https://github.com/jabbink/PokemonGoBot.git && cd PokemonGoBot` or download the zip
-2. Run from terminal/cmd :`gradlew build` (It should download the dependencies)
+1. Run `git submodule update --init --recursive`
+2. Run from terminal/cmd::`gradlew build`
 3. Rename `./config.properties.template` to `./config.properties`
 4. Modify `config.properties` as you please
 5. To run the bot directly from console run `gradlew run`
@@ -19,9 +22,13 @@
 6. Use `cd` to go into the directory with your config and the downloaded `.jar`
 7. `java -jar pogo.scraper-all-VERSION.jar` (replace version with the downloaded one, or type `pogo.scraper-all` and press `TAB`)
 
+# Contributing
+If you want to help and add a new feature, you can create a pull request to merge in the `develop` branch and not in the `master`.  
+As the name says, the `develop` branch is for developing where we'll add new features, with your help; instead we'll update the `master` every now and then, and from that we'll release a new jar.
+
 # Known issues
 
-## I got `COMPILE FAILED`
+## I got `BUILD FAILED`
 Most of the time it's because the api the bot is built upon, [PokeGOAPI-Java](https://github.com/Grover-c13/PokeGOAPI-Java), updated and changed something.  
 Run `gradlew --refresh-dependencies clean build`.  
 If there's still a problem, open an issue.

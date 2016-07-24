@@ -10,6 +10,9 @@ package ink.abb.pogo.scraper
 
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.pokegoapi.api.inventory.Pokeball
+import java.io.BufferedReader
+import java.io.FileOutputStream
+import java.io.FileReader
 import java.util.*
 
 class Settings(val properties: Properties) {
@@ -69,11 +72,13 @@ class Settings(val properties: Properties) {
     }
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
 
-    val shouldDisplayWalkingToNearestUnused = getPropertyIfSet("Display Walking to nearest Unused Pokestop", "display_walking_nearest_unused", false, String::toBoolean)
+    val shouldDisplayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", false, String::toBoolean)
     val shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean)
     val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
 
     val walkOnly = getPropertyIfSet("Only walk to hatch eggs", "walk_only", false, String::toBoolean)
+
+    val sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean)
 
     val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
 
@@ -116,5 +121,29 @@ class Settings(val properties: Properties) {
             println("$settingString is invalid, defaulting to $default: ${e.message}")
             return default
         }
+    }
+
+    fun setToken(value: String) {
+        properties.setProperty("token", value)
+    }
+
+    fun writeToken(propertyFile: String) {
+        val file = BufferedReader(FileReader(propertyFile))
+        var propertiesText = String()
+
+        file.lines().forEach {
+            if (it != null && it.startsWith("token")) {
+                propertiesText += "token=${this.properties.getProperty("token")}\n"
+            } else if (it != null) {
+                propertiesText += "$it\n"
+            }
+        }
+
+        file.close()
+
+        val out = FileOutputStream(propertyFile)
+
+        out.write(propertiesText.toByteArray())
+        out.close()
     }
 }

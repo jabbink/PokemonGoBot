@@ -8,27 +8,31 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
-import ink.abb.pogo.scraper.util.pokemon.*
+import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.pokemon.getIv
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (!settings.shouldAutoTransfer) {
-            return
-        }
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
         val forceTransfer = settings.shouldForceTransfer
         val minIVPercentage = settings.transferIVThreshold
         val minCP = settings.transferCPThreshold
+        val sortByIV = settings.sortByIV
 
         groupedPokemon.forEach {
-            val sorted = if (forceTransfer) it.value else it.value.sortedByDescending { it.cp }
+            var sorted = emptyList<com.pokegoapi.api.pokemon.Pokemon>()
+            if (sortByIV) {
+                sorted = it.value.sortedByDescending { it.getIv() }
+            } else {
+                sorted = it.value.sortedByDescending { it.cp }
+            }
             for ((index, pokemon) in sorted.withIndex()) {
                 // don't drop favourited or nicknamed pokemon
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.favorite
@@ -56,13 +60,13 @@ class ReleasePokemon : Task {
                                 if (pokemon.cp < minCP || minCP == -1) {
                                     cpTooLow = true
                                 }
-                                reason = "CP < $minCP and IV < $minIVPercentage"
+                                reason = "CP < $minCP and IV < $minIVPercentage%"
                                 shouldRelease = ivTooLow && cpTooLow
                             }
                             if (shouldRelease) {
                                 ctx.pokemonStats.second.andIncrement
                                 Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
-                                        "CP ${pokemon.cp} and IV $iv%; reason: $reason")
+                                        "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
                                 pokemon.transferPokemon()
                             }
                         }
