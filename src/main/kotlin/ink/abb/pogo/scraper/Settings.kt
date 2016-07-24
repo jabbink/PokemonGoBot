@@ -42,6 +42,7 @@ data class Settings(
     val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
     val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
     val walkOnly: Boolean = false,
+    val sortByIV: Boolean = false,
 
     val uselessItems: Map<ItemId, Int> = mapOf(
         Pair(ItemId.ITEM_REVIVE, 20),

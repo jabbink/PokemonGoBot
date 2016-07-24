@@ -36,14 +36,18 @@ item_master_ball=50
 item_razz_berry=50
 
 ## Extra Info
-# should the bot display information of where it's walking to (true/false)
-display_walking_nearest_unused=false
-
 # should the bot display rewards pokestop (true/false)
 display_pokestop_rewards=true
 
 # should the bot display rewards when catching pokemon (true/false)
 display_pokemon_catch_rewards=true
+
+# should the bot display information of where it's walking to (true/false)
+# this will show the name of the pokestop that it's walking to and
+# replace on the loot log the pokestop id for its name
+# WARNING:  this will increase the https requests without any need. if
+#           the servers are slow it's recommended to turn off this setting
+display_pokestop_name=false
 
 ## Pokemon Transfer
 # should the bot auto transfer duplicate pokemon
@@ -51,6 +55,9 @@ autotransfer=false
 
 # minimum amount of pokemon type to keep
 keep_pokemon_amount=1
+
+# Sort by IV first instead of CP
+sort_by_iv=false
 
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
