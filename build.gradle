@@ -26,6 +26,11 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+configurations.all {
+    // Check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
 
     compile project(':PokeGOAPI-Java')
