@@ -54,6 +54,9 @@ transfer_iv_threshold=80
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
 
+# Minimum CP to use a Razzberry when capturing (use -1 to disable razzberries)
+razzberry_min_cp=1200
+
 # Only walk (hatch eggs, don't collect pokemon or pokestops)
 walk_only=false
 

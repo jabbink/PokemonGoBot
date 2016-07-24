@@ -44,12 +44,19 @@ class CatchOneNearbyPokemon : Task {
 
             if (ball != null) {
                 val usedPokeball = settings.pokeballItems[ball]
+                val minCPToUseBerry = settings.useBarriesCPThreshold
+
                 Log.green("Found pokemon ${catchablePokemon.pokemonId}")
                 ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
                 val encounterResult = catchablePokemon.encounterPokemon()
                 if (encounterResult.wasSuccessful()) {
                     Log.green("Encountered pokemon ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp}")
-                    val result = catchablePokemon.catchPokemon(usedPokeball)
+                    val result = if (minCPToUseBerry != -1 && encounterResult.wildPokemon.pokemonData.cp > minCPToUseBerry) {
+                        catchablePokemon.catchPokemonWithRazzBerry()
+                        Log.green("Trying to catch with razzberry...")
+                    } else {
+                        catchablePokemon.catchPokemon(usedPokeball)
+                    }
 
                     if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                         ctx.pokemonStats.first.andIncrement
