@@ -50,7 +50,7 @@ class ReleasePokemon : Task {
                                 if (pokemon.cp < minCP || minCP == -1) {
                                     cpTooLow = true
                                 }
-                                reason = "CP < $minCP and IV < $minIVPercentage"
+                                reason = "CP < $minCP and IV < $minIVPercentage%"
                                 shouldRelease = ivTooLow && cpTooLow
                             }
                             if (shouldRelease) {

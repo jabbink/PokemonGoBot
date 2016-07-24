@@ -34,7 +34,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         }
 
         if (nearestUnused.size > 0) {
-            if (settings.shouldDisplayWalkingToNearestUnused)
+            if (settings.shouldDisplayPokestopName)
                 Log.normal("Walking to pokestop \"${nearestUnused.first().details.name}\"")
             walk(ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed)
         }
@@ -45,8 +45,16 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
         val timeout = 200L
+        // prevent division by 0
+        if (speed.equals(0)) {
+            return
+        }
         val timeRequired = distance / speed
         val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
+        // prevent division by 0
+        if (stepsRequired.equals(0)) {
+            return
+        }
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
