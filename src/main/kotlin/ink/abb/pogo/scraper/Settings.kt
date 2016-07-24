@@ -59,8 +59,9 @@ class Settings(val properties: Properties) {
         )
     }
 
-    val preferredBall = getPropertyIfSet("Preferred Ball", "preferred_ball", ItemId.ITEM_POKE_BALL, ItemId::valueOf)
+    val desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.8, String::toDouble)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
+    val keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", 1, String::toInt)
     val shouldForceTransfer = if (shouldAutoTransfer) {
         getPropertyIfSet("Forcetransfer", "forcetransfer", false, String::toBoolean)
     } else {
