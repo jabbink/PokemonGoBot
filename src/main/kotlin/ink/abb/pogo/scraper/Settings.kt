@@ -125,15 +125,18 @@ class Settings(val properties: Properties) {
     fun writeToken(propertyFile: String) {
         val file = BufferedReader(FileReader(propertyFile))
         var propertiesText = String()
-
+        var foundToken = false
         file.lines().forEach {
             if (it != null && it.startsWith("token")) {
                 propertiesText += "token=${this.properties.getProperty("token")}\n"
+                foundToken = true
             } else if (it != null) {
                 propertiesText += "$it\n"
             }
         }
-
+        if (!foundToken){
+            propertiesText += "token=${this.properties.getProperty("token")}\n"
+        }
         file.close()
 
         val out = FileOutputStream(propertyFile)
