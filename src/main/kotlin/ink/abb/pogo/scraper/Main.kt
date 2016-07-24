@@ -12,6 +12,7 @@ import ink.abb.pogo.scraper.util.Log
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
+import com.pokegoapi.auth.GoogleLoginSecrets
 import com.pokegoapi.auth.PtcLogin
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
@@ -89,8 +90,11 @@ fun main(args: Array<String>) {
             GoogleLogin(http).refreshToken(token)
         }
     }
-
-    Log.normal("Logged in as $username with token ${auth.token.contents}")
+    var displayToken = auth.token.contents
+    if (auth.provider.equals("google")) {
+        displayToken = GoogleLoginSecrets.refresh_token
+    }
+    Log.normal("Logged in as $username with token ${displayToken}")
 
     if (token.isBlank()) {
         Log.normal("Set this token in your config to log in directly")
