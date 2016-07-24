@@ -66,7 +66,7 @@ class ReleasePokemon : Task {
                             if (shouldRelease) {
                                 ctx.pokemonStats.second.andIncrement
                                 Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
-                                        "CP ${pokemon.cp} and IV $iv%; reason: $reason")
+                                        "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
                                 pokemon.transferPokemon()
                             }
                         }
