@@ -16,7 +16,6 @@ import com.pokegoapi.auth.PtcLogin
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.security.cert.X509Certificate
@@ -104,7 +103,6 @@ fun main(args: Array<String>) {
         Log.normal("Setting this token in your config")
         settings.setToken(auth.token.contents)
         settings.writeToken("config.properties")
-
     }
     val api = PokemonGo(auth, http)
 

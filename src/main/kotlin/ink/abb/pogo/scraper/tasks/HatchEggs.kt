@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
