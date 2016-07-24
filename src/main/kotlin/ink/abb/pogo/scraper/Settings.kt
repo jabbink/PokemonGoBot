@@ -10,6 +10,9 @@ package ink.abb.pogo.scraper
 
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.pokegoapi.api.inventory.Pokeball
+import java.io.BufferedReader
+import java.io.FileOutputStream
+import java.io.FileReader
 import java.util.*
 
 class Settings(val properties: Properties) {
@@ -113,5 +116,31 @@ class Settings(val properties: Properties) {
             println("$settingString is invalid, defaulting to $default: ${e.message}")
             return default
         }
+    }
+
+    fun setToken(value: String) {
+        properties.setProperty("token", value)
+    }
+
+    fun writeToken(propertyFile: String) {
+        val file = BufferedReader(FileReader(propertyFile))
+        var propertiesText = String()
+
+        file.lines().forEach {
+            if (it != null && it.startsWith("token")) {
+                propertiesText += "token=${this.properties.getProperty("token")}\n"
+            } else if (it != null){
+                propertiesText += "$it\n"
+            }
+        }
+
+        println(propertiesText)
+
+        file.close()
+
+        val out = FileOutputStream(propertyFile)
+
+        out.write(propertiesText.toByteArray())
+        out.close()
     }
 }
