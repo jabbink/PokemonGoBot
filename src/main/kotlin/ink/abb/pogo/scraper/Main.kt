@@ -8,10 +8,10 @@
 
 package ink.abb.pogo.scraper
 
-import Log
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import ink.abb.pogo.scraper.services.BotRunService
+import ink.abb.pogo.scraper.util.Log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication

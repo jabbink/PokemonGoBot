@@ -9,7 +9,9 @@ base64_password=
 token=
 latitude=
 longitude=
-preferred_ball=ITEM_POKE_BALL
+
+# desired chance to catch Pokemon with 1 throw
+desired_catch_probability=0.8
 
 ## Walking
 # Meters per second
@@ -19,7 +21,7 @@ speed=2.778
 # should the bot EVER drop items (true/false)
 drop_items=true
 
-# max number of each item that the bot should keep if "drop_items" is ennabled
+# max number of each item that the bot should keep if "drop_items" is enabled
 # use -1 in a item to never drop this specific item
 item_revive=20
 item_max_revive=10
@@ -47,12 +49,18 @@ display_pokemon_catch_rewards=true
 # should the bot auto transfer duplicate pokemon
 autotransfer=false
 
+# minimum amount of pokemon type to keep
+keep_pokemon_amount=1
+
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
 transfer_iv_threshold=80
 
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
+
+# Only walk (hatch eggs, don't collect pokemon or pokestops)
+walk_only=false
 
 # list of pokemon you don't want to transfer regardless of CP
 # the names must be divided by a ","

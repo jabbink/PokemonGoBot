@@ -11,7 +11,14 @@ package ink.abb.pogo.scraper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
-import ink.abb.pogo.scraper.tasks.*
+import ink.abb.pogo.scraper.tasks.CatchOneNearbyPokemon
+import ink.abb.pogo.scraper.tasks.DropUselessItems
+import ink.abb.pogo.scraper.tasks.GetMapRandomDirection
+import ink.abb.pogo.scraper.tasks.HatchEggs
+import ink.abb.pogo.scraper.tasks.ProcessPokestops
+import ink.abb.pogo.scraper.tasks.ReleasePokemon
+import ink.abb.pogo.scraper.tasks.UpdateProfile
+import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -72,10 +79,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         fixedRateTimer("BotLoop", false, 0, 5000, action = {
             thread(block = {
                 task(keepalive)
-                task(catch)
-                task(drop)
+                if (!settings.walkOnly) {
+                    task(catch)
+                    task(drop)
+                    task(release)
+                }
                 task(process)
-                task(release)
                 task(hatchEggs)
             })
         })

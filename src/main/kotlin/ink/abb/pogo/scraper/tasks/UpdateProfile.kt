@@ -8,12 +8,12 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import Log
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
 import java.text.DecimalFormat
 
 class UpdateProfile : Task {
@@ -30,7 +30,12 @@ class UpdateProfile : Task {
             val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
             val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
             Log.normal("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
-            Log.normal("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}; Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
-        } catch (e: Exception) {}
+            Log.normal("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
+                    "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
+                    "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; " +
+                    "Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}; " +
+                    "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
+        } catch (e: Exception) {
+        }
     }
 }

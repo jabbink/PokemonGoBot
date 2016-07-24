@@ -25,37 +25,22 @@ apply plugin: 'spring-boot'
 
 mainClassName = 'ink.abb.pogo.scraper.MainKt'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
 }
 
-allprojects {
-    repositories {
-        mavenCentral()
-        maven { url "https://jitpack.io" }
-    }
-}
-
 dependencies {
 
-    //compile project(':PokeGOAPI-Java')
-
-    compile 'com.github.Grover-c13:PokeGOAPI-Java:master-SNAPSHOT'
+    compile project(':PokeGOAPI-Java')
 
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
 
     // https://mvnrepository.com/artifact/org.isuper/s2-geometry-library-java
     compile group: 'org.isuper', name: 's2-geometry-library-java', version: '0.0.1'
-
-    // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
-    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.0.0-beta-3'
-    //compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
-
-    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'org.springframework.boot:spring-boot-starter'

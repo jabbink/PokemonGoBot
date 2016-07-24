@@ -4,9 +4,11 @@
 
 ## From Source
 
-1. Clone this repo
-2. Follow the instructions below for adding a bot configuration
-3. Run `Main.kt`
+1. Clone this repo: `git clone https://github.com/jabbink/PokemonGoBot.git && cd PokemonGoBot` or download the zip
+2. Run `git submodule update --init --recursive`
+3. Run from terminal/cmd::`gradlew build -x check`
+4. Follow the instructions below for adding a bot configuration
+5. To run the bot directly from console run `gradlew run`
 
 ## Building a Jar
 
@@ -16,7 +18,6 @@
 4. Open a terminal (or `cmd.exe` on Windows)
 5. Use `cd` to go into the directory with your config and the downloaded `.jar`
 6. `java -jar pogo.scraper-all-VERSION.jar` (replace version with the downloaded one, or type `pogo.scraper-all` and press `TAB`)
-
 # Adding a Bot Configuration
 
 Bot configuration files are JSON files stored in `./bot-settings`, and each bot instance has its own file.  These files contain many configuration values, but most have defaults and the app populate them for you.
@@ -51,6 +52,11 @@ Once you've authenticated, your settings file will be updated with a token that 
 ```
 
 # Known issues
+
+## I got `BUILD FAILED`
+Most of the time it's because the api the bot is built upon, [PokeGOAPI-Java](https://github.com/Grover-c13/PokeGOAPI-Java), updated and changed something.  
+Run `gradlew --refresh-dependencies clean build`.  
+If there's still a problem, open an issue.
 
 ## The bot doesn't catch Pokemon
 

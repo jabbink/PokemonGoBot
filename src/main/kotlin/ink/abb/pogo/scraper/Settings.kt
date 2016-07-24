@@ -35,10 +35,13 @@ data class Settings(
     val shouldDisplayPokemonCatchRewards: Boolean = true,
     val shouldHatchEggs: Boolean = false,
 
+    val keepPokemonAmount: Int = 1,
+    val desiredCatchProbability: Double =  0.8,
     val transferIVThreshold: Int = 80,
     val transferCPThreshold: Int = 400,
     val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
     val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
+    val walkOnly: Boolean = false,
 
     val uselessItems: Map<ItemId, Int> = mapOf(
         Pair(ItemId.ITEM_REVIVE, 20),
