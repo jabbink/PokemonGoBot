@@ -29,6 +29,8 @@ class Settings(val properties: Properties) {
     val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
 
+    val useBarriesCPThreshold =  getPropertyIfSet("CP Threshold to use razzberry", "razzberry_min_cp", 1200, String::toInt)
+
     val uselessItems = if (shouldDropItems) {
         mapOf(
                 Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
