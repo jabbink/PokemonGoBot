@@ -9,7 +9,9 @@ base64_password=
 token=
 latitude=
 longitude=
-preferred_ball=ITEM_POKE_BALL
+
+# desired chance to catch Pokemon with 1 throw
+desired_catch_probability=0.8
 
 ## Walking
 # Meters per second

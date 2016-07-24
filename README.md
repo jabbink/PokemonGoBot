@@ -2,7 +2,7 @@
 
 ## Usage (from source)
 
-1. Clone this repo
+1. Clone this repo: `git clone https://github.com/jabbink/PokemonGoBot.git && cd PokemonGoBot` or download the zip
 1. Run `git submodule update --init --recursive`
 2. Run from terminal/cmd::`gradlew build -x check`
 3. Rename `./config.properties.template` to `./config.properties`
@@ -22,7 +22,7 @@
 
 # Known issues
 
-## I got `COMPILE FAILED`
+## I got `BUILD FAILED`
 Most of the time it's because the api the bot is built upon, [PokeGOAPI-Java](https://github.com/Grover-c13/PokeGOAPI-Java), updated and changed something.  
 Run `gradlew --refresh-dependencies clean build`.  
 If there's still a problem, open an issue.
