@@ -2,7 +2,7 @@
 
 ## Usage (from source)
 
-1. Clone this repo
+1. Clone this repo: `git clone https://github.com/jabbink/PokemonGoBot.git && cd PokemonGoBot` or download the zip
 2. Run from terminal/cmd :`gradlew build` (It should download the dependencies)
 3. Rename `./config.properties.template` to `./config.properties`
 4. Modify `config.properties` as you please
