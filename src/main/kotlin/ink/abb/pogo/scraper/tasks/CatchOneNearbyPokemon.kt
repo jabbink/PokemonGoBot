@@ -34,6 +34,11 @@ class CatchOneNearbyPokemon : Task {
                         ctx.api.inventories.itemBag,
                         settings.desiredCatchProbability)!!
 
+                if (result == null) {
+                    Log.red("No Pokeballs in your inventory")
+                    return
+                }
+
                 if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                     ctx.pokemonStats.first.andIncrement
                     val iv = (encounterResult.wildPokemon.pokemonData.individualAttack + encounterResult.wildPokemon.pokemonData.individualDefense + encounterResult.wildPokemon.pokemonData.individualStamina) * 100 / 45
