@@ -32,7 +32,7 @@ class UpdateProfile : Task {
             Log.normal("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
             Log.normal("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
                     "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
-                    "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; " +
+                    "Items collected/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; " +
                     "Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}; " +
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
         } catch (e: Exception) {
