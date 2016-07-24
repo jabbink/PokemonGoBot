@@ -64,9 +64,15 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         fixedRateTimer("Walk", false, 0, timeout, action = {
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
+
+            ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+
             remainingSteps--
             if (remainingSteps <= 0) {
                 Log.normal("Destination reached.")
+
+                ctx.server.sendPokestops()
+
                 ctx.walking.set(false)
                 cancel()
             }

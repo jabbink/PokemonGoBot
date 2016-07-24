@@ -44,6 +44,7 @@ class CatchOneNearbyPokemon : Task {
                                 "Candy, ${result.stardustList.sum()}x Stardust]"
                     Log.green(message)
 
+                    ctx.server.newPokemon(catchablePokemon.latitude, catchablePokemon.longitude, encounterResult.wildPokemon.pokemonData)
                 } else
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
             } else {

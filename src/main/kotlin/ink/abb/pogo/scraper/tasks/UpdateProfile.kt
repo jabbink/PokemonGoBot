@@ -35,6 +35,8 @@ class UpdateProfile : Task {
                     "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; " +
                     "Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}; " +
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
+
+            ctx.server.sendProfile()
         } catch (e: Exception) {
         }
     }

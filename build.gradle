@@ -37,6 +37,8 @@ dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
 }
 task fatJar(type: Jar) {
     manifest {

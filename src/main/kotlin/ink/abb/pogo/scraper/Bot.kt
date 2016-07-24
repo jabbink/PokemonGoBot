@@ -11,7 +11,10 @@ package ink.abb.pogo.scraper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
+import ink.abb.pogo.scraper.gui.SocketServer
+import ink.abb.pogo.scraper.gui.WebServer
 import ink.abb.pogo.scraper.tasks.*
+import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -27,7 +30,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicDouble(settings.startingLongitude),
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
-            Pair(AtomicInteger(0), AtomicInteger(0))
+            Pair(AtomicInteger(0), AtomicInteger(0)),
+            SocketServer()
     )
 
     fun run() {
@@ -80,6 +84,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(hatchEggs)
             })
         })
+
+        if(settings.guiPort > 0){
+            Log.normal("Running webserver on port ${settings.guiPort}")
+            WebServer().start(settings.guiPort)
+            ctx.server.start(ctx, settings.guiPortSocket)
+        }
     }
 
     fun task(task: Task) {

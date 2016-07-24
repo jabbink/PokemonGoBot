@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokemon Go Bot GUI</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Lato', "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        table {
+            width: 100%;
+            border: none;
+        }
+
+        table td {
+            position: relative;
+        }
+
+        table th, table td .text {
+            padding: 10px 15px;
+        }
+
+        table th {
+            color: #fff;
+            background-color: #1b1e24;
+        }
+
+        table td {
+            width: 100%;
+            border: 1px solid #C1C3D1;
+        }
+
+        table td.TEAM_INSTINCT {
+            background-color: #FFEB3B;
+        }
+
+        table td.TEAM_MYSTIC {
+            background-color: #2196F3;
+        }
+
+        table td.TEAM_VALOR {
+            background-color: #F44336;
+        }
+
+        span.progress {
+            display: block;
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            background: #B0BEC5;
+        }
+
+        .pokemon {
+            padding: 20px;
+            color: #fff;
+        }
+
+        .pokemon:nth-child(4n+1) {
+            background: #FF3D00;
+        }
+
+        .pokemon:nth-child(4n+2) {
+            background: #33691E;
+        }
+
+        .pokemon:nth-child(4n+3) {
+            background: #039BE5;
+        }
+
+        .pokemon:nth-child(4n+4) {
+            background: #AFB42B;
+        }
+
+        .pokemon img {
+            width: 75px;
+            height: 75px;
+            display: inline-block;
+            vertical-align: middle;
+            background-color: #ffffff;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+
+        .pokemon div {
+            width: 100px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .pokemon h1 {
+            font-size: 20px;
+        }
+
+        .pokemon h2 {
+            font-size: 16px;
+        }
+
+        .search {
+            width: 100%;
+            height: 50px;
+            font-size: 30px;
+            text-align: left;
+            outline: none;
+            padding: 0 20px;
+        }
+
+        .map {
+            height: 350px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+</head>
+<body>
+    <table cellspacing="0" cellpadding="0">
+        <tr>
+            <th>Name</th><td><span id="profile_name" class="text"></span></td>
+        </tr>
+        <tr>
+            <th>Team</th><td><span id="profile_team" class="text"></span></td>
+        </tr>
+        <tr>
+            <th>Stardust</th><td><span id="profile_stardust" class="text"></span></td>
+        </tr>
+        <tr>
+            <th>Level</th><td><span id="profile_level_progress" class="progress"></span><span id="profile_level" class="text"></span></td>
+        </tr>
+        <tr>
+            <th>Pokebank</th><td><span id="profile_pokebank_progress" class="progress"></span><span id="profile_pokebank" class="text"></span></td>
+        </tr>
+    </table>
+
+    <div id="map" class="map"></div>
+
+    <!-- Working... -->
+    <!-- <input id="pokemon_search" class="search" type="text" placeholder="Search Pokemon"> -->
+    <div id="pokemon_list">
+    </div>
+
+    <script>
+        var elements = {
+            profile: {
+                name: $('#profile_name'),
+                team: $('#profile_team'),
+                stardust: $('#profile_stardust'),
+                level: $('#profile_level'),
+                level_progress: $('#profile_level_progress'),
+                pokebank: $('#profile_pokebank'),
+                pokebank_progress: $('#profile_pokebank_progress')
+            },
+            pokemonList: $('#pokemon_list')
+        };
+
+        var socket = io.connect('ws://localhost:8001');
+
+        socket.on('profile', function(data){
+            if(typeof data.username !== 'undefined'){
+                elements.profile.name.text(data.username);
+            }
+            if(typeof data.team !== 'undefined'){
+                data.team && elements.profile.team.text(data.team);
+                data.team && elements.profile.team.parent().addClass(data.team);
+            }
+            if(typeof data.stardust !== 'undefined'){
+                elements.profile.stardust.text(data.stardust);
+            }
+            if(typeof data.level !== 'undefined' && typeof data.levelXp !== 'undefined'){
+                elements.profile.level.text(data.level + ' (' + data.levelXp + ' XP)');
+            }
+            if(typeof data.levelRatio !== 'undefined'){
+                elements.profile.level_progress.css('width', data.levelRatio + '%');
+            }
+            if(typeof data.pokebank !== 'undefined' && typeof data.pokebankMax !== 'undefined'){
+                elements.profile.pokebank.text(data.pokebank + ' / ' + data.pokebankMax);
+                elements.profile.pokebank_progress.css('width', ~~(data.pokebank / data.pokebankMax * 100) + '%');
+            }
+        });
+
+        var pokebank = {};
+
+        socket.on('pokebank', function(data){
+            data.pokemon.sort(function(a, b){
+                return b.cp - a.cp;
+            });
+            for(var i = 0; i < data.pokemon.length; i++){
+                var pokemon = data.pokemon[i];
+
+                var id = String(pokemon.id);
+                pokebank[id] = {
+                    pokemonId: pokemon.pokemonId,
+                    name: pokemon.name,
+                    cp: pokemon.cp,
+                    iv: pokemon.iv
+                };
+
+                var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="http://pokeapi.co/media/sprites/pokemon/' + pokemon.pokemonId + '.png"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2>IV ' + pokemon.iv + '</h2></div></div>');
+                elements.pokemonList.append(elem);
+            }
+        });
+
+        var catchedPokemonMarkers = [];
+
+        socket.on('newPokemon', function(data){
+            var marker = new google.maps.Marker({
+                position: {
+                    lat: data.lat,
+                    lng: data.lng
+                },
+                icon: {
+                    url: 'http://pokeapi.co/media/sprites/pokemon/' + data.pokemonId + '.png',
+                    scaledSize: new google.maps.Size(70 , 70)
+                },
+                map: map,
+                title: data.name
+            });
+            catchedPokemonMarkers.push(marker);
+
+            var id = String(data.id);
+            pokebank[id] = {
+                pokemonId: data.pokemonId,
+                name: data.name,
+                cp: data.cp,
+                iv: data.iv
+            };
+
+            var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="http://pokeapi.co/media/sprites/pokemon/' + pokemon.pokemonId + '.png"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2>IV ' + pokemon.iv + '</h2></div></div>');
+            elements.pokemonList.append(elem);
+        });
+
+        socket.on('releasePokemon', function(data){
+            var id = String(data.id);
+            if(typeof pokebank[id] !== 'undefined'){
+                pokebank[id] = undefined;
+                delete pokebank[id];
+                $('#pokemon-id-' + id).remove();
+            }
+        });
+
+        var map;
+
+        var positionMarker;
+        var polyLine;
+
+        socket.on('newLocation', function(data){
+            if(typeof positionMarker !== 'undefined')
+                positionMarker.setPosition( new google.maps.LatLng( data.lat, data.lng ) );
+
+            if(typeof polyLine !== 'undefined'){
+                var path = polyLine.getPath();
+                path.push(new google.maps.LatLng(data.lat, data.lng));
+                polyLine.setPath(path)
+            }
+        });
+
+        var pokestopMarkers = {};
+
+        socket.on('pokestop', function(data){
+            var id = data.id;
+            if(typeof data[id] === 'undefined' && typeof map !== 'undefined'){
+                pokestopMarkers[id] = new google.maps.Marker({
+                    position: {
+                        lat: data.lat,
+                        lng: data.lng
+                    },
+                    map: map,
+                    icon: {
+                        url: 'http://img.photobucket.com/albums/v436/passion4architecture/LOGO_ROUND%20and%20CIRCLE/Logo_Blue-Dot-Cafe-amp-Coffee-Bar_bluedotcafeandcoffeebarcom_dian-hasan-branding_Alameda-CA-US-1_zps54e9b1d7.png',
+                        scaledSize: new google.maps.Size(15 , 15)
+                    },
+                    title: data.name
+                });
+            }
+        });
+
+        function initMap(){
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: 0, lng: 0},
+                zoom: 1
+            });
+            polyLine = new google.maps.Polyline({
+                path: [],
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+                map: map
+            });
+            positionMarker = new google.maps.Marker({
+                position: {
+                    lat: 0,
+                    lng: 0
+                },
+                icon: {
+                    url: 'http://vignette4.wikia.nocookie.net/nintendo/images/3/31/Red.png/revision/latest?cb=20111124132055&path-prefix=en',
+                    scaledSize: new google.maps.Size(30 , 60)
+                },
+                map: map
+            });
+
+            socket.emit('init');
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMZB_Zo029aBahPYLVG7eNV9bMcy5elgM&callback=initMap" async defer></script>
+</body>
+</html>
