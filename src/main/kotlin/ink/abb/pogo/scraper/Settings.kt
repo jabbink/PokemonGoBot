@@ -64,7 +64,7 @@ class Settings(val properties: Properties) {
     val keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", 1, String::toInt)
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
 
-    val shouldDisplayWalkingToNearestUnused = getPropertyIfSet("Display Walking to nearest Unused Pokestop", "display_walking_nearest_unused", false, String::toBoolean)
+    val shouldDisplayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", false, String::toBoolean)
     val shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean)
     val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
 
