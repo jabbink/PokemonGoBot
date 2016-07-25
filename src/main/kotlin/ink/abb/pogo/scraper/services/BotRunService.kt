@@ -92,7 +92,7 @@ class BotRunService {
     fun load(name: String): Settings {
         val save = File(root, "$name.json")
         if(!save.isFile) {
-            log.error("No save file found for name: $name")
+            throw IllegalArgumentException("No save file found for name: $name")
         }
 
         return mapper.readValue(save, Settings::class.java)
