@@ -37,11 +37,11 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         if (nearestUnused.isNotEmpty()) {
             if (settings.shouldDisplayPokestopName)
                 Log.normal("Walking to pokestop \"${nearestUnused.first().details.name}\"")
-            walk(ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed)
+            walk(bot, ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed)
         }
     }
 
-    fun walk(ctx: Context, end: S2LatLng, speed: Double) {
+    fun walk(bot: Bot, ctx: Context, end: S2LatLng, speed: Double) {
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
@@ -62,7 +62,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
-        fixedRateTimer("Walk", false, 0, timeout, action = {
+        bot.runLoop(timeout, "WalkingLoop") { cancel ->
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
             remainingSteps--
@@ -71,6 +71,6 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
                 ctx.walking.set(false)
                 cancel()
             }
-        })
+        }
     }
 }
