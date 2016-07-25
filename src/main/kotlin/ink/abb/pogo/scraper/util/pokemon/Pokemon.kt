@@ -8,6 +8,8 @@
 
 package ink.abb.pogo.scraper.util.pokemon
 
+import POGOProtos.Data.PokemonDataOuterClass
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData
 import com.pokegoapi.api.pokemon.Pokemon
 
 fun Pokemon.getIv(): Int {
@@ -16,6 +18,17 @@ fun Pokemon.getIv(): Int {
 }
 
 fun Pokemon.getIvPercentage(): Int {
+    val iv = getIv()
+    val ivPercentage = (iv * 100) / 45
+    return ivPercentage
+}
+
+fun PokemonData.getIv(): Int {
+    val iv = individualAttack + individualDefense + individualStamina
+    return iv
+}
+
+fun PokemonData.getIvPercentage(): Int {
     val iv = getIv()
     val ivPercentage = (iv * 100) / 45
     return ivPercentage

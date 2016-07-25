@@ -50,7 +50,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         val compareIv = Comparator<Pokemon> { a, b ->
             // compare b to a to get it descending
-            b.getIv().compareTo(a.getIv())
+            if (settings.sortByIV) {
+                b.getIv().compareTo(a.getIv())
+            } else {
+                b.cp.compareTo(a.cp)
+            }
         }
         api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
             val IV = it.getIvPercentage()
