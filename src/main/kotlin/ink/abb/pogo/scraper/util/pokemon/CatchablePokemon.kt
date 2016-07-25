@@ -15,6 +15,7 @@ import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.pokemon.CatchResult
 import com.pokegoapi.api.map.pokemon.CatchablePokemon
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.Settings
 
 /**
  * Extension function to make the code more readable in the CatchOneNearbyPokemon task
@@ -34,13 +35,14 @@ val itemToPokeball = mapOf(
         Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL)
 )
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, settings: Settings): CatchResult? {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     var ball: ItemId? = null
-    var needCurve = false
+    var needCurve = settings.alwaysCurve
     var needRazzBerry = false
     var highestAvailable: ItemId? = null
+    val desiredCatchProbability = settings.desiredCatchProbability
     for ((index, ballType) in ballTypes.withIndex()) {
         val probability = probabilities.get(index)
         val ballAmount = itemBag.getItem(ballType).count

@@ -18,7 +18,8 @@ import java.util.*
 
 class Settings(val properties: Properties) {
 
-    val pokeballItems = mapOf(Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
+    val pokeballItems = mapOf(
+            Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
             Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
             Pair(ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
             Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
@@ -75,6 +76,8 @@ class Settings(val properties: Properties) {
     val walkOnly = getPropertyIfSet("Only walk to hatch eggs", "walk_only", false, String::toBoolean)
 
     val sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean)
+    
+    val alwaysCurve = getPropertyIfSet("Always do a Curveball", "always_curve", false, String::toBoolean)
 
     val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
 
