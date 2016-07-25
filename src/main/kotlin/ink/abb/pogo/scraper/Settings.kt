@@ -94,6 +94,8 @@ class Settings(val properties: Properties) {
         listOf()
     }
 
+    val candyRequiredByPokemon = getCandyByPokemon()
+
     val autoEvolve = getPropertyIfSet("list of pokemon you want to evolve when able to", "auto_evolve", "CATERPIE,PIDGEY,WEEDLE", String::toString).split(",")
 
     //This method only exists because I wasn't sure if this data was stored somewhere else. If it is then this can be removed.
