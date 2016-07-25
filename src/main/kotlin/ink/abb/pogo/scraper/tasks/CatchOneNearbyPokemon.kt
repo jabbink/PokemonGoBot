@@ -9,7 +9,6 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
-import com.pokegoapi.api.inventory.ItemBag
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -39,7 +38,7 @@ class CatchOneNearbyPokemon : Task {
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
-                        settings.desiredCatchProbability)!!
+                        settings.desiredCatchProbability)
 
                 if (result == null) {
                     Log.red("No Pokeballs in your inventory")

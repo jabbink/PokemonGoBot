@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import ink.abb.pogo.scraper.util.map.canLoot;
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
@@ -16,6 +15,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.map.canLoot
 import kotlin.concurrent.fixedRateTimer
 
 class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {

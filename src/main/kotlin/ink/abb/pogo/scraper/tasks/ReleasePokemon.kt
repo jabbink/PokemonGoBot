@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -26,7 +27,7 @@ class ReleasePokemon : Task {
         val sortByIV = settings.sortByIV
 
         groupedPokemon.forEach {
-            var sorted = emptyList<com.pokegoapi.api.pokemon.Pokemon>()
+            var sorted: List<Pokemon>
             if (sortByIV) {
                 sorted = it.value.sortedByDescending { it.getIv() }
             } else {
@@ -42,7 +43,7 @@ class ReleasePokemon : Task {
                         // stop releasing when pokemon is set in ignoredPokemon
                         if (!ignoredPokemon.contains(pokemon.pokemonId.name)) {
                             var shouldRelease = obligatoryTransfer.contains(pokemon.pokemonId.name)
-                            var reason = ""
+                            var reason: String
                             if (shouldRelease) {
                                 reason = "Obligatory release"
                             } else {

@@ -99,7 +99,7 @@ class Settings(val properties: Properties) {
             System.exit(1)
         }
 
-        var result: T? = null
+        var result: T?
         try {
             result = conversion(properties.getProperty(property))
         } catch (e: Exception) {
