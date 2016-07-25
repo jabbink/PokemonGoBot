@@ -17,6 +17,7 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -60,7 +61,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
             val IV = it.getIvPercentage()
-            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV%"
+            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV% \n ${it.getStatsFormatted()}"
         }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
