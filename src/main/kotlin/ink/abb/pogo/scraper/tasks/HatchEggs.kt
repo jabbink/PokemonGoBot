@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
@@ -37,8 +36,6 @@ class HatchEggs : Task {
                 result.forEachIndexed { index, it ->
                     // TODO: That proto is probably wrong and this fails.
                     val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
-                    println(newPokemon)
-                    println(it.id)
                     val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
                     if (newPokemon == null) {
                         Log.green("Hatched pokemon; $stats")

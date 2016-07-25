@@ -8,38 +8,42 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import ink.abb.pogo.scraper.util.Log
+import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
-import ink.abb.pogo.scraper.util.pokemon.*
+import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.pokemon.getIv
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (!settings.shouldAutoTransfer) {
-            return
-        }
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
         val minIVPercentage = settings.transferIVThreshold
         val minCP = settings.transferCPThreshold
+        val sortByIV = settings.sortByIV
 
         groupedPokemon.forEach {
-            val sorted = it.value.sortedByDescending { it.cp }
+            var sorted: List<Pokemon>
+            if (sortByIV) {
+                sorted = it.value.sortedByDescending { it.getIv() }
+            } else {
+                sorted = it.value.sortedByDescending { it.cp }
+            }
             for ((index, pokemon) in sorted.withIndex()) {
                 // don't drop favourited or nicknamed pokemon
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.favorite
                 if (!isFavourite) {
-                    val iv = pokemon.getIv()
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon
                     if (index >= settings.keepPokemonAmount) {
                         // stop releasing when pokemon is set in ignoredPokemon
                         if (!ignoredPokemon.contains(pokemon.pokemonId.name)) {
                             var shouldRelease = obligatoryTransfer.contains(pokemon.pokemonId.name)
-                            var reason = ""
+                            var reason: String
                             if (shouldRelease) {
                                 reason = "Obligatory release"
                             } else {
@@ -60,7 +64,7 @@ class ReleasePokemon : Task {
                             if (shouldRelease) {
                                 ctx.pokemonStats.second.andIncrement
                                 Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
-                                        "CP ${pokemon.cp} and IV $iv%; reason: $reason")
+                                        "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
                                 pokemon.transferPokemon()
                             }
                         }

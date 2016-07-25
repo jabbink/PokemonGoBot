@@ -11,8 +11,12 @@ package ink.abb.pogo.scraper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.tasks.*
+import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.fixedRateTimer
@@ -32,19 +36,26 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
     fun run() {
 
-        println()
-        println("Name: ${ctx.profile.username}")
-        println("Team: ${ctx.profile.team}")
-        println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        println("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
-        println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        println("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
-        //println("Inventory bag ${ctx.api.bag}")
+        Log.normal();
+        Log.normal("Name: ${ctx.profile.username}")
+        Log.normal("Team: ${ctx.profile.team}")
+        Log.normal("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
+        Log.normal("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
+        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
+        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
+        //Log.normal("Inventory bag ${ctx.api.bag}")
 
-        api.inventories.pokebank.pokemons.map {
+        val compareName = Comparator<Pokemon> { a, b ->
+            a.pokemonId.name.compareTo(b.pokemonId.name)
+        }
+        val compareIv = Comparator<Pokemon> { a, b ->
+            // compare b to a to get it descending
+            b.getIv().compareTo(a.getIv())
+        }
+        api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
             val IV = it.getIvPercentage()
             "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV%"
-        }.forEach { println(it) }
+        }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
         val drop = DropUselessItems()
@@ -54,7 +65,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val hatchEggs = HatchEggs()
 
         task(keepalive)
-        println("Getting initial pokestops...")
+        Log.normal("Getting initial pokestops...")
         // TODO: Figure out why pokestops are only showing up the first time api.map.mapObjects is called (???)
         val reply = api.map.mapObjects
         val process = ProcessPokestops(reply.pokestops)
@@ -71,7 +82,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 if (!settings.walkOnly) {
                     task(catch)
                     task(drop)
-                    task(release)
+                    if (settings.shouldAutoTransfer) {
+                        task(release)
+                    }
+
                 }
                 task(process)
                 task(hatchEggs)

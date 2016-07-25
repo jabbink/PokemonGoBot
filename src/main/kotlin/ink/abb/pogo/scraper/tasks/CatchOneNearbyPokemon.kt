@@ -15,11 +15,18 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.pokemon.catch
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val pokemon = ctx.api.map.catchablePokemon
+
+        val hasPokeballs = ctx.api.inventories.itemBag.hasPokeballs()
+
+        if (!hasPokeballs) {
+            return
+        }
 
         if (pokemon.isNotEmpty()) {
             val catchablePokemon = pokemon.first()
@@ -32,12 +39,18 @@ class CatchOneNearbyPokemon : Task {
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
-                        settings.desiredCatchProbability)!!
+                        settings.desiredCatchProbability)
+
+                if (result == null) {
+                    Log.red("No Pokeballs in your inventory")
+                    return
+                }
 
                 if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                     ctx.pokemonStats.first.andIncrement
+                    val iv = (encounterResult.wildPokemon.pokemonData.individualAttack + encounterResult.wildPokemon.pokemonData.individualDefense + encounterResult.wildPokemon.pokemonData.individualStamina) * 100 / 45
                     var message = "Caught a ${catchablePokemon.pokemonId} " +
-                            "with CP ${encounterResult.wildPokemon.pokemonData.cp}"
+                            "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV $iv%"
 
                     if (settings.shouldDisplayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
