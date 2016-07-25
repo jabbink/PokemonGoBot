@@ -14,6 +14,7 @@ import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.util.*
@@ -43,6 +44,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
         Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
+        Log.normal("Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}")
         //Log.normal("Inventory bag ${ctx.api.bag}")
 
         val compareName = Comparator<Pokemon> { a, b ->
