@@ -302,7 +302,7 @@
         <span class="title">Notifications</span>
         <div class="content">
             <div class="notifications">
-                <input type="checkbox" class="notification_check" id="notification_catched_pokemon"><label for="notification_catched_pokemon">Catched Pokemon</label>
+                <input type="checkbox" class="notification_check" id="notification_caught_pokemon"><label for="notification_caught_pokemon">Caught Pokemon</label>
             </div>
         </div>
     </div>
@@ -359,7 +359,7 @@
 
         var settings = {
             notifications: {
-                notification_catched_pokemon: false
+                notification_caught_pokemon: false
             }
         };
 
@@ -441,13 +441,13 @@
             }
         });
 
-        var catchedPokemonMarkers = [];
+        var caughtPokemonMarkers = [];
 
         socket.on('newPokemon', function(data){
             var icon = 'http://pokeapi.co/media/sprites/pokemon/' + data.pokemonId + '.png';
 
-            if(settings.notifications.notification_catched_pokemon){
-                sendNotification("Catched '" + data.name + "' with CP " + data.cp + "", {
+            if(settings.notifications.notification_caught_pokemon){
+                sendNotification("Caught '" + data.name + "' with CP " + data.cp + "", {
                     icon: icon,
                     lang: 'en'
                 }, 1500)
@@ -465,7 +465,7 @@
                 map: map,
                 title: data.name
             });
-            catchedPokemonMarkers.push(marker);
+            caughtPokemonMarkers.push(marker);
 
             var id = String(data.id);
             pokebank[id] = {
