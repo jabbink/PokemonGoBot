@@ -12,17 +12,28 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
-import ink.abb.pogo.scraper.tasks.*
+import ink.abb.pogo.scraper.tasks.CatchOneNearbyPokemon
+import ink.abb.pogo.scraper.tasks.DropUselessItems
+import ink.abb.pogo.scraper.tasks.GetMapRandomDirection
+import ink.abb.pogo.scraper.tasks.HatchEggs
+import ink.abb.pogo.scraper.tasks.ProcessPokestops
+import ink.abb.pogo.scraper.tasks.ReleasePokemon
+import ink.abb.pogo.scraper.tasks.UpdateProfile
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
-import java.util.*
+import java.util.Comparator
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Phaser
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
 class Bot(val api: PokemonGo, val settings: Settings) {
+
+    private var runningLatch = CountDownLatch(0)
+    lateinit private var phaser: Phaser
 
     var ctx = Context(
             api,
@@ -34,9 +45,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Pair(AtomicInteger(0), AtomicInteger(0))
     )
 
-    fun run() {
+    @Synchronized
+    fun start() {
+        if(isRunning()) return
 
-        Log.normal();
+        Log.normal()
         Log.normal("Name: ${ctx.profile.username}")
         Log.normal("Team: ${ctx.profile.team}")
         Log.normal("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
@@ -74,26 +87,68 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val reply = api.map.mapObjects
         val process = ProcessPokestops(reply.pokestops)
 
-        fixedRateTimer("ProfileLoop", false, 0, 60000, action = {
-            thread(block = {
-                task(profile)
-            })
-        })
+        runningLatch = CountDownLatch(1)
+        phaser = Phaser(1)
 
-        fixedRateTimer("BotLoop", false, 0, 5000, action = {
-            thread(block = {
-                task(keepalive)
-                if (settings.shouldCatchPokemons)
-                    task(catch)
-                if (settings.shouldDropItems)
-                    task(drop)
-                if (settings.shouldAutoTransfer)
-                    task(release)
+        runLoop(TimeUnit.SECONDS.toMillis(60), "ProfileLoop") {
+            task(profile)
+        }
 
-                task(process)
-                task(hatchEggs)
-            })
-        })
+        runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
+            task(keepalive)
+            if (settings.shouldCatchPokemons)
+                task(catch)
+            if (settings.shouldDropItems)
+                task(drop)
+            if (settings.shouldAutoTransfer)
+                task(release)
+
+            task(process)
+            task(hatchEggs)
+        }
+    }
+
+    fun runLoop(timeout: Long, name: String, block: (cancel: () -> Unit) -> Unit) {
+        phaser.register()
+        thread(name = name) {
+            try {
+                var cancelled = false
+                while (!cancelled && isRunning()) {
+                    val start = System.currentTimeMillis()
+
+                    try {
+                        block({ cancelled = true })
+                    } catch (t: Throwable) {
+                        Log.red("Error running loop $name!")
+                        t.printStackTrace()
+                    }
+
+                    val sleep = timeout - (System.currentTimeMillis() - start)
+                    if (sleep > 0) {
+                        try {
+                            runningLatch.await(sleep, TimeUnit.MILLISECONDS)
+                        } catch (ignore: InterruptedException) {
+                        }
+                    }
+                }
+            } finally {
+                phaser.arriveAndDeregister()
+            }
+        }
+    }
+
+    @Synchronized
+    fun stop() {
+        if(!isRunning()) return
+
+        Log.red("Stopping bot loops...")
+        runningLatch.countDown()
+        phaser.arriveAndAwaitAdvance()
+        Log.red("All bot loops stopped.")
+    }
+
+    fun isRunning(): Boolean {
+        return runningLatch.count > 0
     }
 
     fun task(task: Task) {

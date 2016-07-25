@@ -18,6 +18,7 @@ import okhttp3.OkHttpClient
 import java.io.FileInputStream
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 fun main(args: Array<String>) {
     val builder = OkHttpClient.Builder()
@@ -77,5 +78,8 @@ fun main(args: Array<String>) {
     }
     println(".")
 
-    Bot(api, settings).run()
+    val bot = Bot(api, settings)
+    Runtime.getRuntime().addShutdownHook(thread(start = false) { bot.stop() })
+
+    bot.start()
 }
