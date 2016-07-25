@@ -19,3 +19,10 @@ fun ItemBag.hasPokeballs(): Boolean {
     return totalCount > 0
 }
 
+fun ItemBag.size(): Int {
+    var count = 0
+    items.toMutableList().forEach {
+        count += it.count
+    }
+    return count
+}
