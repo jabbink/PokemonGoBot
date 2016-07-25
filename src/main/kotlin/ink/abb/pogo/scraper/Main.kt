@@ -12,6 +12,8 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import ink.abb.pogo.scraper.services.BotRunService
 import ink.abb.pogo.scraper.util.Log
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -19,6 +21,7 @@ import java.io.File
 import java.util.Base64
 import java.util.Properties
 import javax.annotation.PostConstruct
+import kotlin.reflect.companionObject
 
 /**
  * Allow all certificate to debug with https://github.com/bettse/mitmdump_decoder
@@ -124,6 +127,18 @@ open class Main {
             Log.red("$settingString is invalid, defaulting to $default: ${e.message}")
             return default
         }
+    }
+}
+
+fun <R : Any> R.logger(): Lazy<Logger> {
+    return lazy { LoggerFactory.getLogger(unwrapCompanionClass(this.javaClass).name) }
+}
+
+fun <T: Any> unwrapCompanionClass(ofClass: Class<T>): Class<*> {
+    return if (ofClass.enclosingClass != null && ofClass.enclosingClass.kotlin.companionObject?.java == ofClass) {
+        ofClass.enclosingClass
+    } else {
+        ofClass
     }
 }
 

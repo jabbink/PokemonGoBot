@@ -7,6 +7,7 @@ import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.PtcLogin
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Settings
+import ink.abb.pogo.scraper.logger
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,6 +20,8 @@ import kotlin.concurrent.thread
  */
 @Service
 class BotRunService {
+
+    val log by logger()
 
     @Autowired
     lateinit var http: OkHttpClient
@@ -89,13 +92,13 @@ class BotRunService {
     fun load(name: String): Settings {
         val save = File(root, "$name.json")
         if(!save.isFile) {
-            throw IllegalArgumentException("No save file found for name: $name")
+            log.error("No save file found for name: $name")
         }
 
         return mapper.readValue(save, Settings::class.java)
     }
 
     fun getSaveNames(): List<String> {
-        return root.list().map { it.replace(Regex("\\.json$"), "") }
+        return root.list().filter { it.endsWith(".json") }.map { it.replace(Regex("\\.json$"), "") }
     }
 }
