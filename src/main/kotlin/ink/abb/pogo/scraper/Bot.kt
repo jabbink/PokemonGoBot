@@ -27,6 +27,8 @@ import java.util.Comparator
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Phaser
 import java.util.concurrent.TimeUnit
+import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
@@ -73,7 +75,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
             val IV = it.getIvPercentage()
-            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV%"
+            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV% \r\n ${it.getStatsFormatted()}"
         }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
