@@ -23,7 +23,7 @@ class HatchEggs : Task {
         val eggs = ctx.api.inventories.hatchery.eggs
                 .filter { it.eggIncubatorId == null || it.eggIncubatorId.isBlank() }
                 .sortedByDescending { it.eggKmWalkedTarget }
-        if (freeIncubators.isNotEmpty() && eggs.isNotEmpty()) {
+        if (freeIncubators.isNotEmpty() && eggs.isNotEmpty() && settings.shouldAutoFillIncubatores) {
             val result = freeIncubators.first().hatchEgg(eggs.first())
             if (result == UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse.Result.SUCCESS) {
                 Log.green("Put egg ${eggs.first().id} in unused incubator")

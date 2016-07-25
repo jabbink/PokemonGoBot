@@ -15,10 +15,10 @@ class Log {
 
     companion object {
 
-        private val green_ = "\u001B[32m"
+        private val green_ = "\u001B[32;1m"
         private val black_ = "\u001B[30m"
-        private val yellow_ = "\u001B[33m"
-        private val red_ = "\u001B[31m"
+        private val yellow_ = "\u001B[33;1m"
+        private val red_ = "\u001B[31;1m"
         private val white_ = "\u001B[37m"
         private val reset = "\u001B[0m"
 
