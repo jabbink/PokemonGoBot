@@ -17,8 +17,6 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.map.canLoot
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
@@ -64,7 +62,6 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
                     Log.red("Pokestop out of range; distance: $distance")
                 }
                 Result.IN_COOLDOWN_PERIOD -> {
-                    val cooldownPeriod = 5
                     Log.red("Pokestop still in cooldown mode")
                 }
                 else -> Log.yellow(result.result.toString())
