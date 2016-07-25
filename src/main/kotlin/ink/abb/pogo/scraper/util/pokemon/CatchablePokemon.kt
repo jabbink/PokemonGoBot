@@ -49,7 +49,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         } else {
             highestAvailable = ballType
         }
-        if (probability >= desiredCatchProbability - 0.2) {
+        if (probability >= desiredCatchProbability) {
             ball = ballType
             break
         } else if (probability >= desiredCatchProbability - 0.1) {
