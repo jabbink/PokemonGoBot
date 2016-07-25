@@ -44,7 +44,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         api.inventories.pokebank.pokemons.map {
             val IV = it.getIvPercentage()
             "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV%"
-        }.forEach { println(it) }
+        }.sortedBy {it}.forEach { println(it) }
 
         val keepalive = GetMapRandomDirection()
         val drop = DropUselessItems()
