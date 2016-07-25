@@ -38,7 +38,8 @@ class CatchOneNearbyPokemon : Task {
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
-                        settings.desiredCatchProbability)
+                        settings.desiredCatchProbability,
+                        -1)
 
                 if (result == null) {
                     Log.red("No Pokeballs in your inventory")
