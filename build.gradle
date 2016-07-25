@@ -1,5 +1,5 @@
 group 'ink.abb'
-version '0.4.0'
+version '0.4.2'
 
 buildscript {
     ext.kotlin_version = '1.0.3'
@@ -18,8 +18,8 @@ apply plugin: 'application'
 
 mainClassName = 'ink.abb.pogo.scraper.MainKt'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
