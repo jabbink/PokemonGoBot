@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.GoogleLogin
+import com.pokegoapi.auth.GoogleLoginSecrets
 import com.pokegoapi.auth.PtcLogin
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Settings
@@ -50,10 +51,13 @@ class BotRunService {
         val auth = if (settings.credentials is Settings.GoogleCredentials) {
             val auth = if (settings.credentials.token.isBlank()) {
                 GoogleLogin(http).login()
-            } else {
+            } else if (settings.credentials.refresh.isBlank()) {
                 GoogleLogin(http).login(settings.credentials.token)
+            } else {
+                GoogleLogin(http).login(settings.credentials.token, settings.credentials.refresh)
             }
             settings.credentials.token = auth.token.contents
+            settings.credentials.refresh = GoogleLoginSecrets.refresh_token
 
             auth
         } else if (settings.credentials is Settings.PokemonTrainersClubCredentials) {
