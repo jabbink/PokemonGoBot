@@ -17,6 +17,9 @@ desired_catch_probability=0.8
 # Meters per second
 speed=2.778
 
+# Should hatch eggs
+should_hatch_eggs=true
+
 ## Items drop
 # should the bot EVER drop items (true/false)
 drop_items=true
@@ -35,7 +38,16 @@ item_ultra_ball=50
 item_master_ball=50
 item_razz_berry=50
 
+# Preffered ball
+preferred_ball=ITEM_POKE_BALL
+
 ## Extra Info
+# Display Keepalive Coordinates
+display_keepalive=true
+
+# Display Walking to Nearest Unused Pokestop
+display_nearest_unused=true
+
 # should the bot display rewards pokestop (true/false)
 display_pokestop_rewards=true
 
@@ -69,13 +81,14 @@ transfer_cp_threshold=400
 # Only walk (hatch eggs, don't collect pokemon or pokestops)
 walk_only=false
 
+# DO NOT LEAVE ignored_pokemon OR obligatory_transfer BLANK
+
 # list of pokemon you don't want to transfer regardless of CP
 # the names must be divided by a ","
-# if you want all pokemons to be transferred just leave it blank
-ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
+ignored_pokemon=MEW
 
 # list of pokemon you always want to trancsfer regardless of CP
-obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
+obligatory_transfer=MISSINGNO
 
 #List of pokemon names
 #MISSINGNO
