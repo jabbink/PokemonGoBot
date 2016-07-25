@@ -53,7 +53,7 @@ class CatchOneNearbyPokemon : Task {
                     val iv = (encounterResult.wildPokemon.pokemonData.individualAttack + encounterResult.wildPokemon.pokemonData.individualDefense + encounterResult.wildPokemon.pokemonData.individualStamina) * 100 / 45
                     var message = "Caught a ${catchablePokemon.pokemonId} " +
                             "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV $iv%"
-                    message += "\n ${encounterResult.wildPokemon.pokemonData.getStatsFormatted()}"
+                    message += "\r\n ${encounterResult.wildPokemon.pokemonData.getStatsFormatted()}"
                     if (settings.shouldDisplayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
                                 "Candy, ${result.stardustList.sum()}x Stardust]"
