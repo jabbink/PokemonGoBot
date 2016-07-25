@@ -21,13 +21,13 @@ import ink.abb.pogo.scraper.util.map.canLoot
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: HashMap<String, Long>) : Task {
+class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>) : Task {
 
     private var pauseDuration = 1L
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val nearbyPokestops = sortedPokestops.filter {
-            it.canLoot(lootTimeouts = lootTimeouts)
+            it.canLoot()
         }
 
         if (nearbyPokestops.isNotEmpty()) {
@@ -48,7 +48,6 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     if (settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
                     Log.green(message)
-                    lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                     //checkResult(result)
                 }
                 Result.INVENTORY_FULL -> {
@@ -57,7 +56,6 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
 
                     Log.red(message)
-                    lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                 }
                 Result.OUT_OF_RANGE -> {
                     val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
@@ -67,8 +65,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                 }
                 Result.IN_COOLDOWN_PERIOD -> {
                     val cooldownPeriod = 5
-                    lootTimeouts.put(closest.id, System.currentTimeMillis() + cooldownPeriod * 60 * 1000)
-                    Log.red("Pokestop still in cooldown mode; blacklisting for $cooldownPeriod minutes")
+                    Log.red("Pokestop still in cooldown mode")
                 }
                 else -> Log.yellow(result.result.toString())
             }
