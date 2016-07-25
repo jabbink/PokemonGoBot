@@ -11,7 +11,14 @@ package ink.abb.pogo.scraper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
-import ink.abb.pogo.scraper.tasks.*
+import ink.abb.pogo.scraper.tasks.CatchOneNearbyPokemon
+import ink.abb.pogo.scraper.tasks.DropUselessItems
+import ink.abb.pogo.scraper.tasks.GetMapRandomDirection
+import ink.abb.pogo.scraper.tasks.HatchEggs
+import ink.abb.pogo.scraper.tasks.ProcessPokestops
+import ink.abb.pogo.scraper.tasks.ReleasePokemon
+import ink.abb.pogo.scraper.tasks.UpdateProfile
+import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -20,7 +27,18 @@ import kotlin.concurrent.thread
 
 class Bot(val api: PokemonGo, val settings: Settings) {
 
-    var ctx = Context(
+    lateinit var ctx: Context
+
+    val keepalive = GetMapRandomDirection()
+    val drop = DropUselessItems()
+    val profile = UpdateProfile()
+    val catch = CatchOneNearbyPokemon()
+    val release = ReleasePokemon()
+    val hatchEggs = HatchEggs()
+    lateinit var process: ProcessPokestops
+
+    fun init() {
+        ctx = Context(
             api,
             api.playerProfile,
             AtomicDouble(settings.startingLatitude),
@@ -28,37 +46,30 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             Pair(AtomicInteger(0), AtomicInteger(0))
-    )
+        )
 
-    fun run() {
-
-        println()
-        println("Name: ${ctx.profile.username}")
-        println("Team: ${ctx.profile.team}")
-        println("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        println("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
-        println("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        println("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
-        //println("Inventory bag ${ctx.api.bag}")
+        Log.normal("")
+        Log.normal("Name: ${ctx.profile.username}")
+        Log.normal("Team: ${ctx.profile.team}")
+        Log.normal("Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}")
+        Log.normal("Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
+        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
+        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
+        Log.normal("")
 
         api.inventories.pokebank.pokemons.map {
             val IV = it.getIvPercentage()
             "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV%"
         }.forEach { println(it) }
 
-        val keepalive = GetMapRandomDirection()
-        val drop = DropUselessItems()
-        val profile = UpdateProfile()
-        val catch = CatchOneNearbyPokemon()
-        val release = ReleasePokemon()
-        val hatchEggs = HatchEggs()
-
         task(keepalive)
-        println("Getting initial pokestops...")
+        Log.normal("Getting initial pokestops...")
         // TODO: Figure out why pokestops are only showing up the first time api.map.mapObjects is called (???)
         val reply = api.map.mapObjects
-        val process = ProcessPokestops(reply.pokestops)
+        process = ProcessPokestops(reply.pokestops)
+    }
 
+    fun run() {
         fixedRateTimer("ProfileLoop", false, 0, 60000, action = {
             thread(block = {
                 task(profile)

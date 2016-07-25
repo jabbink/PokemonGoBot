@@ -12,6 +12,8 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.pokemon.getIv
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
@@ -40,8 +42,8 @@ class ReleasePokemon : Task {
                     // never transfer highest rated Pokemon
                     if (index >= settings.keepPokemonAmount) {
                         // stop releasing when pokemon is set in ignoredPokemon
-                        if (!ignoredPokemon.contains(pokemon.pokemonId.name)) {
-                            var shouldRelease = obligatoryTransfer.contains(pokemon.pokemonId.name)
+                        if (!ignoredPokemon.contains(pokemon.pokemonId)) {
+                            var shouldRelease = obligatoryTransfer.contains(pokemon.pokemonId)
                             var reason = ""
                             if (shouldRelease) {
                                 reason = "Obligatory release"

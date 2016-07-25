@@ -8,137 +8,65 @@
 
 package ink.abb.pogo.scraper
 
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
-import com.pokegoapi.api.inventory.Pokeball
-import java.io.BufferedReader
-import java.io.FileOutputStream
-import java.io.FileReader
-import java.util.*
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 
-class Settings(val properties: Properties) {
+/**
+ * @author Andrew Potter (ddcapotter)
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Settings(
+    val name: String,
+    val startingLatitude: Double,
+    val startingLongitude: Double,
 
-    val pokeballItems = mapOf(Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
-            Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
-            Pair(ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
-            Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL))
+    val credentials: Credentials,
 
-    val startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble)
-    val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
+    val speed: Double = 2.778,
+    val shouldDropItems: Boolean = false,
+    val preferredBall: ItemId = ItemId.ITEM_POKE_BALL,
+    val shouldAutoTransfer: Boolean = false,
+    val shouldDisplayKeepalive: Boolean = true,
+    val shouldDisplayWalkingToNearestUnused: Boolean = true,
+    val shouldDisplayPokestopSpinRewards: Boolean = true,
+    val shouldDisplayPokestopName: Boolean = true,
+    val shouldDisplayPokemonCatchRewards: Boolean = true,
+    val shouldHatchEggs: Boolean = false,
 
-    val username = properties.getProperty("username")
-    val password = if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
-    val token = properties.getProperty("token", "")
+    val keepPokemonAmount: Int = 1,
+    val desiredCatchProbability: Double =  0.8,
+    val transferIVThreshold: Int = 80,
+    val transferCPThreshold: Int = 400,
+    val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
+    val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
+    val walkOnly: Boolean = false,
+    val sortByIV: Boolean = false,
 
-    val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
-    val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
+    val uselessItems: Map<ItemId, Int> = mapOf(
+        Pair(ItemId.ITEM_REVIVE, 20),
+        Pair(ItemId.ITEM_MAX_REVIVE, 10),
+        Pair(ItemId.ITEM_POTION, 0),
+        Pair(ItemId.ITEM_SUPER_POTION, 30),
+        Pair(ItemId.ITEM_HYPER_POTION, 50),
+        Pair(ItemId.ITEM_MAX_POTION, 50),
+        Pair(ItemId.ITEM_POKE_BALL, 50),
+        Pair(ItemId.ITEM_GREAT_BALL, 50),
+        Pair(ItemId.ITEM_ULTRA_BALL, 50),
+        Pair(ItemId.ITEM_MASTER_BALL, 10),
+        Pair(ItemId.ITEM_RAZZ_BERRY, 50)
+    )
+) {
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+    @JsonSubTypes(
+        JsonSubTypes.Type(value = GoogleCredentials::class, name = "google"),
+        JsonSubTypes.Type(value = PokemonTrainersClubCredentials::class, name = "PTC")
+    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    interface Credentials
 
-    val uselessItems = if (shouldDropItems) {
-        mapOf(
-                Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
-                Pair(ItemId.ITEM_MAX_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_REVIVE", "item_max_revive", 10, String::toInt)),
-                Pair(ItemId.ITEM_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_POTION", "item_potion", 0, String::toInt)),
-                Pair(ItemId.ITEM_SUPER_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_SUPER_POTION", "item_super_potion", 30, String::toInt)),
-                Pair(ItemId.ITEM_HYPER_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_HYPER_POTION", "item_hyper_potion", 50, String::toInt)),
-                Pair(ItemId.ITEM_MAX_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_POTION", "item_max_potion", 50, String::toInt)),
-                Pair(ItemId.ITEM_POKE_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_POKE_BALL", "item_poke_ball", 50, String::toInt)),
-                Pair(ItemId.ITEM_GREAT_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_GREAT_BALL", "item_great_ball", 50, String::toInt)),
-                Pair(ItemId.ITEM_ULTRA_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_ULTRA_BALL", "item_ultra_ball", 50, String::toInt)),
-                Pair(ItemId.ITEM_MASTER_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_MASTER_BALL", "item_master_ball", 10, String::toInt)),
-                Pair(ItemId.ITEM_RAZZ_BERRY, getPropertyIfSet("Max number of items to keep from type ITEM_RAZZ_BERRY", "item_razz_berry", 50, String::toInt))
-        )
-    } else {
-        mapOf(
-                Pair(ItemId.ITEM_REVIVE, 20),
-                Pair(ItemId.ITEM_MAX_REVIVE, 10),
-                Pair(ItemId.ITEM_POTION, 0),
-                Pair(ItemId.ITEM_SUPER_POTION, 30),
-                Pair(ItemId.ITEM_HYPER_POTION, 50),
-                Pair(ItemId.ITEM_MAX_POTION, 50),
-                Pair(ItemId.ITEM_POKE_BALL, 50),
-                Pair(ItemId.ITEM_GREAT_BALL, 50),
-                Pair(ItemId.ITEM_ULTRA_BALL, 50),
-                Pair(ItemId.ITEM_MASTER_BALL, 10),
-                Pair(ItemId.ITEM_RAZZ_BERRY, 50)
-        )
-    }
-
-    val desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.8, String::toDouble)
-    val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
-    val keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", 1, String::toInt)
-    val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
-
-    val shouldDisplayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", false, String::toBoolean)
-    val shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean)
-    val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
-
-    val walkOnly = getPropertyIfSet("Only walk to hatch eggs", "walk_only", false, String::toBoolean)
-
-    val sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean)
-
-    val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
-
-    val transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)
-
-    val ignoredPokemon = if (shouldAutoTransfer) {
-        getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMANDER", String::toString).split(",")
-    } else {
-        listOf()
-    }
-    val obligatoryTransfer = if (shouldAutoTransfer) {
-        getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
-    } else {
-        listOf()
-    }
-
-    private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
-        val settingString = "$description setting (\"$property\")"
-
-        if (!properties.containsKey(property)) {
-            println("$settingString not specified in config.properties!")
-            System.exit(1)
-        }
-
-        return conversion(properties.getProperty(property))
-    }
-
-    private fun <T> getPropertyIfSet(description: String, property: String, default: T, conversion: (String) -> T): T {
-        val settingString = "$description setting (\"$property\")"
-        val defaulting = "defaulting to \"$default\""
-
-        if (!properties.containsKey(property)) {
-            println("$settingString not specified, $defaulting.")
-            return default
-        }
-
-        try {
-            return conversion(properties.getProperty(property))
-        } catch (e: Exception) {
-            println("$settingString is invalid, defaulting to $default: ${e.message}")
-            return default
-        }
-    }
-
-    fun setToken(value: String) {
-        properties.setProperty("token", value)
-    }
-
-    fun writeToken(propertyFile: String) {
-        val file = BufferedReader(FileReader(propertyFile))
-        var propertiesText = String()
-
-        file.lines().forEach {
-            if (it != null && it.startsWith("token")) {
-                propertiesText += "token=${this.properties.getProperty("token")}\n"
-            } else if (it != null) {
-                propertiesText += "$it\n"
-            }
-        }
-
-        file.close()
-
-        val out = FileOutputStream(propertyFile)
-
-        out.write(propertiesText.toByteArray())
-        out.close()
-    }
+    data class GoogleCredentials(var token: String = "", var refresh: String = "") : Credentials
+    data class PokemonTrainersClubCredentials(val username: String, val password: String, var token: String = "") : Credentials
 }
