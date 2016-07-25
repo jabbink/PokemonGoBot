@@ -11,7 +11,6 @@ package ink.abb.pogo.scraper.util.map
 import com.pokegoapi.api.map.fort.Pokestop
 
 fun Pokestop.canLoot(ignoreDistance: Boolean = false, lootTimeouts: Map<String, Long>): Boolean {
-    val now = System.currentTimeMillis()
-    val canLoot = lootTimeouts.getOrElse(id, { 0 }) < now && cooldownCompleteTimestampMs < now
+    val canLoot = lootTimeouts.getOrElse(id, { 0 }) < System.currentTimeMillis()
     return (ignoreDistance || inRange()) && canLoot
 }
