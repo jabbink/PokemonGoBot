@@ -17,6 +17,15 @@ desired_catch_probability=0.8
 # Meters per second
 speed=2.778
 
+# Should the bot loot the pokestops (true/false)
+loot_pokestop=true
+
+# Should the bot catch pokemons (true/false)
+catch_pokemon=true
+
+# Shout the bot auto fill incubators with eggs (true/false)
+auto_fill_incubator=true
+
 ## Items drop
 # should the bot EVER drop items (true/false)
 drop_items=true
@@ -65,9 +74,6 @@ transfer_iv_threshold=80
 
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
-
-# Only walk (hatch eggs, don't collect pokemon or pokestops)
-walk_only=false
 
 # list of pokemon you don't want to transfer regardless of CP
 # the names must be divided by a ","
