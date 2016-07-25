@@ -16,6 +16,7 @@ import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.pokemon.catch
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -34,7 +35,7 @@ class CatchOneNearbyPokemon : Task {
             val encounterResult = catchablePokemon.encounterPokemon()
             if (encounterResult.wasSuccessful()) {
                 Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
-                        "with CP ${encounterResult.wildPokemon.pokemonData.cp}")
+                        "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV ${encounterResult.wildPokemon.pokemonData.getIvPercentage()}%")
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
