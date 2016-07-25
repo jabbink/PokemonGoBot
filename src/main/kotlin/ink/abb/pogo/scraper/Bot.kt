@@ -69,7 +69,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val catch = CatchOneNearbyPokemon()
         val release = ReleasePokemon()
         val hatchEggs = HatchEggs()
-        val evolve = EvolvePoekmon()
+        val evolve = EvolvePokemon()
 
         task(keepalive)
         Log.normal("Getting initial pokestops...")
