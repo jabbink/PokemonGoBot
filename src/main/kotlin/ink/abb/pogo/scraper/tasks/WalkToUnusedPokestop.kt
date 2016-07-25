@@ -15,10 +15,9 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.map.canLoot
 import kotlin.concurrent.fixedRateTimer
 
-class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
+class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>) : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // don't run away when there are still Pokemon around
@@ -31,7 +30,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         }
 
         val nearestUnused = sortedPokestops.filter {
-            it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts)
+            it.canLoot(true)
         }
 
         if (nearestUnused.isNotEmpty()) {
