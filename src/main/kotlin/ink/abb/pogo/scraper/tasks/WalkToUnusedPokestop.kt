@@ -30,7 +30,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         }
 
         val nearestUnused = sortedPokestops.filter {
-            it.canLoot(true)
+            it.inRange() && lootTimeouts.getOrElse(it.id, { 0 }) < System.currentTimeMillis()
         }
 
         if (nearestUnused.size > 0) {
