@@ -28,7 +28,7 @@ class Settings(val properties: Properties) {
 
     val username = properties.getProperty("username")
     val password = if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
-    val token = properties.getProperty("token", "")
+    val token = { properties.getProperty("token", "") }
 
     val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
