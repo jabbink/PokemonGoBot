@@ -9,6 +9,7 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -61,7 +62,12 @@ class CatchOneNearbyPokemon : Task {
                 } else
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
             } else {
-                Log.red("Encounter failed with result: ${encounterResult.getStatus()}")
+                val encounterResultStatus = encounterResult.getStatus()
+                Log.red("Encounter failed with result: ${encounterResultStatus}")
+                if(encounterResultStatus == EncounterResponse.Status.POKEMON_INVENTORY_FULL){
+                  settings.walkOnly = true;
+                  Log.yellow("Pokemon Inventory Full, switching to walkOnly mode");
+                }
             }
         }
     }

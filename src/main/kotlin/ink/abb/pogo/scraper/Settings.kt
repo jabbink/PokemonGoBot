@@ -72,7 +72,7 @@ class Settings(val properties: Properties) {
     val shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean)
     val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
 
-    val walkOnly = getPropertyIfSet("Only walk to hatch eggs", "walk_only", false, String::toBoolean)
+    var walkOnly = getPropertyIfSet("Only walk to hatch eggs", "walk_only", false, String::toBoolean)
 
     val sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean)
 
