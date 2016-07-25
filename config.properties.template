@@ -53,6 +53,9 @@ display_pokestop_name=false
 # should the bot auto transfer duplicate pokemon
 autotransfer=false
 
+# should the bot force transfer every pokemon you catch and (IMPORTANT!) already have caught (IMPORTANT!) which do net meet CP,IV,IGNORED
+forcetransfer=false
+
 # minimum amount of pokemon type to keep
 keep_pokemon_amount=1
 

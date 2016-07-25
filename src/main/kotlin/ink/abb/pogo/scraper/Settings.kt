@@ -65,6 +65,11 @@ class Settings(val properties: Properties) {
     val desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.8, String::toDouble)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
     val keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", 1, String::toInt)
+    val shouldForceTransfer = if (shouldAutoTransfer) {
+        getPropertyIfSet("Forcetransfer", "forcetransfer", false, String::toBoolean)
+    } else {
+        false
+    }
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
 
     val shouldDisplayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", false, String::toBoolean)

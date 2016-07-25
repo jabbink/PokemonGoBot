@@ -21,24 +21,26 @@ class ReleasePokemon : Task {
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val ignoredPokemon = settings.ignoredPokemon
         val obligatoryTransfer = settings.obligatoryTransfer
+        val forceTransfer = settings.shouldForceTransfer
         val minIVPercentage = settings.transferIVThreshold
         val minCP = settings.transferCPThreshold
         val sortByIV = settings.sortByIV
 
         groupedPokemon.forEach {
-            var sorted = emptyList<com.pokegoapi.api.pokemon.Pokemon>()
-            if (sortByIV) {
-                sorted = it.value.sortedByDescending { it.getIv() }
-            } else {
-                sorted = it.value.sortedByDescending { it.cp }
-            }
+            var sorted = if (forceTransfer) it.value else
+                if (sortByIV) {
+                    it.value.sortedByDescending { it.getIv() }
+                } else {
+                    it.value.sortedByDescending { it.cp }
+                }
             for ((index, pokemon) in sorted.withIndex()) {
                 // don't drop favourited or nicknamed pokemon
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.favorite
                 if (!isFavourite) {
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon
-                    if (index >= settings.keepPokemonAmount) {
+                    if (index > settings.keepPokemonAmount || forceTransfer) {
+
                         // stop releasing when pokemon is set in ignoredPokemon
                         if (!ignoredPokemon.contains(pokemon.pokemonId.name)) {
                             var shouldRelease = obligatoryTransfer.contains(pokemon.pokemonId.name)

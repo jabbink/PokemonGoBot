@@ -1,5 +1,5 @@
 group 'ink.abb'
-version '0.4.0'
+version '0.3.0'
 
 buildscript {
     ext.kotlin_version = '1.0.3'
@@ -21,6 +21,11 @@ mainClassName = 'ink.abb.pogo.scraper.MainKt'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+configurations.all {
+    // Check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
@@ -28,7 +33,9 @@ repositories {
 
 dependencies {
 
-    compile project(':PokeGOAPI-Java')
+    //compile project(':PokeGOAPI-Java')
+
+    compile ('com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'){changing = true}
 
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
 
