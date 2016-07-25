@@ -17,6 +17,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.map.canLoot
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -26,10 +27,10 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val nearbyPokestops = sortedPokestops.filter {
-            it.inRange() && lootTimeouts.getOrElse(it.id, { 0 }) < System.currentTimeMillis()
+            it.canLoot(lootTimeouts = lootTimeouts)
         }
 
-        if (nearbyPokestops.size > 0) {
+        if (nearbyPokestops.isNotEmpty()) {
             val closest = nearbyPokestops.first()
             var pokestopID = closest.id
             if (settings.shouldDisplayPokestopName)
@@ -69,7 +70,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     lootTimeouts.put(closest.id, System.currentTimeMillis() + cooldownPeriod * 60 * 1000)
                     Log.red("Pokestop still in cooldown mode; blacklisting for $cooldownPeriod minutes")
                 }
-                else -> println(result.result)
+                else -> Log.yellow(result.result.toString())
             }
         }
     }
@@ -85,3 +86,4 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
         }
     }
 }
+
