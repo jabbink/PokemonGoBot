@@ -65,7 +65,7 @@ open class Main {
                 shouldAutoTransfer = getPropertyIfSet(properties, "Autotransfer", "autotransfer", false, String::toBoolean),
                 shouldDisplayKeepalive = getPropertyIfSet(properties, "Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean),
                 transferIVThreshold = getPropertyIfSet(properties, "Minimum IV to keep a pokemon", "transfer_iv_threshold", 80, String::toInt),
-                ignoredPokemon = getPropertyIfSet(properties, "Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMENDER", String::toString).split(",").map { PokemonId.valueOf(it) },
+                ignoredPokemon = getPropertyIfSet(properties, "Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMANDER", String::toString).split(",").map { PokemonId.valueOf(it) },
                 obligatoryTransfer = getPropertyIfSet(properties, "list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",").map { PokemonId.valueOf(it) }
             ))
         } else {
