@@ -1,4 +1,4 @@
-/**
+/*
  * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
@@ -99,7 +99,7 @@ class Settings(val properties: Properties) {
             System.exit(1)
         }
 
-        var result: T? = null
+        var result: T?
         try {
             result = conversion(properties.getProperty(property))
         } catch (e: Exception) {

@@ -9,7 +9,6 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
-import com.pokegoapi.api.inventory.ItemBag
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -17,6 +16,7 @@ import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.pokemon.catch
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -35,11 +35,12 @@ class CatchOneNearbyPokemon : Task {
             val encounterResult = catchablePokemon.encounterPokemon()
             if (encounterResult.wasSuccessful()) {
                 Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
-                        "with CP ${encounterResult.wildPokemon.pokemonData.cp}")
+                        "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV ${encounterResult.wildPokemon.pokemonData.getIvPercentage()}%")
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
-                        settings.desiredCatchProbability)!!
+                        settings.desiredCatchProbability,
+                        -1)
 
                 if (result == null) {
                     Log.red("No Pokeballs in your inventory")
