@@ -67,6 +67,6 @@ data class Settings(
     @JsonIgnoreProperties(ignoreUnknown = true)
     interface Credentials
 
-    data class GoogleCredentials(var token: String = "", var refresh: String = "") : Credentials
+    data class GoogleCredentials(var token: String = "") : Credentials
     data class PokemonTrainersClubCredentials(val username: String, val password: String, var token: String = "") : Credentials
 }
