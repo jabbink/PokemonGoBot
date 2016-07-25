@@ -10,6 +10,7 @@ package ink.abb.pogo.scraper
 
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.pokegoapi.api.inventory.Pokeball
+import ink.abb.pogo.scraper.util.Log
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -85,7 +86,7 @@ class Settings(val properties: Properties) {
         listOf()
     }
     val obligatoryTransfer = if (shouldAutoTransfer) {
-        getPropertyIfSet("list of pokemon you always want to trancsfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
+        getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",")
     } else {
         listOf()
     }
@@ -94,11 +95,19 @@ class Settings(val properties: Properties) {
         val settingString = "$description setting (\"$property\")"
 
         if (!properties.containsKey(property)) {
-            println("$settingString not specified in config.properties!")
+            Log.red("$settingString not specified in config.properties!")
             System.exit(1)
         }
 
-        return conversion(properties.getProperty(property))
+        var result: T? = null
+        try {
+            result = conversion(properties.getProperty(property))
+        } catch (e: Exception) {
+            Log.red("Failed to interpret $settingString, got \"${properties.getProperty(property)}\"")
+            System.exit(1)
+            throw IllegalArgumentException()
+        }
+        return result
     }
 
     private fun <T> getPropertyIfSet(description: String, property: String, default: T, conversion: (String) -> T): T {
@@ -106,14 +115,14 @@ class Settings(val properties: Properties) {
         val defaulting = "defaulting to \"$default\""
 
         if (!properties.containsKey(property)) {
-            println("$settingString not specified, $defaulting.")
+            Log.yellow("$settingString not specified, $defaulting.")
             return default
         }
 
         try {
             return conversion(properties.getProperty(property))
         } catch (e: Exception) {
-            println("$settingString is invalid, defaulting to $default: ${e.message}")
+            Log.yellow("$settingString is invalid, defaulting to $default: ${e.message}")
             return default
         }
     }
@@ -126,6 +135,7 @@ class Settings(val properties: Properties) {
         val file = BufferedReader(FileReader(propertyFile))
         var propertiesText = String()
         var foundToken = false
+
         file.lines().forEach {
             if (it != null && it.startsWith("token")) {
                 propertiesText += "token=${this.properties.getProperty("token")}\n"
@@ -134,7 +144,8 @@ class Settings(val properties: Properties) {
                 propertiesText += "$it\n"
             }
         }
-        if (!foundToken){
+
+        if (!foundToken) {
             propertiesText += "token=${this.properties.getProperty("token")}\n"
         }
         file.close()

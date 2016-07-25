@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import ink.abb.pogo.scraper.util.map.canLoot;
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
@@ -30,10 +31,10 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         }
 
         val nearestUnused = sortedPokestops.filter {
-            it.canLoot(true)
+            it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts)
         }
 
-        if (nearestUnused.size > 0) {
+        if (nearestUnused.isNotEmpty()) {
             if (settings.shouldDisplayPokestopName)
                 Log.normal("Walking to pokestop \"${nearestUnused.first().details.name}\"")
             walk(ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed)
@@ -72,5 +73,4 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
             }
         })
     }
-
 }

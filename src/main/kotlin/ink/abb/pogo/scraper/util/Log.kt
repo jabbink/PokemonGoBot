@@ -24,28 +24,37 @@ class Log {
 
         var format = SimpleDateFormat("dd MMM HH:mm:ss")
 
-        fun green(text: String) {
-            println("${green_}${format.format(Date())}: $text ${reset}")
+        private fun output(text: String, color: String? = null) {
+            val output = "${format.format(Date())}: $text"
+            if (color != null) {
+                println("${color}$output ${reset}")
+            } else {
+                println(output)
+            }
         }
 
-        fun normal(text: String) {
-            println("${format.format(Date())}: $text")
+        fun green(text: String = "") {
+            output(text, green_)
         }
 
-        fun red(text: String) {
-            println("${red_}${format.format(Date())}: $text ${reset}")
+        fun normal(text: String = "") {
+            println(text)
         }
 
-        fun yellow(text: String) {
-            println("${yellow_}${format.format(Date())}: $text ${reset}")
+        fun red(text: String = "") {
+            output(text, red_)
         }
 
-        fun white(text: String) {
-            println("${white_}${format.format(Date())}: $text ${reset}")
+        fun yellow(text: String = "") {
+            output(text, yellow_)
         }
 
-        fun black(text: String) {
-            println("${black_}${format.format(Date())}: $text ${reset}")
+        fun white(text: String = "") {
+            output(text, white_)
+        }
+
+        fun black(text: String = "") {
+            output(text, black_)
         }
     }
 }
