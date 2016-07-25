@@ -8,12 +8,13 @@
 
 package ink.abb.pogo.scraper.util
 
+import ink.abb.pogo.scraper.Context
 import java.text.SimpleDateFormat
 import java.util.*
 
 class Log {
-
     companion object {
+        private var ctx: Context? = null
 
         private val green_ = "\u001B[32m"
         private val black_ = "\u001B[30m"
@@ -24,20 +25,28 @@ class Log {
 
         var format = SimpleDateFormat("dd MMM HH:mm:ss")
 
+        fun setContext(ctx: Context){
+            this.ctx = ctx
+        }
+
         fun green(text: String) {
             println("${green_}${format.format(Date())}: $text ${reset}")
+            ctx?.server?.sendLog("green", text)
         }
 
         fun normal(text: String) {
             println("${format.format(Date())}: $text")
+            ctx?.server?.sendLog("normal", text)
         }
 
         fun red(text: String) {
             println("${red_}${format.format(Date())}: $text ${reset}")
+            ctx?.server?.sendLog("red", text)
         }
 
         fun yellow(text: String) {
             println("${yellow_}${format.format(Date())}: $text ${reset}")
+            ctx?.server?.sendLog("yellow", text)
         }
 
         fun white(text: String) {

@@ -41,6 +41,11 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
             if (result?.itemsAwarded != null) {
                 ctx.itemStats.first.getAndAdd(result.itemsAwarded.size)
             }
+
+            if(result.experience > 0){
+                ctx.server.sendProfile()
+            }
+
             when (result.result) {
                 Result.SUCCESS -> {
                     var message = "Looted pokestop $pokestopID; +${result.experience} XP"

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Pokemon Go Bot GUI</title>
 
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <style>
         * {
@@ -13,52 +14,85 @@
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: default;
         }
 
-        table {
+        html, body {
             width: 100%;
-            border: none;
-        }
-
-        table td {
+            height: 100%;
+            overflow: hidden;
             position: relative;
         }
 
-        table th, table td .text {
-            padding: 10px 15px;
-        }
-
-        table th {
-            color: #fff;
-            background-color: #1b1e24;
-        }
-
-        table td {
-            width: 100%;
-            border: 1px solid #C1C3D1;
-        }
-
-        table td.TEAM_INSTINCT {
-            background-color: #FFEB3B;
-        }
-
-        table td.TEAM_MYSTIC {
-            background-color: #2196F3;
-        }
-
-        table td.TEAM_VALOR {
-            background-color: #F44336;
-        }
-
-        span.progress {
+        /* === WINDOWS === */
+        .window {
             display: block;
             position: absolute;
-            z-index: -1;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            background: #B0BEC5;
+            min-width: 300px;
+            min-height: 300px;
+            background: #fafafa;
+            border-radius: 4px;
+            overflow: hidden;
+            z-index: 1;
+            -webkit-box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.75);
+            -moz-box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.75);
+            box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.75);
+        }
+
+        .window.active {
+            -webkit-box-shadow: 0px 0px 13px 0px rgba(0,0,0,0.75);
+            -moz-box-shadow: 0px 0px 13px 0px rgba(0,0,0,0.75);
+            box-shadow: 0px 0px 13px 0px rgba(0,0,0,0.75);
+        }
+
+        .window .title {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            height: 38px;
+            line-height: 38px;
+            font-size: 14px;
+            background-color: #eee;
+            cursor: pointer;
+        }
+
+        .window .content {
+            display: block;
+            width: 100%;
+            height: calc(100% - 38px);
+            overflow: hidden;
+        }
+
+        .ui-resizable-handle {
+            opacity: 0.0;
+        }
+
+        /* ===  MAP === */
+        #window-map {
+            width: 400px;
+            height: 400px;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* === POKEBANK === */
+        #window-pokebank {
+            width: 300px;
+            height: 400px;
+        }
+
+        #pokemon_list {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         .pokemon {
@@ -83,72 +117,232 @@
         }
 
         .pokemon img {
-            width: 75px;
-            height: 75px;
+            width: 50px;
+            height: 50px;
             display: inline-block;
             vertical-align: middle;
             background-color: #ffffff;
             border-radius: 50%;
-            margin-right: 20px;
+            margin-right: 10px;
         }
 
         .pokemon div {
-            width: 100px;
+            width: 60px;
             display: inline-block;
             vertical-align: middle;
         }
 
         .pokemon h1 {
-            font-size: 20px;
-        }
-
-        .pokemon h2 {
             font-size: 16px;
         }
 
-        .search {
-            width: 100%;
-            height: 50px;
-            font-size: 30px;
-            text-align: left;
-            outline: none;
-            padding: 0 20px;
+        .pokemon h2 {
+            font-size: 12px;
         }
 
-        .map {
-            height: 350px;
+        /* === PROFILE === */
+        #window-profile {
+            width: 400px;
+            height: 400px;
+        }
+
+        #profile-table {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        #profile-table td {
+            position: relative;
+        }
+
+        #profile-table th,
+        #profile-table td .text {
+            padding: 10px 15px;
+        }
+
+        #profile-table th {
+            color: #fff;
+            background-color: #1b1e24;
+        }
+
+        #profile-table td {
+            width: 100%;
+            border: 1px solid #C1C3D1;
+        }
+
+        #profile-table td.TEAM_INSTINCT {
+            background-color: #FFEB3B;
+        }
+
+        #profile-table td.TEAM_MYSTIC {
+            background-color: #2196F3;
+        }
+
+        #profile-table td.TEAM_VALOR {
+            background-color: #F44336;
+        }
+
+        span.progress {
+            display: block;
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            background: #B0BEC5;
+        }
+
+        /* === LOG === */
+        #window-log {
+            width: 500px;
+            height: 400px;
+        }
+
+        .log_wrapper {
+            width: 100%;
+            height: 100%;
+            background-color: #1b1e24;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+
+        .log {
+            display: inline-block;
+            width: 100%;
+            vertical-align: bottom;
+        }
+
+        span.yellow {
+            color: yellow;
+        }
+
+        span.green {
+            color: green;
+        }
+
+        span.red {
+            color: red;
+        }
+
+        span.normal {
+            color: white;
+        }
+
+        /* === NOTIFICATIONS  === */
+        #window-notifications {
+            width: 300px;
+            height: 300px;
+        }
+
+        .notifications {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            overflow: auto;
         }
     </style>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 </head>
 <body>
-    <table cellspacing="0" cellpadding="0">
-        <tr>
-            <th>Name</th><td><span id="profile_name" class="text"></span></td>
-        </tr>
-        <tr>
-            <th>Team</th><td><span id="profile_team" class="text"></span></td>
-        </tr>
-        <tr>
-            <th>Stardust</th><td><span id="profile_stardust" class="text"></span></td>
-        </tr>
-        <tr>
-            <th>Level</th><td><span id="profile_level_progress" class="progress"></span><span id="profile_level" class="text"></span></td>
-        </tr>
-        <tr>
-            <th>Pokebank</th><td><span id="profile_pokebank_progress" class="progress"></span><span id="profile_pokebank" class="text"></span></td>
-        </tr>
-    </table>
+    <div id="window-map" class="window">
+        <span class="title">Map</span>
+        <div class="content">
+            <div id="map"></div>
+        </div>
+    </div>
 
-    <div id="map" class="map"></div>
+    <div id="window-pokebank" class="window">
+        <span class="title">Pokebank</span>
+        <div class="content">
+            <div id="pokemon_list"></div>
+        </div>
+    </div>
 
-    <!-- Working... -->
-    <!-- <input id="pokemon_search" class="search" type="text" placeholder="Search Pokemon"> -->
-    <div id="pokemon_list">
+    <div id="window-profile" class="window">
+        <span class="title">Profile</span>
+        <div class="content">
+            <table id="profile-table" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>Name</th><td><span id="profile_name" class="text"></span></td>
+                </tr>
+                <tr>
+                    <th>Team</th><td><span id="profile_team" class="text"></span></td>
+                </tr>
+                <tr>
+                    <th>Stardust</th><td><span id="profile_stardust" class="text"></span></td>
+                </tr>
+                <tr>
+                    <th>Level</th><td><span id="profile_level_progress" class="progress"></span><span id="profile_level" class="text"></span></td>
+                </tr>
+                <tr>
+                    <th>Pokebank</th><td><span id="profile_pokebank_progress" class="progress"></span><span id="profile_pokebank" class="text"></span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="window-log" class="window">
+        <span class="title">Log</span>
+        <div class="content">
+            <div class="log_wrapper">
+                <div id="log" class="log">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="window-notifications" class="window">
+        <span class="title">Notifications</span>
+        <div class="content">
+            <div class="notifications">
+                <input type="checkbox" class="notification_check" id="notification_catched_pokemon"><label for="notification_catched_pokemon">Catched Pokemon</label>
+            </div>
+        </div>
     </div>
 
     <script>
+        $(function() {
+            var win = $('.window');
+
+            function activeWindow(elem){
+                var maxZIndex = 0;
+                win.each(function(){
+                    $(this).removeClass('active');
+                    var zIndex = parseInt($(this).css('z-index'));
+                    if(zIndex > maxZIndex){
+                        maxZIndex = zIndex;
+                    }
+                });
+                elem.addClass('active');
+                elem.css('z-index', String(maxZIndex + 1));
+            }
+            win.draggable({
+                handle: '.title',
+                containment: 'body'
+            });
+            win.resizable({
+                handles: 'n, ne, e, se, s, sw, w, nw',
+                minWidth: 300,
+                minHeight: 300,
+                containment: 'body',
+                resize: function(){
+                    if($(this).attr('id') === 'window-map'){
+                        google.maps.event.trigger(map, "resize");
+                    }
+                }
+            });
+            win.mousedown(function(){
+                activeWindow($(this));
+            });
+        });
+
         var elements = {
             profile: {
                 name: $('#profile_name'),
@@ -159,8 +353,46 @@
                 pokebank: $('#profile_pokebank'),
                 pokebank_progress: $('#profile_pokebank_progress')
             },
-            pokemonList: $('#pokemon_list')
+            pokemonList: $('#pokemon_list'),
+            log: $('#log')
         };
+
+        var settings = {
+            notifications: {
+                notification_catched_pokemon: false
+            }
+        };
+
+        $('.notification_check').on('click', function(){
+            var name = $(this).attr('id');
+            if (!("Notification" in window)) {
+                alert("This browser does not support notifications");
+            } else {
+                settings.notifications[name] = $(this).prop('checked');
+
+                if(Notification.permission !== 'granted'){
+                    alert('You will have to accept the following request.');
+                    Notification.requestPermission(function(){});
+                }
+            }
+        });
+
+        function sendNotification(title, options, duration){
+            if(Notification.permission === 'granted'){
+                var notification = new Notification(title, options);
+                if(typeof duration !== 'undefined'){
+                    setTimeout(function(){
+                        notification.close();
+                    }, duration);
+                }
+            } else {
+                Notification.requestPermission(function(){
+                    if(Notification.permission === 'granted'){
+                        sendNotification(title, options)
+                    }
+                });
+            }
+        }
 
         var socket = io.connect('ws://localhost:8001');
 
@@ -212,13 +444,22 @@
         var catchedPokemonMarkers = [];
 
         socket.on('newPokemon', function(data){
+            var icon = 'http://pokeapi.co/media/sprites/pokemon/' + data.pokemonId + '.png';
+
+            if(settings.notifications.notification_catched_pokemon){
+                sendNotification("Catched '" + data.name + "' with CP " + data.cp + "", {
+                    icon: icon,
+                    lang: 'en'
+                }, 100000)
+            }
+
             var marker = new google.maps.Marker({
                 position: {
                     lat: data.lat,
                     lng: data.lng
                 },
                 icon: {
-                    url: 'http://pokeapi.co/media/sprites/pokemon/' + data.pokemonId + '.png',
+                    url: icon,
                     scaledSize: new google.maps.Size(70 , 70)
                 },
                 map: map,
@@ -234,7 +475,7 @@
                 iv: data.iv
             };
 
-            var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="http://pokeapi.co/media/sprites/pokemon/' + pokemon.pokemonId + '.png"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2>IV ' + pokemon.iv + '</h2></div></div>');
+            var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="' + icon + '"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2>IV ' + pokemon.iv + '</h2></div></div>');
             elements.pokemonList.append(elem);
         });
 
@@ -283,7 +524,12 @@
             }
         });
 
-        function initMap(){
+        socket.on('log', function(data){
+            var span = $('<span class="' + data.type + '">' + data.text + '</span><br>');
+            elements.log.append(span);
+        });
+
+        function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: {lat: 0, lng: 0},
                 zoom: 1
@@ -303,7 +549,7 @@
                 },
                 icon: {
                     url: 'http://vignette4.wikia.nocookie.net/nintendo/images/3/31/Red.png/revision/latest?cb=20111124132055&path-prefix=en',
-                    scaledSize: new google.maps.Size(30 , 60)
+                    scaledSize: new google.maps.Size(30, 60)
                 },
                 map: map
             });

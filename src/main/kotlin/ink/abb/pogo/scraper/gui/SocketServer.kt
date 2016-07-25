@@ -3,6 +3,7 @@ package ink.abb.pogo.scraper.gui
 import POGOProtos.Data.PokemonDataOuterClass
 import com.corundumstudio.socketio.Configuration
 import com.corundumstudio.socketio.SocketIOServer
+import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Context
@@ -68,20 +69,13 @@ class SocketServer {
         }
     }
 
-    fun sendPokestops() {
-        Thread(){
-            val copyOfPokestops = ctx?.api?.map?.mapObjects?.pokestops?.toList()
-            if(copyOfPokestops != null){
-                for(pokestop in copyOfPokestops){
-                    val pokestopObj = EventPokestop()
-                    pokestopObj.id = pokestop.id
-                    pokestopObj.name = pokestop.details.name
-                    pokestopObj.lat = pokestop.latitude
-                    pokestopObj.lng = pokestop.longitude
-                    server?.broadcastOperations?.sendEvent("pokestop", pokestopObj)
-                }
-            }
-        }.start()
+    fun sendPokestop(pokestop: Pokestop) {
+        val pokestopObj = EventPokestop()
+        pokestopObj.id = pokestop.id
+        pokestopObj.name = pokestop.details.name
+        pokestopObj.lat = pokestop.latitude
+        pokestopObj.lng = pokestop.longitude
+        server?.broadcastOperations?.sendEvent("pokestop", pokestopObj)
     }
 
     fun setLocation(lat: Double, lng: Double){
@@ -101,6 +95,19 @@ class SocketServer {
         newPokemon.cp = pokemon.cp
         newPokemon.iv = pokemon.getIvPercentage()
         server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
+    }
+
+    fun releasePokemon(id: Long){
+        val release = EventReleasePokemon()
+        release.id = id
+        server?.broadcastOperations?.sendEvent("releasePokemon", release)
+    }
+
+    fun sendLog(type: String, text: String){
+        val log = EventLog()
+        log.type = type
+        log.text = text
+        server?.broadcastOperations?.sendEvent("log", log)
     }
 
     class EventInit {
@@ -137,12 +144,12 @@ class SocketServer {
         var lng: Double? = null
     }
 
-    class EventNewLocation() {
+    class EventNewLocation {
         var lat: Double? = null
         var lng: Double? = null
     }
 
-    class EventNewPokemon() {
+    class EventNewPokemon {
         var lat: Double? = null
         var lng: Double? = null
         var id: Long? = null
@@ -150,5 +157,14 @@ class SocketServer {
         var name: String? = null
         var cp: Int? = null
         var iv: Int? = null
+    }
+
+    class EventReleasePokemon {
+        var id: Long? = null
+    }
+
+    class EventLog {
+        var type: String? = null
+        var text: String? = null
     }
 }

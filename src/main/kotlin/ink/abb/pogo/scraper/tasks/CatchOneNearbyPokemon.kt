@@ -45,6 +45,7 @@ class CatchOneNearbyPokemon : Task {
                     Log.green(message)
 
                     ctx.server.newPokemon(catchablePokemon.latitude, catchablePokemon.longitude, encounterResult.wildPokemon.pokemonData)
+                    ctx.server.sendProfile()
                 } else
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
             } else {
