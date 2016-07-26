@@ -54,7 +54,11 @@ fun getAuth(settings: Settings, http: OkHttpClient, retryCount: Int): AuthInfo? 
             if (token.contains("pokemon.com")) {
                 PtcLogin(http).login(token)
             } else {
-                GoogleLogin(http).refreshToken(token)
+                val tempGoogleAuth = GoogleLogin(http).refreshToken(token)
+                if (tempGoogleAuth != null) {
+                    GoogleLoginSecrets.refresh_token = token
+                }
+                tempGoogleAuth
             }
         }
     } while (retries > 0 && auth == null)
