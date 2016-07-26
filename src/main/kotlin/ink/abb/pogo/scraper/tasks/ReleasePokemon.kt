@@ -21,10 +21,6 @@ import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
-        val ignoredPokemon = settings.ignoredPokemon
-        val obligatoryTransfer = settings.obligatoryTransfer
-        val minIVPercentage = settings.transferIVThreshold
-        val minCP = settings.transferCPThreshold
         val sortByIV = settings.sortByIV
 
         groupedPokemon.forEach {
@@ -39,8 +35,8 @@ class ReleasePokemon : Task {
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.isFavorite
                 if (!isFavourite) {
                     val ivPercentage = pokemon.getIvPercentage()
-                    // never transfer highest rated Pokemon
-                    if (index >= settings.keepPokemonAmount) {
+                    // never transfer highest rated Pokemon (except for obligatory transfer)
+                    if (settings.obligatoryTransfer.contains(pokemon.pokemonId.name) || index >= settings.keepPokemonAmount) {
                         val (shouldRelease, reason) = pokemon.shouldTransfer(settings)
 
                         if (shouldRelease) {
