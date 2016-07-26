@@ -29,6 +29,7 @@ class SocketServer {
             run {
                 sendProfile()
                 sendPokebank()
+                setLocation(ctx.api.latitude, ctx.api.longitude)
             }
         }
 
@@ -49,6 +50,8 @@ class SocketServer {
             profile.levelRatio = ratio
             profile.pokebank = ctx!!.api.inventories.pokebank.pokemons.size
             profile.pokebankMax = ctx!!.api.playerProfile.pokemonStorage
+            profile.items = ctx!!.api.inventories.itemBag.items.size
+            profile.itemsMax = ctx!!.api.playerProfile.itemStorage
             server?.broadcastOperations?.sendEvent("profile", profile)
         }
     }
@@ -123,6 +126,8 @@ class SocketServer {
         var levelRatio: Int? = null
         var pokebank: Int? = null
         var pokebankMax: Int? = null
+        var items: Int? = null
+        var itemsMax: Int? = null
     }
 
     class EventPokebank {
