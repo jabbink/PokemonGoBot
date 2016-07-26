@@ -26,7 +26,7 @@ class HatchEggs : Task {
         if (freeIncubators.isNotEmpty() && eggs.isNotEmpty() && settings.shouldAutoFillIncubatores) {
             val result = freeIncubators.first().hatchEgg(eggs.first())
             if (result == UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse.Result.SUCCESS) {
-                Log.green("Put egg ${eggs.first().id} in unused incubator")
+                Log.cyan("Put egg ${eggs.first().id} in unused incubator")
             } else {
                 Log.red("Failed to put egg in incubator; error: $result")
             }
@@ -38,9 +38,9 @@ class HatchEggs : Task {
                     val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
                     val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
                     if (newPokemon == null) {
-                        Log.green("Hatched pokemon; $stats")
+                        Log.cyan("Hatched pokemon; $stats")
                     } else {
-                        Log.green("Hatched ${newPokemon.pokemonId.name} with ${newPokemon.cp} CP " +
+                        Log.cyan("Hatched ${newPokemon.pokemonId.name} with ${newPokemon.cp} CP " +
                                 "and ${newPokemon.getIvPercentage()}% IV; $stats")
                     }
                 }
