@@ -289,9 +289,10 @@
     <div id="window-map" class="window">
         <span class="title">Map</span>
         <div class="content">
-            <div class="upload">
+            <div>
                 <input type="button" id="gpx_upload_button" value="Upload GPX file">
                 <input type="file" id="gpx_upload" accept=".gpx">
+                <input type="checkbox" id="map_autofollow"><label for="map_autofollow">Autofollow</label>
             </div>
             <div id="map"></div>
         </div>
@@ -405,7 +406,8 @@
             notifications: {
                 notification_caught_pokemon: false,
                 notification_next_level: true
-            }
+            },
+            autofollow: false
         };
 
         $(function() {
@@ -635,6 +637,10 @@
                 path.push(new google.maps.LatLng(data.lat, data.lng));
                 polyLine.setPath(path)
             }
+
+            if(settings.autofollow){
+                map.panTo(new google.maps.LatLng(data.lat, data.lng));
+            }
         });
 
         var pokestopMarkers = {};
@@ -724,6 +730,10 @@
                     scaledSize: new google.maps.Size(30, 60)
                 },
                 map: map
+            });
+
+            $('#map_autofollow').on('click', function() {
+                settings.autofollow = $(this).prop('checked');
             });
 
             $('#gpx_upload_button').on('click', function(){
