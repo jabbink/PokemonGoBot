@@ -9,6 +9,8 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse.Status
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -85,7 +87,11 @@ class CatchOneNearbyPokemon : Task {
                 } else
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
             } else {
-                Log.red("Encounter failed with result: ${encounterResult.getStatus()}")
+                Log.red("Encounter failed with result: ${encounterResult.status}")
+                if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
+                    Log.red("Disabling catching of Pokemon")
+                    settings.shouldCatchPokemons = false
+                }
             }
         }
     }

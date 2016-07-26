@@ -10,6 +10,7 @@ package ink.abb.pogo.scraper
 
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
+import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.tasks.*
@@ -81,9 +82,17 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         task(keepalive)
         Log.normal("Getting initial pokestops...")
-        // TODO: Figure out why pokestops are only showing up the first time api.map.mapObjects is called (???)
-        val reply = api.map.mapObjects
-        Log.normal("Got ${reply.pokestops.size} pokestops")
+
+        val sleepTimeout = 10L
+        var reply: MapObjects?
+        do {
+            reply = api.map.mapObjects
+            Log.normal("Got ${reply.pokestops.size} pokestops")
+            if (reply == null || reply.pokestops.size == 0) {
+                Log.red("Retrying in $sleepTimeout seconds...")
+                Thread.sleep(sleepTimeout * 1000)
+            }
+        } while (reply == null || reply.pokestops.size == 0)
         val process = ProcessPokestops(reply.pokestops)
 
         runningLatch = CountDownLatch(1)

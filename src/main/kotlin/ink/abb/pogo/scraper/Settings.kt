@@ -76,7 +76,7 @@ class Settings(val properties: Properties) {
     val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
 
     val shouldLootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", true, String::toBoolean)
-    val shouldCatchPokemons = getPropertyIfSet("Catch Pokemons", "catch_pokemon", true, String::toBoolean)
+    var shouldCatchPokemons = getPropertyIfSet("Catch Pokemons", "catch_pokemon", true, String::toBoolean)
     val shouldAutoFillIncubators = getPropertyIfSet("Auto Fill Incubators", "auto_fill_incubator", true, String::toBoolean)
 
     val sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean)

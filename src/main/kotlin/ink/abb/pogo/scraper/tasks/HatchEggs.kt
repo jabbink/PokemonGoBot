@@ -21,6 +21,7 @@ class HatchEggs : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val result = ctx.api.inventories.hatchery.queryHatchedEggs()
         if (result.isNotEmpty()) {
+            ctx.api.inventories.updateInventories(true)
             result.forEachIndexed { index, it ->
                 val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
                 val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"

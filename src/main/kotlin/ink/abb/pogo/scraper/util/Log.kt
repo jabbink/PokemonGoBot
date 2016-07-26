@@ -37,7 +37,7 @@ class Log {
         }
 
         fun normal(text: String = "") {
-            println(text)
+            output(text)
         }
 
         fun black(text: String = "") {
