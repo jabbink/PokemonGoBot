@@ -76,6 +76,17 @@
             height: 400px;
         }
 
+        #window-map .content {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+        }
+
+        #gpx_upload {
+            display: none;
+        }
+
         #map {
             width: 100%;
             height: 100%;
@@ -278,6 +289,10 @@
     <div id="window-map" class="window">
         <span class="title">Map</span>
         <div class="content">
+            <div class="upload">
+                <input type="button" id="gpx_upload_button" value="Upload GPX file">
+                <input type="file" id="gpx_upload" accept=".gpx">
+            </div>
             <div id="map"></div>
         </div>
     </div>
@@ -581,7 +596,7 @@
                     scaledSize: new google.maps.Size(70 , 70)
                 },
                 map: map,
-                title: data.name
+                title: data.name + ' with CP ' + data.cp
             });
             caughtPokemonMarkers.push(marker);
 
@@ -662,6 +677,25 @@
             gotoMarkers.shift();
         });
 
+        function goto(lat, lng){
+            socket.emit('goto', {
+                lat: lat,
+                lng: lng
+            });
+            var marker = new google.maps.Marker({
+                position: {
+                    lat: lat,
+                    lng: lng
+                },
+                icon: {
+                    url: icons.goto,
+                    scaledSize: new google.maps.Size(35, 35)
+                },
+                map: map
+            });
+            gotoMarkers.push(marker);
+        }
+
         function init() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: {lat: 0, lng: 0},
@@ -670,22 +704,7 @@
             google.maps.event.addListener(map, "rightclick", function(event) {
                 var lat = event.latLng.lat();
                 var lng = event.latLng.lng();
-                socket.emit('goto', {
-                    lat: lat,
-                    lng: lng
-                });
-                var marker = new google.maps.Marker({
-                    position: {
-                        lat: lat,
-                        lng: lng
-                    },
-                    icon: {
-                        url: icons.goto,
-                        scaledSize: new google.maps.Size(35, 35)
-                    },
-                    map: map
-                });
-                gotoMarkers.push(marker);
+                goto(lat, lng);
             });
             polyLine = new google.maps.Polyline({
                 path: [],
@@ -705,6 +724,53 @@
                     scaledSize: new google.maps.Size(30, 60)
                 },
                 map: map
+            });
+
+            $('#gpx_upload_button').on('click', function(){
+                $('#gpx_upload').click();
+            });
+            $('#gpx_upload').change(function (){
+                var file = $(this)[0].files[0];
+                if(file){
+                    var reader = new FileReader();
+                    reader.readAsText(file, "UTF-8");
+                    reader.onload = function (e) {
+                        try {
+                            var xml = $($.parseXML(e.target.result));
+                            var trackName;
+                            if(xml.find('trk').length > 1){
+                                var message = 'More than one track found, please choose one:';
+                                xml.find('trk').each(function(){
+                                    message += '\n' + $(this).find('name').text();
+                                });
+                                trackName = prompt(message);
+                            } else {
+                                trackName = xml.find('trk name').text();
+                            }
+                            var coords = [];
+                            var track = xml.find("trk:contains(" + trackName + ")");
+                            track.find('trkpt').each(function(){
+                                coords.push({
+                                    lat: parseFloat($(this).attr('lat')),
+                                    lng: parseFloat($(this).attr('lon'))
+                                });
+                            });
+                            if(coords.length > 0){
+                                for(var i = 0; i < coords.length; i++){
+                                    goto(coords[i].lat, coords[i].lng);
+                                }
+                            } else {
+                                alert('No waypoints found');
+                            }
+                    } catch(e){
+                            console.log(e);
+                            alert('Invalid gpx file!');
+                        }
+                    };
+                    reader.onerror = function (e) {
+                        alert('error reading file');
+                    }
+                }
             });
 
             socket.emit('init');
