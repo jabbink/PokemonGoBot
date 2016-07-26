@@ -16,13 +16,15 @@ import com.pokegoapi.auth.GoogleLogin
 import com.pokegoapi.auth.GoogleLoginSecrets
 import com.pokegoapi.auth.PtcLogin
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.Helper
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+
 fun getAuth(settings: Settings, http: OkHttpClient, retryCount: Int): AuthInfo? {
-    var retries = retryCount
+    var retries = retryCount    
 
     var auth: AuthInfo?
     do {
@@ -42,8 +44,10 @@ fun getAuth(settings: Settings, http: OkHttpClient, retryCount: Int): AuthInfo? 
                 retries--
                 Log.red("Failed to get login token")
                 if (retries > 0) {
-                    Log.normal("Retrying...")
-                    Thread.sleep(1000)
+
+                    // add random retry delay
+                    Helper.waitRandomSeconds(7,60)
+
                 } else {
                     Log.red("Giving up")
                 }
@@ -83,24 +87,38 @@ fun getPokemonGo(settings: Settings, http: OkHttpClient): Pair<PokemonGo, AuthIn
 
         // Failed? Might have used an expired token
         if (api == null) {
+
             // do we have an (invalid) token?
             if (!settings.token().isBlank()) {
-                // remove it
+
+                // remove the current token
                 settings.setToken("")
-                // try logging in 3 times without a stored token
-                val auth = getAuth(settings, http, retryCount)
-                // got a new auth?
-                if (auth != null) {
-                    // great, try to contact niantic again
-                    val api = try {
-                        PokemonGo(auth, http)
-                    } catch (e: Exception) {
-                        null
+
+                // if it is a Google Login then do this..
+                if (settings.username.contains('@')) {
+                    // not implemented yet..
+                    Log.red("Google login - REFRESH token - is not implemented yet.")
+                }
+
+                // PTC Login
+                else {
+                    // try logging in 3 times without a stored token
+                    val auth = getAuth(settings, http, retryCount)
+
+                    // got a new auth?
+                    if (auth != null) {
+                        // great, try to contact niantic again
+                        val api = try {
+                            PokemonGo(auth, http)
+                        } catch (e: Exception) {
+                            null
+                        }
+                        if (api != null) {
+                            // everything worked; return the api and auth
+                            return Pair(api, auth)
+                        }
                     }
-                    if (api != null) {
-                        // everything worked; return the api and auth
-                        return Pair(api, auth)
-                    }
+
                 }
             }
             // even after resetting the token it failed; hopeless situation; exit

@@ -15,8 +15,10 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.Helper
 import ink.abb.pogo.scraper.util.map.canLoot
 import kotlin.concurrent.fixedRateTimer
+import java.util.concurrent.TimeUnit
 
 class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
 
@@ -45,7 +47,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
-        val timeout = 200L
+        val timeout = 400L
         // prevent division by 0
         if (speed.equals(0)) {
             return
@@ -63,13 +65,34 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         var remainingSteps = stepsRequired
 
         fixedRateTimer("Walk", false, 0, timeout, action = {
-            ctx.lat.addAndGet(deltaLat)
-            ctx.lng.addAndGet(deltaLng)
-            remainingSteps--
-            if (remainingSteps <= 0) {
-                Log.normal("Destination reached.")
-                ctx.walking.set(false)
-                cancel()
+
+            // 15% chance to do NOTHING.
+            val dummy = Helper.getRandomNumber(0,100)
+            if (dummy <= 15) {
+
+                val sleeptime = Helper.getRandomNumber(1,10)
+                Log.yellow("I'm doing nothing .. Replicate human bevahior (sleep for $sleeptime seconds.)")
+
+                TimeUnit.SECONDS.sleep(sleeptime.toLong())
+            }
+
+            else {
+
+                val r1 = deltaLat * (Helper.getRandomNumber(5,15)/100)
+                val r2 = deltaLng * (Helper.getRandomNumber(5,15)/100)
+
+                val deltaLatR = deltaLat + r1
+                val deltaLngR  = deltaLng + r2
+
+                ctx.lat.addAndGet(deltaLatR)
+                ctx.lng.addAndGet(deltaLngR)
+
+                remainingSteps--
+                if (remainingSteps <= 0) {
+                    Log.normal("Destination reached.")
+                    ctx.walking.set(false)
+                    cancel()
+                }
             }
         })
     }

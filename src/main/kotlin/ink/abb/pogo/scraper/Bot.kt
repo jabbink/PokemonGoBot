@@ -14,11 +14,13 @@ import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.Helper
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
@@ -31,7 +33,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicDouble(settings.startingLongitude),
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
-            Pair(AtomicInteger(0), AtomicInteger(0))
+            Pair(AtomicInteger(0), AtomicInteger(0))            
     )
 
     fun run() {
@@ -74,9 +76,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val reply = api.map.mapObjects
         val process = ProcessPokestops(reply.pokestops)
 
-        fixedRateTimer("ProfileLoop", false, 0, 60000, action = {
+        fixedRateTimer("ProfileLoop", false, 0, (Helper.getRandomNumber(50,300) * 1000).toLong(), action = {
             thread(block = {
                 task(profile)
+
+                if (settings.shouldAutoTransfer) {                            
+                    task(release)
+                }
             })
         })
 
@@ -86,10 +92,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 if (!settings.walkOnly) {
                     task(catch)
                     task(drop)
-                    if (settings.shouldAutoTransfer) {
-                        task(release)
-                    }
-
                 }
                 task(process)
                 task(hatchEggs)

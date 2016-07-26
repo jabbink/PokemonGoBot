@@ -14,6 +14,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.Helper
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.pokemon.catch
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
@@ -62,7 +63,7 @@ class CatchOneNearbyPokemon : Task {
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
             } else {
                 Log.red("Encounter failed with result: ${encounterResult.getStatus()}")
-            }
+            }            
         }
     }
 }

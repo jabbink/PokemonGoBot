@@ -14,8 +14,10 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.Helper
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import java.util.concurrent.TimeUnit;
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -65,6 +67,12 @@ class ReleasePokemon : Task {
                                 ctx.pokemonStats.second.andIncrement
                                 Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
                                         "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
+
+                                // wait for random seconds
+                                val sleeptime = Helper.getRandomNumber(5,10)
+                                TimeUnit.SECONDS.sleep(sleeptime.toLong())
+                                Log.yellow("Waited for $sleeptime before transfering pokemon.")
+
                                 pokemon.transferPokemon()
                             }
                         }
