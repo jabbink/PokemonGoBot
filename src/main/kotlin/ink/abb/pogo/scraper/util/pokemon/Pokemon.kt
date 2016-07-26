@@ -46,7 +46,7 @@ fun Pokemon.getStatsFormatted(): String {
 
 fun Pokemon.shouldTransfer(settings: Settings): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
-    val ignoredPokemon = settings.obligatoryTransfer
+    val ignoredPokemon = settings.ignoredPokemon
     val ivPercentage = getIvPercentage()
     val minIVPercentage = settings.transferIVThreshold
     val minCP = settings.transferCPThreshold
@@ -76,7 +76,7 @@ fun Pokemon.shouldTransfer(settings: Settings): Pair<Boolean, String> {
 // TODO: Deduplicate this
 fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
-    val ignoredPokemon = settings.obligatoryTransfer
+    val ignoredPokemon = settings.ignoredPokemon
     val ivPercentage = getIvPercentage()
     val minIVPercentage = settings.transferIVThreshold
     val minCP = settings.transferCPThreshold

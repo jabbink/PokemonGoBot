@@ -10,7 +10,6 @@ package ink.abb.pogo.scraper.util.pokemon
 
 import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus
 import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.inventory.Pokeball
