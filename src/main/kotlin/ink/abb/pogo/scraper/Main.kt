@@ -8,13 +8,11 @@
 
 package ink.abb.pogo.scraper
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
 import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.api.pokemon.Pokemon
-import com.pokegoapi.auth.GoogleLogin
-import com.pokegoapi.auth.GoogleLoginSecrets
-import com.pokegoapi.auth.PtcLogin
+import com.pokegoapi.auth.*
+import com.pokegoapi.exceptions.LoginFailedException
+import com.pokegoapi.exceptions.RemoteServerException
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
@@ -22,105 +20,31 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
-fun getAuth(settings: Settings, http: OkHttpClient, retryCount: Int): AuthInfo? {
-    var retries = retryCount
+fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
+    val username = settings.username
+    val password = settings.password
 
-    var auth: AuthInfo?
-    do {
-        val username = settings.username
-        val password = settings.password
+    val token = settings.token()
 
-        val token = settings.token()
+    val auth = if (username.contains('@')) {
+        if (token.isBlank()) {
+            GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
+                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {}
 
-        auth = if (token.isBlank()) {
-            try {
-                if (username.contains('@')) {
-                    GoogleLogin(http).login()
-                } else {
-                    PtcLogin(http).login(username, password)
+                override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
+                    Log.normal("Setting Google refresh token in your config")
+                    settings.setToken(googleAuthTokenJson.refreshToken)
+                    settings.writeToken("config.properties")
                 }
-            } catch (e: Exception) {
-                retries--
-                Log.red("Failed to get login token")
-                if (retries > 0) {
-                    Log.normal("Retrying...")
-                    Thread.sleep(1000)
-                } else {
-                    Log.red("Giving up")
-                }
-                null
-            }
+            })
         } else {
-            if (token.contains("pokemon.com")) {
-                PtcLogin(http).login(token)
-            } else {
-                val tempGoogleAuth = GoogleLogin(http).refreshToken(token)
-                if (tempGoogleAuth != null) {
-                    GoogleLoginSecrets.refresh_token = token
-                }
-                tempGoogleAuth
-            }
+            GoogleCredentialProvider(http, token)
         }
-    } while (retries > 0 && auth == null)
-
-    if (auth == null) {
-        Log.red("Could not get login token")
-        System.exit(1)
+    } else {
+        PtcCredentialProvider(http, username, password)
     }
 
     return auth
-}
-
-fun getPokemonGo(settings: Settings, http: OkHttpClient): Pair<PokemonGo, AuthInfo> {
-    val retryCount = 3
-
-    // try to get a token 3 times; in case of stored token, immediately returns
-    val auth = getAuth(settings, http, retryCount)
-
-    // did not get AuthInfo? Means no token was set and it failed to login 3 times
-    if (auth != null) {
-        // Got a token: try to contact Niantic
-        val api = try {
-            PokemonGo(auth, http)
-        } catch (e: Exception) {
-            null
-        }
-
-        // Failed? Might have used an expired token
-        if (api == null) {
-            // do we have an (invalid) token?
-            if (!settings.token().isBlank()) {
-                // remove it
-                settings.setToken("")
-                // try logging in 3 times without a stored token
-                val auth = getAuth(settings, http, retryCount)
-                // got a new auth?
-                if (auth != null) {
-                    // great, try to contact niantic again
-                    val api = try {
-                        PokemonGo(auth, http)
-                    } catch (e: Exception) {
-                        null
-                    }
-                    if (api != null) {
-                        // everything worked; return the api and auth
-                        return Pair(api, auth)
-                    }
-                }
-            }
-            // even after resetting the token it failed; hopeless situation; exit
-
-            Log.red("Could not login; are the servers online?")
-            System.exit(1)
-            throw Exception("Failed to log in")
-        }
-        // everything worked; return the api and auth
-        return Pair(api, auth)
-    }
-    // we did not have a token stored and logging in failed
-    Log.red("Could not login; are the servers online?")
-    System.exit(1)
-    throw Exception("Failed to log in")
 }
 
 fun main(args: Array<String>) {
@@ -142,17 +66,41 @@ fun main(args: Array<String>) {
 
     Log.normal("Logging in to game server...")
 
-    val (api, auth) = getPokemonGo(settings, http)
-
-    var displayToken = auth.token.contents
-    if (auth.provider.equals("google")) {
-        displayToken = GoogleLoginSecrets.refresh_token
+    var auth: CredentialProvider?
+    try {
+        auth = getAuth(settings, http)
+    } catch (e: LoginFailedException) {
+        Log.red("Server refused your login credentials. Are they correct?")
+        System.exit(1)
+        return
     }
-    Log.normal("Logged in as ${settings.username} with token ${displayToken}")
 
-    Log.normal("Setting this token in your config")
-    settings.setToken(displayToken)
-    settings.writeToken("config.properties")
+    var retries = 3
+
+    var api: PokemonGo? = null
+    do {
+        try {
+            api = PokemonGo(auth, http)
+        } catch (e: LoginFailedException) {
+            Log.red("Server refused your login credentials. Are they correct?")
+            System.exit(1)
+            return
+        } catch (e: RemoteServerException) {
+            Log.red("Server returned unexpected error")
+            if (retries-- >= 0) {
+                Log.normal("Retrying...")
+                Thread.sleep(1000)
+            }
+        }
+    } while (api == null && retries >= 0)
+
+    if (api == null) {
+        Log.red("Failed to login. Stopping")
+        System.exit(1)
+        return
+    }
+
+    Log.normal("Logged in as ${settings.username}")
 
     print("Getting profile data from pogo server")
     while (api.playerProfile == null) {
