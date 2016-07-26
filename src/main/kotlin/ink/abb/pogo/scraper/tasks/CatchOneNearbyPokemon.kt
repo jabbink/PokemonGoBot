@@ -44,8 +44,9 @@ class CatchOneNearbyPokemon : Task {
             if (encounterResult.wasSuccessful()) {
                 Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
                         "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV ${encounterResult.wildPokemon.pokemonData.getIvPercentage()}%")
-                val shouldRelease = encounterResult.wildPokemon.pokemonData.shouldTransfer(settings).first
+                val (shouldRelease, reason) = encounterResult.wildPokemon.pokemonData.shouldTransfer(settings)
                 val desiredCatchProbability = if (shouldRelease) {
+                    Log.yellow("Using desired_catch_probability_unwanted because $reason")
                     settings.desiredCatchProbabilityUnwanted
                 } else {
                     settings.desiredCatchProbability
