@@ -69,10 +69,10 @@ autotransfer=true
 keep_pokemon_amount=1
 
 # Sort by IV first instead of CP
-sort_by_iv=true
+sort_by_iv=false
 
 # Always throw a Curveball
-always_curve=true
+always_curve=false
 
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
