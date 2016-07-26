@@ -25,7 +25,10 @@ class UpdateProfile : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val player = ctx.api.playerProfile
+        val inventories = ctx.api.inventories
         try {
+            // update km walked, mainly
+            inventories.updateInventories(true)
             player.updateProfile()
             val nextXP = requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]
             val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
