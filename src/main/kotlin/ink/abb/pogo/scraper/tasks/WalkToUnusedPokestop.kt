@@ -18,6 +18,8 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.Helper
 import ink.abb.pogo.scraper.util.map.canLoot
 import kotlin.concurrent.fixedRateTimer
+import kotlin.concurrent.timer
+import kotlin.concurrent.thread
 import java.util.concurrent.TimeUnit
 
 class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
@@ -28,6 +30,8 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         if (pokemonCount != null && pokemonCount > 0) {
             return
         }
+
+        // still walking to existing route, so let's exit this task.
         if (!ctx.walking.compareAndSet(false, true)) {
             return
         }
@@ -47,7 +51,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
-        val timeout = 400L
+        val timeout = 200L
         // prevent division by 0
         if (speed.equals(0)) {
             return
@@ -64,28 +68,22 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
-        fixedRateTimer("Walk", false, 0, timeout, action = {
+/*
+        timer("Walk", false, 0, timeout, action = {
 
-            // 15% chance to do NOTHING.
+            // 10% chance to do NOTHING.
             val dummy = Helper.getRandomNumber(0,100)
-            if (dummy <= 15) {
+            if (dummy <= 10) {
 
-                val sleeptime = Helper.getRandomNumber(1,10)
+                val sleeptime = Helper.getRandomNumber(1,3)
                 Log.yellow("I'm doing nothing .. Replicate human bevahior (sleep for $sleeptime seconds.)")
 
                 TimeUnit.SECONDS.sleep(sleeptime.toLong())
             }
 
             else {
-
-                val r1 = deltaLat * (Helper.getRandomNumber(5,15)/100)
-                val r2 = deltaLng * (Helper.getRandomNumber(5,15)/100)
-
-                val deltaLatR = deltaLat + r1
-                val deltaLngR  = deltaLng + r2
-
-                ctx.lat.addAndGet(deltaLatR)
-                ctx.lng.addAndGet(deltaLngR)
+                ctx.lat.addAndGet(deltaLat)
+                ctx.lng.addAndGet(deltaLng)
 
                 remainingSteps--
                 if (remainingSteps <= 0) {
@@ -94,6 +92,41 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
                     cancel()
                 }
             }
+        })
+*/
+
+        thread(true, false, null, "Walk", 1, block = {
+            var threadRun = true
+
+            while(threadRun) {
+
+                // default delay per steps
+                var randomTimeout = timeout + (Helper.getRandomNumber(0, timeout.toInt()).toLong() * 2)
+                TimeUnit.MILLISECONDS.sleep(randomTimeout)
+
+                // 10% chance to do NOTHING.
+                var dummy = Helper.getRandomNumber(0,100)
+                if (dummy <= 5) {
+
+                    val sleeptime = Helper.getRandomNumber(1,5)
+                    Log.yellow("I'm doing nothing .. Replicate human bevahior (sleep for $sleeptime seconds.)")
+
+                    TimeUnit.SECONDS.sleep(sleeptime.toLong())
+                }
+
+                else {
+                    ctx.lat.addAndGet(deltaLat)
+                    ctx.lng.addAndGet(deltaLng)
+
+                    remainingSteps--
+                    if (remainingSteps <= 0) {
+                        Log.normal("Destination reached.")
+                        ctx.walking.set(false)
+                        threadRun = false
+                    }
+                }
+            }
+
         })
     }
 }

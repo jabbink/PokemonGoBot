@@ -45,14 +45,14 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     do {
         result = catch(captureProbability, itemBag, desiredCatchProbability)
 
-        // wait sometime before next throw
-        val sleeptime = Helper.getRandomNumber(2,10)
-        Log.yellow("Waiting for $sleeptime seconds, before throwing the next ball.")
-        TimeUnit.SECONDS.sleep(sleeptime.toLong())
-
         if (result != null && result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED) {
             break
-        }        
+        } else {
+            // wait sometime before next throw
+            val sleeptime = Helper.getRandomNumber(2,10)
+            Log.normal("Waiting for $sleeptime seconds, before throwing the next ball.")
+            TimeUnit.SECONDS.sleep(sleeptime.toLong())        
+        }
 
         numThrows++
     } while (amount < 0 || numThrows < amount)

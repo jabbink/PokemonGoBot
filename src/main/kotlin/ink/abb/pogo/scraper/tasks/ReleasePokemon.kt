@@ -71,7 +71,7 @@ class ReleasePokemon : Task {
                                 // wait for random seconds
                                 val sleeptime = Helper.getRandomNumber(5,10)
                                 TimeUnit.SECONDS.sleep(sleeptime.toLong())
-                                Log.yellow("Waited for $sleeptime before transfering pokemon.")
+                                Log.yellow("Waited for $sleeptime seconds before transfering pokemon.")
 
                                 pokemon.transferPokemon()
                             }
