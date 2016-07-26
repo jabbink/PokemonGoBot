@@ -6,6 +6,7 @@ import com.corundumstudio.socketio.SocketIOServer
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
+import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
@@ -16,6 +17,8 @@ class SocketServer {
 
     private var ctx: Context? = null
     private var server: SocketIOServer? = null
+
+    val coordinatesToGoTo = mutableListOf<S2LatLng>()
 
     fun start(ctx: Context, port: Int) {
         val config = Configuration()
@@ -29,11 +32,24 @@ class SocketServer {
             run {
                 sendProfile()
                 sendPokebank()
+                sendEggs()
                 setLocation(ctx.api.latitude, ctx.api.longitude)
+            }
+        }
+        server?.addEventListener("goto", EventGoto::class.java) { client, data, ackRequest ->
+            run {
+                if(data.lat != null && data.lng != null){
+                    val coord = S2LatLng.fromRadians(data.lat!!, data.lng!!)
+                    coordinatesToGoTo.add(coord)
+                }
             }
         }
 
         server?.start()
+    }
+
+    fun sendGotoDone(){
+        server?.broadcastOperations?.sendEvent("gotoDone")
     }
 
     fun sendProfile(){
@@ -113,8 +129,26 @@ class SocketServer {
         server?.broadcastOperations?.sendEvent("log", log)
     }
 
+    fun sendEggs(){
+        if(ctx != null){
+            val eggs = EventEggs()
+            for(egg in ctx!!.api.inventories.hatchery.eggs){
+                val eggObj = EventEggs.Egg()
+                eggObj.distanceWalked = egg.eggKmWalkedStart
+                eggObj.distanceTarget = egg.eggKmWalkedTarget
+                eggs.eggs.add(eggObj)
+            }
+            server?.broadcastOperations?.sendEvent("eggs", eggs)
+        }
+    }
+
     class EventInit {
 
+    }
+
+    class EventGoto {
+        var lat: Double? = null
+        var lng: Double? = null
     }
 
     class EventProfile {
@@ -171,5 +205,14 @@ class SocketServer {
     class EventLog {
         var type: String? = null
         var text: String? = null
+    }
+
+    class EventEggs {
+        var eggs = mutableListOf<Egg>()
+
+        class Egg {
+            var distanceWalked : Double? = null
+            var distanceTarget : Double? = null
+        }
     }
 }

@@ -15,10 +15,10 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
-class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
-
+class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // don't run away when there are still Pokemon around
         val pokemonCount = ctx.api.map?.catchablePokemon?.size
@@ -29,20 +29,27 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
             return
         }
 
-        val nearestUnused = sortedPokestops.filter {
-            it.canLoot(true)
-        }
+        if(ctx.server.coordinatesToGoTo.size > 0){
+            val coordinates = ctx.server.coordinatesToGoTo.first()
+            ctx.server.coordinatesToGoTo.removeAt(0)
+            Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
+            walk(ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+        } else {
+            val nearestUnused = sortedPokestops.filter {
+                it.canLoot(true)
+            }
 
-        if (nearestUnused.size > 0) {
-            ctx.server.sendPokestop(nearestUnused.first())
+            if (nearestUnused.size > 0) {
+                ctx.server.sendPokestop(nearestUnused.first())
 
-            if (settings.shouldDisplayPokestopName)
-                Log.normal("Walking to pokestop \"${nearestUnused.first().details.name}\"")
-            walk(ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed)
+                if (settings.shouldDisplayPokestopName)
+                    Log.normal("Walking to pokestop \"${nearestUnused.first().details.name}\"")
+                walk(ctx, S2LatLng.fromDegrees(nearestUnused.first().latitude, nearestUnused.first().longitude), settings.speed, false)
+            }
         }
     }
 
-    fun walk(ctx: Context, end: S2LatLng, speed: Double) {
+    fun walk(ctx: Context, end: S2LatLng, speed: Double, sendDone: Boolean) {
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
@@ -73,10 +80,13 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
             if (remainingSteps <= 0) {
                 Log.normal("Destination reached.")
 
+                if(sendDone){
+                    ctx.server.sendGotoDone()
+                }
+
                 ctx.walking.set(false)
                 cancel()
             }
         })
     }
-
 }
