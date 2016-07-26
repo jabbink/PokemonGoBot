@@ -44,7 +44,7 @@ fun Pokemon.getStatsFormatted(): String {
     return details + " | IV: ${getIv()} (${(getIvPercentage())}%)"
 }
 
-fun Pokemon.shouldTransfer(settings: Settings): Pair<Boolean, String?> {
+fun Pokemon.shouldTransfer(settings: Settings): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
     val ignoredPokemon = settings.obligatoryTransfer
     val ivPercentage = getIvPercentage()
@@ -52,11 +52,9 @@ fun Pokemon.shouldTransfer(settings: Settings): Pair<Boolean, String?> {
     val minCP = settings.transferCPThreshold
 
     var shouldRelease = obligatoryTransfer.contains(this.pokemonId.name)
-    var reason: String? = null
+    var reason: String = "Obligatory transfer"
     if (!ignoredPokemon.contains(this.pokemonId.name)) {
-        if (shouldRelease) {
-            reason = "Obligatory release"
-        } else {
+        if (!shouldRelease) {
             var ivTooLow = false
             var cpTooLow = false
 
@@ -76,7 +74,7 @@ fun Pokemon.shouldTransfer(settings: Settings): Pair<Boolean, String?> {
 }
 
 // TODO: Deduplicate this
-fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String?> {
+fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
     val ignoredPokemon = settings.obligatoryTransfer
     val ivPercentage = getIvPercentage()
@@ -84,11 +82,9 @@ fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String?> {
     val minCP = settings.transferCPThreshold
 
     var shouldRelease = obligatoryTransfer.contains(this.pokemonId.name)
-    var reason: String? = null
+    var reason: String = "Obligatory transfer"
     if (!ignoredPokemon.contains(this.pokemonId.name)) {
-        if (shouldRelease) {
-            reason = "Obligatory release"
-        } else {
+        if (!shouldRelease) {
             var ivTooLow = false
             var cpTooLow = false
 
