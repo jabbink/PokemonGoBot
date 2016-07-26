@@ -64,7 +64,9 @@ class CatchOneNearbyPokemon : Task {
                         -1)
 
                 if (result == null) {
-                    Log.red("No Pokeballs in your inventory")
+                    // prevent trying it in the next iteration
+                    ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    Log.red("No Pokeballs in your inventory; blacklisting Pokemon")
                     return
                 }
 

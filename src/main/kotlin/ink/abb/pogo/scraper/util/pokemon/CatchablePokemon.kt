@@ -41,7 +41,8 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     do {
         result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries)
 
-        if (result != null && result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED) {
+        if (result == null ||
+                (result != null && result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED)) {
             break
         }
         numThrows++
@@ -87,7 +88,6 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     }
 
     if (highestAvailable == null) {
-        Log.red("No balls available")
         return null
     }
 
