@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.*
 import com.pokegoapi.exceptions.LoginFailedException
@@ -29,7 +28,8 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
     val auth = if (username.contains('@')) {
         if (token.isBlank()) {
             GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
-                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {}
+                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {
+                }
 
                 override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
                     Log.normal("Setting Google refresh token in your config")
@@ -66,16 +66,29 @@ fun main(args: Array<String>) {
 
     Log.normal("Logging in to game server...")
 
-    var auth: CredentialProvider?
-    try {
-        auth = getAuth(settings, http)
-    } catch (e: LoginFailedException) {
-        Log.red("Server refused your login credentials. Are they correct?")
-        System.exit(1)
-        return
-    }
+    val retryCount = 3
+    val errorTimeout = 1000L
 
-    var retries = 3
+    var retries = retryCount
+
+    var auth: CredentialProvider? = null
+    do {
+        try {
+            auth = getAuth(settings, http)
+        } catch (e: LoginFailedException) {
+            Log.red("Server refused your login credentials. Are they correct?")
+            System.exit(1)
+            return
+        } catch (e: RemoteServerException) {
+            Log.red("Server returned unexpected error")
+            if (retries-- > 0) {
+                Log.normal("Retrying...")
+                Thread.sleep(errorTimeout)
+            }
+        }
+    } while (auth == null && retries >= 0)
+
+    retries = retryCount
 
     var api: PokemonGo? = null
     do {
@@ -87,9 +100,9 @@ fun main(args: Array<String>) {
             return
         } catch (e: RemoteServerException) {
             Log.red("Server returned unexpected error")
-            if (retries-- >= 0) {
+            if (retries-- > 0) {
                 Log.normal("Retrying...")
-                Thread.sleep(1000)
+                Thread.sleep(errorTimeout)
             }
         }
     } while (api == null && retries >= 0)
