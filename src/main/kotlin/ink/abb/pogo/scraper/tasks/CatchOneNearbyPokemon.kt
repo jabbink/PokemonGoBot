@@ -61,6 +61,7 @@ class CatchOneNearbyPokemon : Task {
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
                         desiredCatchProbability,
+                        settings.alwaysCurve
                         -1)
 
                 if (result == null) {

@@ -79,6 +79,8 @@ class Settings(val properties: Properties) {
 
     val sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean)
 
+    val alwaysCurve = getPropertyIfSet("Always throw curveballs", "always_curve", false, String::toBoolean)
+
     val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
 
     val transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)

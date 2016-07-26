@@ -36,11 +36,11 @@ val itemToPokeball = mapOf(
         Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL)
 )
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, amount: Int): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, amount: Int): CatchResult? {
     var result: CatchResult?
     var numThrows = 0
     do {
-        result = catch(captureProbability, itemBag, desiredCatchProbability)
+        result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve)
 
         if (result != null && result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED) {
             break
@@ -51,11 +51,11 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     return result
 }
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false): CatchResult? {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     var ball: ItemId? = null
-    var needCurve = false
+    var needCurve = alwaysCurve
     var needRazzBerry = false
     var highestAvailable: ItemId? = null
     var catchProbability = 0f

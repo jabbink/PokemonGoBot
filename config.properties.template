@@ -74,6 +74,9 @@ keep_pokemon_amount=1
 # Sort by IV first instead of CP
 sort_by_iv=false
 
+# Always throw curveballs
+always_curve=false
+
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
 transfer_iv_threshold=80
