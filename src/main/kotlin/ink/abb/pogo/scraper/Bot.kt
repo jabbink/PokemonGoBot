@@ -122,6 +122,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                         t.printStackTrace()
                     }
 
+                    if(cancelled) continue
+
                     val sleep = timeout - (System.currentTimeMillis() - start)
                     if (sleep > 0) {
                         try {
