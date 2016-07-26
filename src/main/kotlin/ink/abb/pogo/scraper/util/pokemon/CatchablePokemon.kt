@@ -55,7 +55,6 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     var ball: ItemId? = null
-    var needCurve = false
     var needRazzBerry = false
     var highestAvailable: ItemId? = null
     var catchProbability = 0f
@@ -69,19 +68,15 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
             highestAvailable = ballType
             catchProbability = probability
         }
-        if (probability >= desiredCatchProbability) {
-            catchProbability = probability
+        if (probability >= desiredCatchProbability - 0.1) {
             ball = ballType
-            break
-        } else if (probability >= desiredCatchProbability - 0.1) {
-            ball = ballType
-            needCurve = true
             catchProbability = probability + 0.1f
             break
         } else if (probability >= desiredCatchProbability - 0.2) {
             ball = ballType
-            needCurve = true
-            needRazzBerry = true
+            if (ball == Pokeball.POKEBALL) {
+                needRazzBerry = true
+            }
             catchProbability = probability + 0.2f
             break
         }
@@ -94,7 +89,6 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
 
     if (ball == null) {
         ball = highestAvailable
-        needCurve = true
         needRazzBerry = true
         catchProbability += 0.2f
     }
@@ -108,15 +102,13 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         useItem(ItemId.ITEM_RAZZ_BERRY)
         itemBag.getItem(ItemId.ITEM_RAZZ_BERRY).count--
     }
-    if (needCurve) {
-        logMessage += "; Using curve"
-    }
+    logMessage += "; Using curve"
     logMessage += "; achieved catch probability: ${catchProbability}, desired: ${desiredCatchProbability}"
     Log.yellow(logMessage)
     return catch(
             normalizedHitPosition = 1.0,
             normalizedReticleSize = 1.95 + Math.random() * 0.05,
-            spinModifier = if (needCurve) 0.85 + Math.random() * 0.15 else Math.random() * 0.10,
+            spinModifier = 0.85 + Math.random() * 0.15,
             ballType = itemToPokeball.get(ball),
             amount = 0,
             razzBerryAmount = 0
