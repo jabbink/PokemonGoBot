@@ -58,6 +58,8 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     var needCurve = false
     var needRazzBerry = false
     var highestAvailable: ItemId? = null
+    var catchProbability = 0f
+
     for ((index, ballType) in ballTypes.withIndex()) {
         val probability = probabilities.get(index)
         val ballAmount = itemBag.getItem(ballType).count
@@ -65,18 +67,22 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
             continue;
         } else {
             highestAvailable = ballType
+            catchProbability = probability
         }
         if (probability >= desiredCatchProbability) {
+            catchProbability = probability
             ball = ballType
             break
         } else if (probability >= desiredCatchProbability - 0.1) {
             ball = ballType
             needCurve = true
+            catchProbability = probability + 0.1f
             break
         } else if (probability >= desiredCatchProbability - 0.2) {
             ball = ballType
             needCurve = true
             needRazzBerry = true
+            catchProbability = probability + 0.2f
             break
         }
     }
@@ -90,6 +96,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         ball = highestAvailable
         needCurve = true
         needRazzBerry = true
+        catchProbability += 0.2f
     }
 
     var logMessage = "Using ${ball.name}"
@@ -104,6 +111,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     if (needCurve) {
         logMessage += "; Using curve"
     }
+    logMessage += "; achieved catch probability: ${catchProbability}, desired: ${desiredCatchProbability}"
     Log.yellow(logMessage)
     return catch(
             normalizedHitPosition = 1.0,
