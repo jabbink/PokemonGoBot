@@ -11,7 +11,8 @@ latitude=
 longitude=
 
 # desired probability to catch Pokemon with 1 throw
-desired_catch_probability=0.5
+desired_catch_probability=0.4
+
 # desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)
 # set to -1 to not attempt catching at all
 desired_catch_probability_unwanted=0.0
@@ -76,6 +77,9 @@ sort_by_iv=false
 
 # Always throw curveballs
 always_curve=false
+
+# Never use berries
+never_use_berries=true
 
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80

@@ -19,7 +19,6 @@ import ink.abb.pogo.scraper.util.pokemon.catch
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
-import java.util.*
 
 class CatchOneNearbyPokemon : Task {
     val blacklistedEncounters = mutableSetOf<Long>()
@@ -61,7 +60,8 @@ class CatchOneNearbyPokemon : Task {
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
                         desiredCatchProbability,
-                        settings.alwaysCurve
+                        settings.alwaysCurve,
+                        !settings.neverUseBerries,
                         -1)
 
                 if (result == null) {
