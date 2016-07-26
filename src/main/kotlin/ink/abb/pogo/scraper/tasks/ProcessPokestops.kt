@@ -8,8 +8,8 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import com.google.common.geometry.S2LatLng
 import com.pokegoapi.api.map.fort.Pokestop
+import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -35,7 +35,7 @@ class ProcessPokestops(val pokestops: MutableCollection<Pokestop>) : Task {
             distanceA.compareTo(distanceB)
         })
 
-        if (!settings.walkOnly) {
+        if (settings.shouldLootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             bot.task(loot)
         }

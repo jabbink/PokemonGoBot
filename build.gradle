@@ -1,5 +1,5 @@
 group 'ink.abb'
-version '0.4.2'
+version '0.4.3'
 
 buildscript {
     ext.kotlin_version = '1.0.3'
@@ -23,17 +23,22 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    maven { url "https://jitpack.io" }
+}
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir 'src/main/kotlin'
+        }
+        java {
+            srcDir 'lib/com.google.guava'
+        }
+    }
 }
 
 dependencies {
 
     compile project(':PokeGOAPI-Java')
-
-    compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
-
-    // https://mvnrepository.com/artifact/org.isuper/s2-geometry-library-java
-    compile group: 'org.isuper', name: 's2-geometry-library-java', version: '0.0.1'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.11'

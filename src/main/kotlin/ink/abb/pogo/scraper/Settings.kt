@@ -1,4 +1,4 @@
-/**
+/*
  * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
@@ -28,7 +28,7 @@ class Settings(val properties: Properties) {
 
     val username = properties.getProperty("username")
     val password = if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
-    val token = properties.getProperty("token", "")
+    val token = { properties.getProperty("token", "") }
 
     val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
@@ -63,7 +63,10 @@ class Settings(val properties: Properties) {
         )
     }
 
-    val desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.8, String::toDouble)
+    val randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", 5, String::toInt)
+
+    val desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.4, String::toDouble)
+    val desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", 0.0, String::toDouble)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
     val keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", 1, String::toInt)
     val shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean)
@@ -72,9 +75,15 @@ class Settings(val properties: Properties) {
     val shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean)
     val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
 
-    val walkOnly = getPropertyIfSet("Only walk to hatch eggs", "walk_only", false, String::toBoolean)
+    val shouldLootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", true, String::toBoolean)
+    var shouldCatchPokemons = getPropertyIfSet("Catch Pokemons", "catch_pokemon", true, String::toBoolean)
+    val shouldAutoFillIncubators = getPropertyIfSet("Auto Fill Incubators", "auto_fill_incubator", true, String::toBoolean)
 
     val sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean)
+
+    val alwaysCurve = getPropertyIfSet("Always throw curveballs", "always_curve", false, String::toBoolean)
+
+    val neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", true, String::toBoolean)
 
     val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
 
@@ -99,7 +108,7 @@ class Settings(val properties: Properties) {
             System.exit(1)
         }
 
-        var result: T? = null
+        var result: T?
         try {
             result = conversion(properties.getProperty(property))
         } catch (e: Exception) {
