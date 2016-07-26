@@ -77,7 +77,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
             needCurve = true
             catchProbability = probability + 0.1f
             break
-        } else if (probability >= desiredCatchProbability - 0.2) {
+        } else if (probability >= desiredCatchProbability - 0.2 and ball != Pokeball.POKEBALL) {
             ball = ballType
             needCurve = true
             needRazzBerry = true
