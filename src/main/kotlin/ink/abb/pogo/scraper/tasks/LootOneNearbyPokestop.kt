@@ -70,6 +70,11 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     lootTimeouts.put(closest.id, System.currentTimeMillis() + cooldownPeriod * 60 * 1000)
                     Log.red("Pokestop still in cooldown mode; blacklisting for $cooldownPeriod minutes")
                 }
+                Result.NO_RESULT_SET -> {
+                    val cooldownPeriod = 5
+                    lootTimeouts.put(closest.id, System.currentTimeMillis() + cooldownPeriod * 60 * 1000)
+                    Log.red("Server refuses to loot this Pokestop (usually temporary issue); blacklisting for $cooldownPeriod minutes")
+                }
                 else -> Log.yellow(result.result.toString())
             }
         }
