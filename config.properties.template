@@ -18,8 +18,8 @@ desired_catch_probability=0.4
 desired_catch_probability_unwanted=0.0
 
 # number of nearest unused pokestops to randomly select
-# the next pokestop from (1/infinit)
-randomNextPokestop=1
+# the next pokestop from (1/infinite)
+random_next_pokestop_selection=5
 
 ## Walking
 # Meters per second
