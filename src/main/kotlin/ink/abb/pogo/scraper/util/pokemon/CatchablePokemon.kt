@@ -16,6 +16,7 @@ import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.pokemon.CatchResult
 import com.pokegoapi.api.map.pokemon.CatchablePokemon
+import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.Log
 
 /**
@@ -36,11 +37,11 @@ val itemToPokeball = mapOf(
         Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL)
 )
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, amount: Int): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, settings: Settings, amount: Int): CatchResult? {
     var result: CatchResult?
     var numThrows = 0
     do {
-        result = catch(captureProbability, itemBag, desiredCatchProbability)
+        result = catch(captureProbability, itemBag, settings)
 
         if (result != null && result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED) {
             break
@@ -51,13 +52,14 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     return result
 }
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, settings: Settings): CatchResult? {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     var ball: ItemId? = null
-    var needCurve = false
+    var needCurve = settings.alwaysCurve
     var needRazzBerry = false
     var highestAvailable: ItemId? = null
+    val desiredCatchProbability = settings.desiredCatchProbability
     for ((index, ballType) in ballTypes.withIndex()) {
         val probability = probabilities.get(index)
         val ballAmount = itemBag.getItem(ballType).count
