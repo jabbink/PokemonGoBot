@@ -92,6 +92,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val catch = CatchOneNearbyPokemon()
         val release = ReleasePokemon()
         val evolve = EvolvePokemon()
+        val smartEvolve = SmartEvolve()
         val hatchEggs = HatchEggs()
         val export = Export()
 
@@ -154,8 +155,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             }
             if (settings.dropItems)
                 task(drop)
-            if (settings.autotransfer)
+            if (settings.autotransfer) {
                 task(release)
+            } else {
+                task(smartEvolve)
+            }
 
         }
 
