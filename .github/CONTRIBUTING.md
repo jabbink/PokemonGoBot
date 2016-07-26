@@ -2,7 +2,7 @@
 Thank you for wanting to help with this project! Pull requests and bug reports are always welcome, there are just some small things you should review before submitting.
 
 ## Issues
-If you find any issue with the library, feel free to open an issue report. If it's just a small issue you might want to consider just asking on Slack (see below).
+If you find any issue with the bot, feel free to open an issue report. If it's just a small issue you might want to consider just asking on Slack (see below).
 
 ## Feature Requests
 You may open an issue also to request new features. Make sure you describe what you are missing in the library and add any pointers someone might need to implement it.
