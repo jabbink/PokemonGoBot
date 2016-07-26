@@ -40,7 +40,7 @@ class CatchOneNearbyPokemon : Task {
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
-                        settings.desiredCatchProbability,
+                        settings,
                         -1)
 
                 if (result == null) {
