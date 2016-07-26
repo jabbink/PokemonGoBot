@@ -40,8 +40,6 @@ dependencies {
 
     compile project(':PokeGOAPI-Java')
 
-    compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
-
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
