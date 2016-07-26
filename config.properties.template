@@ -19,7 +19,7 @@ desired_catch_probability_unwanted=0.0
 
 ## Walking
 # Meters per second
-speed=2.778
+speed=1.94
 
 # Should the bot loot the pokestops (true/false)
 loot_pokestop=true
