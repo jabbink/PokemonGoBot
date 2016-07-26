@@ -12,23 +12,16 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
-import ink.abb.pogo.scraper.tasks.CatchOneNearbyPokemon
-import ink.abb.pogo.scraper.tasks.DropUselessItems
-import ink.abb.pogo.scraper.tasks.GetMapRandomDirection
-import ink.abb.pogo.scraper.tasks.HatchEggs
-import ink.abb.pogo.scraper.tasks.ProcessPokestops
-import ink.abb.pogo.scraper.tasks.ReleasePokemon
-import ink.abb.pogo.scraper.tasks.UpdateProfile
+import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
-import java.util.Comparator
+import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Phaser
 import java.util.concurrent.TimeUnit
-import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
@@ -50,7 +43,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
     @Synchronized
     fun start() {
-        if(isRunning()) return
+        if (isRunning()) return
 
         Log.normal()
         Log.normal("Name: ${ctx.profile.username}")
@@ -143,7 +136,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
     @Synchronized
     fun stop() {
-        if(!isRunning()) return
+        if (!isRunning()) return
 
         Log.red("Stopping bot loops...")
         runningLatch.countDown()

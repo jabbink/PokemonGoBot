@@ -16,7 +16,6 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.map.canLoot
-import kotlin.concurrent.fixedRateTimer
 
 class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
 
@@ -36,7 +35,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
 
         if (nearestUnused.isNotEmpty()) {
             // Select random pokestop from the 5 nearest while taking the distance into account
-            val chosenPokestop = selectRandom(nearestUnused.take(5), ctx)            
+            val chosenPokestop = selectRandom(nearestUnused.take(5), ctx)
 
             if (settings.shouldDisplayPokestopName)
                 Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
@@ -78,11 +77,11 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         }
     }
 
-    private fun selectRandom(pokestops: List<Pokestop>, ctx: Context) : Pokestop {
+    private fun selectRandom(pokestops: List<Pokestop>, ctx: Context): Pokestop {
         // Select random pokestop while taking the distance into account
         // E.g. pokestop is closer to the user -> higher probabilty to be chosen
 
-        if (pokestops.size < 2) 
+        if (pokestops.size < 2)
             return pokestops.first()
 
         val currentPosition = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
@@ -96,10 +95,10 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         // Get random value between 0 and 1
         val random = Math.random()
         var cumulativeProbability = 0.0;
-      
+
         for ((index, pokestop) in pokestops.withIndex()) {
             // Calculate probabilty proportional to the closeness
-            val probability = (1 - distances[index]/totalDistance) / (pokestops.size - 1)         
+            val probability = (1 - distances[index] / totalDistance) / (pokestops.size - 1)
 
             cumulativeProbability += probability
             if (random <= cumulativeProbability) {
