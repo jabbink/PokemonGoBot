@@ -86,6 +86,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         fixedRateTimer("BotLoop", false, 0, 5000, action = {
             thread(block = {
                 task(keepalive)
+                task(evolve)
                 if (settings.shouldCatchPokemons)
                     task(catch)
                 if (settings.shouldDropItems)
@@ -95,7 +96,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
                 task(process)
                 task(hatchEggs)
-                task(evolve)
             })
         })
     }
