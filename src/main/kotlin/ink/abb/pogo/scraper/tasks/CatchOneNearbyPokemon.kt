@@ -19,10 +19,12 @@ import ink.abb.pogo.scraper.util.pokemon.catch
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
+import java.util.*
 
 class CatchOneNearbyPokemon : Task {
+    val blacklistedEncounters = mutableSetOf<Long>()
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val pokemon = ctx.api.map.catchablePokemon
+        val pokemon = ctx.api.map.catchablePokemon.filter { !blacklistedEncounters.contains(it.encounterId) }
 
         val hasPokeballs = ctx.api.inventories.itemBag.hasPokeballs()
 
@@ -33,7 +35,8 @@ class CatchOneNearbyPokemon : Task {
         if (pokemon.isNotEmpty()) {
             val catchablePokemon = pokemon.first()
             if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId.name) && settings.desiredCatchProbabilityUnwanted == -1.0) {
-                Log.normal("Found pokemon ${catchablePokemon.pokemonId}; skip because it's unwanted")
+                blacklistedEncounters.add(catchablePokemon.encounterId)
+                Log.normal("Found pokemon ${catchablePokemon.pokemonId}; blacklisting because it's unwanted")
                 return
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
@@ -48,6 +51,11 @@ class CatchOneNearbyPokemon : Task {
                     settings.desiredCatchProbabilityUnwanted
                 } else {
                     settings.desiredCatchProbability
+                }
+                if (desiredCatchProbability == -1.0) {
+                    blacklistedEncounters.add(catchablePokemon.encounterId)
+                    Log.normal("CP/IV of encountered pokemon ${catchablePokemon.pokemonId} turns out to be too low; blacklisting encounter")
+                    return
                 }
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
