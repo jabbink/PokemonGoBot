@@ -18,6 +18,7 @@ import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.pokemon.catch
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -31,16 +32,27 @@ class CatchOneNearbyPokemon : Task {
 
         if (pokemon.isNotEmpty()) {
             val catchablePokemon = pokemon.first()
+            if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId.name) && settings.desiredCatchProbabilityUnwanted == -1.0) {
+                Log.normal("Found pokemon ${catchablePokemon.pokemonId}; skip because it's unwanted")
+                return
+            }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
+
             val encounterResult = catchablePokemon.encounterPokemon()
             if (encounterResult.wasSuccessful()) {
                 Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
                         "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV ${encounterResult.wildPokemon.pokemonData.getIvPercentage()}%")
+                val (shouldRelease, reason) = encounterResult.wildPokemon.pokemonData.shouldTransfer(settings)
+                val desiredCatchProbability = if (shouldRelease) {
+                    settings.desiredCatchProbabilityUnwanted
+                } else {
+                    settings.desiredCatchProbability
+                }
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.inventories.itemBag,
-                        settings.desiredCatchProbability,
+                        desiredCatchProbability,
                         -1)
 
                 if (result == null) {

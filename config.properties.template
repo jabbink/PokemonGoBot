@@ -10,8 +10,11 @@ token=
 latitude=
 longitude=
 
-# desired chance to catch Pokemon with 1 throw
-desired_catch_probability=0.8
+# desired probability to catch Pokemon with 1 throw
+desired_catch_probability=0.5
+# desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)
+# set to -1 to not attempt catching at all
+desired_catch_probability_unwanted=0.0
 
 ## Walking
 # Meters per second
