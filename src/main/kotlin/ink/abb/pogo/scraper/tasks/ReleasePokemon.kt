@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
@@ -31,7 +32,7 @@ class ReleasePokemon : Task {
                 sorted = it.value.sortedByDescending { it.cp }
             }
             for ((index, pokemon) in sorted.withIndex()) {
-                // don't drop favourited or nicknamed pokemon
+                // don't drop favorited or nicknamed pokemon
                 val isFavourite = pokemon.nickname.isNotBlank() || pokemon.isFavorite
                 if (!isFavourite) {
                     val ivPercentage = pokemon.getIvPercentage()
@@ -40,10 +41,14 @@ class ReleasePokemon : Task {
                         val (shouldRelease, reason) = pokemon.shouldTransfer(settings)
 
                         if (shouldRelease) {
-                            ctx.pokemonStats.second.andIncrement
                             Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
                                     "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
-                            pokemon.transferPokemon()
+                            val result = pokemon.transferPokemon()
+                            if (result == Result.SUCCESS) {
+                                ctx.pokemonStats.second.andIncrement
+                            } else {
+                                Log.red("Failed to transfer ${pokemon.pokemonId.name}: ${result.name}")
+                            }
                         }
                     }
                 }
