@@ -35,7 +35,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
 
         if (nearestUnused.isNotEmpty()) {
             // Select random pokestop from the 5 nearest while taking the distance into account
-            val chosenPokestop = selectRandom(nearestUnused.take(5), ctx)
+            val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx)
 
             if (settings.shouldDisplayPokestopName)
                 Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")

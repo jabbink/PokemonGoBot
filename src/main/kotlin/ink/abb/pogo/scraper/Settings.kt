@@ -63,6 +63,8 @@ class Settings(val properties: Properties) {
         )
     }
 
+    val randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "randomNextPokestop", 5, String::toInt)
+
     val desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.4, String::toDouble)
     val desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", 0.0, String::toDouble)
     val shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean)
