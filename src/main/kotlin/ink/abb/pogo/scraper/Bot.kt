@@ -38,7 +38,8 @@ class Bot(var api: PokemonGo, val settings: Settings) {
             AtomicDouble(settings.startingLongitude),
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
-            Pair(AtomicInteger(0), AtomicInteger(0))            
+            Pair(AtomicInteger(0), AtomicInteger(0)),
+            mutableSetOf()            
     )
 
     @Synchronized
@@ -81,6 +82,7 @@ class Bot(var api: PokemonGo, val settings: Settings) {
         Log.normal("Getting initial pokestops...")
         // TODO: Figure out why pokestops are only showing up the first time api.map.mapObjects is called (???)
         val reply = api.map.mapObjects
+        Log.normal("Got ${reply.pokestops.size} pokestops")
         val process = ProcessPokestops(reply.pokestops)
 
 

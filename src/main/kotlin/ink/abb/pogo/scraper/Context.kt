@@ -25,6 +25,8 @@ data class Context(
         val pokemonStats: Pair<AtomicInteger, AtomicInteger>,
         val itemStats: Pair<AtomicInteger, AtomicInteger>,
 
+        val blacklistedEncounters: MutableSet<Long>,
+
         var walking: AtomicBoolean = AtomicBoolean(false),
 
 		var releasing: AtomicBoolean = AtomicBoolean(false)        

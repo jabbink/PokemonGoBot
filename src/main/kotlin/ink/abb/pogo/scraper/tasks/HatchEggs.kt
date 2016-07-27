@@ -19,31 +19,30 @@ import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 class HatchEggs : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val freeIncubators = ctx.api.inventories.incubators.filter { it.kmTarget <= ctx.api.playerProfile.stats.kmWalked }
-        val eggs = ctx.api.inventories.hatchery.eggs
-                .filter { it.eggIncubatorId == null || it.eggIncubatorId.isBlank() }
-                .sortedByDescending { it.eggKmWalkedTarget }
-        if (freeIncubators.isNotEmpty() && eggs.isNotEmpty() && settings.shouldAutoFillIncubatores) {
-            val result = freeIncubators.first().hatchEgg(eggs.first())
-            if (result == UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse.Result.SUCCESS) {
-                Log.cyan("Put egg ${eggs.first().id} in unused incubator")
-            } else {
-                Log.red("Failed to put egg in incubator; error: $result")
-            }
-        } else {
-            val result = ctx.api.inventories.hatchery.queryHatchedEggs()
-            if (result.isNotEmpty()) {
-                result.forEachIndexed { index, it ->
-                    // TODO: That proto is probably wrong and this fails.
-                    val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
-                    val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
-                    if (newPokemon == null) {
-                        Log.cyan("Hatched pokemon; $stats")
-                    } else {
-                        Log.cyan("Hatched ${newPokemon.pokemonId.name} with ${newPokemon.cp} CP " +
-                                "and ${newPokemon.getIvPercentage()}% IV; $stats")
-                    }
+        val result = ctx.api.inventories.hatchery.queryHatchedEggs()
+        if (result.isNotEmpty()) {
+            result.forEachIndexed { index, it ->
+                val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
+                val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
+                if (newPokemon == null) {
+                    Log.cyan("Hatched pokemon; $stats")
+                } else {
+                    Log.cyan("Hatched ${newPokemon.pokemonId.name} with ${newPokemon.cp} CP " +
+                            "and ${newPokemon.getIvPercentage()}% IV; $stats")
                 }
+            }
+        }
+
+        val freeIncubators = ctx.api.inventories.incubators.filter { !it.isInUse }
+        val eggs = ctx.api.inventories.hatchery.eggs
+                .filter { !it.isIncubate }
+                .sortedByDescending { it.eggKmWalkedTarget }
+        if (freeIncubators.isNotEmpty() && eggs.isNotEmpty() && settings.shouldAutoFillIncubators) {
+            val result2 = eggs.first().incubate(freeIncubators.first())
+            if (result2 == UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse.Result.SUCCESS) {
+                Log.cyan("Put egg of ${eggs.first().eggKmWalkedTarget}km in unused incubator")
+            } else {
+                Log.red("Failed to put egg in incubator; error: $result2")
             }
         }
     }

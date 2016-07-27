@@ -90,8 +90,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         }
     }
 
-    if (highestAvailable == null) {
-        Log.red("No balls available")
+    if (highestAvailable == null) {        
         return null
     }
 
