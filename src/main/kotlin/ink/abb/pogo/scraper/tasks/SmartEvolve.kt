@@ -15,6 +15,12 @@ import kotlin.comparisons.compareBy
  */
 class SmartEvolve : Task {
 
+    lateinit private var release: ReleasePokemon
+
+    constructor(release: ReleasePokemon) {
+        this.release = release
+    }
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val pokebagFillPercent = ctx.api.inventories.pokebank.pokemons.size.toDouble() / ctx.profile.pokemonStorage
         Log.white("Pokebag ${pokebagFillPercent * 100} % full.")
@@ -51,31 +57,21 @@ class SmartEvolve : Task {
                     if (ctx.api.inventories.candyjar.getCandies(pokemon.pokemonFamily) < candyNeeded) {
                         break;
                     }
+                    if (pokemon.pokemonId == PokemonIdOuterClass.PokemonId.EEVEE) {
+                        if (ctx.api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.VAPOREON) == null) {
+                            pokemon.renamePokemon("Rainer")
+                        } else if (ctx.api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.FLAREON) == null) {
+                            pokemon.renamePokemon("Pyro")
+                        } else if (ctx.api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.JOLTEON) == null) {
+                            pokemon.renamePokemon("Sparky")
+                        }
+                    }
                     Log.green("Evolving ${pokemon.pokemonId.name} because we have ${pokemon.candy} candy and only need ${candyNeeded}.")
                     pokemon.evolve()
                 }
             }
 
-            val currentPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
-            currentPokemon.forEach {
-                if (it.value.size > 0) {
-                    val pokes = it.value.sortedBy {
-                        if (settings.sortByIV) {
-                            (it.ivRatio * 100).toInt()
-                        } else {
-                            it.cp
-                        }
-                    }
-                    for ((index, value) in pokes.withIndex()) {
-                        if (index != pokes.size - 1) {
-                            Log.red("Transfering ${value.pokemonId.name} (${value.ivRatio} - ${value.cp}cp) because it is not the best")
-                            value.transferPokemon()
-                        } else {
-                            Log.yellow("The best ${value.pokemonId.name}'s stats are: ${value.ivRatio} & ${value.cp}cp")
-                        }
-                    }
-                }
-            }
+            release.run(bot,ctx,settings)
         }
     }
 }
