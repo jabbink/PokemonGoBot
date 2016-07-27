@@ -56,7 +56,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
         Log.normal("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
+        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.pokemonStorage}")
         Log.normal("Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}")
         //Log.normal("Inventory bag ${ctx.api.bag}")
 
@@ -101,11 +101,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         runningLatch = CountDownLatch(1)
         phaser = Phaser(1)
 
-        runLoop(TimeUnit.SECONDS.toMillis(60), "ProfileLoop") {
+        runLoop(TimeUnit.SECONDS.toMillis(settings.profileUpdateTimer), "ProfileLoop") {
             task(profile)
             task(hatchEggs)
         }
-
+        
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
             if (settings.shouldCatchPokemons)
@@ -133,7 +133,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             try {
                 var cancelled = false
                 while (!cancelled && isRunning()) {
-                    val start = System.currentTimeMillis()
+                    val start = api.currentTimeMillis()
 
                     try {
                         block({ cancelled = true })
@@ -142,7 +142,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                         t.printStackTrace()
                     }
 
-                    val sleep = timeout - (System.currentTimeMillis() - start)
+                    if(cancelled) continue
+
+                    val sleep = timeout - (api.currentTimeMillis() - start)
+
                     if (sleep > 0) {
                         try {
                             runningLatch.await(sleep, TimeUnit.MILLISECONDS)

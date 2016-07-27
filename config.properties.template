@@ -31,7 +31,7 @@ loot_pokestop=true
 # Should the bot catch pokemons (true/false)
 catch_pokemon=true
 
-# Shout the bot auto fill incubators with eggs (true/false)
+# Should the bot auto fill incubators with eggs (true/false)
 auto_fill_incubator=true
 
 ## Items drop
@@ -85,6 +85,9 @@ always_curve=false
 # Never use berries
 never_use_berries=true
 
+# Set Profile Update Timer (Default: 60)
+profile_update_timer=60
+
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
 transfer_iv_threshold=80
@@ -97,7 +100,7 @@ transfer_cp_threshold=400
 # if you want all pokemons to be transferred just leave it blank
 ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
 
-# list of pokemon you always want to trancsfer regardless of CP
+# list of pokemon you always want to transfer regardless of CP
 obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
 
 # port where the webserver (gui) should listen, 0 = do not listen

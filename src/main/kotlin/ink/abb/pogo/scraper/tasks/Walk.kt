@@ -35,7 +35,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             walk(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
-                it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts)
+                it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
             }
 
             if (nearestUnused.isNotEmpty()) {
