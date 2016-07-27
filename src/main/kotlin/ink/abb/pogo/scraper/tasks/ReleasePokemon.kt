@@ -25,15 +25,14 @@ class ReleasePokemon : Task {
         val sortByIV = settings.sortByIV
 
         groupedPokemon.forEach {
-            var sorted: List<Pokemon>
-            if (sortByIV) {
-                sorted = it.value.sortedByDescending { it.getIv() }
+            val sorted = if (sortByIV) {
+                it.value.sortedByDescending { it.getIv() }
             } else {
-                sorted = it.value.sortedByDescending { it.cp }
+                it.value.sortedByDescending { it.cp }
             }
             for ((index, pokemon) in sorted.withIndex()) {
-                // don't drop favorited or nicknamed pokemon
-                val isFavourite = pokemon.nickname.isNotBlank() || pokemon.isFavorite
+                // don't drop favorited, deployed, or nicknamed pokemon
+                val isFavourite = pokemon.nickname.isNotBlank() || pokemon.isFavorite || !pokemon.deployedFortId.isEmpty()
                 if (!isFavourite) {
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon (except for obligatory transfer)
