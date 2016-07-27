@@ -86,6 +86,11 @@ class CatchOneNearbyPokemon : Task {
 
                 } else
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+
+                    if (result.status == CatchPokemonResponse.CatchStatus.CATCH_ERROR) {
+                        Log.red("Blacklisting pokemon to prevent infinite loop")
+                        ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    }                    
             } else {
                 Log.red("Encounter failed with result: ${encounterResult.getStatus()}")
             }
