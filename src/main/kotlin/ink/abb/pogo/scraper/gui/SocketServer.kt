@@ -63,7 +63,14 @@ class SocketServer {
             profile.levelRatio = ratio
             profile.pokebank = ctx!!.api.inventories.pokebank.pokemons.size
             profile.pokebankMax = ctx!!.api.playerProfile.pokemonStorage
-            profile.items = ctx!!.api.inventories.itemBag.items.size
+
+            // Replace with @pr0ves method
+            var count = 0
+            ctx!!.api.inventories.itemBag.items.toMutableList().forEach {
+                count += it.count
+            }
+            profile.items = count
+
             profile.itemsMax = ctx!!.api.playerProfile.itemStorage
             server?.broadcastOperations?.sendEvent("profile", profile)
         }
@@ -131,7 +138,7 @@ class SocketServer {
             val eggs = EventEggs()
             for(egg in ctx!!.api.inventories.hatchery.eggs){
                 val eggObj = EventEggs.Egg()
-                eggObj.distanceWalked = egg.eggKmWalked
+                // eggObj.distanceWalked = egg.eggKmWalked
                 eggObj.distanceTarget = egg.eggKmWalkedTarget
                 eggs.eggs.add(eggObj)
             }
