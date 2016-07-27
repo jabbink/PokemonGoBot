@@ -28,7 +28,6 @@ class SocketServer {
 
     fun start(ctx: Context, port: Int) {
         val config = Configuration()
-        config.hostname = "localhost"
         config.port = port
 
         this.ctx = ctx
