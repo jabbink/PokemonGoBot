@@ -76,6 +76,9 @@ autotransfer=true
 # minimum amount of pokemon type to keep
 keep_pokemon_amount=1
 
+# maximum amount of pokemon type to keep (-1 to keep all)
+max_pokemon_amount=-1
+
 # Sort by IV first instead of CP
 sort_by_iv=false
 
