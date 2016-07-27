@@ -232,7 +232,7 @@ def callback1(args):
 
 
 def callback2(*args):
-    webbrowser.open_new(r"https://github.com/ZingBallyhoo")
+    webbrowser.open_new(r"https://github.com/ZingBallyhoo/PokemonGoBot-ConfigTool")
     return args
 
 
