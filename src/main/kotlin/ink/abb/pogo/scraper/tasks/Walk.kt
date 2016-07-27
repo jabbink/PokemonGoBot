@@ -16,14 +16,10 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.map.canLoot;
+import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 
 class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        // don't run away when there are still Pokemon around
-        val pokemonCount = ctx.api.map?.catchablePokemon?.filter { !ctx.blacklistedEncounters.contains(it.encounterId) }?.size
-        if (pokemonCount != null && pokemonCount > 0 && settings.shouldCatchPokemons) {
-            return
-        }
         if (!ctx.walking.compareAndSet(false, true)) {
             return
         }
@@ -32,7 +28,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             val coordinates = ctx.server.coordinatesToGoTo.first()
             ctx.server.coordinatesToGoTo.removeAt(0)
             Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
-            walk(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
                 val canLoot = it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
@@ -53,12 +49,12 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 if (settings.shouldDisplayPokestopName)
                     Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
 
-                walk(bot, ctx, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
             }
         }
     }
 
-    fun walk(bot: Bot, ctx: Context, end: S2LatLng, speed: Double, sendDone: Boolean) {
+    fun walk(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
@@ -79,7 +75,26 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
+        var walking = true
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
+            // don't run away when there are still Pokemon around
+            if(walking) {
+                if(bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                    // Stop walking
+                    walking = false
+                    Log.normal("Pausing to catch pokemon...")
+                } // Else continue walking.
+            } else {
+                if(bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
+                    walking = true
+                    Log.normal("Resuming walk.")
+                } // Else continue waiting.
+            }
+
+            if(!walking) {
+                return@runLoop
+            }
+
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
 

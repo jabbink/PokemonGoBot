@@ -17,6 +17,7 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
+import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 import ink.abb.pogo.scraper.util.pokemon.catch
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
@@ -24,7 +25,7 @@ import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val pokemon = ctx.api.map.catchablePokemon.filter { !ctx.blacklistedEncounters.contains(it.encounterId) }
+        val pokemon = ctx.api.map.getCatchablePokemon(ctx.blacklistedEncounters)
 
         val hasPokeballs = ctx.api.inventories.itemBag.hasPokeballs()
 
