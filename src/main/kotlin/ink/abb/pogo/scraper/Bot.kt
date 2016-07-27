@@ -12,6 +12,8 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.player.PlayerProfile
+import ink.abb.pogo.scraper.gui.SocketServer
+import ink.abb.pogo.scraper.gui.WebServer
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
@@ -40,7 +42,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             Pair(AtomicInteger(0), AtomicInteger(0)),
-            mutableSetOf()
+            mutableSetOf(),
+            SocketServer()
     )
 
     @Synchronized
@@ -98,11 +101,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         runningLatch = CountDownLatch(1)
         phaser = Phaser(1)
 
-        runLoop(TimeUnit.SECONDS.toMillis(60), "ProfileLoop") {
+        runLoop(TimeUnit.SECONDS.toMillis(settings.profileUpdateTimer), "ProfileLoop") {
             task(profile)
             task(hatchEggs)
         }
-
+        
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
             if (settings.shouldCatchPokemons)
@@ -114,6 +117,14 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
             task(process)
         }
+
+        Log.setContext(ctx)
+
+        if(settings.guiPort > 0){
+            Log.normal("Running webserver on port ${settings.guiPort}")
+            WebServer().start(settings.guiPort, settings.guiPortSocket)
+            ctx.server.start(ctx, settings.guiPortSocket)
+        }
     }
 
     fun runLoop(timeout: Long, name: String, block: (cancel: () -> Unit) -> Unit) {
@@ -122,7 +133,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             try {
                 var cancelled = false
                 while (!cancelled && isRunning()) {
-                    val start = System.currentTimeMillis()
+                    val start = api.currentTimeMillis()
 
                     try {
                         block({ cancelled = true })
@@ -131,7 +142,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                         t.printStackTrace()
                     }
 
-                    val sleep = timeout - (System.currentTimeMillis() - start)
+                    if(cancelled) continue
+
+                    val sleep = timeout - (api.currentTimeMillis() - start)
+
                     if (sleep > 0) {
                         try {
                             runningLatch.await(sleep, TimeUnit.MILLISECONDS)

@@ -18,6 +18,8 @@ import java.util.*
 
 class Settings(val properties: Properties) {
 
+    val profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", 60, String::toLong)
+
     val pokeballItems = mapOf(Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
             Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
             Pair(ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
@@ -99,6 +101,9 @@ class Settings(val properties: Properties) {
     } else {
         listOf()
     }
+
+    val guiPort = getPropertyIfSet("Port where the webserver should listen", "gui_port", 8000, String::toInt)
+    val guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", 8001, String::toInt)
 
     private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
         val settingString = "$description setting (\"$property\")"

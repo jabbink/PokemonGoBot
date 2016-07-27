@@ -46,6 +46,8 @@ class ReleasePokemon : Task {
                             val result = pokemon.transferPokemon()
                             if (result == Result.SUCCESS) {
                                 ctx.pokemonStats.second.andIncrement
+                                ctx.server.releasePokemon(pokemon.id)
+                                ctx.server.sendProfile()
                             } else {
                                 Log.red("Failed to transfer ${pokemon.pokemonId.name}: ${result.name}")
                             }

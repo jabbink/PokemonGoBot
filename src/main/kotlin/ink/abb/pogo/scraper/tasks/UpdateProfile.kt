@@ -40,7 +40,9 @@ class UpdateProfile : Task {
                     "Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.pokemonStorage}; " +
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
                     "Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}"
+
             )
+            ctx.server.sendProfile()
         } catch (e: Exception) {
         }
     }
