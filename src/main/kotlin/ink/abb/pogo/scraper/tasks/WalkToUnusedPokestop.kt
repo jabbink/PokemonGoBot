@@ -27,6 +27,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // don't run away when there are still Pokemon around
         val pokemonCount = ctx.api.map?.catchablePokemon?.size
+        
         if (pokemonCount != null && pokemonCount > 0) {
             return
         }
@@ -68,33 +69,6 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
-/*
-        timer("Walk", false, 0, timeout, action = {
-
-            // 10% chance to do NOTHING.
-            val dummy = Helper.getRandomNumber(0,100)
-            if (dummy <= 10) {
-
-                val sleeptime = Helper.getRandomNumber(1,3)
-                Log.yellow("I'm doing nothing .. Replicate human bevahior (sleep for $sleeptime seconds.)")
-
-                TimeUnit.SECONDS.sleep(sleeptime.toLong())
-            }
-
-            else {
-                ctx.lat.addAndGet(deltaLat)
-                ctx.lng.addAndGet(deltaLng)
-
-                remainingSteps--
-                if (remainingSteps <= 0) {
-                    Log.normal("Destination reached.")
-                    ctx.walking.set(false)
-                    cancel()
-                }
-            }
-        })
-*/
-
         thread(true, false, null, "Walk", 1, block = {
             var threadRun = true
 
@@ -109,7 +83,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
                 if (dummy <= 5) {
 
                     val sleeptime = Helper.getRandomNumber(1,5)
-                    Log.yellow("I'm doing nothing .. Replicate human bevahior (sleep for $sleeptime seconds.)")
+                    Log.yellow("I'm doing nothing .. Replicate human behavior (sleep for $sleeptime seconds.)")
 
                     TimeUnit.SECONDS.sleep(sleeptime.toLong())
                 }

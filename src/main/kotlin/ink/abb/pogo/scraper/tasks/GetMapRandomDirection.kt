@@ -20,7 +20,10 @@ class GetMapRandomDirection : Task {
         val lat = ctx.lat.get() + randomLatLng()
         val lng = ctx.lng.get() + randomLatLng()
 
-        if (settings.shouldDisplayKeepalive) Log.normal("Getting map of ($lat, $lng)")
+        if (settings.shouldDisplayKeepalive) {
+            Log.normal("Getting map of ($lat, $lng)")
+        }
+
         ctx.api.setLocation(lat, lng, 0.0)
     }
 

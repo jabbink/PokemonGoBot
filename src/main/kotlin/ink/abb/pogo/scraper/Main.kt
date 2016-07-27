@@ -124,7 +124,7 @@ fun getPokemonGo(settings: Settings, http: OkHttpClient): Pair<PokemonGo, AuthIn
     throw Exception("Failed to log in")
 }
 
-fun main(args: Array<String>) {
+fun login(): Pair<PokemonGo, AuthInfo> {
     val builder = OkHttpClient.Builder()
     builder.connectTimeout(60, TimeUnit.SECONDS)
     builder.readTimeout(60, TimeUnit.SECONDS)
@@ -158,9 +158,25 @@ fun main(args: Array<String>) {
     print("Getting profile data from pogo server")
     while (api.playerProfile == null) {
         print(".")
-        Thread.sleep(1000)
+        Thread.sleep(2500)
     }
     println(".")
 
+    return Pair(api, auth)
+}
+
+fun main(args: Array<String>) {
+
+    val properties = Properties()
+
+    val input = FileInputStream("config.properties")
+    input.use {
+        properties.load(it)
+    }
+    input.close()
+
+    val settings = Settings(properties)
+
+    val (api, auth) = login()
     Bot(api, settings).run()
 }

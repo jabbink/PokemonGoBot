@@ -12,6 +12,7 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
+import ink.abb.pogo.scraper.*
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.Helper
@@ -23,8 +24,10 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
+import java.util.concurrent.TimeUnit
+import com.pokegoapi.exceptions.LoginFailedException
 
-class Bot(val api: PokemonGo, val settings: Settings) {
+class Bot(var api: PokemonGo, val settings: Settings) {
 
     var ctx = Context(
             api,
@@ -76,30 +79,88 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val reply = api.map.mapObjects
         val process = ProcessPokestops(reply.pokestops)
 
-        fixedRateTimer("ProfileLoop", false, 0, (Helper.getRandomNumber(50,300) * 1000).toLong(), action = {
-            thread(block = {
-                task(profile)
 
-                if (settings.shouldAutoTransfer) {                            
-                    task(release)
-                }
-            })
-        })
+        // BotLoop 1
+        thread(true, false, null, "BotLoop1", 1, block = {
+            var threadRun = true
 
-        fixedRateTimer("BotLoop", false, 0, 5000, action = {
-            thread(block = {
+            while(threadRun) {
+
+                // keepalive
                 task(keepalive)
-                if (!settings.walkOnly) {
-                    task(catch)
-                    task(drop)
-                }
+
+                // process
                 task(process)
-                task(hatchEggs)
-            })
+
+                TimeUnit.SECONDS.sleep(Helper.getRandomNumber(4,7).toLong())
+            }
         })
+
+        // BotLoop 2
+        thread(true, false, null, "BotLoop2", 1, block = {
+            var threadRun = true
+
+            while(threadRun) {
+
+                synctask(profile)
+                synctask(hatchEggs)
+
+                TimeUnit.SECONDS.sleep(Helper.getRandomNumber(50,300).toLong())
+            }
+        })
+
+        // BotLoop 3
+        thread(true, false, null, "BotLoop3", 1, block = {
+            var threadRun = true
+
+            while(threadRun) {
+                if (!settings.walkOnly) {
+                    synctask(catch)
+                    if (settings.shouldAutoTransfer) {                            
+                      synctask(release)
+                    }                    
+                    synctask(drop)
+                }                                
+
+                TimeUnit.SECONDS.sleep(Helper.getRandomNumber(3,10).toLong())
+            }
+
+        })
+
+    }
+
+    fun synctask(task: Task) {
+        synchronized(ctx) {
+            synchronized(settings) {
+
+                try {            
+                    task.run(this, ctx, settings)
+                } catch (lfe: LoginFailedException) {
+
+                    lfe.printStackTrace()
+
+                    var (api2, auth2) = login()
+
+                    synchronized(ctx) {
+                        ctx.api = api2
+                    }
+                }
+            }
+        }
     }
 
     fun task(task: Task) {
-        task.run(this, ctx, settings)
+        try {
+            task.run(this, ctx, settings)
+        } catch (lfe: LoginFailedException) {
+
+            lfe.printStackTrace()
+
+            var (api2, auth2) = login()
+
+            synchronized(ctx) {
+                ctx.api = api2
+            }
+        }        
     }
 }
