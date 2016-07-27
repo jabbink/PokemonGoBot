@@ -22,11 +22,12 @@ firstRun = True
 has_reset = False
 alive = True
 groupLogin = ["Username", "Password", "Base64 Password", "Token"]
-groupLocation = ["Latitude", "Longitude", "Walk Only", "Speed"]
+groupLocation = ["Latitude", "Longitude", "Walk Only", "Speed", "Random Next Pokestop Selection"]
 groupItems = ["Drop Items", "Item Revive", "Item Max Revive", "Item Potion", "Item Super Potion", "Item Hyper Potion", "Item Max Potion", "Item Poke Ball", "Item Great Ball", "Item Ultra Ball", "Item Master Ball", "Item Razz Berry", "Preferred Ball"]
-groupTransfer = ["Autotransfer", "Keep Pokemon Amount", "Sort By Iv", "Transfer Iv Threshold", "Transfer Cp Threshold", "Ignored Pokemon", "Obligatory Transfer", "Desired Catch Probability"]
+groupTransfer = ["Autotransfer", "Keep Pokemon Amount", "Sort By Iv", "Transfer Iv Threshold", "Transfer Cp Threshold", "Ignored Pokemon", "Obligatory Transfer", "Desired Catch Probability", "Desired Catch Probability Unwanted"]
 groupLog = ["Display Keepalive", "Display Nearest Unused", "Display Pokestop Rewards", "Display Pokemon Catch Rewards", "Display Pokestop Name"]
 groupGui = ["Gui Port", "Gui Port Socket"]
+groupJobs = ["Loot Pokestop", "Catch Pokemon", "Auto Fill Incubator", "Always Curve", "Never Use Berries"]
 loginRow = 0
 locationRow = 0
 itemsRow = 0
@@ -34,10 +35,12 @@ transferRow = 0
 logRow = 0
 noneRow = 0
 guiRow = 0
+jobsRow = 0
 
 
 class Entry:
     def __init__(self, text, value):
+        global jobsRow
         global frameNone
         global loginRow
         global loginRow
@@ -79,23 +82,28 @@ class Entry:
             guiRow += 1
             self.row = guiRow
             self.col = 1
+        elif self.text in groupJobs:
+            self.parent = frameJobs
+            jobsRow += 1
+            self.row = jobsRow
+            self.col = 1
         else:
             try:
                 frameNone
             except NameError:
                 frameNone = LabelFrame(root, text="Unknown")
-                frameNone.grid(column=3, row=0)
+                frameNone.grid(column=3, row=0, rowspan=2)
             self.parent = frameNone
             noneRow += 1
             self.row = noneRow
             self.col = 0
         self.label = tk.Label(self.parent, text=self.text)
         self.label.grid(row=self.row, column=self.col)
-        if value not in tf:
+        if self.val not in tf:
             self.entry = tk.Entry(self.parent)
             self.entry.grid(row=self.row, column=(self.col + 1))
             self.entry.insert(END, self.val)
-        if value in tf:
+        if self.val in tf:
             self.var = tk.StringVar(self.parent)
             self.var.set(value)
             self.entry = OptionMenu(self.parent, self.var, *tf)
@@ -122,7 +130,6 @@ def reset(ask):
     global has_reset
     if not ask:
         try:
-            print("hi")
             default_file = open(file_name, "r")
             cfg_file = open(file_name_2, "w")
             cfg_file.truncate()
@@ -344,17 +351,19 @@ if alive:
     root.resizable(width=False, height=False)
     root.title("Pokemon GO Bot Configuration Tool")
     frameLogin = LabelFrame(root, text="Login")
-    frameLogin.grid()
+    frameLogin.grid(rowspan=1)
     frameLocation = LabelFrame(root, text="Location")
     frameLocation.grid()
     frameItems = LabelFrame(root, text="Items")
-    frameItems.grid(rowspan=5)
+    frameItems.grid(rowspan=3)
     frameTransfer = LabelFrame(root, text="Transfer")
     frameTransfer.grid(column=1, rowspan=2, row=0, columnspan=2)
     frameLog = LabelFrame(root, text="Logging")
     frameLog.grid(column=1, row=2, rowspan=1, columnspan=2)
     frameGui = LabelFrame(root, text="Web GUI")
     frameGui.grid(column=1, row=3, columnspan=2)
+    frameJobs = LabelFrame(root, text="Jobs")
+    frameJobs.grid(column=1, row=4, columnspan=2)
     menu_bar = Menu(root)
     menu_bar.add_cascade(label="About", command=display_about)
     root.config(menu=menu_bar)
