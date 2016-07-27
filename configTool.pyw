@@ -255,75 +255,6 @@ properties_lines = []
 current_line = []
 current_val = []
 
-'''def check_template():
-    first_pass = True
-    with open(file_name) as file:
-        for line in file:
-            if line.find("#") == 0 or not line.strip():
-                pass
-            else:
-                if not first_pass:
-                    # dict = {'Name': 'Zara', 'Age': 7, 'Class': 'First'}
-                    dict = {}
-                    dict["".join(current_line)] = "".join(current_val)
-                    print(dict)
-                    # Add new entry
-                    del current_val[:]
-                    del current_line[:]
-                doIt = 1
-                first_pass = False
-                for char in line:
-                    if doIt == 1:
-                        if char in ["="]:
-                            doIt = 2
-                        else:
-                            current_line.append(char)
-                    if doIt == 2:
-                        if char != "=":
-                            current_val.append(char)
-                            print(template_lines)
-    with open(file_name_2) as file:
-        for line in file:
-            if line.find("#") == 0 or not line.strip():
-                pass
-            else:
-                doIt = 1
-                for char in line:
-                    if doIt == 1:
-                        if char in ["="]:
-                            doIt = 2
-                        else:
-                            current_line.append(char)
-                    if doIt == 2:
-                        properties_lines.append("".join(current_line))
-                        doIt = 0
-                        print(properties_lines)
-                        del current_line[:]
-    for item in template_lines:
-        with open(file_name_2) as file:
-            saved_lines = []
-            for line in file:
-                saved_lines.append(line)
-        if item not in properties_lines:
-            saved_lines.append(item)
-    # print(saved_lines)
-    cfg_file = open(file_name_2, "w")
-    cfg_file.truncate()
-    for line in saved_lines:
-        cfg_file.write(line)
-    for item in properties_lines:
-        with open(file_name_2) as file:
-            saved_lines = []
-            for line in file:
-                saved_lines.append(line)
-        if item not in template_lines:
-            properties_lines.remove(item)
-    print(saved_lines)
-    cfg_file = open(file_name_2, "w")
-    cfg_file.truncate()
-    for line in saved_lines:
-        cfg_file.write(line)'''
-
 
 def thread_loop():
     global done
@@ -416,4 +347,3 @@ if alive:
     loop.start()
     mainloop()
     alive = False
-
