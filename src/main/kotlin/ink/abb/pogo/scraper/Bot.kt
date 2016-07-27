@@ -12,6 +12,8 @@ import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.player.PlayerProfile
+import ink.abb.pogo.scraper.gui.SocketServer
+import ink.abb.pogo.scraper.gui.WebServer
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
@@ -25,6 +27,7 @@ import java.util.concurrent.Phaser
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
 class Bot(val api: PokemonGo, val settings: Settings) {
@@ -40,7 +43,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             Pair(AtomicInteger(0), AtomicInteger(0)),
-            mutableSetOf()
+            mutableSetOf(),
+            SocketServer()
     )
 
     @Synchronized
@@ -113,6 +117,14 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(release)
 
             task(process)
+        }
+
+        Log.setContext(ctx)
+
+        if(settings.guiPort > 0){
+            Log.normal("Running webserver on port ${settings.guiPort}")
+            WebServer().start(settings.guiPort)
+            ctx.server.start(ctx, settings.guiPortSocket)
         }
     }
 

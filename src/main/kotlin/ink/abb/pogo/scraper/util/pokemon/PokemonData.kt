@@ -8,26 +8,27 @@
 
 package ink.abb.pogo.scraper.util.pokemon
 
-import com.pokegoapi.api.pokemon.Pokemon
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData
 import ink.abb.pogo.scraper.Settings
 
-fun Pokemon.getIv(): Int {
+fun PokemonData.getIv(): Int {
     val iv = individualAttack + individualDefense + individualStamina
     return iv
 }
 
-fun Pokemon.getIvPercentage(): Int {
+fun PokemonData.getIvPercentage(): Int {
     val iv = getIv()
     val ivPercentage = (iv * 100) / 45
     return ivPercentage
 }
 
-fun Pokemon.getStatsFormatted(): String {
+fun PokemonData.getStatsFormatted(): String {
     val details = "Stamina: $individualStamina | Attack: $individualAttack | Defense: $individualDefense"
     return details + " | IV: ${getIv()} (${(getIvPercentage())}%)"
 }
 
-fun Pokemon.shouldTransfer(settings: Settings): Pair<Boolean, String> {
+// TODO: Deduplicate this
+fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
     val ignoredPokemon = settings.ignoredPokemon
     val ivPercentage = getIvPercentage()
