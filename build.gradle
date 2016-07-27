@@ -39,7 +39,7 @@ sourceSets {
 dependencies {
 
     compile project(':PokeGOAPI-Java')
-
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
     compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.21'

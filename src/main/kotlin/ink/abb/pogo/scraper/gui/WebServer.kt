@@ -11,9 +11,11 @@ package ink.abb.pogo.scraper.gui
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
+import org.apache.commons.io.IOUtils
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -32,7 +34,7 @@ class WebServer {
 
         @Throws(IOException::class)
         override fun handle(t: HttpExchange) {
-            var string = String(Files.readAllBytes(Paths.get("src/main/resources/gui/index.html")))
+            var string = IOUtils.toString(ClassLoader.getSystemClassLoader().getResourceAsStream("gui/index.html"), StandardCharsets.UTF_8);
             string = string.replace("{{socketPort}}", socketPort.toString())
             val bytes = string.toByteArray(Charset.forName("UTF-8"))
             t.responseHeaders.set("Content-Type", "text/html; charset=UTF-8")
