@@ -14,6 +14,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.inventory.size
 import java.text.DecimalFormat
 
 class UpdateProfile : Task {
@@ -32,9 +33,11 @@ class UpdateProfile : Task {
             Log.normal("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
             Log.normal("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
                     "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
-                    "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()}; " +
+                    "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};\n" +
                     "Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}; " +
-                    "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
+                    "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
+                    "Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}"                    
+            )
         } catch (e: Exception) {
         }
     }
