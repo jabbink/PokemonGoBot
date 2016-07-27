@@ -70,11 +70,8 @@ class ReleasePokemon : Task {
             return false
         }
         val name = pokemon.pokemonId.name
-        if (!pokemonCounts.containsKey(name)) {
-            pokemonCounts.set(name, 0)
-        }
-        val count = pokemonCounts.get(name)!! + 1
-        pokemonCounts.set(name, count)
+        val count = pokemonCounts.getOrElse(name, { 0 }) + 1
+        pokemonCounts.put(name, count)
         return (count > max)
     }
 }
