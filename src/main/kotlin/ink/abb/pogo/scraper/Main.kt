@@ -41,7 +41,16 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
             GoogleCredentialProvider(http, token)
         }
     } else {
-        PtcCredentialProvider(http, username, password)
+        try {
+            PtcCredentialProvider(http, username, password)
+        } catch (e: LoginFailedException) {
+            throw e
+        } catch (e: RemoteServerException) {
+            throw e
+        } catch (e: Exception) {
+            // sometimes throws ArrayIndexOutOfBoundsException or other RTE's
+            throw RemoteServerException(e)
+        }
     }
 
     return auth
