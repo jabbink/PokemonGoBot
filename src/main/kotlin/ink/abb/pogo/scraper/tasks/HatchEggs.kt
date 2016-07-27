@@ -19,7 +19,7 @@ import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 class HatchEggs : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val freeIncubators = ctx.api.inventories.incubators.filter { !it.isInUse }
+        val freeIncubators = ctx.api.inventories.incubators.filter { it.kmTarget <= ctx.api.playerProfile.stats.kmWalked }
         val eggs = ctx.api.inventories.hatchery.eggs
                 .filter { it.eggIncubatorId == null || it.eggIncubatorId.isBlank() }
                 .sortedByDescending { it.eggKmWalkedTarget }
