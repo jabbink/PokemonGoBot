@@ -91,24 +91,25 @@ class Entry:
             try:
                 frameNone
             except NameError:
-                frameNone = LabelFrame(root, text="Unknown")
+                frameNone = ttk.LabelFrame(root, text="Unknown")
                 frameNone.grid(column=3, row=0, rowspan=2)
             self.parent = frameNone
             noneRow += 1
             self.row = noneRow
             self.col = 0
-        self.label = tk.Label(self.parent, text=self.text)
-        self.label.grid(row=self.row, column=self.col)
+        self.label = ttk.Label(self.parent, text=self.text)
+        self.label.grid(row=self.row, column=self.col, sticky="nesw")
         if self.val not in tf:
-            self.entry = tk.Entry(self.parent)
+            self.entry = ttk.Entry(self.parent)
             self.entry.grid(row=self.row, column=(self.col + 1))
             self.entry.insert(END, self.val)
         if self.val in tf:
-            self.var = tk.StringVar(self.parent)
+            self.var = StringVar(self.parent)
             self.var.set(value)
-            self.entry = OptionMenu(self.parent, self.var, *tf)
-            self.entry.grid(row=self.row, column=(self.col + 1), sticky="ew")
-            # self.entry.insert(END, self.val)
+            self.entry = ttk.OptionMenu(self.parent, self.var, *tf)
+            self.entry.grid(row=self.row, column=(self.col + 1), sticky="nesw")
+        self.entry.columnconfigure(1, weight=1)
+        self.entry.grid_rowconfigure(0, weight=1)
 
 
 def save():
@@ -205,9 +206,9 @@ def make_entries():
         entries.append("".join(name))
         del name[:]
         del val[:]
-        save_button = tk.Button(None, text="Save", command=save)
+        save_button = ttk.Button(None, text="Save", command=save)
         save_button.grid(row=5, column=1)
-        reset_button = tk.Button(None, text="Reset", command=lambda: reset(True))
+        reset_button = ttk.Button(None, text="Reset", command=lambda: reset(True))
         reset_button.grid(row=5, column=2)
 
 
@@ -350,23 +351,31 @@ if alive:
     root = tk.Tk()
     root.resizable(width=False, height=False)
     root.title("Pokemon GO Bot Configuration Tool")
-    frameLogin = LabelFrame(root, text="Login")
-    frameLogin.grid(rowspan=1)
-    frameLocation = LabelFrame(root, text="Location")
-    frameLocation.grid()
-    frameItems = LabelFrame(root, text="Items")
-    frameItems.grid(rowspan=3)
-    frameTransfer = LabelFrame(root, text="Transfer")
-    frameTransfer.grid(column=1, rowspan=2, row=0, columnspan=2)
-    frameLog = LabelFrame(root, text="Logging")
-    frameLog.grid(column=1, row=2, rowspan=1, columnspan=2)
-    frameGui = LabelFrame(root, text="Web GUI")
-    frameGui.grid(column=1, row=3, columnspan=2)
-    frameJobs = LabelFrame(root, text="Jobs")
-    frameJobs.grid(column=1, row=4, columnspan=2)
+    frameLogin = ttk.LabelFrame(root, text="Login")
+    frameLogin.grid(rowspan=1, sticky="ewns", columnspan=2)
+    frameLocation = ttk.LabelFrame(root, text="Location")
+    frameLocation.grid(rowspan=1, sticky="ewns", columnspan=2)
+    frameItems = ttk.LabelFrame(root, text="Items")
+    frameItems.grid(rowspan=3, sticky="ewns", columnspan=2)
+    frameTransfer = ttk.LabelFrame(root, text="Transfer")
+    frameTransfer.grid(column=2, rowspan=2, row=0, columnspan=2, sticky="ewns")
+    frameLog = ttk.LabelFrame(root, text="Logging")
+    frameLog.grid(column=2, row=2, rowspan=1, columnspan=2, sticky="ewns")
+    frameGui = ttk.LabelFrame(root, text="Web GUI")
+    frameGui.grid(column=2, row=3, columnspan=2, sticky="ewns")
+    frameJobs = ttk.LabelFrame(root, text="Jobs")
+    frameJobs.grid(column=2, row=4, columnspan=2, sticky="ewns")
     menu_bar = Menu(root)
     menu_bar.add_cascade(label="About", command=display_about)
     root.config(menu=menu_bar)
+    for x in range(60):
+        Grid.columnconfigure(root, x, weight=1)
+    for y in range(30):
+        Grid.rowconfigure(root, y, weight=1)
+    s = ttk.Style()
+    print(s.theme_names())
+    s.theme_use('vista')
+    print(s.theme_use())
     loop = threading.Thread(target=thread_loop)
     loop.daemon = True
     loop.start()
