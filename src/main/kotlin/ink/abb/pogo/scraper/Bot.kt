@@ -19,6 +19,7 @@ import ink.abb.pogo.scraper.util.Helper
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -40,7 +41,8 @@ class Bot(var api: PokemonGo, val settings: Settings) {
             Pair(AtomicInteger(0), AtomicInteger(0))            
     )
 
-    fun run() {
+    @Synchronized
+    fun start() {
 
         Log.normal();
         Log.normal("Name: ${ctx.profile.username}")
@@ -65,7 +67,7 @@ class Bot(var api: PokemonGo, val settings: Settings) {
         }
         api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
             val IV = it.getIvPercentage()
-            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV%"
+            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV% \r\n ${it.getStatsFormatted()}"
         }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
@@ -173,5 +175,13 @@ class Bot(var api: PokemonGo, val settings: Settings) {
                 ctx.api = api2
             }
         }        
+    }
+
+    @Synchronized
+    fun stop() {
+        // do something
+
+        Log.red("Stopping bot loops...")
+        Log.red("All bot loops stopped.")
     }
 }

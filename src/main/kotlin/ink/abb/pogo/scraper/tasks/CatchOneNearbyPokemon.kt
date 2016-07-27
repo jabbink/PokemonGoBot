@@ -18,6 +18,7 @@ import ink.abb.pogo.scraper.util.Helper
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.pokemon.catch
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -54,6 +55,7 @@ class CatchOneNearbyPokemon : Task {
                     var message = "Caught a ${catchablePokemon.pokemonId} " +
                             "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV $iv%"
 
+                    message += "\r\n ${encounterResult.wildPokemon.pokemonData.getStatsFormatted()}"
                     if (settings.shouldDisplayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
                                 "Candy, ${result.stardustList.sum()}x Stardust]"

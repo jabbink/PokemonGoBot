@@ -179,5 +179,9 @@ fun main(args: Array<String>) {
     val settings = Settings(properties)
 
     val (api, auth) = login()
-    Bot(api, settings).run()
+    
+    val bot = Bot(api, settings)
+    Runtime.getRuntime().addShutdownHook(thread(start = false) {bot.stop() })
+
+    bot.start()
 }

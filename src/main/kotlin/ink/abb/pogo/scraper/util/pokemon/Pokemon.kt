@@ -33,3 +33,13 @@ fun PokemonData.getIvPercentage(): Int {
     val ivPercentage = (iv * 100) / 45
     return ivPercentage
 }
+
+fun PokemonData.getStatsFormatted(): String{
+    val details = "Stamina: $individualStamina | Attack: $individualAttack | Defense: $individualDefense"
+    return details + " | IV: ${getIv()} (${(getIvPercentage())}%)"
+}
+
+fun Pokemon.getStatsFormatted(): String{
+    val details = "Stamina: $individualStamina | Attack: $individualAttack | Defense: $individualDefense"
+    return details + " | IV: ${getIv()} (${(getIvPercentage())}%)"
+}
