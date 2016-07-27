@@ -122,7 +122,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             try {
                 var cancelled = false
                 while (!cancelled && isRunning()) {
-                    val start = System.currentTimeMillis()
+                    val start = api.currentTimeMillis()
 
                     try {
                         block({ cancelled = true })
@@ -133,7 +133,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
                     if(cancelled) continue
 
-                    val sleep = timeout - (System.currentTimeMillis() - start)
+                    val sleep = timeout - (api.currentTimeMillis() - start)
+
                     if (sleep > 0) {
                         try {
                             runningLatch.await(sleep, TimeUnit.MILLISECONDS)

@@ -12,12 +12,15 @@ import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.*
 import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
+import com.pokegoapi.util.SystemTimeImpl
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
+
+val time = SystemTimeImpl()
 
 fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
     val username = settings.username
@@ -36,12 +39,12 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
                     settings.setToken(googleAuthTokenJson.refreshToken)
                     settings.writeToken("config.properties")
                 }
-            })
+            }, time)
         } else {
-            GoogleCredentialProvider(http, token)
+            GoogleCredentialProvider(http, token, time)
         }
     } else {
-        PtcCredentialProvider(http, username, password)
+        PtcCredentialProvider(http, username, password, time)
     }
 
     return auth
@@ -93,7 +96,7 @@ fun main(args: Array<String>) {
     var api: PokemonGo? = null
     do {
         try {
-            api = PokemonGo(auth, http)
+            api = PokemonGo(auth, http, time)
         } catch (e: LoginFailedException) {
             Log.red("Server refused your login credentials. Are they correct?")
             System.exit(1)
