@@ -79,7 +79,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
 
     private fun selectRandom(pokestops: List<Pokestop>, ctx: Context): Pokestop {
         // Select random pokestop while taking the distance into account
-        // E.g. pokestop is closer to the user -> higher probabilty to be chosen
+        // E.g. pokestop is closer to the user -> higher probability to be chosen
 
         if (pokestops.size < 2)
             return pokestops.first()
