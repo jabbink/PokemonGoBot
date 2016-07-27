@@ -39,11 +39,11 @@ val itemToPokeball = mapOf(
         Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL)
 )
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, amount: Int): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, amount: Int): CatchResult? {
     var result: CatchResult?
     var numThrows = 0
     do {
-        result = catch(captureProbability, itemBag, desiredCatchProbability)
+        result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries)
 
         if (result != null && result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED) {
             break
@@ -60,11 +60,11 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     return result
 }
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false): CatchResult? {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     var ball: ItemId? = null
-    var needCurve = false
+    var needCurve = alwaysCurve
     var needRazzBerry = false
     var highestAvailable: ItemId? = null
     for ((index, ballType) in ballTypes.withIndex()) {
@@ -105,7 +105,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     itemBag.getItem(ball).count--
 
     val razzBerryCount = itemBag.getItem(ItemId.ITEM_RAZZ_BERRY).count
-    if (razzBerryCount > 0 && needRazzBerry) {
+    if (allowBerries && razzBerryCount > 0 && needRazzBerry) {
         logMessage += "; Using Razz Berry"
         useItem(ItemId.ITEM_RAZZ_BERRY)
         itemBag.getItem(ItemId.ITEM_RAZZ_BERRY).count--

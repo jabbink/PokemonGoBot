@@ -20,14 +20,11 @@ import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean
+import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
-        val ignoredPokemon = settings.ignoredPokemon
-        val obligatoryTransfer = settings.obligatoryTransfer
-        val minIVPercentage = settings.transferIVThreshold
-        val minCP = settings.transferCPThreshold
         val sortByIV = settings.sortByIV
 
         // there is still a pokemon release process
@@ -52,27 +49,9 @@ class ReleasePokemon : Task {
                         val ivPercentage = pokemon.getIvPercentage()
                         // never transfer highest rated Pokemon (except for obligatory transfer)
                         if (settings.obligatoryTransfer.contains(pokemon.pokemonId.name) || index >= settings.keepPokemonAmount) {
-                            // stop releasing when pokemon is set in ignoredPokemon
-                            if (!ignoredPokemon.contains(pokemon.pokemonId.name)) {
-                                var shouldRelease = obligatoryTransfer.contains(pokemon.pokemonId.name)
-                                var reason: String
-                                if (shouldRelease) {
-                                    reason = "Obligatory release"
-                                } else {
-                                    var ivTooLow = false
-                                    var cpTooLow = false
 
-                                    // never transfer > min IV percentage (unless set to -1)
-                                    if (ivPercentage < minIVPercentage || minIVPercentage == -1) {
-                                        ivTooLow = true
-                                    }
-                                    // never transfer > min CP  (unless set to -1)
-                                    if (pokemon.cp < minCP || minCP == -1) {
-                                        cpTooLow = true
-                                    }
-                                    reason = "CP < $minCP and IV < $minIVPercentage%"
-                                    shouldRelease = ivTooLow && cpTooLow
-                                }
+                                val (shouldRelease, reason) = pokemon.shouldTransfer(settings)
+
                                 if (shouldRelease) {                                
 
                                     ctx.releasing.getAndSet(true)
@@ -95,8 +74,7 @@ class ReleasePokemon : Task {
                                     }
 
                                     ctx.releasing.getAndSet(false)
-                                }
-                            }
+                                }                            
                         }
                     }
                 }                
