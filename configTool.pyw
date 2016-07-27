@@ -352,7 +352,6 @@ def thread_loop():
             save_button.grid_forget()
             reset_button.grid_forget()
             make_entries()
-        time.sleep(0.1)
 # check_template()
 try:
     default_file = open(file_name, "r")
@@ -388,15 +387,22 @@ if alive:
     menu_bar = Menu(root)
     s = ttk.Style()
     print(s.theme_names())
-    s.theme_use('vista')
     themeMenu = Menu(menu_bar, tearoff=0)
-    themeMenu.add_command(label="winnative", command=lambda: set_theme("winnative"))
+    try:
+        s.theme_use('vista')
+        win = 1
+    except tkinter.TclError:
+        s.theme_use('clam')
+        win = 0
+    if win == 1:
+        themeMenu.add_command(label="winnative", command=lambda: set_theme("winnative"))
+        themeMenu.add_command(label="vista", command=lambda: set_theme("vista"))
+        themeMenu.add_command(label="xpnative", command=lambda: set_theme("xpnative"))
     themeMenu.add_command(label="clam", command=lambda: set_theme("clam"))
     themeMenu.add_command(label="alt", command=lambda: set_theme("alt"))
     themeMenu.add_command(label="default", command=lambda: set_theme("default"))
     themeMenu.add_command(label="classic", command=lambda: set_theme("classic"))
-    themeMenu.add_command(label="vista", command=lambda: set_theme("vista"))
-    themeMenu.add_command(label="xpnative", command=lambda: set_theme("xpnative"))
+
     menu_bar.add_cascade(label="About", command=display_about)
     menu_bar.add_cascade(label="Theme", menu=themeMenu)
     root.config(menu=menu_bar)
