@@ -1,6 +1,8 @@
 package ink.abb.pogo.scraper.tasks
 
+import POGOProtos.Enums.PokemonFamilyIdOuterClass
 import POGOProtos.Enums.PokemonIdOuterClass
+import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.api.pokemon.PokemonMetaRegistry
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
@@ -16,62 +18,93 @@ import kotlin.comparisons.compareBy
 class SmartEvolve : Task {
 
     lateinit private var release: ReleasePokemon
+    lateinit private var EEVEE_EVOLUTION_DATA: Map<PokemonIdOuterClass.PokemonId, String>
 
     constructor(release: ReleasePokemon) {
         this.release = release
+
+        EEVEE_EVOLUTION_DATA = mapOf(
+                Pair(PokemonIdOuterClass.PokemonId.VAPOREON, "Rainer"),
+                Pair(PokemonIdOuterClass.PokemonId.FLAREON, "Pyro"),
+                Pair(PokemonIdOuterClass.PokemonId.JOLTEON, "Sparky")
+        )
     }
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val pokebagFillPercent = ctx.api.inventories.pokebank.pokemons.size.toDouble() / ctx.profile.pokemonStorage
         Log.white("Pokebag ${pokebagFillPercent * 100} % full.")
-        val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
-        if (pokebagFillPercent >= 0.7) {
-            val canEvolve = groupedPokemon.filter {
-                PokemonMetaRegistry.getMeta(it.key).candyToEvolve > 0
-            }
-            if (canEvolve.isEmpty()) {
-                return
-            }
-            val evolveSorted = canEvolve.entries.map({ group ->
-                val descendant = PokemonMetaRegistry.getHightestForFamily(PokemonMetaRegistry.getMeta(group.key).family)
-                if (group.key == PokemonIdOuterClass.PokemonId.EEVEE) {
-                    Pair(-1, group)
-                } else if (ctx.api.inventories.pokedex.getPokedexEntry(descendant) == null) {
-                    Pair(0, group)
-                } else {
-                    Pair(PokemonMetaRegistry.getMeta(group.key).candyToEvolve, group)
-                }
-            }).sortedWith(compareBy { it.first })
+        if (pokebagFillPercent >= 0.5) {
+            val pokemonFamilies = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonFamily }
 
-            evolveSorted.forEach {
-                val poke = it.second
-                val sorted = poke.value.sortedByDescending {
-                    if (settings.sortByIV) {
-                        (it.ivRatio * 100).toInt()
-                    } else {
-                        it.cp
+            pokemonFamilies.forEach {
+                var run = true
+                while (run) {
+                    val pokemon = nextPokemonToEvolve(ctx, settings, it.key)
+                    if (pokemon == null) {
+                        run = false
+                        continue
                     }
-                }
-                val candyNeeded = PokemonMetaRegistry.getMeta(poke.key).candyToEvolve
-                for ((index, pokemon) in sorted.withIndex()) {
-                    if (ctx.api.inventories.candyjar.getCandies(pokemon.pokemonFamily) < candyNeeded) {
-                        break;
-                    }
-                    if (pokemon.pokemonId == PokemonIdOuterClass.PokemonId.EEVEE) {
-                        if (ctx.api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.VAPOREON) == null) {
-                            pokemon.renamePokemon("Rainer")
-                        } else if (ctx.api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.FLAREON) == null) {
-                            pokemon.renamePokemon("Pyro")
-                        } else if (ctx.api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.JOLTEON) == null) {
-                            pokemon.renamePokemon("Sparky")
-                        }
-                    }
-                    Log.green("Evolving ${pokemon.pokemonId.name} because we have ${pokemon.candy} candy and only need ${candyNeeded}.")
+
+                    Log.green("Evolving ${pokemon.pokemonId.name} with IV ${pokemon.ivRatio} and ${pokemon.cp}cp")
                     pokemon.evolve()
+
+                    // This might work. not sure
+//                    if (pokemon.pokemonFamily == PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_EEVEE) {
+//                        pokemon.renamePokemon("")
+//                    }
                 }
             }
 
             release.run(bot,ctx,settings)
         }
+    }
+
+    /*
+     * Prioritize IV over xp farming
+     */
+    fun nextPokemonToEvolve(ctx: Context, settings: Settings, family: PokemonFamilyIdOuterClass.PokemonFamilyId) : Pokemon? {
+        val familyMetas = PokemonMetaRegistry.meta.filter { it.value.family == family }
+
+        if (familyMetas.size == 1) {
+            return null
+        }
+
+        val candies = ctx.api.inventories.candyjar.getCandies(family)
+        val pokemonFamily = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonFamily }.get(family)
+
+        var evolvePriority = pokemonFamily.orEmpty().sortedByDescending { it.ivRatio }
+        var pokemonToEvolve = evolvePriority[0]
+
+        if (pokemonToEvolve.candiesToEvolve == 0) {
+            val generations = pokemonFamily.orEmpty().filter { it.candiesToEvolve > 0 }.groupBy { it.candiesToEvolve }
+            if (generations.size == 0) {
+                Log.white("Only have pokemon that cannot evolve in ${family.name}")
+                return null
+            }
+
+            evolvePriority = generations.getOrElse(generations.keys.sorted()[0]){ listOf() }.sortedByDescending { it.ivRatio }
+            pokemonToEvolve = evolvePriority[0]
+        }
+
+        if (pokemonToEvolve.candiesToEvolve > candies) {
+            return null
+        }
+
+        if (pokemonToEvolve.pokemonId == PokemonIdOuterClass.PokemonId.EEVEE) {
+            EEVEE_EVOLUTION_DATA.forEach {
+                if (ctx.api.inventories.pokedex.getPokedexEntry(it.component1()) == null) {
+                    pokemonToEvolve.renamePokemon(it.component2())
+                    return pokemonToEvolve
+                }
+
+                val current = ctx.api.inventories.pokebank.getPokemonByPokemonId(it.key).sortedByDescending { it.ivRatio }
+                if (current[0].ivRatio < pokemonToEvolve.ivRatio) {
+                    pokemonToEvolve.renamePokemon(it.component2())
+                    return pokemonToEvolve
+                }
+            }
+        }
+
+        return pokemonToEvolve
     }
 }
