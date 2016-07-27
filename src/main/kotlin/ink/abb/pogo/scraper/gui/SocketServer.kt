@@ -17,8 +17,10 @@ import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.requiredXp
+import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import kotlin.concurrent.thread
 
 class SocketServer {
     private var ctx: Context? = null
@@ -28,7 +30,6 @@ class SocketServer {
 
     fun start(ctx: Context, port: Int) {
         val config = Configuration()
-        config.hostname = "localhost"
         config.port = port
 
         this.ctx = ctx
@@ -51,6 +52,11 @@ class SocketServer {
             }
         }
 
+        Runtime.getRuntime().addShutdownHook(thread(start = false) {
+            Log.red("Stopping SocketServer...")
+            server?.stop()
+            Log.red("Stopped SocketServer.")
+        })
         server?.start()
     }
 

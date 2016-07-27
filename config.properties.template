@@ -23,7 +23,7 @@ random_next_pokestop_selection=5
 
 ## Walking
 # Meters per second
-speed=1.94
+speed=2.8
 
 # Should the bot follow the streets (true) or just go directly to pokestops/waypoints
 follow_streets = true
@@ -79,6 +79,9 @@ autotransfer=true
 # minimum amount of pokemon type to keep
 keep_pokemon_amount=1
 
+# maximum amount of pokemon type to keep (-1 to keep all)
+max_pokemon_amount=-1
+
 # Sort by IV first instead of CP
 sort_by_iv=false
 
@@ -87,6 +90,13 @@ always_curve=false
 
 # Never use berries
 never_use_berries=true
+
+# Allow leaving the starting area
+allow_leave_start_area=false
+
+# Max distance from starting point the bot should ever go in meters
+# (-1: only limited by the initial pokestops (~3*3km); with allow_leave_start_area=true unlimited)
+spawn_radius=-1
 
 # Set Profile Update Timer (Default: 60)
 profile_update_timer=60
