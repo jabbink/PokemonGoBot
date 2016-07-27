@@ -85,6 +85,9 @@ always_curve=false
 # Never use berries
 never_use_berries=true
 
+# Allow leaving the starting area
+allow_leave_start_area=false
+
 # Set Profile Update Timer (Default: 60)
 profile_update_timer=60
 

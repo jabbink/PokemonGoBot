@@ -26,13 +26,15 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
     private val lootTimeouts = HashMap<String, Long>()
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        try {
-            val newStops = ctx.api.map.mapObjects.pokestops
-            if (newStops.size > 0) {
-                pokestops = newStops
+        if (settings.allowLeaveStartArea) {
+            try {
+                val newStops = ctx.api.map.mapObjects.pokestops
+                if (newStops.size > 0) {
+                    pokestops = newStops
+                }
+            } catch (e: Exception) {
+                // ignored failed request
             }
-        } catch (e: Exception) {
-            // ignored failed request
         }
         val sortedPokestops = pokestops.sortedWith(Comparator { a, b ->
             val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)

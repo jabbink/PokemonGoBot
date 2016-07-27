@@ -87,6 +87,8 @@ class Settings(val properties: Properties) {
 
     val neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", true, String::toBoolean)
 
+    val allowLeaveStartArea = getPropertyIfSet("Allow leaving the starting area", "allow_leave_start_area", false, String::toBoolean)
+
     val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
 
     val transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", 80, String::toInt)
