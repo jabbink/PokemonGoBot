@@ -106,7 +106,10 @@ class Entry:
         if self.val in tf:
             self.var = StringVar(self.parent)
             self.var.set(value)
-            self.entry = ttk.OptionMenu(self.parent, self.var, *tf)
+            if self.val == "true":
+                self.entry = ttk.OptionMenu(self.parent, self.var, "true", *tf)
+            if self.val == "false":
+                self.entry = ttk.OptionMenu(self.parent, self.var, "false", *tf)
             self.entry.grid(row=self.row, column=(self.col + 1), sticky="nesw")
         self.entry.columnconfigure(1, weight=1)
         self.entry.grid_rowconfigure(0, weight=1)
@@ -116,7 +119,16 @@ def save():
     cfg_file = open(file_name_2, "w")
     cfg_file.truncate()
     for box in entries:
-        things = globals()[box].text
+        try:
+            del box_text[:]
+        except:
+            pass
+        box_text = []
+        for char in globals()[box].text:
+            if char == " ":
+                char = "_"
+            box_text.append(char)
+        things = "".join(box_text).lower()
         things += "="
         try:
             things += globals()[box].entry.get()
@@ -206,9 +218,9 @@ def make_entries():
         entries.append("".join(name))
         del name[:]
         del val[:]
-        save_button = ttk.Button(None, text="Save", command=save)
+        save_button = ttk.Button(frameTools, text="Save", command=save)
         save_button.grid(row=5, column=1)
-        reset_button = ttk.Button(None, text="Reset", command=lambda: reset(True))
+        reset_button = ttk.Button(frameTools, text="Reset", command=lambda: reset(True))
         reset_button.grid(row=5, column=2)
 
 
@@ -347,6 +359,11 @@ except FileNotFoundError:
     tkinter.messagebox.showerror("Missing file!", "Could not find config.properties.template, please ensure that"
                                                   " it is next to this file")
     alive = False
+
+
+def set_theme(new_theme):
+    print(new_theme)
+    s.theme_use(new_theme)
 if alive:
     root = tk.Tk()
     root.resizable(width=False, height=False)
@@ -365,17 +382,27 @@ if alive:
     frameGui.grid(column=2, row=3, columnspan=2, sticky="ewns")
     frameJobs = ttk.LabelFrame(root, text="Jobs")
     frameJobs.grid(column=2, row=4, columnspan=2, sticky="ewns")
+    frameTools = ttk.LabelFrame(root, text="Tools")
+    frameTools.grid(column=0, row=5, columnspan=4, sticky="ewns")
     menu_bar = Menu(root)
+    s = ttk.Style()
+    print(s.theme_names())
+    s.theme_use('vista')
+    themeMenu = Menu(menu_bar, tearoff=0)
+    themeMenu.add_command(label="winnative", command=lambda: set_theme("winnative"))
+    themeMenu.add_command(label="clam", command=lambda: set_theme("clam"))
+    themeMenu.add_command(label="alt", command=lambda: set_theme("alt"))
+    themeMenu.add_command(label="default", command=lambda: set_theme("default"))
+    themeMenu.add_command(label="classic", command=lambda: set_theme("classic"))
+    themeMenu.add_command(label="vista", command=lambda: set_theme("vista"))
+    themeMenu.add_command(label="xpnative", command=lambda: set_theme("xpnative"))
     menu_bar.add_cascade(label="About", command=display_about)
+    menu_bar.add_cascade(label="Theme", menu=themeMenu)
     root.config(menu=menu_bar)
     for x in range(60):
         Grid.columnconfigure(root, x, weight=1)
     for y in range(30):
         Grid.rowconfigure(root, y, weight=1)
-    s = ttk.Style()
-    print(s.theme_names())
-    s.theme_use('vista')
-    print(s.theme_use())
     loop = threading.Thread(target=thread_loop)
     loop.daemon = True
     loop.start()
