@@ -85,6 +85,9 @@ always_curve=false
 # Never use berries
 never_use_berries=true
 
+# Set Timer for profile,Xp,lvl update. (Default: 60)
+set_timer=60
+
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
 transfer_iv_threshold=80
