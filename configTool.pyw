@@ -250,6 +250,7 @@ def display_about():
     link2.bind("<Button-1>", callback2)
     l = tk.Label(t, text="Made using Python 3.5.2")
     l.pack(side="top", fill="both", expand=True)
+    t.focus()
 template_lines = []
 properties_lines = []
 current_line = []
@@ -284,7 +285,6 @@ def thread_loop():
             save_button.grid_forget()
             reset_button.grid_forget()
             make_entries()
-# check_template()
 try:
     default_file = open(file_name, "r")
 except FileNotFoundError:
@@ -334,7 +334,6 @@ if alive:
     themeMenu.add_command(label="alt", command=lambda: set_theme("alt"))
     themeMenu.add_command(label="default", command=lambda: set_theme("default"))
     themeMenu.add_command(label="classic", command=lambda: set_theme("classic"))
-
     menu_bar.add_cascade(label="About", command=display_about)
     menu_bar.add_cascade(label="Theme", menu=themeMenu)
     root.config(menu=menu_bar)
