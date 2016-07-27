@@ -31,7 +31,7 @@ loot_pokestop=true
 # Should the bot catch pokemons (true/false)
 catch_pokemon=true
 
-# Shout the bot auto fill incubators with eggs (true/false)
+# Should the bot auto fill incubators with eggs (true/false)
 auto_fill_incubator=true
 
 ## Items drop
