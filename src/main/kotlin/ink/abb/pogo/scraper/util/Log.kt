@@ -15,37 +15,62 @@ class Log {
 
     companion object {
 
-        private val green_ = "\u001B[32m"
         private val black_ = "\u001B[30m"
-        private val yellow_ = "\u001B[33m"
-        private val red_ = "\u001B[31m"
-        private val white_ = "\u001B[37m"
+        private val red_ = "\u001B[31;1m"
+        private val green_ = "\u001B[32;1m"
+        private val yellow_ = "\u001B[33;1m"
+        private val blue_ = "\u001B[34;1m"
+        private val magenta_ = "\u001B[35;1m"
+        private val cyan_ = "\u001B[36;1m"
+        private val white_ = "\u001B[1m"
         private val reset = "\u001B[0m"
 
         var format = SimpleDateFormat("dd MMM HH:mm:ss")
 
-        fun green(text: String) {
-            println("${green_}${format.format(Date())}: $text ${reset}")
+        private fun output(text: String, color: String? = null) {
+            val output = "${format.format(Date())}: $text"
+            if (color != null) {
+                println("${color}$output ${reset}")
+            } else {
+                println(output)
+            }
         }
 
-        fun normal(text: String) {
-            println("${format.format(Date())}: $text")
+        fun normal(text: String = "") {
+            output(text)
         }
 
-        fun red(text: String) {
-            println("${red_}${format.format(Date())}: $text ${reset}")
+        fun black(text: String = "") {
+            output(text, black_)
         }
 
-        fun yellow(text: String) {
-            println("${yellow_}${format.format(Date())}: $text ${reset}")
+        fun red(text: String = "") {
+            output(text, red_)
         }
 
-        fun white(text: String) {
-            println("${white_}${format.format(Date())}: $text ${reset}")
+        fun green(text: String = "") {
+            output(text, green_)
         }
 
-        fun black(text: String) {
-            println("${black_}${format.format(Date())}: $text ${reset}")
+        fun yellow(text: String = "") {
+            output(text, yellow_)
         }
+
+        fun blue(text: String = "") {
+            output(text, blue_)
+        }
+
+        fun magenta(text: String = "") {
+            output(text, magenta_)
+        }
+
+        fun cyan(text: String = "") {
+            output(text, cyan_)
+        }
+
+        fun white(text: String = "") {
+            output(text, white_)
+        }
+
     }
 }

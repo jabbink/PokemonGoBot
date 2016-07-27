@@ -8,94 +8,112 @@
 
 package ink.abb.pogo.scraper
 
-import ink.abb.pogo.scraper.util.Log
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
 import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.auth.GoogleLogin
-import com.pokegoapi.auth.PtcLogin
+import com.pokegoapi.auth.*
+import com.pokegoapi.exceptions.LoginFailedException
+import com.pokegoapi.exceptions.RemoteServerException
+import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
-import java.net.InetSocketAddress
-import java.net.Proxy
-import java.security.cert.X509Certificate
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.security.cert.CertificateException
+import kotlin.concurrent.thread
 
-/**
- * Allow all certificate to debug with https://github.com/bettse/mitmdump_decoder
- */
-fun allowProxy(builder: OkHttpClient.Builder) {
-    builder.proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved("localhost", 8888)))
-    val trustAllCerts = arrayOf<TrustManager>(object : javax.net.ssl.X509TrustManager {
-        override fun getAcceptedIssuers(): Array<out X509Certificate> {
-            return emptyArray()
+fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
+    val username = settings.username
+    val password = settings.password
+
+    val token = settings.token()
+
+    val auth = if (username.contains('@')) {
+        if (token.isBlank()) {
+            GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
+                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {
+                }
+
+                override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
+                    Log.normal("Setting Google refresh token in your config")
+                    settings.setToken(googleAuthTokenJson.refreshToken)
+                    settings.writeToken("config.properties")
+                }
+            })
+        } else {
+            GoogleCredentialProvider(http, token)
         }
+    } else {
+        PtcCredentialProvider(http, username, password)
+    }
 
-        @Throws(CertificateException::class)
-        override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
-        }
-
-        @Throws(CertificateException::class)
-        override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
-        }
-    })
-
-    // Install the all-trusting trust manager
-    val sslContext = SSLContext.getInstance("SSL")
-    sslContext.init(null, trustAllCerts, java.security.SecureRandom())
-    // Create an ssl socket factory with our all-trusting manager
-    val sslSocketFactory = sslContext.socketFactory
-
-    builder.sslSocketFactory(sslSocketFactory)
-    builder.hostnameVerifier { hostname, session -> true }
+    return auth
 }
 
 fun main(args: Array<String>) {
     val builder = OkHttpClient.Builder()
-    // allowProxy(builder)
     builder.connectTimeout(60, TimeUnit.SECONDS)
     builder.readTimeout(60, TimeUnit.SECONDS)
     builder.writeTimeout(60, TimeUnit.SECONDS)
     val http = builder.build()
 
     val properties = Properties()
-    FileInputStream("config.properties").use {
+
+    val input = FileInputStream("config.properties")
+    input.use {
         properties.load(it)
     }
+    input.close()
 
     val settings = Settings(properties)
 
-    val username = settings.username
-    val password = settings.password
-
-    val token = settings.token
-
     Log.normal("Logging in to game server...")
-    val auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
 
-    auth = if (token.isBlank()) {
-        if (username.contains('@')) {
-            GoogleLogin(http).login(username, password)
-        } else {
-            PtcLogin(http).login(username, password)
+    val retryCount = 3
+    val errorTimeout = 1000L
+
+    var retries = retryCount
+
+    var auth: CredentialProvider? = null
+    do {
+        try {
+            auth = getAuth(settings, http)
+        } catch (e: LoginFailedException) {
+            Log.red("Server refused your login credentials. Are they correct?")
+            System.exit(1)
+            return
+        } catch (e: RemoteServerException) {
+            Log.red("Server returned unexpected error")
+            if (retries-- > 0) {
+                Log.normal("Retrying...")
+                Thread.sleep(errorTimeout)
+            }
         }
-    } else {
-        if (token.contains("pokemon.com")) {
-            PtcLogin(http).login(token)
-        } else {
-            GoogleLogin(http).login(token)
+    } while (auth == null && retries >= 0)
+
+    retries = retryCount
+
+    var api: PokemonGo? = null
+    do {
+        try {
+            api = PokemonGo(auth, http)
+        } catch (e: LoginFailedException) {
+            Log.red("Server refused your login credentials. Are they correct?")
+            System.exit(1)
+            return
+        } catch (e: RemoteServerException) {
+            Log.red("Server returned unexpected error")
+            if (retries-- > 0) {
+                Log.normal("Retrying...")
+                Thread.sleep(errorTimeout)
+            }
         }
+    } while (api == null && retries >= 0)
+
+    if (api == null) {
+        Log.red("Failed to login. Stopping")
+        System.exit(1)
+        return
     }
 
-    Log.normal("Logged in as $username with token ${auth.token.contents}")
-
-    if (token.isBlank()) {
-        Log.normal("Set this token in your config to log in directly")
-    }
-    val api = PokemonGo(auth, http)
+    Log.normal("Logged in as ${settings.username}")
 
     print("Getting profile data from pogo server")
     while (api.playerProfile == null) {
@@ -104,5 +122,8 @@ fun main(args: Array<String>) {
     }
     println(".")
 
-    Bot(api, settings).run()
+    val bot = Bot(api, settings)
+    Runtime.getRuntime().addShutdownHook(thread(start = false) { bot.stop() })
+
+    bot.start()
 }

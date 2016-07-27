@@ -17,6 +17,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.map.canLoot
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -26,12 +27,15 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val nearbyPokestops = sortedPokestops.filter {
-            it.inRange() && lootTimeouts.getOrElse(it.id, { 0 }) < System.currentTimeMillis()
+            it.canLoot(lootTimeouts = lootTimeouts)
         }
 
-        if (nearbyPokestops.size > 0) {
+        if (nearbyPokestops.isNotEmpty()) {
             val closest = nearbyPokestops.first()
-            Log.normal("Looting nearby pokestop ${closest.id}")
+            var pokestopID = closest.id
+            if (settings.shouldDisplayPokestopName)
+                pokestopID = "\"${closest.details.name}\""
+            Log.normal("Looting nearby pokestop $pokestopID")
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
             val result = closest.loot()
 
@@ -40,7 +44,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
             }
             when (result.result) {
                 Result.SUCCESS -> {
-                    var message = "Looted pokestop ${closest.id}; +${result.experience} XP"
+                    var message = "Looted pokestop $pokestopID; +${result.experience} XP"
                     if (settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
                     Log.green(message)
@@ -48,7 +52,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     //checkResult(result)
                 }
                 Result.INVENTORY_FULL -> {
-                    var message = "Looted pokestop ${closest.id}; +${result.experience} XP, but inventory is full"
+                    var message = "Looted pokestop $pokestopID; +${result.experience} XP, but inventory is full"
                     if (settings.shouldDisplayPokestopSpinRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
 
@@ -66,7 +70,12 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     lootTimeouts.put(closest.id, System.currentTimeMillis() + cooldownPeriod * 60 * 1000)
                     Log.red("Pokestop still in cooldown mode; blacklisting for $cooldownPeriod minutes")
                 }
-                else -> println(result.result)
+                Result.NO_RESULT_SET -> {
+                    val cooldownPeriod = 5
+                    lootTimeouts.put(closest.id, System.currentTimeMillis() + cooldownPeriod * 60 * 1000)
+                    Log.red("Server refuses to loot this Pokestop (usually temporary issue); blacklisting for $cooldownPeriod minutes")
+                }
+                else -> Log.yellow(result.result.toString())
             }
         }
     }
@@ -82,3 +91,4 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
         }
     }
 }
+

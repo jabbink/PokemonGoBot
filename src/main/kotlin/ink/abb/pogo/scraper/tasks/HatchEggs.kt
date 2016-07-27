@@ -8,22 +8,40 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import ink.abb.pogo.scraper.util.Log
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class HatchEggs : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        val result = ctx.api.inventories.hatchery.queryHatchedEggs()
+        if (result.isNotEmpty()) {
+            ctx.api.inventories.updateInventories(true)
+            result.forEachIndexed { index, it ->
+                val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
+                val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
+                if (newPokemon == null) {
+                    Log.cyan("Hatched pokemon; $stats")
+                } else {
+                    Log.cyan("Hatched ${newPokemon.pokemonId.name} with ${newPokemon.cp} CP " +
+                            "and ${newPokemon.getIvPercentage()}% IV; $stats")
+                }
+            }
+        }
+
         val freeIncubators = ctx.api.inventories.incubators.filter { !it.isInUse }
-        val eggs = ctx.api.inventories.hatchery.eggs.filter { it.eggIncubatorId == null || it.eggIncubatorId.isBlank() }
-        if (freeIncubators.isNotEmpty() && eggs.isNotEmpty()) {
-            val result = freeIncubators.first().hatchEgg(eggs.first())
+        val eggs = ctx.api.inventories.hatchery.eggs
+                .filter { !it.isIncubate }
+                .sortedByDescending { it.eggKmWalkedTarget }
+        if (freeIncubators.isNotEmpty() && eggs.isNotEmpty() && settings.shouldAutoFillIncubators) {
+            val result = eggs.first().incubate(freeIncubators.first())
             if (result == UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse.Result.SUCCESS) {
-                Log.green("Put egg ${eggs.first().id} in unused incubator")
+                Log.cyan("Put egg of ${eggs.first().eggKmWalkedTarget}km in unused incubator")
             } else {
                 Log.red("Failed to put egg in incubator; error: $result")
             }

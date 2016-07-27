@@ -1,4 +1,4 @@
 rootProject.name = 'pogo.scraper'
 
-/*include ':PokeGOAPI-Java'
-project(':PokeGOAPI-Java').projectDir = file('../PokeGOAPI-Java')*/
+include ':PokeGOAPI-Java'
+project(':PokeGOAPI-Java').projectDir = file('lib/PokeGOAPI-Java')

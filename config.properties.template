@@ -9,11 +9,30 @@ base64_password=
 token=
 latitude=
 longitude=
-preferred_ball=ITEM_POKE_BALL
+
+# desired probability to catch Pokemon with 1 throw
+desired_catch_probability=0.4
+
+# desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)
+# set to -1 to not attempt catching at all
+desired_catch_probability_unwanted=0.0
+
+# number of nearest unused pokestops to randomly select
+# the next pokestop from (1/infinite)
+random_next_pokestop_selection=5
 
 ## Walking
 # Meters per second
-speed=2.778
+speed=1.94
+
+# Should the bot loot the pokestops (true/false)
+loot_pokestop=true
+
+# Should the bot catch pokemons (true/false)
+catch_pokemon=true
+
+# Shout the bot auto fill incubators with eggs (true/false)
+auto_fill_incubator=true
 
 ## Items drop
 # should the bot EVER drop items (true/false)
@@ -34,18 +53,37 @@ item_master_ball=50
 item_razz_berry=50
 
 ## Extra Info
-# should the bot display information of where it's walking to (true/false)
-display_walking_nearest_unused=false
-
 # should the bot display rewards pokestop (true/false)
 display_pokestop_rewards=true
 
 # should the bot display rewards when catching pokemon (true/false)
 display_pokemon_catch_rewards=true
 
+# Display Keepalive Coordinates
+display_keepalive=true
+
+# should the bot display information of where it's walking to (true/false)
+# this will show the name of the pokestop that it's walking to and
+# replace on the loot log the pokestop id for its name
+# WARNING:  this will increase the https requests without any need. if
+#           the servers are slow it's recommended to turn off this setting
+display_pokestop_name=false
+
 ## Pokemon Transfer
 # should the bot auto transfer duplicate pokemon
-autotransfer=false
+autotransfer=true
+
+# minimum amount of pokemon type to keep
+keep_pokemon_amount=1
+
+# Sort by IV first instead of CP
+sort_by_iv=false
+
+# Always throw curveballs
+always_curve=false
+
+# Never use berries
+never_use_berries=true
 
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
@@ -53,9 +91,6 @@ transfer_iv_threshold=80
 
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
-
-# Only walk (hatch eggs, don't collect pokemon or pokestops)
-walk_only=false
 
 # list of pokemon you don't want to transfer regardless of CP
 # the names must be divided by a ","

@@ -8,64 +8,91 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import ink.abb.pogo.scraper.util.Log
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse.Status
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.inventory.hasPokeballs
+import ink.abb.pogo.scraper.util.pokemon.catch
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val pokemon = ctx.api.map.catchablePokemon
+        val pokemon = ctx.api.map.catchablePokemon.filter { !ctx.blacklistedEncounters.contains(it.encounterId) }
+
+        val hasPokeballs = ctx.api.inventories.itemBag.hasPokeballs()
+
+        if (!hasPokeballs) {
+            return
+        }
 
         if (pokemon.isNotEmpty()) {
             val catchablePokemon = pokemon.first()
-            var ball: ItemId? = null
-            try {
-                val preferred_ball = settings.preferredBall
-                var item = ctx.api.inventories.itemBag.getItem(preferred_ball)
-
-                // if we dont have our prefered pokeball, try fallback to other
-                if (item == null || item.count == 0)
-                    for (other in settings.pokeballItems) {
-                        if (preferred_ball == other) continue
-
-                        item = ctx.api.inventories.itemBag.getItem(other.key);
-                        if (item != null && item.count > 0)
-                            ball = other.key
-                    }
-                else
-                    ball = preferred_ball
-            } catch (e: Exception) {
-                throw e
+            if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId.name) && settings.desiredCatchProbabilityUnwanted == -1.0) {
+                ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                Log.normal("Found pokemon ${catchablePokemon.pokemonId}; blacklisting because it's unwanted")
+                return
             }
+            Log.green("Found pokemon ${catchablePokemon.pokemonId}")
+            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
 
-            if (ball != null) {
-                val usedPokeball = settings.pokeballItems[ball]
-                Log.green("Found pokemon ${catchablePokemon.pokemonId}")
-                ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
-                val encounterResult = catchablePokemon.encounterPokemon()
-                if (encounterResult.wasSuccessful()) {
-                    Log.green("Encountered pokemon ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp}")
-                    val result = catchablePokemon.catchPokemon(usedPokeball)
-
-                    if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
-                        ctx.pokemonStats.first.andIncrement
-                        var message = "Caught a ${catchablePokemon.pokemonId} with CP ${encounterResult.wildPokemon.pokemonData.cp} using $ball"
-
-                        if (settings.shouldDisplayPokemonCatchRewards)
-                            message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x Candy, ${result.stardustList.sum()}x Stardust]"
-                        Log.green(message)
-
-                    } else
-                        Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+            val encounterResult = catchablePokemon.encounterPokemon()
+            if (encounterResult.wasSuccessful()) {
+                Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
+                        "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV ${encounterResult.wildPokemon.pokemonData.getIvPercentage()}%")
+                val (shouldRelease, reason) = encounterResult.wildPokemon.pokemonData.shouldTransfer(settings)
+                val desiredCatchProbability = if (shouldRelease) {
+                    Log.yellow("Using desired_catch_probability_unwanted because $reason")
+                    settings.desiredCatchProbabilityUnwanted
                 } else {
-                    Log.red("Encounter failed with result: ${encounterResult.getStatus()}")
-                } 
-            }
+                    settings.desiredCatchProbability
+                }
+                if (desiredCatchProbability == -1.0) {
+                    ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    Log.normal("CP/IV of encountered pokemon ${catchablePokemon.pokemonId} turns out to be too low; blacklisting encounter")
+                    return
+                }
+                val result = catchablePokemon.catch(
+                        encounterResult.captureProbability,
+                        ctx.api.inventories.itemBag,
+                        desiredCatchProbability,
+                        settings.alwaysCurve,
+                        !settings.neverUseBerries,
+                        -1)
 
+                if (result == null) {
+                    // prevent trying it in the next iteration
+                    ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    Log.red("No Pokeballs in your inventory; blacklisting Pokemon")
+                    return
+                }
+
+                if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                    ctx.pokemonStats.first.andIncrement
+                    val iv = (encounterResult.wildPokemon.pokemonData.individualAttack + encounterResult.wildPokemon.pokemonData.individualDefense + encounterResult.wildPokemon.pokemonData.individualStamina) * 100 / 45
+                    var message = "Caught a ${catchablePokemon.pokemonId} " +
+                            "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV $iv%"
+                    message += "\r\n ${encounterResult.wildPokemon.pokemonData.getStatsFormatted()}"
+                    if (settings.shouldDisplayPokemonCatchRewards)
+                        message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
+                                "Candy, ${result.stardustList.sum()}x Stardust]"
+                    Log.cyan(message)
+
+                } else
+                    Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+            } else {
+                Log.red("Encounter failed with result: ${encounterResult.status}")
+                if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
+                    Log.red("Disabling catching of Pokemon")
+                    settings.shouldCatchPokemons = false
+                }
+            }
         }
     }
 }

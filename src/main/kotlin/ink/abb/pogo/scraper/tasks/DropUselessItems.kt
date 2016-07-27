@@ -8,23 +8,19 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import ink.abb.pogo.scraper.util.Log
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
 
 class DropUselessItems : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (!settings.shouldDropItems) {
-            return
-        }
-
         settings.uselessItems.forEach {
             val item = ctx.api.inventories.itemBag.getItem(it.key)
             val count = item.count - it.value
-            if (it.value != -1 &&count > 0) {
+            if (it.value != -1 && count > 0) {
                 val result = ctx.api.inventories.itemBag.removeItem(it.key, count)
                 if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
                     ctx.itemStats.second.getAndAdd(count)
