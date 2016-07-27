@@ -23,6 +23,7 @@ class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         val sortByIV = settings.sortByIV
+        val pokemonCounts = hashMapOf<String, Int>()
 
         groupedPokemon.forEach {
             val sorted = if (sortByIV) {
@@ -37,7 +38,14 @@ class ReleasePokemon : Task {
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon (except for obligatory transfer)
                     if (settings.obligatoryTransfer.contains(pokemon.pokemonId.name) || index >= settings.keepPokemonAmount) {
-                        val (shouldRelease, reason) = pokemon.shouldTransfer(settings)
+                        var (shouldRelease, reason) = pokemon.shouldTransfer(settings)
+
+                        if (!shouldRelease) {
+                            if (isTooMany(settings, pokemonCounts, pokemon)) {
+                                shouldRelease = true
+                                reason = "Too many"
+                            }
+                        }
 
                         if (shouldRelease) {
                             Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
@@ -55,5 +63,16 @@ class ReleasePokemon : Task {
                 }
             }
         }
+    }
+
+    fun isTooMany(settings: Settings, pokemonCounts: MutableMap<String, Int>, pokemon: Pokemon): Boolean {
+        val max = settings.maxPokemonAmount
+        if (max == -1) {
+            return false
+        }
+        val name = pokemon.pokemonId.name
+        val count = pokemonCounts.getOrElse(name, { 0 }) + 1
+        pokemonCounts.put(name, count)
+        return (count > max)
     }
 }
