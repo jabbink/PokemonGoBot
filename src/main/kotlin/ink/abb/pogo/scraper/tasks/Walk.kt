@@ -85,11 +85,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
-        if (hasLure) {
-            Log.magenta("Walking to pokestop with lure ${end.toStringDegrees()} in $stepsRequired steps.")
-        } else {
-            Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
-        }
+        Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
         val pauseWalk:AtomicBoolean = AtomicBoolean(false)
