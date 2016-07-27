@@ -100,12 +100,9 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         runLoop(TimeUnit.SECONDS.toMillis(settings.profileUpdateTimer), "ProfileLoop") {
             task(profile)
-        }
-		
-	runLoop(TimeUnit.SECONDS.toMillis(60), "HatchEggsLoop") {
             task(hatchEggs)
         }
-
+        
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
             if (settings.shouldCatchPokemons)
