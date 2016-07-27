@@ -147,22 +147,25 @@ class Settings(val properties: Properties) {
         properties.setProperty("token", value)
     }
 
-    fun writeToken(propertyFile: String) {
+    fun writeProperty(propertyFile: String, key: String) {
+        // TODO: This function does not work with lists, like obligatory_transfer
         val file = BufferedReader(FileReader(propertyFile))
         var propertiesText = String()
-        var foundToken = false
+        var foundKey = false
+
+        val newKeyValue = "$key=${this.properties.getProperty(key)}\r\n"
 
         file.lines().forEach {
-            if (it != null && it.startsWith("token")) {
-                propertiesText += "token=${this.properties.getProperty("token")}\n"
-                foundToken = true
+            if (it != null && it.startsWith(key)) {
+                propertiesText += newKeyValue
+                foundKey = true
             } else if (it != null) {
-                propertiesText += "$it\n"
+                propertiesText += "$it\r\n"
             }
         }
 
-        if (!foundToken) {
-            propertiesText += "token=${this.properties.getProperty("token")}\n"
+        if (!foundKey) {
+            propertiesText += newKeyValue
         }
         file.close()
 

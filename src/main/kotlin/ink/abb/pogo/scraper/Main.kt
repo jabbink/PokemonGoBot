@@ -37,7 +37,7 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
                 override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
                     Log.normal("Setting Google refresh token in your config")
                     settings.setToken(googleAuthTokenJson.refreshToken)
-                    settings.writeToken("config.properties")
+                    settings.writeProperty("config.properties", "token")
                 }
             }, time)
         } else {
