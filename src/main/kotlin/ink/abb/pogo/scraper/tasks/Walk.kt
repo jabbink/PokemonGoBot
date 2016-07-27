@@ -35,7 +35,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             walk(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
-                it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
+                val canLoot = it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
+                if (settings.spawnRadius == -1) {
+                    canLoot
+                } else {
+                    val distanceToStart = settings.startingLocation.getEarthDistance(S2LatLng.fromDegrees(it.latitude, it.longitude))
+                    canLoot && distanceToStart < settings.spawnRadius
+                }
             }
 
             if (nearestUnused.isNotEmpty()) {
