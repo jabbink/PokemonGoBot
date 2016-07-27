@@ -22,7 +22,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // don't run away when there are still Pokemon around
         val pokemonCount = ctx.api.map?.catchablePokemon?.filter { !ctx.blacklistedEncounters.contains(it.encounterId) }?.size
-        if (pokemonCount != null && pokemonCount > 0) {
+        if (pokemonCount != null && pokemonCount > 0 && settings.shouldCatchPokemons) {
             return
         }
         if (!ctx.walking.compareAndSet(false, true)) {
