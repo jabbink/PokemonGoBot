@@ -3,6 +3,7 @@ import time
 import threading
 from tkinter import *
 import tkinter as tk
+from tkinter import ttk
 import tkinter.messagebox
 import webbrowser
 fileDir = os.path.dirname(os.path.realpath('__file__'))
