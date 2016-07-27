@@ -42,7 +42,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
             if (nearestUnused.isNotEmpty()) {
                 // Select random pokestop from the 5 nearest while taking the distance into account
-                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx, settings)
+                val chosenPokestop = select(nearestUnused.take(settings.randomNextPokestop), ctx, settings)
 
                 ctx.server.sendPokestop(chosenPokestop)
 
@@ -72,9 +72,9 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
-        if(hasLure){
+        if (hasLure) {
             Log.magenta("Walking to pokestop with lure ${end.toStringDegrees()} in $stepsRequired steps.")
-        }else {
+        } else {
             Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         }
         var remainingSteps = stepsRequired
@@ -82,20 +82,20 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         var walking = true
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             // don't run away when there are still Pokemon around
-            if(walking) {
-                if(bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+            if (walking) {
+                if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     walking = false
                     Log.normal("Pausing to catch pokemon...")
                 } // Else continue walking.
             } else {
-                if(bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
+                if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
                     walking = true
                     Log.normal("Resuming walk.")
                 } // Else continue waiting.
             }
 
-            if(!walking) {
+            if (!walking) {
                 return@runLoop
             }
 
@@ -116,6 +116,32 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 cancel()
             }
         }
+    }
+
+    private fun select(pokestops: List<Pokestop>, ctx: Context, settings: Settings): Pokestop {
+        // Select a pokestop from config
+        // if no special rules, use selectRandom
+
+        // Rule 1 : lurePokestopModifier = -1
+        // always go to neareast lure ( at range )
+        if (settings.lurePokestopModifier < 0) {
+
+            val pokestopsWithLure: List<Pokestop> = pokestops.filter {
+                it.hasLurePokemon()
+            }
+            if (pokestopsWithLure.isNotEmpty()) {
+                val currentPosition = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
+
+                val pokestopsOrder: List<Pokestop> = pokestopsWithLure.sortedBy {
+                    val end = S2LatLng.fromDegrees(it.latitude, it.longitude)
+                    currentPosition.getEarthDistance(end)
+                }
+
+                return pokestopsOrder.first()
+            }
+        }
+
+        return selectRandom(pokestops, ctx, settings)
     }
 
     private fun selectRandom(pokestops: List<Pokestop>, ctx: Context, settings: Settings): Pokestop {
