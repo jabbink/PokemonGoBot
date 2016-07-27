@@ -15,10 +15,9 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.map.canLoot
+import ink.abb.pogo.scraper.util.map.canLoot;
 
-class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
-
+class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // don't run away when there are still Pokemon around
         val pokemonCount = ctx.api.map?.catchablePokemon?.filter { !ctx.blacklistedEncounters.contains(it.encounterId) }?.size
@@ -29,22 +28,31 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
             return
         }
 
-        val nearestUnused = sortedPokestops.filter {
-            it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
-        }
+        if (ctx.server.coordinatesToGoTo.size > 0) {
+            val coordinates = ctx.server.coordinatesToGoTo.first()
+            ctx.server.coordinatesToGoTo.removeAt(0)
+            Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
+            walk(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+        } else {
+            val nearestUnused: List<Pokestop> = sortedPokestops.filter {
+                it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
+            }
 
-        if (nearestUnused.isNotEmpty()) {
-            // Select random pokestop from the 5 nearest while taking the distance into account
-            val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx)
+            if (nearestUnused.isNotEmpty()) {
+                // Select random pokestop from the 5 nearest while taking the distance into account
+                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx)
 
-            if (settings.shouldDisplayPokestopName)
-                Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
+                ctx.server.sendPokestop(chosenPokestop)
 
-            walk(bot, ctx, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed)
+                if (settings.shouldDisplayPokestopName)
+                    Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
+
+                walk(bot, ctx, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+            }
         }
     }
 
-    fun walk(bot: Bot, ctx: Context, end: S2LatLng, speed: Double) {
+    fun walk(bot: Bot, ctx: Context, end: S2LatLng, speed: Double, sendDone: Boolean) {
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
@@ -68,9 +76,17 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
+
+            ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+
             remainingSteps--
             if (remainingSteps <= 0) {
                 Log.normal("Destination reached.")
+
+                if (sendDone) {
+                    ctx.server.sendGotoDone()
+                }
+
                 ctx.walking.set(false)
                 cancel()
             }

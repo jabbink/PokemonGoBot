@@ -42,7 +42,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries)
 
         if (result == null ||
-                (result != null && result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED)) {
+                (result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED)) {
             break
         }
         numThrows++
