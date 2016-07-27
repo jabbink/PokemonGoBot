@@ -292,7 +292,7 @@
             <div>
                 <input type="button" id="gpx_upload_button" value="Upload GPX file">
                 <input type="file" id="gpx_upload" accept=".gpx">
-                <input type="checkbox" id="map_autofollow"><label for="map_autofollow">Autofollow</label>
+                <input type="checkbox" id="map_autofollow" checked><label for="map_autofollow">Autofollow</label>
             </div>
             <div id="map"></div>
         </div>
@@ -407,7 +407,7 @@
                 notification_caught_pokemon: false,
                 notification_next_level: true
             },
-            autofollow: false
+            autofollow: true
         };
 
         $(function() {
@@ -705,7 +705,7 @@
         function init() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: {lat: 0, lng: 0},
-                zoom: 1
+                zoom: 16
             });
             google.maps.event.addListener(map, "rightclick", function(event) {
                 var lat = event.latLng.lat();
