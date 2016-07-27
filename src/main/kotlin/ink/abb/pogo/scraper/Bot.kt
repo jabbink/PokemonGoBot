@@ -53,7 +53,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
         Log.normal("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
+        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.pokemonStorage}")
         Log.normal("Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}")
         //Log.normal("Inventory bag ${ctx.api.bag}")
 

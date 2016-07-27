@@ -37,7 +37,7 @@ class UpdateProfile : Task {
             Log.white("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
                     "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
                     "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};\n" +
-                    "Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}; " +
+                    "Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.pokemonStorage}; " +
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
                     "Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}"
             )
