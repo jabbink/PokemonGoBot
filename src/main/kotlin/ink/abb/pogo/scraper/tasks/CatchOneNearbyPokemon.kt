@@ -87,7 +87,6 @@ class CatchOneNearbyPokemon : Task {
                     ctx.server.newPokemon(catchablePokemon.latitude, catchablePokemon.longitude, encounterResult.wildPokemon.pokemonData)
                     ctx.server.sendProfile()
                 } else {
-                    ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
                     if (result.status == CatchPokemonResponse.CatchStatus.CATCH_ERROR) {
                         Log.red("Blacklisting pokemon to prevent infinite loop")
