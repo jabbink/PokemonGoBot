@@ -78,7 +78,7 @@ class CatchOneNearbyPokemon : Task {
                     if (settings.shouldDisplayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
                                 "Candy, ${result.stardustList.sum()}x Stardust]"
-                    Log.green(message)
+                    Log.cyan(message)
 
                 } else
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
