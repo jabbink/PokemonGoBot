@@ -33,7 +33,11 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             val coordinates = ctx.server.coordinatesToGoTo.first()
             ctx.server.coordinatesToGoTo.removeAt(0)
             Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
-            walkRoute(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            if (settings.shouldFollowStreets) {
+                walkRoute(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            } else {
+                walk(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            }
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
                 it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
@@ -47,8 +51,11 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
                 if (settings.shouldDisplayPokestopName)
                     Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
-
-                walkRoute(bot, ctx, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                if (settings.shouldFollowStreets) {
+                    walkRoute(bot, ctx, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                } else {
+                    walk(bot, ctx, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                }
             }
         }
     }
@@ -95,9 +102,44 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
     }
 
     fun walkRoute(bot: Bot, ctx: Context, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
-        val coordinateList = getRouteCoordinates(start, end)
-        coordinateList.forEach { walk(bot, ctx, it, speed, sendDone) }
+        if (speed.equals(0)) {
+            return
+        }
+        val timeout = 200L
+        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end)
+        bot.runLoop(timeout, "WalkingLoop") { cancel ->
+            val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
+            val step = coordinatesList.first()
+            coordinatesList.removeAt(0)
+            val diff = step.sub(start)
+            val distance = start.getEarthDistance(step)
+            val timeRequired = distance / speed
+            val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
+            if (stepsRequired.equals(0)) {
+                cancel()
+            }
+            val deltaLat = diff.latDegrees() / stepsRequired
+            val deltaLng = diff.lngDegrees() / stepsRequired
+            var remainingSteps = stepsRequired
+            while (remainingSteps > 0) {
+                ctx.lat.addAndGet(deltaLat)
+                ctx.lng.addAndGet(deltaLng)
+                ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+                remainingSteps--
+                Thread.sleep(timeout)
+            }
+
+            if (coordinatesList.size <= 0) {
+                Log.normal("Destination reached.")
+
+                if (sendDone) {
+                    ctx.server.sendGotoDone()
+                }
+
+                ctx.walking.set(false)
+                cancel()
+            }
+        }
     }
 
     private fun selectRandom(pokestops: List<Pokestop>, ctx: Context): Pokestop {
