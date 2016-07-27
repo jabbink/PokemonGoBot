@@ -76,12 +76,12 @@ fun getPokemonGo(settings: Settings, http: OkHttpClient): Pair<PokemonGo, AuthIn
     val retryCount = 3
 
     // try to get a token 3 times; in case of stored token, immediately returns
-    val auth = getAuth(settings, http, retryCount)
+    var auth = getAuth(settings, http, retryCount)
 
     // did not get AuthInfo? Means no token was set and it failed to login 3 times
     if (auth != null) {
         // Got a token: try to contact Niantic
-        val api = try {
+        var api = try {
             PokemonGo(auth, http)
         } catch (e: Exception) {
             null
@@ -94,11 +94,11 @@ fun getPokemonGo(settings: Settings, http: OkHttpClient): Pair<PokemonGo, AuthIn
                 // remove it
                 settings.setToken("")
                 // try logging in 3 times without a stored token
-                val auth = getAuth(settings, http, retryCount)
+                auth = getAuth(settings, http, retryCount)
                 // got a new auth?
                 if (auth != null) {
                     // great, try to contact niantic again
-                    val api = try {
+                    api = try {
                         PokemonGo(auth, http)
                     } catch (e: Exception) {
                         null
@@ -165,6 +165,7 @@ fun login(): Pair<PokemonGo, AuthInfo> {
     return Pair(api, auth)
 }
 
+@Suppress("UNUSED_VARIABLE")
 fun main(args: Array<String>) {
 
     val properties = Properties()

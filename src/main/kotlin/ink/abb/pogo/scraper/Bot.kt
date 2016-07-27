@@ -138,6 +138,7 @@ class Bot(var api: PokemonGo, val settings: Settings) {
 
     }
 
+    @Suppress("UNUSED_VARIABLE")
     fun synctask(task: Task) {
         synchronized(ctx) {
             synchronized(settings) {
@@ -148,7 +149,7 @@ class Bot(var api: PokemonGo, val settings: Settings) {
 
                     lfe.printStackTrace()
 
-                    var (api2, auth2) = login()
+                    val (api2, auth) = login()
 
                     synchronized(ctx) {
                         ctx.api = api2
@@ -158,6 +159,7 @@ class Bot(var api: PokemonGo, val settings: Settings) {
         }
     }
 
+    @Suppress("UNUSED_VARIABLE")
     fun task(task: Task) {
         try {
             task.run(this, ctx, settings)
@@ -165,7 +167,7 @@ class Bot(var api: PokemonGo, val settings: Settings) {
 
             lfe.printStackTrace()
 
-            var (api2, auth2) = login()
+            val (api2, auth) = login()
 
             synchronized(ctx) {
                 ctx.api = api2
