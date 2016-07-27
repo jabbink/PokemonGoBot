@@ -63,14 +63,7 @@ class SocketServer {
             profile.levelRatio = ratio
             profile.pokebank = ctx!!.api.inventories.pokebank.pokemons.size
             profile.pokebankMax = ctx!!.api.playerProfile.pokemonStorage
-
-            // Replace with @pr0ves method
-            var count = 0
-            ctx!!.api.inventories.itemBag.items.toMutableList().forEach {
-                count += it.count
-            }
-            profile.items = count
-
+            profile.items = ctx!!.api.inventories.itemBag.size()
             profile.itemsMax = ctx!!.api.playerProfile.itemStorage
             server?.broadcastOperations?.sendEvent("profile", profile)
         }
