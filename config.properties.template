@@ -97,7 +97,7 @@ transfer_cp_threshold=400
 # if you want all pokemons to be transferred just leave it blank
 ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
 
-# list of pokemon you always want to trancsfer regardless of CP
+# list of pokemon you always want to transfer regardless of CP
 obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
 
 #List of pokemon names
