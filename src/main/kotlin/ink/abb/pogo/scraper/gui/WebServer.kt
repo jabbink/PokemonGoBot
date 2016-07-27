@@ -13,27 +13,31 @@ import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
 import java.io.IOException
 import java.net.InetSocketAddress
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
 
 class WebServer {
     @Throws(Exception::class)
-    fun start(port: Int) {
+    fun start(port: Int, socketPort: Int) {
         Thread(){
             val server = HttpServer.create(InetSocketAddress(port), 0)
-            server.createContext("/", RootHandler())
+            server.createContext("/", RootHandler(socketPort))
             server.executor = null
             server.start()
         }.start()
     }
 
-    inner class RootHandler : HttpHandler {
+    inner class RootHandler(val socketPort: Int) : HttpHandler {
+
         @Throws(IOException::class)
         override fun handle(t: HttpExchange) {
-            val encoded = Files.readAllBytes(Paths.get("gui/index.html"))
+            var string = String(Files.readAllBytes(Paths.get("src/main/resources/gui/index.html")))
+            string = string.replace("{{socketPort}}", socketPort.toString())
+            val bytes = string.toByteArray(Charset.forName("UTF-8"))
             t.responseHeaders.set("Content-Type", "text/html; charset=UTF-8")
-            t.sendResponseHeaders(200, encoded.size.toLong())
-            t.responseBody.write(encoded)
+            t.sendResponseHeaders(200, bytes.size.toLong())
+            t.responseBody.write(bytes)
             t.responseBody.close()
         }
     }

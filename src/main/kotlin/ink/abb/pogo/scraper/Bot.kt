@@ -27,7 +27,6 @@ import java.util.concurrent.Phaser
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.thread
 
 class Bot(val api: PokemonGo, val settings: Settings) {
@@ -123,7 +122,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         if(settings.guiPort > 0){
             Log.normal("Running webserver on port ${settings.guiPort}")
-            WebServer().start(settings.guiPort)
+            WebServer().start(settings.guiPort, settings.guiPortSocket)
             ctx.server.start(ctx, settings.guiPortSocket)
         }
     }

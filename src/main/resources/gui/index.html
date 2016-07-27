@@ -251,6 +251,26 @@
             color: white;
         }
 
+        span.white {
+            color: white;
+        }
+
+        span.black {
+            color: #777;
+        }
+
+        span.blue {
+            color: #28f;
+        }
+
+        span.magenta {
+            color: #f0f;
+        }
+
+        span.cyan {
+            color: #0ff;
+        }
+
         /* === NOTIFICATIONS  === */
         #window-notifications {
             width: 300px;
@@ -526,7 +546,7 @@
             }
         }
 
-        var socket = io.connect('ws://localhost:8001');
+        var socket = io.connect('ws://' + window.location.hostname + ':{{socketPort}}');
 
         var currentLevel;
 
