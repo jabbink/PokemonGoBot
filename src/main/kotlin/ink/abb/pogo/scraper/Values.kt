@@ -1,3 +1,11 @@
+/**
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper
 
 val requiredXp = arrayOf(0, 1000, 3000, 6000, 10000, 15000, 21000, 28000, 36000, 45000, 55000, 65000, 75000,
