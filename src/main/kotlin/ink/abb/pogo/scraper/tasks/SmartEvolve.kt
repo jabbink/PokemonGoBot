@@ -3,14 +3,11 @@ package ink.abb.pogo.scraper.tasks
 import POGOProtos.Enums.PokemonFamilyIdOuterClass
 import POGOProtos.Enums.PokemonIdOuterClass
 import com.pokegoapi.api.pokemon.Pokemon
-import com.pokegoapi.api.pokemon.PokemonMetaRegistry
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.comparisons.compareBy
 
 /**
  * Created by ddcbdevins on 7/26/16.
@@ -63,12 +60,6 @@ class SmartEvolve : Task {
      * Prioritize IV over xp farming
      */
     fun nextPokemonToEvolve(ctx: Context, settings: Settings, family: PokemonFamilyIdOuterClass.PokemonFamilyId) : Pokemon? {
-        val familyMetas = PokemonMetaRegistry.meta.filter { it.value.family == family }
-
-        if (familyMetas.size == 1) {
-            return null
-        }
-
         val candies = ctx.api.inventories.candyjar.getCandies(family)
         val pokemonFamily = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonFamily }.get(family)
 
