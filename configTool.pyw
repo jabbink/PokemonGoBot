@@ -215,6 +215,7 @@ def make_entries():
                             val.append(char)
         done = True
         cRow += 1
+        val.pop(-1)
         globals()["".join(name)] = Entry("".join(name), "".join(val))
         entries.append("".join(name))
         del name[:]
@@ -415,3 +416,4 @@ if alive:
     loop.start()
     mainloop()
     alive = False
+
