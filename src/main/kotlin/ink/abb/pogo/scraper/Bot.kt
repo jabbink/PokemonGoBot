@@ -102,7 +102,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             task(profile)
         }
 		
-		runLoop(TimeUnit.SECONDS.toMillis(settings.profileUpdateTimer), "HatchEggsLoop") {
+	runLoop(TimeUnit.SECONDS.toMillis(60), "HatchEggsLoop") {
             task(hatchEggs)
         }
 
