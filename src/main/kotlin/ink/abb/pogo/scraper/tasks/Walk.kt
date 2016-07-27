@@ -51,7 +51,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
             if (nearestUnused.isNotEmpty()) {
                 // Select random pokestop from the 5 nearest while taking the distance into account
-                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx)
+                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx, settings)
 
                 ctx.server.sendPokestop(chosenPokestop)
 
@@ -268,7 +268,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
     }
 
-    private fun selectRandom(pokestops: List<Pokestop>, ctx: Context): Pokestop {
+    private fun selectRandom(pokestops: List<Pokestop>, ctx: Context, settings: Settings): Pokestop {
         // Select random pokestop while taking the distance into account
         // E.g. pokestop is closer to the user -> higher probabilty to be chosen
 
@@ -279,13 +279,17 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         val distances = pokestops.map {
             val end = S2LatLng.fromDegrees(it.latitude, it.longitude)
-            currentPosition.getEarthDistance(end)
+            if (it.hasLurePokemon()) {
+                currentPosition.getEarthDistance(end) / settings.lurePokestopModifier
+            } else {
+                currentPosition.getEarthDistance(end)
+            }
         }
         val totalDistance = distances.sum()
 
         // Get random value between 0 and 1
         val random = Math.random()
-        var cumulativeProbability = 0.0;
+        var cumulativeProbability = 0.0
 
         for ((index, pokestop) in pokestops.withIndex()) {
             // Calculate probabilty proportional to the closeness
