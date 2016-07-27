@@ -32,7 +32,7 @@ class ReleasePokemon : Task {
             }
             for ((index, pokemon) in sorted.withIndex()) {
                 // don't drop favorited, deployed, or nicknamed pokemon
-                val isFavourite = pokemon.nickname.isNotBlank() || pokemon.isFavorite || pokemon.deployedFortId != null
+                val isFavourite = pokemon.nickname.isNotBlank() || pokemon.isFavorite || !pokemon.deployedFortId.isEmpty()
                 if (!isFavourite) {
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon (except for obligatory transfer)
