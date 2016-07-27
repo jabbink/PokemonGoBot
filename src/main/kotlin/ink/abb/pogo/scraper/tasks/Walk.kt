@@ -15,7 +15,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.map.canLoot;
+import ink.abb.pogo.scraper.util.map.canLoot
 
 class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -32,7 +32,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             val coordinates = ctx.server.coordinatesToGoTo.first()
             ctx.server.coordinatesToGoTo.removeAt(0)
             Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
-            walk(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            walk(bot, ctx, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true, false)
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
                 it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
@@ -40,19 +40,19 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
             if (nearestUnused.isNotEmpty()) {
                 // Select random pokestop from the 5 nearest while taking the distance into account
-                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx)
+                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx, settings)
 
                 ctx.server.sendPokestop(chosenPokestop)
 
                 if (settings.shouldDisplayPokestopName)
                     Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
 
-                walk(bot, ctx, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                walk(bot, ctx, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false, chosenPokestop.hasLurePokemon())
             }
         }
     }
 
-    fun walk(bot: Bot, ctx: Context, end: S2LatLng, speed: Double, sendDone: Boolean) {
+    fun walk(bot: Bot, ctx: Context, end: S2LatLng, speed: Double, sendDone: Boolean, hasLure: Boolean) {
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
@@ -70,7 +70,11 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
-        Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
+        if(hasLure){
+            Log.magenta("Walking to pokestop with lure ${end.toStringDegrees()} in $stepsRequired steps.")
+        }else {
+            Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
+        }
         var remainingSteps = stepsRequired
 
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
@@ -93,7 +97,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
     }
 
-    private fun selectRandom(pokestops: List<Pokestop>, ctx: Context): Pokestop {
+    private fun selectRandom(pokestops: List<Pokestop>, ctx: Context, settings: Settings): Pokestop {
         // Select random pokestop while taking the distance into account
         // E.g. pokestop is closer to the user -> higher probabilty to be chosen
 
@@ -104,13 +108,17 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         val distances = pokestops.map {
             val end = S2LatLng.fromDegrees(it.latitude, it.longitude)
-            currentPosition.getEarthDistance(end)
+            if (it.hasLurePokemon()) {
+                currentPosition.getEarthDistance(end) / settings.lurePokestopModifier
+            } else {
+                currentPosition.getEarthDistance(end)
+            }
         }
         val totalDistance = distances.sum()
 
         // Get random value between 0 and 1
         val random = Math.random()
-        var cumulativeProbability = 0.0;
+        var cumulativeProbability = 0.0
 
         for ((index, pokestop) in pokestops.withIndex()) {
             // Calculate probabilty proportional to the closeness

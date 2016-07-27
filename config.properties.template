@@ -28,6 +28,9 @@ speed=1.94
 # Should the bot loot the pokestops (true/false)
 loot_pokestop=true
 
+# How a lure is more attractive than a standard pokestop ( 2 -> twice, etc )
+lure_pokestop_modifier=1.0
+
 # Should the bot catch pokemons (true/false)
 catch_pokemon=true
 

@@ -78,6 +78,7 @@ class Settings(val properties: Properties) {
     val shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean)
 
     val shouldLootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", true, String::toBoolean)
+    val lurePokestopModifier = getPropertyIfSet("Lure Pokestops modifier", "lure_pokestop_modifier", 1.0, String::toDouble)
     var shouldCatchPokemons = getPropertyIfSet("Catch Pokemons", "catch_pokemon", true, String::toBoolean)
     val shouldAutoFillIncubators = getPropertyIfSet("Auto Fill Incubators", "auto_fill_incubator", true, String::toBoolean)
 
