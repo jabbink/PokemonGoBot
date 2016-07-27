@@ -57,6 +57,7 @@ def save():
 
 
 def reset(ask):
+    global default_file
     global has_reset
     if not ask:
         try:
@@ -70,8 +71,8 @@ def reset(ask):
                                                         "values, when you are done editing press the \"save\" button"
                                                         "\n You can come back and change settings at any time")
         except FileNotFoundError:
-            tkinter.messagebox.showerror("Missing file!", "Could not find config.properties.template, please ensure that"
-                                                          " it is next to this file")
+            tkinter.messagebox.showerror("Missing file!", "Could not find config.properties.template, please ensure "
+                                                          "that it is next to this file")
     if ask:
         if tkinter.messagebox.askokcancel("Reset", "Are you sure you want to reset to defaults?"):
             default_file = open(file_name, "r")
@@ -85,10 +86,11 @@ def reset(ask):
             has_reset = True
 
 
-# noinspection PyGlobalUndefined
 def make_entries():
     lines = 0
+    # noinspection PyGlobalUndefined
     global reset_button
+    # noinspection PyGlobalUndefined
     global save_button
     global done
     global firstRun
@@ -106,7 +108,7 @@ def make_entries():
                 pass
             else:
                 if not firstRun:
-                    if cRow > (lines/2):
+                    if cRow > (lines / 2):
                         cCol = 3
                         cRow = 0
                     cRow += 1
@@ -147,10 +149,12 @@ def make_entries():
 
 def callback1(args):
     webbrowser.open_new(r"https://github.com/jabbink/PokemonGoBot")
+    return args
 
 
 def callback2(*args):
     webbrowser.open_new(r"https://github.com/ZingBallyhoo")
+    return args
 
 
 def display_about():
@@ -167,7 +171,6 @@ def display_about():
     link2.bind("<Button-1>", callback2)
     l = tk.Label(t, text="Made using Python 3.5.2")
     l.pack(side="top", fill="both", expand=True)
-
 
 
 def thread_loop():
