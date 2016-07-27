@@ -1,5 +1,5 @@
 group 'ink.abb'
-version '0.4.2'
+version '0.4.3'
 
 buildscript {
     ext.kotlin_version = '1.0.3'
