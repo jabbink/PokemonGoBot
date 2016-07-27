@@ -54,22 +54,6 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
     return latlngList
 }
 
-//Usage
-fun main(args: Array<String>) {
-    val route = Route(getRouteCoordinates(38.885989, -77.100163, 38.886068, -77.102383))
-    //route.coordinateList.forEach { println("${it.latDegrees()},${it.lngDegrees()}") }
-
-
-    for (i in 0..route.coordinateList.size - 2) {
-        println("Distance between $i and ${i + 1}: ${route.coordinateList[i].getEarthDistance(route.coordinateList[i + 1])}m")
-        if (route.coordinateList[i].getEarthDistance(route.coordinateList[i + 1]) > 30) {
-            //println("Distance: ${route.coordinateList[i].getEarthDistance(route.coordinateList[i+1])}m")
-            println("Start: ${route.coordinateList[i].latDegrees()},${route.coordinateList[i].lngDegrees()}")
-            route.additionalSteps(i, 2.8, 2).forEach {
-                println("${it.latDegrees()},${it.lngDegrees()}")
-            }
-            println("End: ${route.coordinateList[i + 1].latDegrees()},${route.coordinateList[i + 1].lngDegrees()}")
-        }
-    }
-
+fun getRouteCoordinates(start: S2LatLng, end: S2LatLng): ArrayList<S2LatLng> {
+    return getRouteCoordinates(start.latDegrees(),start.lngDegrees(),end.latDegrees(),end.lngDegrees())
 }

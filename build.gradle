@@ -44,6 +44,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
+
+    compile group: 'org.json', name: 'json', version: '20160212'
 }
 task fatJar(type: Jar) {
     manifest {
