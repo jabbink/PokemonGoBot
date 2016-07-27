@@ -113,6 +113,8 @@ class Settings(val properties: Properties) {
     val guiPort = getPropertyIfSet("Port where the webserver should listen", "gui_port", 8000, String::toInt)
     val guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", 8001, String::toInt)
 
+    val exportCSV = getPropertyIfSet("Export CSV on Profile Update", "export_csv", false, String::toBoolean)
+
     private fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
         val settingString = "$description setting (\"$property\")"
 
