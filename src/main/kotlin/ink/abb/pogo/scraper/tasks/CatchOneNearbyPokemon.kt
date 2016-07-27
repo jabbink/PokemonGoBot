@@ -86,8 +86,13 @@ class CatchOneNearbyPokemon : Task {
 
                     ctx.server.newPokemon(catchablePokemon.latitude, catchablePokemon.longitude, encounterResult.wildPokemon.pokemonData)
                     ctx.server.sendProfile()
-                } else
+                } else {
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+                    if (result.status == CatchPokemonResponse.CatchStatus.CATCH_ERROR) {
+                        Log.red("Blacklisting pokemon to prevent infinite loop")
+                        ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    }
+                }
             } else {
                 Log.red("Encounter failed with result: ${encounterResult.status}")
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {

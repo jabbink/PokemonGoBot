@@ -36,6 +36,7 @@ class WebServer {
             string = string.replace("{{socketPort}}", socketPort.toString())
             val bytes = string.toByteArray(Charset.forName("UTF-8"))
             t.responseHeaders.set("Content-Type", "text/html; charset=UTF-8")
+            t.responseHeaders.set("Access-Control-Allow-Origin", "*")
             t.sendResponseHeaders(200, bytes.size.toLong())
             t.responseBody.write(bytes)
             t.responseBody.close()
