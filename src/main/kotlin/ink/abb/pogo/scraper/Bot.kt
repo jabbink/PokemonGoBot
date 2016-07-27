@@ -114,11 +114,18 @@ class Bot(var api: PokemonGo, val settings: Settings) {
             var threadRun = true
 
             while(threadRun) {
-                if (!settings.walkOnly) {
+                // catch pokemon
+                if (settings.shouldCatchPokemons) {
                     synctask(catch)
-                    if (settings.shouldAutoTransfer) {                            
-                      synctask(release)
-                    }                    
+                }
+
+                // transfer pokemon
+                if (settings.shouldAutoTransfer) {                            
+                    synctask(release)
+                }
+
+                // drop items
+                if (settings.shouldDropItems) {
                     synctask(drop)
                 }                                
 
