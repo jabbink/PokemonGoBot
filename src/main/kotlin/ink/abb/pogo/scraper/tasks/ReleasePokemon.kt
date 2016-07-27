@@ -38,14 +38,7 @@ class ReleasePokemon : Task {
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon (except for obligatory transfer)
                     if (settings.obligatoryTransfer.contains(pokemon.pokemonId.name) || index >= settings.keepPokemonAmount) {
-                        var (shouldRelease, reason) = pokemon.shouldTransfer(settings)
-
-                        if (!shouldRelease) {
-                            if (isTooMany(settings, pokemonCounts, pokemon)) {
-                                shouldRelease = true
-                                reason = "Too many"
-                            }
-                        }
+                        var (shouldRelease, reason) = pokemon.shouldTransfer(settings, pokemonCounts)
 
                         if (shouldRelease) {
                             Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
@@ -63,16 +56,5 @@ class ReleasePokemon : Task {
                 }
             }
         }
-    }
-
-    fun isTooMany(settings: Settings, pokemonCounts: MutableMap<String, Int>, pokemon: Pokemon): Boolean {
-        val max = settings.maxPokemonAmount
-        if (max == -1) {
-            return false
-        }
-        val name = pokemon.pokemonId.name
-        val count = pokemonCounts.getOrElse(name, { 0 }) + 1
-        pokemonCounts.put(name, count)
-        return (count > max)
     }
 }
