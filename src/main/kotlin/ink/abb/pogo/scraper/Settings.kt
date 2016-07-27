@@ -18,7 +18,7 @@ import java.util.*
 
 class Settings(val properties: Properties) {
 
-	val profileUpdateTimer = getPropertyIfSet("Set Timer", "set_timer", 60, String::toLong)
+    val profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", 60, String::toLong)
 
     val pokeballItems = mapOf(Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
             Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
