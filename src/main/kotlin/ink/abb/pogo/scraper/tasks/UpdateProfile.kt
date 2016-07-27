@@ -33,8 +33,8 @@ class UpdateProfile : Task {
             val nextXP = requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]
             val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
             val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
-            Log.white("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
-            Log.white("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
+            Log.magenta("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
+            Log.magenta("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
                     "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
                     "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};\n" +
                     "Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.pokemonStorage}; " +
