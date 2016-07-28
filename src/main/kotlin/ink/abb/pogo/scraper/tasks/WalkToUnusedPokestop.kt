@@ -37,8 +37,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
             return
         }
 
-        val nearestUnused = sortedPokestops.filter {
-            // it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts)
+        val nearestUnused = sortedPokestops.filter {            
 
                 val canLoot = it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts)
                 if (settings.spawnRadius == -1) {
@@ -52,7 +51,7 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
         if (nearestUnused.isNotEmpty()) {
 
             // Select random pokestop from the 5 nearest while taking the distance into account
-            val chosenPokestop = selectRandom(nearestUnused.take(5), ctx)              
+            val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx)              
 
             if (settings.shouldDisplayPokestopName)
                 Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
@@ -110,6 +109,16 @@ class WalkToUnusedPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts
                         Log.normal("Destination reached.")
                         ctx.walking.set(false)
                         threadRun = false
+
+                        // stop at the pokestop for random seconds
+                        ctx.stopAtPoint.getAndSet(true)
+                        val randomStopTimeout = Helper.getRandomNumber(30, 600)
+                        Log.blue("We are stopping at this Pokestop for $randomStopTimeout seconds.")
+                        TimeUnit.SECONDS.sleep(randomStopTimeout.toLong())
+
+                        ctx.stopAtPoint.getAndSet(false)
+                        Log.magenta("We are done stopping. Begin to search for our next pokestop!")
+
                     }
                 }
             }

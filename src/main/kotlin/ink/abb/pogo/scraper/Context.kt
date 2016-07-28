@@ -29,5 +29,7 @@ data class Context(
 
         var walking: AtomicBoolean = AtomicBoolean(false),
 
-		var releasing: AtomicBoolean = AtomicBoolean(false)        
+        // sphinxid
+		var releasing: AtomicBoolean = AtomicBoolean(false),
+		var stopAtPoint: AtomicBoolean = AtomicBoolean(false)
 )

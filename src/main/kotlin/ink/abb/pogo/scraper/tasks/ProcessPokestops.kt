@@ -51,8 +51,11 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             bot.task(loot)
         }
-        val walk = WalkToUnusedPokestop(sortedPokestops, lootTimeouts)
 
-        bot.task(walk)
+        // if we are not stopping, then we walk again..
+        if (!ctx.stopAtPoint.get()) {
+            val walk = WalkToUnusedPokestop(sortedPokestops, lootTimeouts)
+            bot.task(walk)
+        }
     }
 }

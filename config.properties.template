@@ -13,6 +13,10 @@ longitude=
 # desired chance to catch Pokemon with 1 throw
 desired_catch_probability=0.8
 
+# number of nearest unused pokestops to randomly select
+# the next pokestop from (1/infinite)
+random_next_pokestop_selection=2
+
 ## Walking
 # Meters per second
 speed=0.7918
