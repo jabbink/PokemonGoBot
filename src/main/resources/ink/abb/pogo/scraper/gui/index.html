@@ -318,6 +318,16 @@
         </div>
     </div>
 
+    <div id="window-GPX-Generator" class="window">
+        <span class="title">Generate GPX file</span>
+        <div class="content">
+            <strong>Destination address:</strong>
+            <input type="text" name="gpx_dest_address" id="destAddress" />
+            <input type="button" value="Generate GPX file" id="genGpxFile" />
+            <hr />
+            <ul id="GpxDownloadLinks" />
+        </div>
+    </div>
     <div id="window-pokebank" class="window">
         <span class="title">Pokebank</span>
         <div class="content">
@@ -756,6 +766,14 @@
                 settings.autofollow = $(this).prop('checked');
             });
 
+            $("#genGpxFile").click(function(){
+                var destAddress = encodeURIComponent($("#destAddress").val());
+                lat = positionMarker.position.lat();
+                lng = positionMarker.position.lng()
+                var downloadLink = 'http://gpx.geotags.com/cgi-bin/gpx.cgi?saddr=' + lat + ',' + lng + '&daddr=' + destAddress;
+                $('#GpxDownloadLinks').append('<li><a href="' + downloadLink + '" target="_blank">Download GPX ' +$("#destAddress").val() + '</a></li>');
+            });
+            
             $('#gpx_upload_button').on('click', function(){
                 $('#gpx_upload').click();
             });
