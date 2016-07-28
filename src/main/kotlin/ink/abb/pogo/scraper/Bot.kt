@@ -84,6 +84,9 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val hatchEggs = HatchEggs()
         val exportCsv = ExportCSV()
 
+        if (settings.exportCSV)
+            task(exportCsv)
+
         task(keepalive)
         Log.normal("Getting initial pokestops...")
 
