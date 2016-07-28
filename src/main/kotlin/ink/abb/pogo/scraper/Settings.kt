@@ -20,23 +20,23 @@ import java.util.Properties
 
 
 class SettingsParser(val properties: Properties) {
-fun createSettingsFromProperties(): Settings {
-    return Settings(
-    profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", 60, String::toLong),
+    fun createSettingsFromProperties(): Settings {
+        return Settings(
+            profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", 60, String::toLong),
 
-    startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
-    startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
+            startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
+            startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
 
-    credentials = if(properties.getProperty("username", "").isEmpty() || properties.getProperty("username", "").contains("@")) {
-        GoogleCredentials(properties.getProperty("token"))
-    } else {
-        PtcCredentials(properties.getProperty("username"), if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", ""))))
-    },
+            credentials = if (properties.getProperty("username", "").isEmpty() || properties.getProperty("username", "").contains("@")) {
+                GoogleCredentials(properties.getProperty("token"))
+            } else {
+                PtcCredentials(properties.getProperty("username"), if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", ""))))
+            },
 
-    speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble),
-    shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean),
+            speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble),
+            shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean),
 
-    uselessItems = mapOf(
+            uselessItems = mapOf(
                 Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
                 Pair(ItemId.ITEM_MAX_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_REVIVE", "item_max_revive", 10, String::toInt)),
                 Pair(ItemId.ITEM_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_POTION", "item_potion", 0, String::toInt)),
@@ -48,47 +48,47 @@ fun createSettingsFromProperties(): Settings {
                 Pair(ItemId.ITEM_ULTRA_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_ULTRA_BALL", "item_ultra_ball", 50, String::toInt)),
                 Pair(ItemId.ITEM_MASTER_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_MASTER_BALL", "item_master_ball", 10, String::toInt)),
                 Pair(ItemId.ITEM_RAZZ_BERRY, getPropertyIfSet("Max number of items to keep from type ITEM_RAZZ_BERRY", "item_razz_berry", 50, String::toInt))
-        ),
+            ),
 
-    randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", 5, String::toInt),
+            randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", 5, String::toInt),
 
-    desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.4, String::toDouble),
-    desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", 0.0, String::toDouble),
-    shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean),
-    keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", 1, String::toInt),
-    maxPokemonAmount = getPropertyIfSet("maximum keep pokemon amount", "max_pokemon_amount", -1, String::toInt),
-    shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean),
+            desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.4, String::toDouble),
+            desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", 0.0, String::toDouble),
+            shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", false, String::toBoolean),
+            keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", 1, String::toInt),
+            maxPokemonAmount = getPropertyIfSet("maximum keep pokemon amount", "max_pokemon_amount", -1, String::toInt),
+            shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", true, String::toBoolean),
 
-    shouldDisplayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", false, String::toBoolean),
-    shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean),
-    shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean),
+            shouldDisplayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", false, String::toBoolean),
+            shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", true, String::toBoolean),
+            shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", true, String::toBoolean),
 
-    shouldLootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", true, String::toBoolean),
-    shouldCatchPokemons = getPropertyIfSet("Catch Pokemons", "catch_pokemon", true, String::toBoolean),
-    shouldAutoFillIncubators = getPropertyIfSet("Auto Fill Incubators", "auto_fill_incubator", true, String::toBoolean),
+            shouldLootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", true, String::toBoolean),
+            shouldCatchPokemons = getPropertyIfSet("Catch Pokemons", "catch_pokemon", true, String::toBoolean),
+            shouldAutoFillIncubators = getPropertyIfSet("Auto Fill Incubators", "auto_fill_incubator", true, String::toBoolean),
 
-    sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean),
+            sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", false, String::toBoolean),
 
-    alwaysCurve = getPropertyIfSet("Always throw curveballs", "always_curve", false, String::toBoolean),
+            alwaysCurve = getPropertyIfSet("Always throw curveballs", "always_curve", false, String::toBoolean),
 
-    neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", true, String::toBoolean),
+            neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", true, String::toBoolean),
 
-    allowLeaveStartArea = getPropertyIfSet("Allow leaving the starting area", "allow_leave_start_area", false, String::toBoolean),
+            allowLeaveStartArea = getPropertyIfSet("Allow leaving the starting area", "allow_leave_start_area", false, String::toBoolean),
 
-    spawnRadius = getPropertyIfSet("Max distance from starting point the bot should ever go", "spawn_radius", -1, String::toInt),
+            spawnRadius = getPropertyIfSet("Max distance from starting point the bot should ever go", "spawn_radius", -1, String::toInt),
 
-    transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt),
+            transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt),
 
-    transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", 80, String::toInt),
+            transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", 80, String::toInt),
 
-    ignoredPokemon = getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMANDER", String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
+            ignoredPokemon = getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", "EEVEE,MEWTWO,CHARMANDER", String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
-    obligatoryTransfer = getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
+            obligatoryTransfer = getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", "DODUO,RATTATA,CATERPIE,PIDGEY", String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
-    guiPort = getPropertyIfSet("Port where the webserver should listen", "gui_port", 8000, String::toInt),
-    guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", 8001, String::toInt)
-    )
-}
+            guiPort = getPropertyIfSet("Port where the webserver should listen", "gui_port", 8000, String::toInt),
+            guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", 8001, String::toInt)
+        )
+    }
 
     fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
         val settingString = "$description setting (\"$property\")"
@@ -212,9 +212,9 @@ data class Settings(
 
 interface Credentials
 
-data class GoogleCredentials(var token: String = ""): Credentials
+data class GoogleCredentials(var token: String = "") : Credentials
 
 data class PtcCredentials(
     val username: String = "",
     val password: String = ""
-): Credentials
+) : Credentials
