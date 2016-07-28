@@ -26,7 +26,7 @@ random_next_pokestop_selection=5
 speed=2.8
 
 # Should the bot follow the streets (true) or just go directly to pokestops/waypoints
-follow_streets = true
+follow_streets = false
 
 # Should the bot loot the pokestops (true/false)
 loot_pokestop=true
