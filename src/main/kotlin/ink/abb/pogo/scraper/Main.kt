@@ -23,29 +23,25 @@ import kotlin.concurrent.thread
 val time = SystemTimeImpl()
 
 fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
-    val username = settings.username
-    val password = settings.password
-
-    val token = settings.token()
-
-    val auth = if (username.contains('@')) {
-        if (token.isBlank()) {
+    val credentials = settings.credentials
+    val auth = if (credentials is GoogleCredentials) {
+        if (credentials.token.isBlank()) {
             GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
                 override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {
                 }
 
                 override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
                     Log.normal("Setting Google refresh token in your config")
-                    settings.setToken(googleAuthTokenJson.refreshToken)
-                    settings.writeProperty("config.properties", "token")
+                    credentials.token = googleAuthTokenJson.refreshToken
+                    settings.writeProperty("config.properties", "token", credentials.token)
                 }
             }, time)
         } else {
-            GoogleCredentialProvider(http, token, time)
+            GoogleCredentialProvider(http, credentials.token, time)
         }
-    } else {
+    } else if(credentials is PtcCredentials) {
         try {
-            PtcCredentialProvider(http, username, password, time)
+            PtcCredentialProvider(http, credentials.username, credentials.password, time)
         } catch (e: LoginFailedException) {
             throw e
         } catch (e: RemoteServerException) {
@@ -54,6 +50,8 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
             // sometimes throws ArrayIndexOutOfBoundsException or other RTE's
             throw RemoteServerException(e)
         }
+    } else {
+        throw IllegalStateException("Unknown credentials: ${credentials.javaClass}")
     }
 
     return auth
@@ -74,7 +72,7 @@ fun main(args: Array<String>) {
     }
     input.close()
 
-    val settings = Settings(properties)
+    val settings = SettingsParser(properties).createSettingsFromProperties()
 
     Log.normal("Logging in to game server...")
 
@@ -92,7 +90,7 @@ fun main(args: Array<String>) {
             System.exit(1)
             return
         } catch (e: RemoteServerException) {
-            Log.red("Server returned unexpected error")
+            Log.red("Server returned unexpected error: ${e.message}")
             if (retries-- > 0) {
                 Log.normal("Retrying...")
                 Thread.sleep(errorTimeout)
@@ -125,7 +123,7 @@ fun main(args: Array<String>) {
         return
     }
 
-    Log.normal("Logged in as ${settings.username}")
+    Log.normal("Logged in successfully")
 
     print("Getting profile data from pogo server")
     while (api.playerProfile == null) {

@@ -37,7 +37,7 @@ class ReleasePokemon : Task {
                 if (!isFavourite) {
                     val ivPercentage = pokemon.getIvPercentage()
                     // never transfer highest rated Pokemon (except for obligatory transfer)
-                    if (settings.obligatoryTransfer.contains(pokemon.pokemonId.name) || index >= settings.keepPokemonAmount) {
+                    if (settings.obligatoryTransfer.contains(pokemon.pokemonId) || index >= settings.keepPokemonAmount) {
                         val (shouldRelease, reason) = pokemon.shouldTransfer(settings, pokemonCounts)
 
                         if (shouldRelease) {
