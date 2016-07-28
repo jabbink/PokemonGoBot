@@ -62,10 +62,10 @@ class ExportCSV : Task {
             writer.println("ID,Name,Nickname,Favorite ?,CP,IV [%],Stamina (HP),Max Stamina (HP),Move 1,Move 2,iStamina,iAttack,iDefense,cpMultiplier,Height [m],Weight [kg],Candy,Candies to evolve")
 
             ctx.api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
-                "${it.pokemonId.number},${it.pokemonId.name},\"${it.nickname}\",${it.isFavorite},${it.cp},${it.getIvPercentage()},${it.stamina},${it.maxStamina},${it.move1.name},${it.move2.name},${it.individualStamina},${it.individualAttack},${it.individualDefense},${it.cpMultiplier},${it.heightM},n/a,${it.candy},${it.candiesToEvolve}"
+                "${it.pokemonId.number},${it.pokemonId.name},\"${it.nickname}\",${it.isFavorite},${it.cp},${it.getIvPercentage()},${it.stamina},${it.maxStamina},${it.move1.name},${it.move2.name},${it.individualStamina},${it.individualAttack},${it.individualDefense},${it.cpMultiplier},${it.heightM},${it.weightKg},${it.candy},${it.candiesToEvolve}"
             }.forEach { writer.println(it) }
 
-            Log.normal("Wrote export CSV.");
+            Log.normal("Wrote export CSV.")
 
             writer.close()
             os.close()
