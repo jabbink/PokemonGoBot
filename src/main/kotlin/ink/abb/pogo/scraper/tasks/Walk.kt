@@ -124,14 +124,100 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
     }
 
-    fun walkRoute(bot: Bot, ctx: Context,settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
+    fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
         if (speed.equals(0)) {
             return
         }
         val timeout = 200L
         val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end)
+        if (coordinatesList.size <= 0) {
+            walk(bot, ctx, settings, end, speed, sendDone)
+        } else {
+            var walking = true
+            bot.runLoop(timeout, "WalkingLoop") { cancel ->
+                if (walking) {
+                    if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                        // Stop walking
+                        walking = false
+                        Log.normal("Pausing to catch pokemon...")
+                    } // Else continue walking.
+                } else {
+                    if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
+                        walking = true
+                        Log.normal("Resuming walk.")
+                    } // Else continue waiting.
+                }
+
+                if (!walking) {
+                    return@runLoop
+                }
+
+
+                val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
+                val step = coordinatesList.first()
+                coordinatesList.removeAt(0)
+                val diff = step.sub(start)
+                val distance = start.getEarthDistance(step)
+                val timeRequired = distance / speed
+                val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
+                if (stepsRequired.equals(0)) {
+                    cancel()
+                }
+                val deltaLat = diff.latDegrees() / stepsRequired
+                val deltaLng = diff.lngDegrees() / stepsRequired
+                var remainingSteps = stepsRequired
+                while (remainingSteps > 0) {
+                    ctx.lat.addAndGet(deltaLat)
+                    ctx.lng.addAndGet(deltaLng)
+                    ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+                    remainingSteps--
+                    Thread.sleep(timeout)
+                }
+
+                if (coordinatesList.size <= 0) {
+                    if (ctx.lat.get()!= end.latDegrees() && ctx.lng.get() != end.lngDegrees()) {
+                        ctx.walking.set(false)
+                        walkAndComeBack(bot,ctx,settings,end,speed,sendDone)
+                        cancel()
+                    } else {
+                        Log.normal("Destination reached.")
+                        if (sendDone) {
+                            ctx.server.sendGotoDone()
+                        }
+                        ctx.walking.set(false)
+                        cancel()
+                    }
+                }
+            }
+        }
+    }
+
+    fun walkAndComeBack(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
+        val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
+        val diff = end.sub(start)
+        val distance = start.getEarthDistance(end)
+        val timeout = 200L
+        // prevent division by 0
+        if (speed.equals(0)) {
+            return
+        }
+        val timeRequired = distance / speed
+        val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
+        // prevent division by 0
+        if (stepsRequired.equals(0)) {
+            return
+        }
+        val deltaLat = diff.latDegrees() / stepsRequired
+        val deltaLng = diff.lngDegrees() / stepsRequired
+        val deltaLat2 = -deltaLat
+        val deltaLng2 = -deltaLng
+
+        Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
+        var remainingStepsGoing = stepsRequired
+        var remainingStepsComing = stepsRequired
         var walking = true
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
+            // don't run away when there are still Pokemon around
             if (walking) {
                 if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
@@ -149,30 +235,23 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 return@runLoop
             }
 
+            ctx.lat.addAndGet(deltaLat)
+            ctx.lng.addAndGet(deltaLng)
 
+            ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
 
-            val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
-            val step = coordinatesList.first()
-            coordinatesList.removeAt(0)
-            val diff = step.sub(start)
-            val distance = start.getEarthDistance(step)
-            val timeRequired = distance / speed
-            val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
-            if (stepsRequired.equals(0)) {
-                cancel()
-            }
-            val deltaLat = diff.latDegrees() / stepsRequired
-            val deltaLng = diff.lngDegrees() / stepsRequired
-            var remainingSteps = stepsRequired
-            while (remainingSteps > 0) {
-                ctx.lat.addAndGet(deltaLat)
-                ctx.lng.addAndGet(deltaLng)
+            remainingStepsGoing--
+
+            if (remainingStepsGoing <= 0) {
+                ctx.lat.addAndGet(deltaLat2)
+                ctx.lng.addAndGet(deltaLng2)
+
                 ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
-                remainingSteps--
-                Thread.sleep(timeout)
+
+                remainingStepsComing--
             }
 
-            if (coordinatesList.size <= 0) {
+            if (remainingStepsComing <= 0) {
                 Log.normal("Destination reached.")
 
                 if (sendDone) {
