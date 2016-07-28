@@ -250,9 +250,8 @@
                 min-height: 50vw;
             }
 
-            [class*="col-"] {
-                padding: 2px;
-            }
+
+
         }
     </style>
 
@@ -625,10 +624,11 @@
                     pokemonId: pokemon.pokemonId,
                     name: pokemon.name,
                     cp: pokemon.cp,
-                    iv: pokemon.iv
+                    iv: pokemon.iv,
+                    stats: pokemon.stats
                 };
 
-                var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="' + icons.pokemon(pokemon.pokemonId) + '"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2>IV ' + pokemon.iv + '</h2></div></div>');
+                var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="' + icons.pokemon(pokemon.pokemonId) + '"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2>IV ' + pokemon.iv + '</h2><h2>'+pokemon.stats+'</h2></div></div>');
                 elements.pokemonList.append(elem);
             }
         });
