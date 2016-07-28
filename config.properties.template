@@ -17,6 +17,13 @@ desired_catch_probability=0.8
 # Meters per second
 speed=0.7918
 
+# allow leaving the starting area
+allow_leave_start_area=false
+
+# Max distance from starting point the bot should ever go in meters
+# (-1: only limited by the initial pokestops (~3*3km); with allow_leave_start_area=true unlimited)
+spawn_radius=-1
+
 # Should the bot loot the pokestops (true/false)
 loot_pokestop=true
  

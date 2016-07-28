@@ -15,6 +15,7 @@ import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.util.*
+import com.pokegoapi.google.common.geometry.S2LatLng
 
 class Settings(val properties: Properties) {
 
@@ -25,6 +26,8 @@ class Settings(val properties: Properties) {
 
     val startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble)
     val startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble)
+
+    val startingLocation = S2LatLng.fromDegrees(startingLatitude, startingLongitude)
 
     val username = properties.getProperty("username")
     val password = if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
@@ -84,6 +87,9 @@ class Settings(val properties: Properties) {
 
     val neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", true, String::toBoolean)
 
+    val allowLeaveStartArea = getPropertyIfSet("Allow leaving the starting area", "allow_leave_start_area", false, String::toBoolean)
+
+    val spawnRadius = getPropertyIfSet("Max distance from starting point the bot should ever go", "spawn_radius", -1, String::toInt)
 
     val transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", 400, String::toInt)
 

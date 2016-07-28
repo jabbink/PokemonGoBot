@@ -158,6 +158,8 @@ class Bot(var api: PokemonGo, val settings: Settings) {
                     synchronized(ctx) {
                         ctx.api = api2
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
         }
@@ -176,7 +178,9 @@ class Bot(var api: PokemonGo, val settings: Settings) {
             synchronized(ctx) {
                 ctx.api = api2
             }
-        }        
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }       
     }
 
     @Synchronized
