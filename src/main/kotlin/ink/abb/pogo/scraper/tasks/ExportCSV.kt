@@ -18,7 +18,6 @@ import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
-import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
