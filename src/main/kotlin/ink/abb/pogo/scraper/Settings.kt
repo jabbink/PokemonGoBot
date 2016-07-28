@@ -23,11 +23,11 @@ class SettingsParser(val properties: Properties) {
     fun createSettingsFromProperties(): Settings {
         val defaults = Settings(credentials = GoogleCredentials(), startingLatitude = 0.0, startingLongitude = 0.0)
         val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.shouldDropItems, String::toBoolean)
-    val timerWalkToStartPokeStop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timerWalkToStartPokeStop", -1, String::toLong)
+
 
         return Settings(
             profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
-
+            timerWalkToStartPokeStop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timerWalkToStartPokeStop", defaults.timerWalkToStartPokeStop, String::toLong),
             startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
             startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
 
@@ -139,6 +139,7 @@ class SettingsParser(val properties: Properties) {
 
 data class Settings(
     val profileUpdateTimer: Long = 60,
+    val timerWalkToStartPokeStop: Long = -1L,
     val startingLatitude: Double,
     val startingLongitude: Double,
 
