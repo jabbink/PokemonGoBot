@@ -1,5 +1,5 @@
 group 'ink.abb'
-version '0.5.0-alpha'
+version '0.5.0-alpha2'
 
 buildscript {
     ext.kotlin_version = '1.0.3'
@@ -23,6 +23,7 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 sourceSets {
@@ -42,9 +43,12 @@ dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
+
+    compile group: 'org.json', name: 'json', version: '20160212'
     compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.21'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
+
 }
 task fatJar(type: Jar) {
     manifest {
