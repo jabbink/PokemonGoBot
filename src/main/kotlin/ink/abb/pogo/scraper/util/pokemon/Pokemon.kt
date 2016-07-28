@@ -48,9 +48,9 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
     // add 1 to the map
     val isTooMany = isTooMany(settings, pokemonCounts, this)
 
-    var shouldRelease = obligatoryTransfer.contains(this.pokemonId.name)
+    var shouldRelease = obligatoryTransfer.contains(this.pokemonId)
     var reason: String = "Obligatory transfer"
-    if (!ignoredPokemon.contains(this.pokemonId.name)) {
+    if (!ignoredPokemon.contains(this.pokemonId)) {
         // shouldn't release? check for IV/CP
         if (!shouldRelease) {
             var ivTooLow = false
