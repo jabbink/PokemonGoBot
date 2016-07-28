@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.gui
 
+import ink.abb.pogo.scraper.Context
 import spark.Request
 import spark.Response
 import spark.Spark.get
@@ -18,12 +19,13 @@ import java.util.stream.Collectors
 
 class WebServer {
 
-    fun start(port: Int, socketPort: Int) {
+    fun start(ctx: Context, port: Int, socketPort: Int) {
         port(port)
         get("/") { request: Request, response: Response ->
             val string = BufferedReader(InputStreamReader(WebServer::class.java.getResourceAsStream("index.html")))
                     .lines().collect(Collectors.joining("\n"))
                     .replace("{{socketPort}}", socketPort.toString())
+                    .replace("{{username}}", ctx.api.playerProfile.username)
             response.header("Access-Control-Allow-Origin", "*")
             string
         }
