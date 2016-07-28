@@ -16,7 +16,7 @@ var routeProvider = "http://router.project-osrm.org/viaroute"
 fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
     val connection = URL(createURLString(olat, olng, dlat, dlng)).openConnection() as HttpURLConnection
     connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-    connection.setRequestProperty("Accept-Encoding", "gzip")
+    //connection.setRequestProperty("Accept-Encoding", "gzip")
     connection.setRequestProperty("Accept-Language", "en")
     connection.setRequestProperty("Cache-Control", "max=0")
     connection.setRequestProperty("Connection", "keep-alive")
@@ -25,8 +25,8 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
     connection.setRequestProperty("Upgrade-Insecure-Requests", "1")
     connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36")
     var routeFile = String()
-    GZIPInputStream(connection.inputStream).bufferedReader().lines().forEach {
-        routeFile += it + "\n"
+    connection.inputStream.bufferedReader().lines().forEach {
+        routeFile += "$it\n"
     }
     return routeFile
 }
