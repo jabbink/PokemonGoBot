@@ -9,10 +9,7 @@
 package ink.abb.pogo.scraper
 
 import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.auth.CredentialProvider
-import com.pokegoapi.auth.GoogleAutoCredentialProvider
-import com.pokegoapi.auth.GoogleCredentialProvider
-import com.pokegoapi.auth.PtcCredentialProvider
+import com.pokegoapi.auth.*
 import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
 import com.pokegoapi.util.SystemTimeImpl
@@ -33,7 +30,16 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
 
     val auth = if (username.contains('@')) {
         if (token.isBlank()) {
-            GoogleAutoCredentialProvider(http, username, password, time)
+            GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
+                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {
+                }
+
+                override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
+                    Log.normal("Setting Google refresh token in your config")
+                    settings.setToken(googleAuthTokenJson.refreshToken)
+                    settings.writeProperty("config.properties", "token")
+                }
+            }, time)
         } else {
             GoogleCredentialProvider(http, token, time)
         }

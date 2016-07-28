@@ -24,7 +24,7 @@ import java.util.*
 class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 
     private val lootTimeouts = HashMap<String, Long>()
-
+    var startPokeStop: Pokestop? = null
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         if (settings.allowLeaveStartArea) {
             try {
@@ -44,6 +44,8 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
             val distanceB = self.getEarthDistance(locationB)
             distanceA.compareTo(distanceB)
         })
+        if (startPokeStop == null)
+            startPokeStop = sortedPokestops.first()
 
         if (settings.shouldLootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)

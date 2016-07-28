@@ -20,6 +20,7 @@ import java.util.*
 class Settings(val properties: Properties) {
 
     val profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", 60, String::toLong)
+    val timerWalkToStartPokeStop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timerWalkToStartPokeStop", -1, String::toLong)
 
     val pokeballItems = mapOf(Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
             Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
@@ -67,7 +68,6 @@ class Settings(val properties: Properties) {
                 Pair(ItemId.ITEM_RAZZ_BERRY, 50)
         )
     }
-
     val randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", 5, String::toInt)
 
     val desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", 0.4, String::toDouble)
