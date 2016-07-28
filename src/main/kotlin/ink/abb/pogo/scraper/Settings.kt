@@ -36,6 +36,7 @@ class Settings(val properties: Properties) {
     val token = { properties.getProperty("token", "") }
 
     val speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble)
+    val shouldFollowStreets = getPropertyIfSet("Should the bot follow streets", "follow_streets", false, String::toBoolean)
     val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", false, String::toBoolean)
 
     val uselessItems = if (shouldDropItems) {
