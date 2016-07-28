@@ -78,3 +78,7 @@ The Pokemon Go servers are offline/too busy. Check IsPokemonGoDownOrNot.com
 
 Separate the windows as they're conjoined together.
 
+## When I login using a Google account it returns my credentials as null.
+
+We're aware of the issue and implementing a fix.  For now, please use PTC accounts.
+
