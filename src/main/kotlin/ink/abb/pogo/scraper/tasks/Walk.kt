@@ -15,6 +15,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.canLoot;
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 
@@ -78,22 +79,23 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         var walking = true
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             // don't run away when there are still Pokemon around
-            if(walking) {
-                if(bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+            if (walking) {
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     walking = false
                     Log.normal("Pausing to catch pokemon...")
                 } // Else continue walking.
             } else {
-                if(bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
+                if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
                     walking = true
                     Log.normal("Resuming walk.")
                 } // Else continue waiting.
             }
 
-            if(!walking) {
+            if (!walking) {
                 return@runLoop
             }
+
 
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
