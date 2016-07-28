@@ -9,43 +9,49 @@
 package ink.abb.pogo.scraper
 
 import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.auth.*
+import com.pokegoapi.auth.CredentialProvider
+import com.pokegoapi.auth.GoogleAutoCredentialProvider
+import com.pokegoapi.auth.GoogleUserCredentialProvider
+import com.pokegoapi.auth.PtcCredentialProvider
 import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
 import com.pokegoapi.util.SystemTimeImpl
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
-import java.util.*
+import java.util.Properties
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 val time = SystemTimeImpl()
 
 fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
-    val username = settings.username
-    val password = settings.password
+    val credentials = settings.credentials
+    val auth = if (credentials is GoogleCredentials) {
+        if (credentials.token.isBlank()) {
+            val provider = GoogleUserCredentialProvider(http, time)
 
-    val token = settings.token()
+            println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL)
+            println("Enter authorisation code:")
 
-    val auth = if (username.contains('@')) {
-        if (token.isBlank()) {
-            GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
-                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {
-                }
+            val access = readLine()
 
-                override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
-                    Log.normal("Setting Google refresh token in your config")
-                    settings.setToken(googleAuthTokenJson.refreshToken)
-                    settings.writeProperty("config.properties", "token")
-                }
-            }, time)
+            // we should be able to login with this token
+            provider.login(access)
+            println("Refresh token:" + provider.getRefreshToken())
+            Log.normal("Setting Google refresh token in your config")
+            credentials.token = provider.refreshToken
+            settings.writeProperty("config.properties", "token", credentials.token)
+
+            provider
         } else {
-            GoogleCredentialProvider(http, token, time)
+            GoogleUserCredentialProvider(http, credentials.token, time)
         }
-    } else {
+    } else if(credentials is GoogleAutoCredentials) {
+        GoogleAutoCredentialProvider(http, credentials.username, credentials.password, time)
+    } else if(credentials is PtcCredentials) {
         try {
-            PtcCredentialProvider(http, username, password, time)
+            PtcCredentialProvider(http, credentials.username, credentials.password, time)
         } catch (e: LoginFailedException) {
             throw e
         } catch (e: RemoteServerException) {
@@ -54,6 +60,8 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
             // sometimes throws ArrayIndexOutOfBoundsException or other RTE's
             throw RemoteServerException(e)
         }
+    } else {
+        throw IllegalStateException("Unknown credentials: ${credentials.javaClass}")
     }
 
     return auth
@@ -74,7 +82,7 @@ fun main(args: Array<String>) {
     }
     input.close()
 
-    val settings = Settings(properties)
+    val settings = SettingsParser(properties).createSettingsFromProperties()
 
     Log.normal("Logging in to game server...")
 
@@ -92,7 +100,7 @@ fun main(args: Array<String>) {
             System.exit(1)
             return
         } catch (e: RemoteServerException) {
-            Log.red("Server returned unexpected error")
+            Log.red("Server returned unexpected error: ${e.message}")
             if (retries-- > 0) {
                 Log.normal("Retrying...")
                 Thread.sleep(errorTimeout)
@@ -125,7 +133,7 @@ fun main(args: Array<String>) {
         return
     }
 
-    Log.normal("Logged in as ${settings.username}")
+    Log.normal("Logged in successfully")
 
     print("Getting profile data from pogo server")
     while (api.playerProfile == null) {
