@@ -15,8 +15,7 @@ import ink.abb.pogo.scraper.util.Log
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
-import java.util.Base64
-import java.util.Properties
+import java.util.*
 
 
 class SettingsParser(val properties: Properties) {
@@ -39,6 +38,7 @@ class SettingsParser(val properties: Properties) {
             },
 
             speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
+            shouldFollowStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.shouldFollowStreets, String::toBoolean),
             shouldDropItems = shouldDropItems,
 
             uselessItems = if(shouldDropItems) mapOf(
@@ -144,6 +144,7 @@ data class Settings(
     val startingLocation: S2LatLng = S2LatLng.fromDegrees(startingLatitude, startingLongitude),
     val credentials: Credentials,
     val speed: Double = 2.778,
+    val shouldFollowStreets: Boolean = false,
     val shouldDropItems: Boolean = false,
     val uselessItems: Map<ItemId, Int> = mapOf(
         Pair(ItemId.ITEM_REVIVE, 20),
