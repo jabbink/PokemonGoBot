@@ -117,6 +117,8 @@ obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
 gui_port=8000
 # port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
+# alternative theme for webserver
+use_responsive_design = false
 
 #List of pokemon names
 #MISSINGNO
