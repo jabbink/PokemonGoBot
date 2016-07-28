@@ -10,10 +10,8 @@ package ink.abb.pogo.scraper
 
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.CredentialProvider
-import com.pokegoapi.auth.GoogleAuthJson
-import com.pokegoapi.auth.GoogleAuthTokenJson
 import com.pokegoapi.auth.GoogleAutoCredentialProvider
-import com.pokegoapi.auth.GoogleCredentialProvider
+import com.pokegoapi.auth.GoogleUserCredentialProvider
 import com.pokegoapi.auth.PtcCredentialProvider
 import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
@@ -21,7 +19,7 @@ import com.pokegoapi.util.SystemTimeImpl
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
-import java.util.*
+import java.util.Properties
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -31,18 +29,23 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
     val credentials = settings.credentials
     val auth = if (credentials is GoogleCredentials) {
         if (credentials.token.isBlank()) {
-            GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
-                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {
-                }
+            val provider = GoogleUserCredentialProvider(http, time)
 
-                override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
-                    Log.normal("Setting Google refresh token in your config")
-                    credentials.token = googleAuthTokenJson.refreshToken
-                    settings.writeProperty("config.properties", "token", credentials.token)
-                }
-            }, time)
+            println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL)
+            println("Enter authorisation code:")
+
+            val access = readLine()
+
+            // we should be able to login with this token
+            provider.login(access)
+            println("Refresh token:" + provider.getRefreshToken())
+            Log.normal("Setting Google refresh token in your config")
+            credentials.token = provider.refreshToken
+            settings.writeProperty("config.properties", "token", credentials.token)
+
+            provider
         } else {
-            GoogleCredentialProvider(http, credentials.token, time)
+            GoogleUserCredentialProvider(http, credentials.token, time)
         }
     } else if(credentials is GoogleAutoCredentials) {
         GoogleAutoCredentialProvider(http, credentials.username, credentials.password, time)

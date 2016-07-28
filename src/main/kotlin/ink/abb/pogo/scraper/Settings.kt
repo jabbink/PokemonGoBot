@@ -28,7 +28,7 @@ class SettingsParser(val properties: Properties) {
             startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
 
             credentials = if (properties.getProperty("username", "").isEmpty()) {
-                GoogleCredentials(properties.getProperty("token"))
+                GoogleCredentials(properties.getProperty("token", ""))
             } else if(properties.getProperty("username", "").contains("@")) {
                 GoogleAutoCredentials(properties.getProperty("username"), getPasswordProperty())
             } else {
