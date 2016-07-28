@@ -27,10 +27,12 @@ class SettingsParser(val properties: Properties) {
             startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
             startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
 
-            credentials = if (properties.getProperty("username", "").isEmpty() || properties.getProperty("username", "").contains("@")) {
+            credentials = if (properties.getProperty("username", "").isEmpty()) {
                 GoogleCredentials(properties.getProperty("token"))
+            } else if(properties.getProperty("username", "").contains("@")) {
+                GoogleAutoCredentials(properties.getProperty("username"), getPasswordProperty())
             } else {
-                PtcCredentials(properties.getProperty("username"), if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", ""))))
+                PtcCredentials(properties.getProperty("username"), getPasswordProperty())
             },
 
             speed = getPropertyIfSet("Speed", "speed", 2.778, String::toDouble),
@@ -88,6 +90,10 @@ class SettingsParser(val properties: Properties) {
             guiPort = getPropertyIfSet("Port where the webserver should listen", "gui_port", 8000, String::toInt),
             guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", 8001, String::toInt)
         )
+    }
+
+    fun getPasswordProperty(): String {
+        return if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
     }
 
     fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
@@ -213,8 +219,7 @@ data class Settings(
 interface Credentials
 
 data class GoogleCredentials(var token: String = "") : Credentials
+data class GoogleAutoCredentials(var username: String = "", var password: String = "") : Credentials
 
-data class PtcCredentials(
-    val username: String = "",
-    val password: String = ""
+data class PtcCredentials( val username: String = "", val password: String = ""
 ) : Credentials
