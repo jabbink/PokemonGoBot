@@ -122,7 +122,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         if(settings.guiPort > 0){
             Log.normal("Running webserver on port ${settings.guiPort}")
-            WebServer().start(settings.guiPort, settings.guiPortSocket)
+            WebServer().start(settings.guiPort, settings.guiPortSocket, settings.responsiveDesign)
             ctx.server.start(ctx, settings.guiPortSocket)
         }
     }

@@ -22,21 +22,27 @@ import java.util.stream.Collectors
 
 class WebServer {
     @Throws(Exception::class)
-    fun start(port: Int, socketPort: Int) {
+    fun start(port: Int, socketPort: Int, responsiveDesign: Boolean) {
         Thread(){
             val server = HttpServer.create(InetSocketAddress(port), 0)
-            server.createContext("/", RootHandler(socketPort))
+            server.createContext("/", RootHandler(socketPort, responsiveDesign))
             server.executor = null
             server.start()
         }.start()
     }
 
-    inner class RootHandler(val socketPort: Int) : HttpHandler {
+    inner class RootHandler(val socketPort: Int, val responsiveDesign: Boolean) : HttpHandler {
 
         @Throws(IOException::class)
         override fun handle(t: HttpExchange) {
+            val filename : String
+            if(responsiveDesign){
+                 filename = "indexResponsive.html"
+            } else {
+                 filename = "index.html"   
+            }
 
-            val string = BufferedReader(InputStreamReader(WebServer::class.java.getResourceAsStream("index.html")))
+            val string = BufferedReader(InputStreamReader(WebServer::class.java.getResourceAsStream(filename)))
                     .lines().collect(Collectors.joining("\n"))
                     .replace("{{socketPort}}", socketPort.toString())
             val bytes = string.toByteArray(Charset.forName("UTF-8"))
