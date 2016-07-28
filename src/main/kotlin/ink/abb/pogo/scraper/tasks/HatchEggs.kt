@@ -23,6 +23,7 @@ class HatchEggs : Task {
         if (result.isNotEmpty()) {
             ctx.api.inventories.updateInventories(true)
             result.forEachIndexed { index, it ->
+                ctx.eggStats.andIncrement
                 val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
                 val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
                 if (newPokemon == null) {

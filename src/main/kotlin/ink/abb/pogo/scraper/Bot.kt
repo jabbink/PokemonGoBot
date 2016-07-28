@@ -40,6 +40,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             Pair(AtomicInteger(0), AtomicInteger(0)),
+            AtomicInteger(0),
             mutableSetOf()
     )
 
@@ -55,6 +56,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
         Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size}/${ctx.profile.pokemonStorage}")
         Log.normal("Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}")
+        println("Eggs hatching ${ctx.api.inventories.hatchery.eggs.filter { it.eggIncubatorId != null && !it.eggIncubatorId.isBlank()}.count()}/${ctx.api.inventories.hatchery.eggs.count()}")
         //Log.normal("Inventory bag ${ctx.api.bag}")
 
         val compareName = Comparator<Pokemon> { a, b ->

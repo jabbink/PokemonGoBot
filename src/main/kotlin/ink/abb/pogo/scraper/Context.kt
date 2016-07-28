@@ -24,6 +24,7 @@ data class Context(
         val startXp: AtomicLong,
         val pokemonStats: Pair<AtomicInteger, AtomicInteger>,
         val itemStats: Pair<AtomicInteger, AtomicInteger>,
+        val eggStats: AtomicInteger,
 
         val blacklistedEncounters: MutableSet<Long>,
 
