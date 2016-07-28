@@ -30,16 +30,11 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
 
     val auth = if (username.contains('@')) {
         if (token.isBlank()) {
-            GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
-                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {
-                }
-
-                override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
-                    Log.normal("Setting Google refresh token in your config")
-                    settings.setToken(googleAuthTokenJson.refreshToken)
-                    settings.writeProperty("config.properties", "token")
-                }
-            }, time)
+            GoogleAutoCredentialProvider(http, username, password)
+            /**
+             * refer to commit 79e0d99d520c2f4545fcf48f43bb9776d1ee2f02 of pokegoapi
+             * add try catch 
+             */
         } else {
             GoogleCredentialProvider(http, token, time)
         }
