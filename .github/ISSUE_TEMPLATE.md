@@ -1,5 +1,5 @@
 **Description:**
-[Short description of the issue observed. If this ia feature request you can modify the template as required.]
+[Short description of the issue observed. If this is feature request you can modify the template as required.]
 
 **Steps to reproduce:**
 
@@ -16,4 +16,10 @@
 [Please use pastebin if it's too long]
 
 **Version:**
-[The version of the lib you used]
+[The version of the bot you used; when self-compiled: :exclamation: the commit hash :exclamation:]
+
+**Operating System:**
+[Your operating system]
+
+**Java version:**
+[Full output of `java -version`]
