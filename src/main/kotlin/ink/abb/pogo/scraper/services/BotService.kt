@@ -59,6 +59,11 @@ class BotService {
         return root.list().filter { it.endsWith(".json") }.map { it.replace(Regex("\\.json$"), "") }
     }
 
+    @Synchronized
+    fun getAllBotSettings(): List<Settings> {
+        return bots.map { it.settings }
+    }
+
     @PreDestroy
     @Synchronized
     fun stopAllBots() {

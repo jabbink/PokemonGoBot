@@ -538,7 +538,7 @@
             }
         }
 
-        var socket = io.connect('ws://' + window.location.hostname + ':8080/socket');
+        var socket = io.connect('ws://' + window.location.hostname + ':{{socketPort}}');
 
         var currentLevel;
 

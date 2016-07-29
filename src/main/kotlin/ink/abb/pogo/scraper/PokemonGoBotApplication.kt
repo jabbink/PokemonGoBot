@@ -7,11 +7,14 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 /**
- * @author Andrew Potter (ddcapotter)
+ * @author Andrew Potter (apottere)
  */
 @SpringBootApplication
 open class PokemonGoBotApplication {
@@ -23,6 +26,15 @@ open class PokemonGoBotApplication {
         builder.readTimeout(60, TimeUnit.SECONDS)
         builder.writeTimeout(60, TimeUnit.SECONDS)
         return builder.build()
+    }
+
+    @Bean
+    open fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurerAdapter() {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**").allowedOrigins("*")
+            }
+        }
     }
 
     @Component
