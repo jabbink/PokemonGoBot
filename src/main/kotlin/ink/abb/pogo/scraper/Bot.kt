@@ -168,6 +168,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Log.red("Stopping SocketServer...")
             ctx.server.stop()
             Log.red("Stopped SocketServer.")
+            socketServerStopLatch.countDown()
         }
 
         Log.red("Stopping bot loops...")
