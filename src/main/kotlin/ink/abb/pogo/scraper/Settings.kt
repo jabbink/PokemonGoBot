@@ -101,8 +101,6 @@ class SettingsParser(val properties: Properties) {
         return if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
     }
 
-    val exportCSV = getPropertyIfSet("Export CSV on Profile Update", "export_csv", false, String::toBoolean)
-
     fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
         val settingString = "$description setting (\"$property\")"
 
