@@ -17,6 +17,8 @@ import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.canLoot;
+import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
+import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 
 class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
@@ -29,7 +31,12 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             val coordinates = ctx.server.coordinatesToGoTo.first()
             ctx.server.coordinatesToGoTo.removeAt(0)
             Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
-            walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+
+            if (settings.shouldFollowStreets) {
+                walkRoute(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            } else {
+                walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            }
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
                 val canLoot = it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
@@ -50,7 +57,11 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 if (settings.shouldDisplayPokestopName)
                     Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
 
-                walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                if (settings.shouldFollowStreets) {
+                    walkRoute(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                } else {
+                    walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                }
             }
         }
     }
@@ -80,7 +91,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             // don't run away when there are still Pokemon around
             if (walking) {
-                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     walking = false
                     Log.normal("Pausing to catch pokemon...")
@@ -96,7 +107,6 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 return@runLoop
             }
 
-
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
 
@@ -104,6 +114,139 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
             remainingSteps--
             if (remainingSteps <= 0) {
+                Log.normal("Destination reached.")
+
+                if (sendDone) {
+                    ctx.server.sendGotoDone()
+                }
+
+                ctx.walking.set(false)
+                cancel()
+            }
+        }
+    }
+
+    fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
+        if (speed.equals(0)) {
+            return
+        }
+        val timeout = 200L
+        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end)
+        if (coordinatesList.size <= 0) {
+            walk(bot, ctx, settings, end, speed, sendDone)
+        } else {
+            var walking = true
+            bot.runLoop(timeout, "WalkingLoop") { cancel ->
+                if (walking) {
+                    if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                        // Stop walking
+                        walking = false
+                        Log.normal("Pausing to catch pokemon...")
+                    } // Else continue walking.
+                } else {
+                    if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
+                        walking = true
+                        Log.normal("Resuming walk.")
+                    } // Else continue waiting.
+                }
+
+                if (!walking) {
+                    return@runLoop
+                }
+
+
+                val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
+                val step = coordinatesList.first()
+                coordinatesList.removeAt(0)
+                val diff = step.sub(start)
+                val distance = start.getEarthDistance(step)
+                val timeRequired = distance / speed
+                val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
+                if (stepsRequired.equals(0)) {
+                    cancel()
+                }
+                val deltaLat = diff.latDegrees() / stepsRequired
+                val deltaLng = diff.lngDegrees() / stepsRequired
+                var remainingSteps = stepsRequired
+                while (remainingSteps > 0) {
+                    ctx.lat.addAndGet(deltaLat)
+                    ctx.lng.addAndGet(deltaLng)
+                    ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+                    remainingSteps--
+                    Thread.sleep(timeout)
+                }
+
+                if (coordinatesList.size <= 0) {
+                    Log.normal("Destination reached.")
+                    if (sendDone) {
+                        ctx.server.sendGotoDone()
+                    }
+                    ctx.walking.set(false)
+                    cancel()
+
+                }
+            }
+        }
+    }
+
+    fun walkAndComeBack(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
+        val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
+        val diff = end.sub(start)
+        val distance = start.getEarthDistance(end)
+        val timeout = 200L
+        // prevent division by 0
+        if (speed.equals(0)) {
+            return
+        }
+        val timeRequired = distance / speed
+        val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
+        // prevent division by 0
+        if (stepsRequired.equals(0)) {
+            return
+        }
+        val deltaLat = diff.latDegrees() / stepsRequired
+        val deltaLng = diff.lngDegrees() / stepsRequired
+        val deltaLat2 = -deltaLat
+        val deltaLng2 = -deltaLng
+
+        Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
+        var remainingStepsGoing = stepsRequired
+        var remainingStepsComing = stepsRequired
+        var walking = true
+        bot.runLoop(timeout, "WalkingLoop") { cancel ->
+            // don't run away when there are still Pokemon around
+            if (walking) {
+                if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                    // Stop walking
+                    walking = false
+                    Log.normal("Pausing to catch pokemon...")
+                } // Else continue walking.
+            } else {
+                if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
+                    walking = true
+                    Log.normal("Resuming walk.")
+                } // Else continue waiting.
+            }
+
+            if (!walking) {
+                return@runLoop
+            }
+            if (remainingStepsGoing > 0) {
+                ctx.lat.addAndGet(deltaLat)
+                ctx.lng.addAndGet(deltaLng)
+
+                ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+                remainingStepsGoing--
+            } else if (remainingStepsGoing <= 0) {
+                ctx.lat.addAndGet(deltaLat2)
+                ctx.lng.addAndGet(deltaLng2)
+
+                ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+
+                remainingStepsComing--
+            }
+
+            if (remainingStepsComing <= 0) {
                 Log.normal("Destination reached.")
 
                 if (sendDone) {
