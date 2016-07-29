@@ -44,6 +44,7 @@ class UpdateProfile : Task {
             )
             ctx.server.sendProfile()
         } catch (e: Exception) {
+            Log.red("Failed to update profile and inventories")
         }
     }
 }
