@@ -68,7 +68,7 @@ class ExportCSV : Task {
 
             // Output Pokebank
             writer.println("Pokebank overview")
-            writer.println("Number,Name,Nickname,Favorite?,CP,IV [%],Stamina (HP),Max Stamina (HP),Class,Type,Move 1,Move 1 Power,Move 1 Accuracy, Move 1 Crit Chance,Move 1 Time,Move 1 Energy,Move 2,Move 2 Power,Move 2 Accuracy, Move 2 Crit Chance,Move 2 Time,Move 2 Energy,iStamina,iAttack,iDefense,cpMultiplier,Height [m],Weight [kg],Candy,Candies to evolve,Candy costs for powerup,Stardust costs for powerup,Creation Time,Base Capture Rate,Base Flee Rate,Battles Attacked,Battles Defended,Injured?,Fainted?,Level,CP after powerup,Max CP,ID")
+            writer.println("Number,Name,Nickname,Favorite?,CP,IV [%],Stamina (HP),Max Stamina (HP),Class,Type,Move 1,Move 1 Power,Move 1 Accuracy,Move 1 Crit Chance,Move 1 Time,Move 1 Energy,Move 2,Move 2 Power,Move 2 Accuracy,Move 2 Crit Chance,Move 2 Time,Move 2 Energy,iStamina,iAttack,iDefense,cpMultiplier,Height [m],Weight [kg],Candy,Candies to evolve,Candy costs for powerup,Stardust costs for powerup,Creation Time,Base Capture Rate,Base Flee Rate,Battles Attacked,Battles Defended,Injured?,Fainted?,Level,CP after powerup,Max CP,ID")
 
             ctx.api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
                 val date = Date(it.creationTimeMs)
