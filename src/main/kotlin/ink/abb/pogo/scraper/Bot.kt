@@ -174,6 +174,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     }
 
     fun task(task: Task) {
+        Thread.sleep(300)
         task.run(this, ctx, settings)
     }
 }
