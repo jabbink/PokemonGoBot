@@ -43,17 +43,21 @@ drop_items=true
 
 # max number of each item that the bot should keep if "drop_items" is enabled
 # use -1 in a item to never drop this specific item
+# the default values add up to 350
 item_revive=20
 item_max_revive=10
 item_potion=0
 item_super_potion=30
 item_hyper_potion=50
 item_max_potion=50
-item_poke_ball=50
-item_great_ball=50
+item_poke_ball=40
+item_great_ball=45
 item_ultra_ball=50
-item_master_ball=50
-item_razz_berry=50
+item_master_ball=10
+item_razz_berry=30
+item_lucky_egg=5
+item_incense=5
+item_lure_module=5
 
 ## Extra Info
 # should the bot display rewards pokestop (true/false)
