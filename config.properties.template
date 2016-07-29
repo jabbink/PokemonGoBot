@@ -122,6 +122,10 @@ gui_port=8000
 gui_port_socket=8001
 
 # Export CSV on Profile Update
+# WARNING:  The exported file will be in correct CSV format ("," as delimiter and "." as decimal separator).
+#           On some computers MS Excel will use other settings (";" as delimiter and "," as decimal separator)
+#           which will display a broken spreadsheet if you open it directly. In that case you have to import
+#           the file in a new file (Data tab -> Get External Data group -> From Text, check the correct character).
 export_csv=false
 
 #List of pokemon names
