@@ -1,6 +1,6 @@
 package ink.abb.pogo.scraper
 
-import ink.abb.pogo.scraper.services.BotRunService
+import ink.abb.pogo.scraper.services.BotService
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -31,7 +31,7 @@ open class PokemonGoBotApplication {
         lateinit var http: OkHttpClient
 
         @Autowired
-        lateinit var botRunService: BotRunService
+        lateinit var botRunService: BotService
 
         override fun run(vararg args: String?) {
             val names = botRunService.getSaveNames()

@@ -163,10 +163,19 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun stop() {
         if (!isRunning()) return
 
+        val socketServerStopLatch = CountDownLatch(1)
+        thread {
+            Log.red("Stopping SocketServer...")
+            ctx.server.stop()
+            Log.red("Stopped SocketServer.")
+        }
+
         Log.red("Stopping bot loops...")
         runningLatch.countDown()
         phaser.arriveAndAwaitAdvance()
         Log.red("All bot loops stopped.")
+
+        socketServerStopLatch.await()
     }
 
     fun isRunning(): Boolean {

@@ -52,12 +52,11 @@ class SocketServer {
             }
         }
 
-        Runtime.getRuntime().addShutdownHook(thread(start = false) {
-            Log.red("Stopping SocketServer...")
-            server?.stop()
-            Log.red("Stopped SocketServer.")
-        })
         server?.start()
+    }
+
+    fun stop() {
+        server?.stop()
     }
 
     fun sendGotoDone(){

@@ -9,12 +9,15 @@ import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import javax.annotation.PreDestroy
+import kotlin.concurrent.thread
 
 /**
  * @author Andrew Potter (apottere)
  */
 @Service
-class BotRunService {
+class BotService {
 
     @Autowired
     lateinit var http: OkHttpClient
@@ -54,5 +57,19 @@ class BotRunService {
 
     fun getSaveNames(): List<String> {
         return root.list().filter { it.endsWith(".json") }.map { it.replace(Regex("\\.json$"), "") }
+    }
+
+    @PreDestroy
+    @Synchronized
+    fun stopAllBots() {
+        val latch = CountDownLatch(bots.size)
+        bots.forEach {
+            thread {
+                it.stop()
+                latch.countDown()
+            }
+        }
+
+        latch.await()
     }
 }

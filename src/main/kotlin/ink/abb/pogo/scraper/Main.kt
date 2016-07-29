@@ -16,7 +16,7 @@ import com.pokegoapi.auth.PtcCredentialProvider
 import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
 import com.pokegoapi.util.SystemTimeImpl
-import ink.abb.pogo.scraper.services.BotRunService
+import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
@@ -72,7 +72,7 @@ fun main(args: Array<String>) {
     SpringApplication.run(PokemonGoBotApplication::class.java, *args)
 }
 
-fun startDefaultBot(http: OkHttpClient, service: BotRunService) {
+fun startDefaultBot(http: OkHttpClient, service: BotService) {
     val properties = Properties()
 
     val input = FileInputStream("config.properties")
@@ -141,8 +141,6 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     println(".")
 
     val bot = Bot(api, settings)
-    Runtime.getRuntime().addShutdownHook(thread(start = false) { bot.stop() })
-
     bot.start()
 
     return bot
