@@ -10,6 +10,9 @@ package ink.abb.pogo.scraper
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
 import java.io.BufferedReader
@@ -20,10 +23,11 @@ import java.util.*
 
 class SettingsParser(val properties: Properties) {
     fun createSettingsFromProperties(): Settings {
-        val defaults = Settings(credentials = GoogleCredentials(), startingLatitude = 0.0, startingLongitude = 0.0)
+        val defaults = Settings(name = "", credentials = GoogleCredentials(), startingLatitude = 0.0, startingLongitude = 0.0)
         val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.shouldDropItems, String::toBoolean)
 
         return Settings(
+            name = "default",
             profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
 
             startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
@@ -136,7 +140,9 @@ class SettingsParser(val properties: Properties) {
     }
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Settings(
+    val name: String,
     val profileUpdateTimer: Long = 60,
     val startingLatitude: Double,
     val startingLongitude: Double,
@@ -220,6 +226,13 @@ data class Settings(
     }
 }
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = GoogleCredentials::class, name = "google"),
+    JsonSubTypes.Type(value = GoogleAutoCredentials::class, name = "google-auto"),
+    JsonSubTypes.Type(value = PtcCredentials::class, name = "ptc")
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 interface Credentials
 
 data class GoogleCredentials(var token: String = "") : Credentials

@@ -2,19 +2,25 @@ group 'ink.abb'
 version '0.5.0-alpha2'
 
 buildscript {
-    ext.kotlin_version = '1.0.3'
+    ext {
+        kotlin_version = '1.0.3'
+        springBootVersion = '1.3.6.RELEASE'
+        jacksonVersion = '2.8.0'
+    }
 
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'application'
+apply plugin: 'spring-boot'
 
 mainClassName = 'ink.abb.pogo.scraper.MainKt'
 
@@ -44,8 +50,14 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
 
+    compile 'org.springframework.boot:spring-boot-starter'
+
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: jacksonVersion
+
     compile group: 'org.json', name: 'json', version: '20160212'
-    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.21'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 

@@ -129,7 +129,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
     fun runLoop(timeout: Long, name: String, block: (cancel: () -> Unit) -> Unit) {
         phaser.register()
-        thread(name = name) {
+        thread(name = "${settings.name}: $name") {
             try {
                 var cancelled = false
                 while (!cancelled && isRunning()) {
