@@ -45,6 +45,8 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
                 (result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED)) {
             break
         }
+
+        Thread.sleep(500)
         numThrows++
     } while (amount < 0 || numThrows < amount)
 
