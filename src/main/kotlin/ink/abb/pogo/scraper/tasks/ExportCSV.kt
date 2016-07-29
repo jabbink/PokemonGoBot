@@ -8,8 +8,12 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import POGOProtos.Enums.PokemonIdOuterClass
+import POGOProtos.Enums.PokemonMoveOuterClass
 import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.api.pokemon.PokemonMetaRegistry
+import com.pokegoapi.api.pokemon.PokemonMoveMetaRegistry
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -64,13 +68,17 @@ class ExportCSV : Task {
 
             // Output Pokebank
             writer.println("Pokebank overview")
-            writer.println("Number,Name,Nickname,Favorite?,CP,IV [%],Stamina (HP),Max Stamina (HP),Move 1,Move 2,iStamina,iAttack,iDefense,cpMultiplier,Height [m],Weight [kg],Candy,Candies to evolve,Candy costs for powerup,Stardust costs for powerup,Creation Time,Base Capture Rate,Base Flee Rate,Battles Attacked,Battles Defended,Injured?,Fainted?,Level,CP after powerup,Max CP,ID")
+            writer.println("Number,Name,Nickname,Favorite?,CP,IV [%],Stamina (HP),Max Stamina (HP),Class,Type,Move 1,Move 1 Power,Move 1 Accuracy, Move 1 Crit Chance,Move 1 Time,Move 1 Energy,Move 2,Move 2 Power,Move 2 Accuracy, Move 2 Crit Chance,Move 2 Time,Move 2 Energy,iStamina,iAttack,iDefense,cpMultiplier,Height [m],Weight [kg],Candy,Candies to evolve,Candy costs for powerup,Stardust costs for powerup,Creation Time,Base Capture Rate,Base Flee Rate,Battles Attacked,Battles Defended,Injured?,Fainted?,Level,CP after powerup,Max CP,ID")
 
             ctx.api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
                 val date = Date(it.creationTimeMs)
                 dateFormatter.format(date)
 
-                "${it.pokemonId.number},${it.pokemonId.name},\"${it.nickname}\",${it.isFavorite},${it.cp},${it.getIvPercentage()},${it.stamina},${it.maxStamina},${it.move1.name},${it.move2.name},${it.individualStamina},${it.individualAttack},${it.individualDefense},${it.cpMultiplier},${it.heightM},${it.weightKg},${it.candy},${it.candiesToEvolve},${it.candyCostsForPowerup},${it.stardustCostsForPowerup},${dateFormatter.format(date)},${it.baseCaptureRate},${it.baseFleeRate},${it.battlesAttacked},${it.battlesDefended},${it.isInjured},${it.isFainted},${it.level},${it.cpAfterPowerup},${it.maxCp},${it.id}"
+                val pmeta = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.forNumber(it.pokemonId.number))
+                val pmmeta1 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.move1.number))
+                val pmmeta2 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.move2.number))
+
+                "${it.pokemonId.number},${it.pokemonId.name},\"${it.nickname}\",${it.isFavorite},${it.cp},${it.getIvPercentage()},${it.stamina},${it.maxStamina},${pmeta.pokemonClass.name},${pmeta.type1.name}/${pmeta.type2.name},${it.move1.name},${pmmeta1.power},${pmmeta1.accuracy},${pmmeta1.critChance},${pmmeta1.time},${pmmeta1.energy},${it.move2.name},${pmmeta2.power},${pmmeta2.accuracy},${pmmeta2.critChance},${pmmeta2.time},${pmmeta2.energy},${it.individualStamina},${it.individualAttack},${it.individualDefense},${it.cpMultiplier},${it.heightM},${it.weightKg},${it.candy},${it.candiesToEvolve},${it.candyCostsForPowerup},${it.stardustCostsForPowerup},${dateFormatter.format(date)},${it.baseCaptureRate},${it.baseFleeRate},${it.battlesAttacked},${it.battlesDefended},${it.isInjured},${it.isFainted},${it.level},${it.cpAfterPowerup},${it.maxCp},${it.id}"
             }.forEach { writer.println(it) }
 
             Log.normal("Wrote export CSV.")
