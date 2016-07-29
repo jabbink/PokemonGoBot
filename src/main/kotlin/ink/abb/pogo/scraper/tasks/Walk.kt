@@ -175,18 +175,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 }
 
                 if (coordinatesList.size <= 0) {
-                    if (ctx.lat.get()!= end.latDegrees() && ctx.lng.get() != end.lngDegrees()) {
-                        ctx.walking.set(false)
-                        walkAndComeBack(bot,ctx,settings,end,speed,sendDone)
-                        cancel()
-                    } else {
-                        Log.normal("Destination reached.")
-                        if (sendDone) {
-                            ctx.server.sendGotoDone()
-                        }
-                        ctx.walking.set(false)
-                        cancel()
+                    Log.normal("Destination reached.")
+                    if (sendDone) {
+                        ctx.server.sendGotoDone()
                     }
+                    ctx.walking.set(false)
+                    cancel()
+
                 }
             }
         }
@@ -234,15 +229,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             if (!walking) {
                 return@runLoop
             }
+            if (remainingStepsGoing > 0) {
+                ctx.lat.addAndGet(deltaLat)
+                ctx.lng.addAndGet(deltaLng)
 
-            ctx.lat.addAndGet(deltaLat)
-            ctx.lng.addAndGet(deltaLng)
-
-            ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
-
-            remainingStepsGoing--
-
-            if (remainingStepsGoing <= 0) {
+                ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+                remainingStepsGoing--
+            } else if (remainingStepsGoing <= 0) {
                 ctx.lat.addAndGet(deltaLat2)
                 ctx.lng.addAndGet(deltaLng2)
 
