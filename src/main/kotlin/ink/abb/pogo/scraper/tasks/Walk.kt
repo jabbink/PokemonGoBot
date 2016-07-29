@@ -87,31 +87,27 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
-        var walking = true
+
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
+            // incase api does not respond ; just continue
+            var walking = true
             // don't run away when there are still Pokemon around
             if (walking) {
-                try {
-                    if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
-                        // Stop walking
-                        walking = false
-                        Log.normal("Pausing to catch pokemon...")
-                        // Else continue walking.
-                    } else {
-                        if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
-                            walking = true
-                            Log.normal("Resuming walk.")
-                        } // Else continue waiting.
-                    }
-                } catch(e: Exception) {
-                    // incase api does not responst ; just continue
-                    walking = true
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                    // Stop walking
+                    walking = false
+                    Log.normal("Pausing to catch pokemon...")
+                    // Else continue walking.
+                } else {
+                    if (!walking && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
+                        walking = true
+                        Log.normal("Resuming walk.")
+                    } // Else continue waiting.
                 }
             }
-
-                if (!walking) {
-                    return@runLoop
-                }
+            if (!walking) {
+                return@runLoop
+            }
 
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
@@ -141,31 +137,26 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (coordinatesList.size <= 0) {
             walk(bot, ctx, settings, end, speed, sendDone)
         } else {
-            var walking = true
             bot.runLoop(timeout, "WalkingLoop") { cancel ->
+                // incase api does not respond ; just continue
+                var walking = true
+                // don't run away when there are still Pokemon around
                 if (walking) {
-                    try {
-                        if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
-                            // Stop walking
-                            walking = false
-                            Log.normal("Pausing to catch pokemon...")
-                            // Else continue walking.
-                        } else {
-                            if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
-                                walking = true
-                                Log.normal("Resuming walk.")
-                            } // Else continue waiting.
-                        }
-                    } catch (e: Exception) {
-                        // incase api does not responst ; just continue
-                        walking = true
+                    if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                        // Stop walking
+                        walking = false
+                        Log.normal("Pausing to catch pokemon...")
+                        // Else continue walking.
+                    } else {
+                        if (!walking && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
+                            walking = true
+                            Log.normal("Resuming walk.")
+                        } // Else continue waiting.
                     }
-
                 }
                 if (!walking) {
                     return@runLoop
                 }
-
 
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                 val step = coordinatesList.first()
