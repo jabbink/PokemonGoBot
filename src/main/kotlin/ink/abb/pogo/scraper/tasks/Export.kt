@@ -53,10 +53,26 @@ class Export : Task {
             output.add(arrayOf("Pokecoin", "${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}"))
             output.add(arrayOf("Stardust", "${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}"))
             output.add(arrayOf("Level", "${ctx.profile.stats.level}"))
-            output.add(arrayOf("Experience", "${ctx.profile.stats.experience}"))
-            output.add(arrayOf("Pokebank", "${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.pokemonStorage}"))
-            output.add(arrayOf("Inventory", "${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}"))
-            output.add(arrayOf("Last update", dateFormatter.format(dateNow)))
+            output.add(arrayOf("Experience", "${ctx.profile.stats.experience}", "${ctx.profile.stats.nextLevelXp}"))
+            output.add(arrayOf("Km walked", ds("${ctx.profile.stats.kmWalked}", settings)))
+            output.add(arrayOf("Pokemons Encountered", "${ctx.profile.stats.pokemonsEncountered}"))
+            output.add(arrayOf("Pokemons Captured", "${ctx.profile.stats.pokemonsCaptured}"))
+            output.add(arrayOf("Unique Pokedex Entries", "${ctx.profile.stats.uniquePokedexEntries}"))
+            output.add(arrayOf("Evolutions", "${ctx.profile.stats.evolutions}"))
+            output.add(arrayOf("Pokestop Visits", "${ctx.profile.stats.pokeStopVisits}"))
+            output.add(arrayOf("Pokeballs Thrown", "${ctx.profile.stats.pokeballsThrown}"))
+            output.add(arrayOf("Eggs Hatched", "${ctx.profile.stats.eggsHatched}"))
+            output.add(arrayOf("Battle Attack Won", "${ctx.profile.stats.battleAttackWon}"))
+            output.add(arrayOf("Battle Attack Total", "${ctx.profile.stats.battleAttackTotal}"))
+            output.add(arrayOf("Battle Defended Won", "${ctx.profile.stats.battleDefendedWon}"))
+            output.add(arrayOf("Battle Training Won", "${ctx.profile.stats.battleTrainingTotal}"))
+            output.add(arrayOf("Battle Training Total", "${ctx.profile.stats.battleTrainingTotal}"))
+            output.add(arrayOf("Prestige Raised Total", "${ctx.profile.stats.prestigeRaisedTotal}"))
+            output.add(arrayOf("Prestige Dropped Total", "${ctx.profile.stats.prestigeDroppedTotal}"))
+            output.add(arrayOf("Pokemon Deployed", "${ctx.profile.stats.pokemonDeployed}"))
+            output.add(arrayOf("Pokebank", "${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}", "${ctx.profile.pokemonStorage}"))
+            output.add(arrayOf("Inventory", "${ctx.api.inventories.itemBag.size()}", "${ctx.profile.itemStorage}"))
+            output.add(arrayOf("Last Update", dateFormatter.format(dateNow)))
             output.add(arrayOf(""))
 
             // Output Pokebank
@@ -112,7 +128,7 @@ class Export : Task {
         }
     }
 
-    // Detect of the "float" fields need to be forced to use "," instead of "." (DSV export)
+    // Detect if the "float" fields need to be forced to use "," instead of "." (DSV export)
     private fun ds(string: String, settings: Settings): String {
         var result = string
         if (settings.export.equals("DSV"))
