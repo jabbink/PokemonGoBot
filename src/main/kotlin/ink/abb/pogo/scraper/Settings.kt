@@ -93,6 +93,8 @@ class SettingsParser(val properties: Properties) {
 
             obligatoryTransfer = getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", defaults.obligatoryTransfer.map {it.name}.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
+            export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
+
             guiPort = getPropertyIfSet("Port where the webserver should listen", "gui_port", defaults.guiPort, String::toInt),
             guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt)
         )
@@ -193,6 +195,8 @@ data class Settings(
     val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO),
 
     val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
+
+    val export: String = "",
 
     val guiPort: Int = 8000,
     val guiPortSocket: Int = 8001

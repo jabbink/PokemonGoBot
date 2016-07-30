@@ -82,6 +82,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val catch = CatchOneNearbyPokemon()
         val release = ReleasePokemon()
         val hatchEggs = HatchEggs()
+        val export = Export()
+
+        if (settings.export.length > 0)
+            task(export)
 
         task(keepalive)
         Log.normal("Getting initial pokestops...")
@@ -104,6 +108,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         runLoop(TimeUnit.SECONDS.toMillis(settings.profileUpdateTimer), "ProfileLoop") {
             task(profile)
             task(hatchEggs)
+            if (settings.export.length > 0)
+                task(export)
         }
         
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
