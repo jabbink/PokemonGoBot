@@ -102,6 +102,9 @@ allow_leave_start_area=false
 # (-1: only limited by the initial pokestops (~3*3km); with allow_leave_start_area=true unlimited)
 spawn_radius=-1
 
+# Set Timer in seconds to go back to the starting PokeStop (-1 disabled)
+timerWalkToStartPokeStop=-1
+
 # Set Profile Update Timer (Default: 60)
 profile_update_timer=60
 

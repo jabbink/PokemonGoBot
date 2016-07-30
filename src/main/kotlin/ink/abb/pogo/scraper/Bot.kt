@@ -11,6 +11,7 @@ package ink.abb.pogo.scraper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
+import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.gui.WebServer
@@ -25,6 +26,7 @@ import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Phaser
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
@@ -32,6 +34,9 @@ import kotlin.concurrent.thread
 class Bot(val api: PokemonGo, val settings: Settings) {
 
     private var runningLatch = CountDownLatch(0)
+    var prepareWalkBack = AtomicBoolean(false)
+    var walkBackLock = AtomicBoolean(true)
+
     lateinit private var phaser: Phaser
 
     var ctx = Context(
@@ -111,7 +116,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             if (settings.export.length > 0)
                 task(export)
         }
-        
+
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
             if (settings.shouldCatchPokemons)
@@ -121,7 +126,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             if (settings.shouldAutoTransfer)
                 task(release)
 
-            task(process)
+            if (!prepareWalkBack.get())
+                task(process)
+            else if(!ctx.walking.get())
+                task(WalkToStartPokeStop(process.startPokeStop as Pokestop))
         }
 
         Log.setContext(ctx)
@@ -131,6 +139,16 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             WebServer().start(settings.guiPort, settings.guiPortSocket)
             ctx.server.start(ctx, settings.guiPortSocket)
         }
+
+
+        if (settings.timerWalkToStartPokeStop <= 0)
+            runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), "BotWalkBackLoop") {
+                if(!prepareWalkBack.get())
+                    Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokeStop} seconds")
+                runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), TimeUnit.MILLISECONDS)
+                prepareWalkBack.set(true)
+                while(walkBackLock.get()){}
+            }
     }
 
     fun runLoop(timeout: Long, name: String, block: (cancel: () -> Unit) -> Unit) {
@@ -148,7 +166,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                         t.printStackTrace()
                     }
 
-                    if(cancelled) continue
+                    if (cancelled) continue
 
                     val sleep = timeout - (api.currentTimeMillis() - start)
 
