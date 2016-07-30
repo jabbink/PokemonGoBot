@@ -90,14 +90,15 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             // don't run away when there are still Pokemon around
-            if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
-                // Stop walking
-                Log.normal("Pausing to catch pokemon...")
-                // Try to catch once, then wait for next walk loop
-                bot.task(CatchOneNearbyPokemon())
+            if (remainingSteps.toInt().mod(20) == 0)
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                    // Stop walking
+                    Log.normal("Pausing to catch pokemon...")
+                    // Try to catch once, then wait for next walk loop
+                    bot.task(CatchOneNearbyPokemon())
 
-                return@runLoop
-            }
+                    return@runLoop
+                }
 
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
@@ -196,14 +197,14 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         var remainingStepsComing = stepsRequired
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             // don't run away when there are still Pokemon around
-            // don't run away when there are still Pokemon around
-            if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
-                // Stop walking
-                Log.normal("Pausing to catch pokemon...")
-                // Try to catch once, then wait for next walk loop
-                bot.task(CatchOneNearbyPokemon())
-                return@runLoop
-            }
+            if (remainingStepsGoing.toInt().mod(20) == 0 || remainingStepsComing.toInt().mod(20) == 0)
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                    // Stop walking
+                    Log.normal("Pausing to catch pokemon...")
+                    // Try to catch once, then wait for next walk loop
+                    bot.task(CatchOneNearbyPokemon())
+                    return@runLoop
+                }
 
             if (remainingStepsGoing > 0) {
                 ctx.lat.addAndGet(deltaLat)
