@@ -187,7 +187,7 @@ class SocketServer {
             var name: String? = null
             var cp: Int? = null
             var iv: Int? = null
-			var stats: String? = null
+	    var stats: String? = null
         }
     }
 
