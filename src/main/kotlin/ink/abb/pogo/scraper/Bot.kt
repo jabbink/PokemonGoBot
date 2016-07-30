@@ -135,7 +135,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
 
 
-        if (settings.timerWalkToStartPokeStop != -1L)
+        if (settings.timerWalkToStartPokeStop <= 0)
             runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), "BotWalkBackLoop") {
                 if(!prepareWalkBack.get())
                     Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokeStop} seconds")
