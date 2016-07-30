@@ -26,7 +26,6 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
     connection.inputStream.bufferedReader().lines().forEach {
         routeFile += "$it\n"
     }
-    println(routeFile)
     return routeFile
 }
 
