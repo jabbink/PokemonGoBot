@@ -299,7 +299,37 @@
             text-align: center;
             vertical-align: middle;
         }
-    </style>
+		
+		/* === MORE IV INFORMATION === */
+		
+		.ivTooltip {
+			position: relative;
+			display: inline-block;
+			border-bottom: 1px dotted black;
+		}
+
+		.ivTooltip .ivTooltipText {
+			visibility: hidden;
+			width: 150px;
+			background-color: black;
+			color: #fff;
+			text-align: center;
+			border-radius: 6px;
+			padding: 5px 0;
+			position: absolute;
+			z-index: 1;
+			bottom: 100%;
+			left: 50%;
+			margin-left: -60px;
+			opacity: 0;
+			transition: opacity 0.6s;
+		}
+
+		.ivTooltip:hover .ivTooltipText {
+			visibility: visible;
+			opacity: 0.7;
+		}
+	</style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
@@ -600,10 +630,11 @@
                     pokemonId: pokemon.pokemonId,
                     name: pokemon.name,
                     cp: pokemon.cp,
-                    iv: pokemon.iv
+                    iv: pokemon.iv,
+					stats: pokemon.stats
                 };
 
-                var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="' + icons.pokemon(pokemon.pokemonId) + '"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2>IV ' + pokemon.iv + '</h2></div></div>');
+                var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="' + icons.pokemon(pokemon.pokemonId) + '"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2 class="ivTooltip">IV ' + pokemon.iv + '<span class="ivTooltipText">' + pokemon.stats + '</span></h2></div></div>');
                 elements.pokemonList.append(elem);
             }
         });
