@@ -2,15 +2,13 @@ package ink.abb.pogo.scraper.util.directions
 
 import com.pokegoapi.google.common.geometry.S1Angle
 import com.pokegoapi.google.common.geometry.S2LatLng
-import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 import java.util.regex.Pattern
-import java.util.zip.GZIPInputStream
 
-//var routeProvider = "http://yournavigation.org/api/dev/route.php"
-var routeProvider = "http://router.project-osrm.org/viaroute"
+var routeProvider = "http://yournavigation.org/api/dev/route.php"
+//var routeProvider = "http://router.project-osrm.org/viaroute"
 
 
 fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
@@ -33,11 +31,33 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
 
 
 fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
-    //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1"
-    return "$routeProvider?loc=$olat,$olng&loc=$dlat,$dlng&compression=false"
+    return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1"
+    //return "$routeProvider?loc=$olat,$olng&loc=$dlat,$dlng&compression=false"
 }
 
 fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
+    var routeParsed = getRoutefile(olat, olng, dlat, dlng)
+    if (!routeParsed.contains("<distance>0</distance>")){
+        routeParsed = routeParsed.split("<coordinates>")[1]
+        val matcher = Pattern.compile("(|-)\\d+.(|-)\\d+,(|-)\\d+.(|-)\\d+").matcher(routeParsed)
+        val coordinatesList = ArrayList<String>()
+        while (matcher.find()) {
+            coordinatesList.add(matcher.group())
+        }
+        val latlngList = ArrayList<S2LatLng>()
+        coordinatesList.forEach {
+            latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[1].toDouble()), S1Angle.degrees(it.toString().split(",")[0].toDouble())))
+        }
+        return latlngList
+    }else{
+        return ArrayList()
+    }
+
+}
+
+
+//Keep this in case yournavigation.org goes down
+/*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     val routeJSONParsed = JSONObject(getRoutefile(olat, olng, dlat, dlng))
     var coordinates = routeJSONParsed.get("route_geometry").toString()
     coordinates = coordinates.replace("[", "")
@@ -52,8 +72,8 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
         latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[0].toDouble()), S1Angle.degrees(it.toString().split(",")[1].toDouble())))
     }
     return latlngList
-}
+}*/
 
 fun getRouteCoordinates(start: S2LatLng, end: S2LatLng): ArrayList<S2LatLng> {
-    return getRouteCoordinates(start.latDegrees(),start.lngDegrees(),end.latDegrees(),end.lngDegrees())
+    return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees())
 }
