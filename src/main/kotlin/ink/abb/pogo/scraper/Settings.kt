@@ -53,9 +53,9 @@ class SettingsParser(val properties: Properties) {
                 Pair(ItemId.ITEM_ULTRA_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_ULTRA_BALL", "item_ultra_ball", 50, String::toInt)),
                 Pair(ItemId.ITEM_MASTER_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_MASTER_BALL", "item_master_ball", 10, String::toInt)),
                 Pair(ItemId.ITEM_RAZZ_BERRY, getPropertyIfSet("Max number of items to keep from type ITEM_RAZZ_BERRY", "item_razz_berry", 30, String::toInt)),
-                Pair(ItemId.ITEM_LUCKY_EGG, getPropertyIfSet("Max number of items to keep from type ITEM_LUCKY_EGG", "item_lucky_egg", 5, String::toInt)),
-                Pair(ItemId.ITEM_INCENSE_ORDINARY, getPropertyIfSet("Max number of items to keep from type ITEM_INCENSE_ORDINARY", "item_incense", 5, String::toInt)),
-                Pair(ItemId.ITEM_TROY_DISK, getPropertyIfSet("Max number of items to keep from type ITEM_TROY_DISK (lure module)", "item_lure_module", 5, String::toInt))
+                Pair(ItemId.ITEM_LUCKY_EGG, getPropertyIfSet("Max number of items to keep from type ITEM_LUCKY_EGG", "item_lucky_egg", -1, String::toInt)),
+                Pair(ItemId.ITEM_INCENSE_ORDINARY, getPropertyIfSet("Max number of items to keep from type ITEM_INCENSE_ORDINARY", "item_incense", -1, String::toInt)),
+                Pair(ItemId.ITEM_TROY_DISK, getPropertyIfSet("Max number of items to keep from type ITEM_TROY_DISK (lure module)", "item_lure_module", -1, String::toInt))
             ) else mapOf(),
 
             randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestop, String::toInt),
@@ -163,9 +163,9 @@ data class Settings(
         Pair(ItemId.ITEM_ULTRA_BALL, 50),
         Pair(ItemId.ITEM_MASTER_BALL, 10),
         Pair(ItemId.ITEM_RAZZ_BERRY, 30),
-        Pair(ItemId.ITEM_LUCKY_EGG, 5),
-        Pair(ItemId.ITEM_INCENSE_ORDINARY, 5),
-        Pair(ItemId.ITEM_TROY_DISK, 5)
+        Pair(ItemId.ITEM_LUCKY_EGG, -1),
+        Pair(ItemId.ITEM_INCENSE_ORDINARY, -1),
+        Pair(ItemId.ITEM_TROY_DISK, -1)
 
     ),
 
