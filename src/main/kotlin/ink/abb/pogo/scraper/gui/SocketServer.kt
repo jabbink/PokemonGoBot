@@ -95,7 +95,7 @@ class SocketServer {
                 pokemonObj.name = pokemon.pokemonId.name
                 pokemonObj.cp = pokemon.cp
                 pokemonObj.iv = pokemon.getIvPercentage()
-				pokemonObj.stats = pokemon.getStatsFormatted()
+		pokemonObj.stats = pokemon.getStatsFormatted()
                 pokebank.pokemon.add(pokemonObj)
             }
             server?.broadcastOperations?.sendEvent("pokebank", pokebank)
