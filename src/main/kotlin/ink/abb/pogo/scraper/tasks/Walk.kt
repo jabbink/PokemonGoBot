@@ -15,6 +15,8 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.inventory.hasPokeballs
+import ink.abb.pogo.scraper.util.map.canLoot;
 import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
 import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
@@ -85,23 +87,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
-        var walking = true
+
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             // don't run away when there are still Pokemon around
-            if (walking) {
-                if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
-                    // Stop walking
-                    walking = false
-                    Log.normal("Pausing to catch pokemon...")
-                } // Else continue walking.
-            } else {
-                if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
-                    walking = true
-                    Log.normal("Resuming walk.")
-                } // Else continue waiting.
-            }
+            if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                // Stop walking
+                Log.normal("Pausing to catch pokemon...")
 
-            if (!walking) {
                 return@runLoop
             }
 
@@ -133,25 +125,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (coordinatesList.size <= 0) {
             walk(bot, ctx, settings, end, speed, sendDone)
         } else {
-            var walking = true
             bot.runLoop(timeout, "WalkingLoop") { cancel ->
-                if (walking) {
-                    if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
-                        // Stop walking
-                        walking = false
-                        Log.normal("Pausing to catch pokemon...")
-                    } // Else continue walking.
-                } else {
-                    if (bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size <= 0) {
-                        walking = true
-                        Log.normal("Resuming walk.")
-                    } // Else continue waiting.
-                }
-
-                if (!walking) {
+                // don't run away when there are still Pokemon around
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                    // Stop walking
+                    Log.normal("Pausing to catch pokemon...")
                     return@runLoop
                 }
-
 
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                 val step = coordinatesList.first()
