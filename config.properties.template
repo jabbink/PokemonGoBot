@@ -102,6 +102,9 @@ allow_leave_start_area=false
 # (-1: only limited by the initial pokestops (~3*3km); with allow_leave_start_area=true unlimited)
 spawn_radius=-1
 
+# Number of seconds to wait after a softban has been detected
+ban_wait_time=30
+
 # Set Timer in seconds to go back to the starting PokeStop (-1 disabled)
 timerWalkToStartPokeStop=-1
 

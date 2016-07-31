@@ -86,6 +86,8 @@ class SettingsParser(val properties: Properties) {
 
             spawnRadius = getPropertyIfSet("Max distance from starting point the bot should ever go", "spawn_radius", defaults.spawnRadius, String::toInt),
 
+            banWaitTime = getPropertyIfSet("Number of seconds to wait after a softban has been detected", "ban_wait_time", defaults.banWaitTime, String::toInt),
+
             transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", defaults.transferCPThreshold, String::toInt),
 
             transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", defaults.transferIVThreshold, String::toInt),
@@ -192,6 +194,7 @@ data class Settings(
     val neverUseBerries: Boolean = true,
     val allowLeaveStartArea: Boolean = false,
     val spawnRadius: Int = -1,
+    val banWaitTime: Int = 30,
     val transferCPThreshold: Int = 400,
     val transferIVThreshold: Int = 80,
     val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO),
