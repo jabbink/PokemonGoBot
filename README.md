@@ -9,11 +9,11 @@
 - With that said, please do your due diligence and research your problem without opening unnecessary issue tickets.
 - *Searching* here, reddit or Google will more than likely provide you with an answer.
     - Common issues may be found at the bottom of this page.
-- Those that are actively contributing to this project utilize the ticket system for tracking technical issues and 
+- Those that are actively contributing to this project utilize the ticket system for tracking technical issues and
 having to answer the same question can really clog up the pipes for people who are presenting an original problem.
 - For legitimate technical issues **PLEASE** abide by the given template and provide as much information as possible.
     - For extensive logs, please use PasteBin.
- 
+
 
 ## Usage (from source)
 
@@ -38,14 +38,14 @@ having to answer the same question can really clog up the pipes for people who a
 8. `java -jar pogo.scraper-all-VERSION.jar` (replace version with the downloaded one, or type `pogo.scraper-all` and press `TAB`)
 
 # Contributing
-If you want to help and add a new feature, you can create a pull request to merge in the `develop` branch and not in the `master`.  
+If you want to help and add a new feature, you can create a pull request to merge in the `develop` branch and not in the `master`.
 As the name says, the `develop` branch is for developing where we'll add new features, with your help; instead we'll update the `master` every now and then, and from that we'll release a new jar.
 
 # Known issues
 
 ## I got `BUILD FAILED`
 Most of the time it's because the you didn't execute step 2 of the README.
-  
+
 After that, just try `gradlew clean build`.
 
 If there's still a problem, open an issue.
