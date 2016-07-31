@@ -70,7 +70,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     pauseCounter = 2
-
+                    pauseWalk.set(true)
                     return@runLoop
                 }
 
@@ -121,6 +121,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     pauseCounter = 2
+                    pauseWalk.set(true)
                     return@runLoop
                 }
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
