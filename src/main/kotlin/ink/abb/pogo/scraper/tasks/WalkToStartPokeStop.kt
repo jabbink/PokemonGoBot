@@ -69,8 +69,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                 if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
-                    // Try to catch once, then wait for next walk loop
-                    bot.task(CatchOneNearbyPokemon())
+                    pauseCounter = 2
 
                     return@runLoop
                 }
@@ -121,8 +120,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                 if (pauseCounter > 0 && ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
-                    // Try to catch once, then wait for next walk loop
-                    bot.task(CatchOneNearbyPokemon())
+                    pauseCounter = 2
                     return@runLoop
                 }
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
