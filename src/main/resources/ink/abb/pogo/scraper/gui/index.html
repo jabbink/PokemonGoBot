@@ -97,19 +97,19 @@
             height: 400px;
         }
 
-        #pokemon_list {
+        #pokemon_list, #window-pokevision .content {
             width: 100%;
             height: 100%;
             overflow-x: hidden;
             overflow-y: auto;
         }
 
-        .pokemon {
+        .pokemon, #pokevision-button {
             padding: 20px;
             color: #fff;
         }
 
-        .pokemon:nth-child(4n+1) {
+        .pokemon:nth-child(4n+1), #pokevision-button {
             background: #FF3D00;
         }
 
@@ -356,11 +356,17 @@
             <hr />
             <ul id="GpxDownloadLinks" />
         </div>
-    </div>
+    </div>  
     <div id="window-pokebank" class="window">
         <span class="title">Pokebank</span>
         <div class="content">
             <div id="pokemon_list"></div>
+        </div>
+    </div>
+    <div id="window-pokevision" class="window">
+        <span class="title">Pokévision</span>
+        <div class="content">
+                <div align="center" style="cursor: pointer; cursor: hand;" id="pokevision-button"><h1>Go</h1></div>
         </div>
     </div>
 
@@ -802,6 +808,10 @@
                 lng = positionMarker.position.lng()
                 var downloadLink = 'http://gpx.geotags.com/cgi-bin/gpx.cgi?saddr=' + lat + ',' + lng + '&daddr=' + destAddress;
                 $('#GpxDownloadLinks').append('<li><a href="' + downloadLink + '" target="_blank">Download GPX ' +$("#destAddress").val() + '</a></li>');
+            });
+
+            $("#pokevision-button").click(function(){
+                window.open("https://pokevision.com/#/@"+map.center.lat()+","+map.center.lng(), "_blank");
             });
             
             $('#gpx_upload_button').on('click', function(){
