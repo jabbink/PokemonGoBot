@@ -65,7 +65,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                 }
             }
             // don't run away when there are still Pokemon around
-            if (remainingSteps.toInt().mod(20) == 0)
+            if (remainingSteps.toInt().mod(20) == 0 && pauseCounter > 0)
                 if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
@@ -118,7 +118,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                     }
                 }
                 // don't run away when there are still Pokemon around
-                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                if (pauseCounter > 0 && ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     // Try to catch once, then wait for next walk loop
