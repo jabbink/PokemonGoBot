@@ -20,6 +20,7 @@ import ink.abb.pogo.scraper.util.map.canLoot;
 import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
 import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
+import java.util.concurrent.atomic.AtomicBoolean
 
 class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -87,16 +88,31 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
-
+        val pauseWalk:AtomicBoolean = AtomicBoolean(false)
+        var pauseCounter = 2
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
+            if (pauseWalk.get()) {
+                Thread.sleep(timeout * 2)
+                pauseCounter--
+                if (!(ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons)) {
+                    // api break free
+                    pauseWalk.set(false)
+                    pauseCounter = 0
+                }
+                //  fixed tries break free
+                if (pauseCounter > 0) {
+                    return@runLoop
+                } else {
+                    pauseWalk.set(false)
+                }
+            }
             // don't run away when there are still Pokemon around
-            if (remainingSteps.toInt().mod(20) == 0)
+            if (remainingSteps.toInt().mod(20) == 0 && pauseCounter > 0)
                 if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
-                    // Try to catch once, then wait for next walk loop
-                    bot.task(CatchOneNearbyPokemon())
-
+                    pauseCounter = 2
+                    pauseWalk.set(true)
                     return@runLoop
                 }
 
@@ -117,6 +133,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 cancel()
             }
         }
+
     }
 
     fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
@@ -128,13 +145,31 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (coordinatesList.size <= 0) {
             walk(bot, ctx, settings, end, speed, sendDone)
         } else {
+            val pauseWalk: AtomicBoolean = AtomicBoolean(false)
+            var pauseCounter = 2
             bot.runLoop(timeout, "WalkingLoop") { cancel ->
+                if (pauseWalk.get()) {
+                    Thread.sleep(timeout * 2)
+                    pauseCounter--
+                    if (!(ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons)) {
+                        // api break free
+                        pauseWalk.set(false)
+                        pauseCounter = 0
+                    }
+                    //  fixed tries break free
+                    if (pauseCounter > 0) {
+                        return@runLoop
+                    } else {
+                        pauseWalk.set(false)
+                    }
+                }
                 // don't run away when there are still Pokemon around
                 if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
+
                     // Try to catch once, then wait for next walk loop
-                    bot.task(CatchOneNearbyPokemon())
+//                    bot.task(CatchOneNearbyPokemon())
                     return@runLoop
                 }
 
