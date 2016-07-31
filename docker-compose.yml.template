@@ -1,0 +1,8 @@
+pokemongobot:
+  build: .
+  restart: always
+  environment:
+    - POGO_USERNAME=user@gmail.com
+    - POGO_PASSWORD=secret
+    - POGO_LATITUDE=40.767809
+    - POGO_LONGITUDE=-73.971792
