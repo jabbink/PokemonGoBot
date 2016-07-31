@@ -13,7 +13,6 @@ import com.corundumstudio.socketio.Configuration
 import com.corundumstudio.socketio.SocketIOServer
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
-import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.requiredXp
@@ -67,8 +66,8 @@ class SocketServer {
     fun sendProfile(){
         if(ctx != null){
             val profile = EventProfile()
-            profile.username = ctx!!.api.playerProfile.username
-            profile.team = ctx!!.api.playerProfile.team.name
+            profile.username = ctx!!.api.playerProfile.playerData.username
+            profile.team = ctx!!.api.playerProfile.playerData.team.name
             profile.stardust = ctx!!.api.playerProfile.currencies[PlayerProfile.Currency.STARDUST]
             profile.level = ctx!!.api.playerProfile.stats.level
             val curLevelXP = ctx!!.api.playerProfile.stats.experience - requiredXp[ctx!!.api.playerProfile.stats.level - 1]
@@ -77,9 +76,9 @@ class SocketServer {
             val ratio = ((curLevelXP.toDouble() / nextXP.toDouble()) * 100).toInt()
             profile.levelRatio = ratio
             profile.pokebank = ctx!!.api.inventories.pokebank.pokemons.size
-            profile.pokebankMax = ctx!!.api.playerProfile.pokemonStorage
+            profile.pokebankMax = ctx!!.api.playerProfile.playerData.maxPokemonStorage
             profile.items = ctx!!.api.inventories.itemBag.size()
-            profile.itemsMax = ctx!!.api.playerProfile.itemStorage
+            profile.itemsMax = ctx!!.api.playerProfile.playerData.maxItemStorage
             server?.broadcastOperations?.sendEvent("profile", profile)
         }
     }

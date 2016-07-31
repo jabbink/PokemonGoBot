@@ -10,23 +10,21 @@ package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Enums.PokemonMoveOuterClass
-import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.api.pokemon.PokemonMetaRegistry
 import com.pokegoapi.api.pokemon.PokemonMoveMetaRegistry
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
-import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.io.*
+import ink.abb.pogo.scraper.util.inventory.size
+import ink.abb.pogo.scraper.util.io.CSVWriter
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.text.SimpleDateFormat
-import java.util.ArrayList
-import java.util.Comparator
-import java.util.Date
+import java.util.*
 
 class Export : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -48,8 +46,8 @@ class Export : Task {
             val output = ArrayList<Array<String>>()
 
             // Output player information
-            output.add(arrayOf("Name", ctx.profile.username))
-            output.add(arrayOf("Team", ctx.profile.team.name))
+            output.add(arrayOf("Name", ctx.profile.playerData.username))
+            output.add(arrayOf("Team", ctx.profile.playerData.team.name))
             output.add(arrayOf("Pokecoin", "${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}"))
             output.add(arrayOf("Stardust", "${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}"))
             output.add(arrayOf("Level", "${ctx.profile.stats.level}"))
@@ -70,8 +68,8 @@ class Export : Task {
             output.add(arrayOf("Prestige Raised Total", "${ctx.profile.stats.prestigeRaisedTotal}"))
             output.add(arrayOf("Prestige Dropped Total", "${ctx.profile.stats.prestigeDroppedTotal}"))
             output.add(arrayOf("Pokemon Deployed", "${ctx.profile.stats.pokemonDeployed}"))
-            output.add(arrayOf("Pokebank", "${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}", "${ctx.profile.pokemonStorage}"))
-            output.add(arrayOf("Inventory", "${ctx.api.inventories.itemBag.size()}", "${ctx.profile.itemStorage}"))
+            output.add(arrayOf("Pokebank", "${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}", "${ctx.profile.playerData.maxPokemonStorage}"))
+            output.add(arrayOf("Inventory", "${ctx.api.inventories.itemBag.size()}", "${ctx.profile.playerData.maxItemStorage}"))
             output.add(arrayOf("Last Update", dateFormatter.format(dateNow)))
             output.add(arrayOf(""))
 
