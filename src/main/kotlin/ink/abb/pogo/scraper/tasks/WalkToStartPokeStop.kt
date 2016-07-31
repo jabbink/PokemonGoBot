@@ -8,6 +8,8 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
+import ink.abb.pogo.scraper.util.inventory.hasPokeballs
+import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 
 /**
  * Created by Home on 27.07.2016.
@@ -45,6 +47,17 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
         var remainingSteps = stepsRequired
 
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
+            // don't run away when there are still Pokemon around
+            if (remainingSteps.toInt().mod(20) == 0)
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                    // Stop walking
+                    Log.normal("Pausing to catch pokemon...")
+                    // Try to catch once, then wait for next walk loop
+                    bot.task(CatchOneNearbyPokemon())
+
+                    return@runLoop
+                }
+
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
             ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
@@ -70,6 +83,14 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
             walk(bot, ctx, settings)
         } else {
             bot.runLoop(timeout, "WalkingLoop") { cancel ->
+                // don't run away when there are still Pokemon around
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                    // Stop walking
+                    Log.normal("Pausing to catch pokemon...")
+                    // Try to catch once, then wait for next walk loop
+                    bot.task(CatchOneNearbyPokemon())
+                    return@runLoop
+                }
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                 val step = coordinatesList.first()
                 coordinatesList.removeAt(0)
