@@ -16,7 +16,6 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
-import ink.abb.pogo.scraper.util.map.canLoot;
 import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
 import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
@@ -35,7 +34,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             if (settings.shouldFollowStreets) {
                 walkRoute(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
             } else {
-                walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true, false)
+                walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
             }
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
@@ -54,19 +53,23 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
                 ctx.server.sendPokestop(chosenPokestop)
 
-                if (settings.shouldDisplayPokestopName)
-                    Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
-
+                if (settings.shouldDisplayPokestopName) {
+                    if (chosenPokestop.hasLure()) {
+                        Log.magenta("Walking to pokestop \"${chosenPokestop.details.name}\" with lure")
+                    }else {
+                        Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
+                    }
+                }
                 if (settings.shouldFollowStreets) {
                     walkRoute(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
                 } else {
-                    walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false, chosenPokestop.hasLurePokemon())
+                    walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
                 }
             }
         }
     }
 
-    fun walk(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean, hasLure: Boolean) {
+    fun walk(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
         val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
         val diff = end.sub(start)
         val distance = start.getEarthDistance(end)
@@ -84,11 +87,8 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         val deltaLat = diff.latDegrees() / stepsRequired
         val deltaLng = diff.lngDegrees() / stepsRequired
 
-        if (hasLure) {
-            Log.magenta("Walking to pokestop with lure ${end.toStringDegrees()} in $stepsRequired steps.")
-        } else {
-            Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
-        }
+        Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
+
         var remainingSteps = stepsRequired
 
 
@@ -122,7 +122,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
     }
 
-    fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean, hasLure: Boolean) {
+    fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
         if (speed.equals(0)) {
             return
         }
@@ -246,7 +246,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (settings.lurePokestopModifier < 0) {
 
             val pokestopsWithLure: List<Pokestop> = pokestops.filter {
-                it.hasLurePokemon()
+                it.hasLure()
             }
             if (pokestopsWithLure.isNotEmpty()) {
                 val currentPosition = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
@@ -274,7 +274,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         val distances = pokestops.map {
             val end = S2LatLng.fromDegrees(it.latitude, it.longitude)
-            if (it.hasLurePokemon()) {
+            if (it.hasLure()) {
                 currentPosition.getEarthDistance(end) / settings.lurePokestopModifier
             } else {
                 currentPosition.getEarthDistance(end)
