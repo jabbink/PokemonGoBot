@@ -89,7 +89,6 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         val deltaLng = diff.lngDegrees() / stepsRequired
 
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
-
         var remainingSteps = stepsRequired
 
         val pauseWalk:AtomicBoolean = AtomicBoolean(false)
@@ -137,7 +136,6 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 cancel()
             }
         }
-
     }
 
     fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
