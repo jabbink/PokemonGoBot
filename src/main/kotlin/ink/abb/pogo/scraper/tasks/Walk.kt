@@ -168,6 +168,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     pauseCounter = 2
+                    pauseWalk.set(true)
                     return@runLoop
                 }
 
