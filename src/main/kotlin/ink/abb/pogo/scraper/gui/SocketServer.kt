@@ -20,6 +20,7 @@ import ink.abb.pogo.scraper.requiredXp
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
+import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import kotlin.concurrent.thread
 
 class SocketServer {
@@ -94,6 +95,7 @@ class SocketServer {
                 pokemonObj.name = pokemon.pokemonId.name
                 pokemonObj.cp = pokemon.cp
                 pokemonObj.iv = pokemon.getIvPercentage()
+                pokemonObj.stats = pokemon.getStatsFormatted()
                 pokebank.pokemon.add(pokemonObj)
             }
             server?.broadcastOperations?.sendEvent("pokebank", pokebank)
@@ -185,6 +187,7 @@ class SocketServer {
             var name: String? = null
             var cp: Int? = null
             var iv: Int? = null
+            var stats: String? = null
         }
     }
 
