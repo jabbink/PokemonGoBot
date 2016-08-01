@@ -23,9 +23,10 @@ class SettingsParser(val properties: Properties) {
         val defaults = Settings(credentials = GoogleCredentials(), startingLatitude = 0.0, startingLongitude = 0.0)
         val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.shouldDropItems, String::toBoolean)
 
+
         return Settings(
             profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
-
+            timerWalkToStartPokeStop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timerWalkToStartPokeStop", defaults.timerWalkToStartPokeStop, String::toLong),
             startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
             startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
 
@@ -49,13 +50,13 @@ class SettingsParser(val properties: Properties) {
                 Pair(ItemId.ITEM_HYPER_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_HYPER_POTION", "item_hyper_potion", 50, String::toInt)),
                 Pair(ItemId.ITEM_MAX_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_POTION", "item_max_potion", 50, String::toInt)),
                 Pair(ItemId.ITEM_POKE_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_POKE_BALL", "item_poke_ball", 40, String::toInt)),
-                Pair(ItemId.ITEM_GREAT_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_GREAT_BALL", "item_great_ball", 45, String::toInt)),
+                Pair(ItemId.ITEM_GREAT_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_GREAT_BALL", "item_great_ball", 50, String::toInt)),
                 Pair(ItemId.ITEM_ULTRA_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_ULTRA_BALL", "item_ultra_ball", 50, String::toInt)),
                 Pair(ItemId.ITEM_MASTER_BALL, getPropertyIfSet("Max number of items to keep from type ITEM_MASTER_BALL", "item_master_ball", 10, String::toInt)),
-                Pair(ItemId.ITEM_RAZZ_BERRY, getPropertyIfSet("Max number of items to keep from type ITEM_RAZZ_BERRY", "item_razz_berry", 30, String::toInt)),
-                Pair(ItemId.ITEM_LUCKY_EGG, getPropertyIfSet("Max number of items to keep from type ITEM_LUCKY_EGG", "item_lucky_egg", 5, String::toInt)),
-                Pair(ItemId.ITEM_INCENSE_ORDINARY, getPropertyIfSet("Max number of items to keep from type ITEM_INCENSE_ORDINARY", "item_incense", 5, String::toInt)),
-                Pair(ItemId.ITEM_TROY_DISK, getPropertyIfSet("Max number of items to keep from type ITEM_TROY_DISK (lure module)", "item_lure_module", 5, String::toInt))
+                Pair(ItemId.ITEM_RAZZ_BERRY, getPropertyIfSet("Max number of items to keep from type ITEM_RAZZ_BERRY", "item_razz_berry", 40, String::toInt)),
+                Pair(ItemId.ITEM_LUCKY_EGG, getPropertyIfSet("Max number of items to keep from type ITEM_LUCKY_EGG", "item_lucky_egg", -1, String::toInt)),
+                Pair(ItemId.ITEM_INCENSE_ORDINARY, getPropertyIfSet("Max number of items to keep from type ITEM_INCENSE_ORDINARY", "item_incense", -1, String::toInt)),
+                Pair(ItemId.ITEM_TROY_DISK, getPropertyIfSet("Max number of items to keep from type ITEM_TROY_DISK (lure module)", "item_lure_module", -1, String::toInt))
             ) else mapOf(),
 
             randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestop, String::toInt),
@@ -92,6 +93,8 @@ class SettingsParser(val properties: Properties) {
             ignoredPokemon = getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", defaults.ignoredPokemon.map {it.name}.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
             obligatoryTransfer = getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", defaults.obligatoryTransfer.map {it.name}.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
+
+            export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
 
             guiPort = getPropertyIfSet("Port where the webserver should listen", "gui_port", defaults.guiPort, String::toInt),
             guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt)
@@ -141,6 +144,7 @@ class SettingsParser(val properties: Properties) {
 
 data class Settings(
     val profileUpdateTimer: Long = 60,
+    val timerWalkToStartPokeStop: Long = -1L,
     val startingLatitude: Double,
     val startingLongitude: Double,
 
@@ -157,13 +161,13 @@ data class Settings(
         Pair(ItemId.ITEM_HYPER_POTION, 50),
         Pair(ItemId.ITEM_MAX_POTION, 50),
         Pair(ItemId.ITEM_POKE_BALL, 40),
-        Pair(ItemId.ITEM_GREAT_BALL, 45),
+        Pair(ItemId.ITEM_GREAT_BALL, 50),
         Pair(ItemId.ITEM_ULTRA_BALL, 50),
         Pair(ItemId.ITEM_MASTER_BALL, 10),
-        Pair(ItemId.ITEM_RAZZ_BERRY, 30),
-        Pair(ItemId.ITEM_LUCKY_EGG, 5),
-        Pair(ItemId.ITEM_INCENSE_ORDINARY, 5),
-        Pair(ItemId.ITEM_TROY_DISK, 5)
+        Pair(ItemId.ITEM_RAZZ_BERRY, 40),
+        Pair(ItemId.ITEM_LUCKY_EGG, -1),
+        Pair(ItemId.ITEM_INCENSE_ORDINARY, -1),
+        Pair(ItemId.ITEM_TROY_DISK, -1)
 
     ),
 
@@ -193,6 +197,8 @@ data class Settings(
     val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO),
 
     val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
+
+    val export: String = "",
 
     val guiPort: Int = 8000,
     val guiPortSocket: Int = 8001
