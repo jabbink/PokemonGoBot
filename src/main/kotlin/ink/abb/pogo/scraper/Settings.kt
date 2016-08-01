@@ -194,7 +194,7 @@ data class Settings(
     val neverUseBerries: Boolean = true,
     val allowLeaveStartArea: Boolean = false,
     val spawnRadius: Int = -1,
-    val banSpinCount: Int = 40,
+    val banSpinCount: Int = 0,
     val transferCPThreshold: Int = 400,
     val transferIVThreshold: Int = 80,
     val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO),
