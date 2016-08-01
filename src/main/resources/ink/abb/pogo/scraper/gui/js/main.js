@@ -53,6 +53,7 @@ $(function() {
                         gpx: $('.panel-gpx'),
                         notifications: $('.panel-notifications'),
                         pokebank: $('.panel-pokebank'),
+                        loot: $('.panel-loot'),
                         eggs: $('.panel-eggs'),
                         profile: $('.panel-profile'),
                         log: $('.panel-log'),
@@ -462,11 +463,11 @@ $(function() {
 
 					pokebank: {},
 
-                              renderPokemon: function(pokemon, id) {
+                              renderPokemon: function(pokemon, id, inverse) {
 
                                     var popOver = '<p><strong>CP: </strong>'+ pokemon.cp +' <br/> <strong>IV: </strong>'+ pokemon.iv +' <br/> <strong>Stats: </strong>'+ pokemon.stats +'</p>';
                                     
-                                    var elem = $('<a href="#" id="pokemon-id-' + id + '" class="col-sm-4"><img class="media-object img-thumbnail" src="'+ icons.pokemon(pokemon.pokemonId) +'" alt="'+ pokemon.name +'" /></a>').popover({
+                                    var elem = $('<span id="pokemon-id-' + id + '" class="col-sm-4"><img class="media-object img-thumbnail" src="'+ icons.pokemon(pokemon.pokemonId) +'" alt="'+ pokemon.name +'" /></span>').popover({
                                           title: pokemon.name,
                                           html: true,
                                           placement: 'top',
@@ -474,7 +475,16 @@ $(function() {
                                           trigger: 'hover'
                                     });
 
-                                    elements.panels.pokebank.find('.pokemon-list').append(elem);
+                                    if (inverse) {
+                                          
+                                          elements.panels.pokebank.find('.pokemon-list').prepend(elem);
+                                          elements.panels.pokebank.find('#pokemon-id-' + id ).append('<span class="badge">New</span>')
+
+                                    } else {
+
+                                          elements.panels.pokebank.find('.pokemon-list').append(elem);
+                                    
+                                    }
 
                               },
 
@@ -551,7 +561,7 @@ $(function() {
                                                 stats: data.stats
                                           };
 
-                                          APP.Modules.Pokebank.renderPokemon(data, id);
+                                          APP.Modules.Pokebank.renderPokemon(data, id, true);
 
                                     });
 
@@ -575,6 +585,52 @@ $(function() {
 
 			}()),
 
+                  Loot: (function() {
+
+                        return {
+
+                              init: (function() {
+
+                                    console.log("Loot Module Initialized");
+
+                                    /* =======================
+                                       COMPONENT FUNCTIONALITY
+                                       ======================= */
+                                    $(document).on('loot', function(event, lootText) {
+
+                                          var name = lootText.split(',');
+                                              name = name[0].split('"');
+
+                                          var m = new Date(),
+                                              dateString = m.getUTCFullYear() +"/"+ (m.getUTCMonth()+1) +"/"+ m.getUTCDate() + " " + m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds();
+
+                                          elements.panels.loot.find('.alert').remove();
+                                          elements.panels.loot.find('.loot-wrapper').show();
+                                          elements.panels.loot.find('.loot-history').prepend('<li></li>');
+
+                                          elements.panels.loot.find('.loot-history li:first').append('<h4>' + name[1] + '</h4>');
+                                          elements.panels.loot.find('.loot-history li:first').append('<strong>Time: </strong>' + dateString + '<br />');
+
+                                          var loot = lootText.substr(lootText.indexOf('['));
+                                              loot = loot.substring(1, loot.length-1);
+
+                                          var lootArray = loot.split(',');
+
+                                          for (var i = 0; i < lootArray.length; i++) {
+
+                                                var item = lootArray[i].split('x');
+
+                                                elements.panels.loot.find('.loot-history li:first').append('<strong>'+ item[1] +': </strong>' + item[0] + '<br />');
+                                          
+                                          }
+
+                                    });
+
+                              }())
+                        }
+
+                  }()),
+
 			Eggs: (function() {
 
 				return {
@@ -595,7 +651,7 @@ $(function() {
                                                 var egg = data.eggs[i];
 
                                                 var popOver = '<p><strong>Target: </strong>'+ egg.distanceTarget +' Km / <strong>Walked: </strong>'+ egg.distanceWalked.toFixed(2) +' Km</p>';
-                                                var elem = $('<a href="#" class="col-sm-4"><img class="media-object img-thumbnail center-block" src="'+ icons.egg +'" alt="'+ egg.distanceTarget +'" /></a>').popover({
+                                                var elem = $('<span class="col-sm-4"><img class="media-object img-thumbnail center-block" src="'+ icons.egg +'" alt="'+ egg.distanceTarget +'" /></span>').popover({
                                                       title: 'Egg',
                                                       html: true,
                                                       placement: 'top',
@@ -635,7 +691,7 @@ $(function() {
                                     if (typeof data.username !== 'undefined') {
 
                                           elements.profile.name.text(data.username);
-                                          $('title').text(data.username + ' - Pok&eacute;mon Go Bot GUI');
+                                          $('title').text(data.username + ' - Pokemon Go Bot GUI');
 
                                     }
 
@@ -719,6 +775,12 @@ $(function() {
                                     if (shouldScroll) {
 
                                           logWrapper.prop('scrollTop', logWrapper.prop('scrollHeight'));
+
+                                    }
+
+                                    if (data.type === 'green' && data.text.startsWith('Looted')) {
+
+                                          $(document).trigger('loot', data.text);
 
                                     }
 

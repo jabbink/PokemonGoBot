@@ -10,7 +10,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pok&eacute;mon Go Bot GUI</title>
+    <title>Pokemon Go Bot GUI</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -221,7 +221,35 @@
 
                     </div>
                 </div>
-                <!-- /Pokebank -->  
+                <!-- /Pokebank --> 
+
+                <div class="panel-sortable panel-loot">
+                    <div class="panel panel-default">
+                        
+                        <div class="panel-heading">
+                            <i class="fa fa-history" aria-hidden="true"></i> Loot History
+                            <div class="btn-group pull-right" role="group">
+                                <button type="button" class="panel-toggle btn btn-xs btn-primary"><i class="fa fa-minus" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+
+                            <div class="panel-loader"><div class="panel-spinner"></div></div>
+
+                            <div class="alert alert-warning">No Pok&eacute;Stops looted yet!</div>
+                            
+                            <div class="loot-wrapper">
+
+                                <ul class="loot-history list-unstyled"></ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /Log --> 
 
             </div>
             <!-- /col -->

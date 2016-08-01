@@ -151,11 +151,42 @@ body {
     margin: 2px 0;
 }
 
+.pokemon-list span {
+  position: relative;
+
+}
+
+.pokemon-list span .badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* ===============
+    LOOT HISTORY 
+   =============== */
+.panel-loot .alert {
+  margin-bottom: 0;
+}
+
+.loot-wrapper {
+    display: none;
+    height: 200px;
+    max-height: 200px;
+    overflow: scroll;
+}
+
+.loot-history li {
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
 /* ===============
         EGGS
    =============== */
 .egg-list {
-  min-height: 140px;
+    min-height: 140px;
 }
 
 .egg-list img {
