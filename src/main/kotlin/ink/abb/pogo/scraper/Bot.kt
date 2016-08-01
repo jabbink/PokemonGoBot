@@ -15,7 +15,6 @@ import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.gui.SocketServer
-import ink.abb.pogo.scraper.gui.WebServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
@@ -135,9 +134,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.setContext(ctx)
 
         if(settings.guiPort > 0){
-            Log.normal("Running webserver on port ${settings.guiPort}")
-            WebServer().start(settings.guiPort, settings.guiPortSocket)
+            Log.normal("Running socket server on port ${settings.guiPortSocket}")
             ctx.server.start(ctx, settings.guiPortSocket)
+            var needPort = ""
+            if (settings.guiPortSocket != 8001) {
+                needPort = "#localhost:${settings.guiPortSocket}"
+            }
+            Log.green("Open the map on http://pogo.abb.ink/map.html${needPort}")
         }
 
 
