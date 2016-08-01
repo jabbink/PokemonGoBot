@@ -146,18 +146,19 @@ class SettingsParser(val properties: Properties) {
     }
 }
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties("startingLocation", "name", ignoreUnknown = true)
 data class Settings(
-    val name: String,
-    val profileUpdateTimer: Long = 60,
-    val timerWalkToStartPokeStop: Long = -1L,
+    var name: String = "",
+
     val startingLatitude: Double,
     val startingLongitude: Double,
-
     val startingLocation: S2LatLng = S2LatLng.fromDegrees(startingLatitude, startingLongitude),
+
     val credentials: Credentials,
+
     val speed: Double = 2.778,
     val shouldFollowStreets: Boolean = false,
+
     val shouldDropItems: Boolean = false,
     val uselessItems: Map<ItemId, Int> = mapOf(
         Pair(ItemId.ITEM_REVIVE, 20),
@@ -177,6 +178,8 @@ data class Settings(
 
     ),
 
+    val profileUpdateTimer: Long = 60,
+    val timerWalkToStartPokeStop: Long = -1L,
     val randomNextPokestop: Int = 5,
     val desiredCatchProbability: Double = 0.4,
     val desiredCatchProbabilityUnwanted: Double = 0.0,
@@ -209,6 +212,10 @@ data class Settings(
     val guiPort: Int = 8000,
     val guiPortSocket: Int = 8001
 ) {
+    fun withName(name: String): Settings {
+        this.name = name
+        return this
+    }
 
     fun writeProperty(propertyFile: String, key: String, value: Any) {
         // TODO: This function does not work with lists, like obligatory_transfer

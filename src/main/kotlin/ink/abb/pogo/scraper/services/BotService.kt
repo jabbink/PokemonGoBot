@@ -52,7 +52,7 @@ class BotService {
             throw IllegalArgumentException("No save file found for name: $name")
         }
 
-        return mapper.readValue(save, Settings::class.java)
+        return mapper.readValue(save, Settings::class.java).withName(name)
     }
 
     fun getSaveNames(): List<String> {
