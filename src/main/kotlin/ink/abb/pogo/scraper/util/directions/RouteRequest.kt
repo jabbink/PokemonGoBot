@@ -28,7 +28,7 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
         connection.inputStream.bufferedReader().lines().forEach {
             routeFile += "$it\n"
         }
-    } catch (e: ConnectException) {
+    } catch (e: Exception) {
         Log.red("Error fetching route from provider: " + e.message)
     }
     return routeFile
@@ -41,7 +41,7 @@ fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): Str
 
 fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     var routeParsed = getRoutefile(olat, olng, dlat, dlng)
-    if (!routeParsed.contains("<distance>0</distance>")){
+    if (routeParsed.length > 0 && !routeParsed.contains("<distance>0</distance>")) {
         routeParsed = routeParsed.split("<coordinates>")[1]
         val matcher = Pattern.compile("(|-)\\d+.(|-)\\d+,(|-)\\d+.(|-)\\d+").matcher(routeParsed)
         val coordinatesList = ArrayList<String>()
