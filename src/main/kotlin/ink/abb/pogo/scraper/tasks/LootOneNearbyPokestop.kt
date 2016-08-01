@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit
 
 class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: HashMap<String, Long>) : Task {
 
+    private var cooldownPeriod = 5
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val nearbyPokestops = sortedPokestops.filter {
             it.canLoot(lootTimeouts = lootTimeouts, api = ctx.api)
@@ -54,7 +56,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
                     Log.green(message)
                     lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
-                    checkForBan(result, bot, settings)
+                    checkForBan(result, closest, bot, settings)
                 }
                 Result.INVENTORY_FULL -> {
                     ctx.server.sendPokestop(closest)
@@ -73,12 +75,10 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     Log.red("Pokestop out of range; distance: $distance")
                 }
                 Result.IN_COOLDOWN_PERIOD -> {
-                    val cooldownPeriod = 5
                     lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
                     Log.red("Pokestop still in cooldown mode; blacklisting for $cooldownPeriod minutes")
                 }
                 Result.NO_RESULT_SET -> {
-                    val cooldownPeriod = 5
                     lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
                     Log.red("Server refuses to loot this Pokestop (usually temporary issue); blacklisting for $cooldownPeriod minutes")
                 }
@@ -87,11 +87,13 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
         }
     }
 
-    private fun checkForBan(result: PokestopLootResult, bot: Bot, settings: Settings) {
-        if (settings.banWaitTime > 0 && result.experience == 0 && result.itemsAwarded.isEmpty()) {
-            Log.red("Looks like a ban. Pause for ${settings.banWaitTime} seconds.")
-            // Sleep for $banWaitTime seconds or until bot is stopped
-            bot.runningLatchAwait(settings.banWaitTime.toLong(), TimeUnit.SECONDS)
+    private fun checkForBan(result: PokestopLootResult, pokestop:Pokestop, bot: Bot, settings: Settings) {
+        if (settings.banSpinCount > 0 && result.experience == 0 && result.itemsAwarded.isEmpty()) {
+            Log.red("Looks like a ban. Trying to bypass softban by repeatedly spinning the pokestop.")
+            bot.task(BypassSoftban(pokestop))
+            Log.yellow("Finished softban bypass attempt. Continuing.")
+            // Add pokestop to cooldown list to prevent immediate retry in the next loop
+            lootTimeouts.put(pokestop.id, bot.ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
         }
     }
 }
