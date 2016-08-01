@@ -26,6 +26,8 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+def generatedResourcesFolder = "$projectDir/build/resources/main"
+
 sourceSets {
     main {
         kotlin {
@@ -34,6 +36,7 @@ sourceSets {
         java {
             srcDir 'lib/com.google.guava'
         }
+        resources.srcDirs generatedResourcesFolder
     }
 }
 
