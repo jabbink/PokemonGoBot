@@ -77,7 +77,7 @@ display_keepalive=true
 display_pokestop_name=false
 
 ## Pokemon Transfer
-# Should the bot auto transfer duplicate pokemon
+# Should the bot auto transfer pokemon at all?
 autotransfer=true
 
 # Minimum amount of pokemon type to keep
