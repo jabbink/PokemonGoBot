@@ -105,7 +105,7 @@ spawn_radius=-1
 # Number of times the pokestop should be spun to attempt softban bypass (0 to disable)
 ban_spin_count=40
 
-# Set Timer in seconds to go back to the starting PokeStop (-1 disabled)
+# Set timer in seconds to go back to the starting PokeStop (-1 disabled)
 timerWalkToStartPokeStop=-1
 
 # Set profile update timer (Default: 60)
