@@ -19,7 +19,7 @@ import com.pokegoapi.util.SystemTimeImpl
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import java.io.FileInputStream
-import java.util.Properties
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -47,9 +47,9 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
         } else {
             GoogleUserCredentialProvider(http, credentials.token, time)
         }
-    } else if(credentials is GoogleAutoCredentials) {
+    } else if (credentials is GoogleAutoCredentials) {
         GoogleAutoCredentialProvider(http, credentials.username, credentials.password, time)
-    } else if(credentials is PtcCredentials) {
+    } else if (credentials is PtcCredentials) {
         try {
             PtcCredentialProvider(http, credentials.username, credentials.password, time)
         } catch (e: LoginFailedException) {
