@@ -172,10 +172,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                     val sleep = timeout - (api.currentTimeMillis() - start)
 
                     if (sleep > 0) {
-                        try {
-                            runningLatch.await(sleep, TimeUnit.MILLISECONDS)
-                        } catch (ignore: InterruptedException) {
-                        }
+                        runningLatchAwait(sleep, TimeUnit.MILLISECONDS)
                     }
                 }
             } finally {
@@ -202,6 +199,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.red("All bot loops stopped.")
 
         socketServerStopLatch.await()
+    }
+
+    fun runningLatchAwait(timeout: Long, unit: TimeUnit) {
+        try {
+            runningLatch.await(timeout, unit)
+        } catch (ignore: InterruptedException) {
+        }
     }
 
     fun isRunning(): Boolean {
