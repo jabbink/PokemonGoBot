@@ -128,13 +128,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
             if (!prepareWalkBack.get())
                 task(process)
-            else if(!ctx.walking.get())
+            else if (!ctx.walking.get())
                 task(WalkToStartPokeStop(process.startPokeStop as Pokestop))
         }
 
         Log.setContext(ctx)
 
-        if(settings.guiPort > 0){
+        if (settings.guiPort > 0) {
             Log.normal("Running webserver on port ${settings.guiPort}")
             WebServer().start(settings.guiPort, settings.guiPortSocket)
             ctx.server.start(ctx, settings.guiPortSocket)
@@ -143,11 +143,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         if (settings.timerWalkToStartPokeStop > 0)
             runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), "BotWalkBackLoop") {
-                if(!prepareWalkBack.get())
+                if (!prepareWalkBack.get())
                     Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokeStop} seconds")
                 runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), TimeUnit.MILLISECONDS)
                 prepareWalkBack.set(true)
-                while(walkBackLock.get()){}
+                while (walkBackLock.get()) {
+                }
             }
     }
 

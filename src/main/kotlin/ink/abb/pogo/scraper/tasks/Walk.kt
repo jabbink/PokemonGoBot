@@ -15,9 +15,8 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.inventory.hasPokeballs
-import ink.abb.pogo.scraper.util.map.canLoot;
 import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
+import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 import java.util.concurrent.atomic.AtomicBoolean
@@ -88,7 +87,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         Log.normal("Walking to ${end.toStringDegrees()} in $stepsRequired steps.")
         var remainingSteps = stepsRequired
 
-        val pauseWalk:AtomicBoolean = AtomicBoolean(false)
+        val pauseWalk: AtomicBoolean = AtomicBoolean(false)
         var pauseCounter = 2
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             if (pauseWalk.get()) {

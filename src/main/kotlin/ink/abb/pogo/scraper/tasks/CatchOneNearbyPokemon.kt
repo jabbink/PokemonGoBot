@@ -9,7 +9,6 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse.Status
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context

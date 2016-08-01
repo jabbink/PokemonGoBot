@@ -45,7 +45,7 @@ class SocketServer {
         }
         server?.addEventListener("goto", EventGoto::class.java) { client, data, ackRequest ->
             run {
-                if(data.lat != null && data.lng != null){
+                if (data.lat != null && data.lng != null) {
                     val coord = S2LatLng.fromRadians(data.lat!!, data.lng!!)
                     coordinatesToGoTo.add(coord)
                 }
@@ -60,12 +60,12 @@ class SocketServer {
         server?.start()
     }
 
-    fun sendGotoDone(){
+    fun sendGotoDone() {
         server?.broadcastOperations?.sendEvent("gotoDone")
     }
 
-    fun sendProfile(){
-        if(ctx != null){
+    fun sendProfile() {
+        if (ctx != null) {
             val profile = EventProfile()
             profile.username = ctx!!.api.playerProfile.playerData.username
             profile.team = ctx!!.api.playerProfile.playerData.team.name
@@ -85,9 +85,9 @@ class SocketServer {
     }
 
     fun sendPokebank() {
-        if(ctx != null){
+        if (ctx != null) {
             val pokebank = EventPokebank()
-            for(pokemon in ctx!!.api.inventories.pokebank.pokemons){
+            for (pokemon in ctx!!.api.inventories.pokebank.pokemons) {
                 val pokemonObj = EventPokebank.Pokemon()
                 pokemonObj.id = pokemon.id
                 pokemonObj.pokemonId = pokemon.pokemonId.number
@@ -110,14 +110,14 @@ class SocketServer {
         server?.broadcastOperations?.sendEvent("pokestop", pokestopObj)
     }
 
-    fun setLocation(lat: Double, lng: Double){
+    fun setLocation(lat: Double, lng: Double) {
         val newLocation = EventNewLocation()
         newLocation.lat = lat
         newLocation.lng = lng
         server?.broadcastOperations?.sendEvent("newLocation", newLocation)
     }
 
-    fun newPokemon(lat: Double, lng: Double, pokemon: PokemonDataOuterClass.PokemonData){
+    fun newPokemon(lat: Double, lng: Double, pokemon: PokemonDataOuterClass.PokemonData) {
         val newPokemon = EventNewPokemon()
         newPokemon.lat = lat
         newPokemon.lng = lng
@@ -129,23 +129,23 @@ class SocketServer {
         server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
     }
 
-    fun releasePokemon(id: Long){
+    fun releasePokemon(id: Long) {
         val release = EventReleasePokemon()
         release.id = id
         server?.broadcastOperations?.sendEvent("releasePokemon", release)
     }
 
-    fun sendLog(type: String, text: String){
+    fun sendLog(type: String, text: String) {
         val log = EventLog()
         log.type = type
         log.text = text
         server?.broadcastOperations?.sendEvent("log", log)
     }
 
-    fun sendEggs(){
-        if(ctx != null){
+    fun sendEggs() {
+        if (ctx != null) {
             val eggs = EventEggs()
-            for(egg in ctx!!.api.inventories.hatchery.eggs){
+            for (egg in ctx!!.api.inventories.hatchery.eggs) {
                 val eggObj = EventEggs.Egg()
                 // eggObj.distanceWalked = egg.eggKmWalked
                 eggObj.distanceTarget = egg.eggKmWalkedTarget
@@ -225,8 +225,8 @@ class SocketServer {
         var eggs = mutableListOf<Egg>()
 
         class Egg {
-            var distanceWalked : Double? = null
-            var distanceTarget : Double? = null
+            var distanceWalked: Double? = null
+            var distanceTarget: Double? = null
         }
     }
 }
