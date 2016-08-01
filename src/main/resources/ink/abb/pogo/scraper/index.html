@@ -343,10 +343,6 @@
             padding: 5px 20px;
         }
 
-        .map-button:not(:first-child) {
-            border-left: 1px solid #ccc;
-        }
-
         /*Upload GPX file button*/
         .input-file {
             input[type="file"] {
@@ -445,7 +441,7 @@
                         <input type="file" id="gpx_upload">
                     </div>
                 </div>
-                <div class="map-button">
+                <div class="map-button" style="border-left: 1px solid #ccc; border-right: 1px solid #ccc;">
                     <h4>Autofollow bot</h4>
                     <div style="display: block" class="autofollow-slide">
                         <input type="checkbox" value="None" id="autofollow-slide" name="check" checked />
