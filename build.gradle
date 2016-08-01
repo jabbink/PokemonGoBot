@@ -43,10 +43,6 @@ sourceSets {
     }
 }
 
-configurations {
-    compile.exclude module: "spring-boot-starter-tomcat"
-}
-
 dependencies {
 
     compile project(':PokeGOAPI-Java')
@@ -55,8 +51,6 @@ dependencies {
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
 
     compile 'org.springframework.boot:spring-boot-starter'
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.boot:spring-boot-starter-undertow'
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
