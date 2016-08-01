@@ -102,8 +102,8 @@ allow_leave_start_area=false
 # (-1: only limited by the initial pokestops (~3*3km); with allow_leave_start_area=true unlimited)
 spawn_radius=-1
 
-# Number of times the pokestop should be spun to attempt softban bypass (0 to disable)
-ban_spin_count=40
+# Number of times the pokestop should be spun to attempt softban bypass (0 to disable, 40 recommended value to work)
+ban_spin_count=0
 
 # Set timer in seconds to go back to the starting pokestop (-1 disabled)
 timerWalkToStartPokeStop=-1
