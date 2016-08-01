@@ -26,6 +26,8 @@ class WebServer {
         Thread(){
             val server = HttpServer.create(InetSocketAddress(port), 0)
             server.createContext("/", RootHandler(socketPort))
+            server.createContext("/js", JSHandler(socketPort))
+            server.createContext("/css", CSSHandler(socketPort))
             server.executor = null
             server.start()
         }.start()
@@ -41,6 +43,40 @@ class WebServer {
                     .replace("{{socketPort}}", socketPort.toString())
             val bytes = string.toByteArray(Charset.forName("UTF-8"))
             t.responseHeaders.set("Content-Type", "text/html; charset=UTF-8")
+            t.responseHeaders.set("Access-Control-Allow-Origin", "*")
+            t.sendResponseHeaders(200, bytes.size.toLong())
+            t.responseBody.write(bytes)
+            t.responseBody.close()
+        }
+    }
+
+    inner class JSHandler(val socketPort: Int) : HttpHandler {
+
+        @Throws(IOException::class)
+        override fun handle(t: HttpExchange) {
+
+            val string = BufferedReader(InputStreamReader(WebServer::class.java.getResourceAsStream("js/main.js")))
+                    .lines().collect(Collectors.joining("\n"))
+                    .replace("{{socketPort}}", socketPort.toString())
+            val bytes = string.toByteArray(Charset.forName("UTF-8"))
+            t.responseHeaders.set("Content-Type", "application/javascript; charset=UTF-8")
+            t.responseHeaders.set("Access-Control-Allow-Origin", "*")
+            t.sendResponseHeaders(200, bytes.size.toLong())
+            t.responseBody.write(bytes)
+            t.responseBody.close()
+        }
+    }
+
+    inner class CSSHandler(val socketPort: Int) : HttpHandler {
+
+        @Throws(IOException::class)
+        override fun handle(t: HttpExchange) {
+
+            val string = BufferedReader(InputStreamReader(WebServer::class.java.getResourceAsStream("css/main.css")))
+                    .lines().collect(Collectors.joining("\n"))
+                    .replace("{{socketPort}}", socketPort.toString())
+            val bytes = string.toByteArray(Charset.forName("UTF-8"))
+            t.responseHeaders.set("Content-Type", "text/css; charset=UTF-8")
             t.responseHeaders.set("Access-Control-Allow-Origin", "*")
             t.sendResponseHeaders(200, bytes.size.toLong())
             t.responseBody.write(bytes)
