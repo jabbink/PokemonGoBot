@@ -13,9 +13,9 @@ import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.gui.WebServer
-import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
@@ -56,13 +56,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         if (isRunning()) return
 
         Log.normal()
-        Log.normal("Name: ${ctx.profile.username}")
-        Log.normal("Team: ${ctx.profile.team}")
+        Log.normal("Name: ${ctx.profile.playerData.username}")
+        Log.normal("Team: ${ctx.profile.playerData.team.name}")
         Log.normal("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
         Log.normal("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.pokemonStorage}")
-        Log.normal("Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.itemStorage}")
+        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
+        Log.normal("Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
         //Log.normal("Inventory bag ${ctx.api.bag}")
 
         val compareName = Comparator<Pokemon> { a, b ->
