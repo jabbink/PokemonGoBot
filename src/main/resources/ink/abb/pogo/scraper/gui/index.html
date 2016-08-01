@@ -299,7 +299,36 @@
             text-align: center;
             vertical-align: middle;
         }
-    </style>
+		
+        /* === MORE IV INFORMATION === */
+        .ivTooltip {
+          position: relative;
+          display: inline-block;
+          border-bottom: 1px dotted black;
+        }
+
+        .ivTooltip .ivTooltipText {
+          visibility: hidden;
+          width: 150px;
+          background-color: black;
+          color: #fff;
+          text-align: center;
+          border-radius: 6px;
+          padding: 5px 0;
+          position: absolute;
+          z-index: 1;
+          bottom: 100%;
+          left: 50%;
+          margin-left: -60px;
+          opacity: 0;
+          transition: opacity 0.6s;
+        }
+
+        .ivTooltip:hover .ivTooltipText {
+          visibility: visible;
+          opacity: 0.7;
+        }
+	</style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
@@ -318,6 +347,16 @@
         </div>
     </div>
 
+    <div id="window-GPX-Generator" class="window">
+        <span class="title">Generate GPX file</span>
+        <div class="content">
+            <strong>Destination address:</strong>
+            <input type="text" name="gpx_dest_address" id="destAddress" />
+            <input type="button" value="Generate GPX file" id="genGpxFile" />
+            <hr />
+            <ul id="GpxDownloadLinks" />
+        </div>
+    </div>
     <div id="window-pokebank" class="window">
         <span class="title">Pokebank</span>
         <div class="content">
@@ -590,10 +629,11 @@
                     pokemonId: pokemon.pokemonId,
                     name: pokemon.name,
                     cp: pokemon.cp,
-                    iv: pokemon.iv
+                    iv: pokemon.iv,
+                    stats: pokemon.stats
                 };
 
-                var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="' + icons.pokemon(pokemon.pokemonId) + '"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2>IV ' + pokemon.iv + '</h2></div></div>');
+                var elem = $('<div id="pokemon-id-' + id + '" class="pokemon"><img src="' + icons.pokemon(pokemon.pokemonId) + '"><div><h1>' + pokemon.name + '</h1><h2>CP ' + pokemon.cp + '</h2><h2 class="ivTooltip">IV ' + pokemon.iv + '<span class="ivTooltipText">' + pokemon.stats + '</span></h2></div></div>');
                 elements.pokemonList.append(elem);
             }
         });
@@ -756,6 +796,14 @@
                 settings.autofollow = $(this).prop('checked');
             });
 
+            $("#genGpxFile").click(function(){
+                var destAddress = encodeURIComponent($("#destAddress").val());
+                lat = positionMarker.position.lat();
+                lng = positionMarker.position.lng()
+                var downloadLink = 'http://gpx.geotags.com/cgi-bin/gpx.cgi?saddr=' + lat + ',' + lng + '&daddr=' + destAddress;
+                $('#GpxDownloadLinks').append('<li><a href="' + downloadLink + '" target="_blank">Download GPX ' +$("#destAddress").val() + '</a></li>');
+            });
+            
             $('#gpx_upload_button').on('click', function(){
                 $('#gpx_upload').click();
             });
