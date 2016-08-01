@@ -54,6 +54,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     @Synchronized
     fun start() {
         if (isRunning()) return
+        ctx.walking.set(false)
 
         Log.normal()
         Log.normal("Name: ${ctx.profile.playerData.username}")

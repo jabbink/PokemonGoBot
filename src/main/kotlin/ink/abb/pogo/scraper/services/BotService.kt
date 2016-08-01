@@ -40,6 +40,11 @@ class BotService {
         bots.add(bot)
     }
 
+    @Synchronized
+    fun removeBot(bot: Bot) {
+        bots.remove(bot)
+    }
+
     private fun save(settings: Settings) {
         File(root, "${settings.name}.json").bufferedWriter().use {
             it.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(settings))
@@ -62,6 +67,13 @@ class BotService {
     @Synchronized
     fun getAllBotSettings(): List<Settings> {
         return bots.map { it.settings }
+    }
+
+    fun doWithBot(name: String, action: (bot: Bot) -> Unit): Boolean {
+        val bot = bots.find { it.settings.name == name } ?: return false
+
+        action(bot)
+        return true
     }
 
     @PreDestroy
