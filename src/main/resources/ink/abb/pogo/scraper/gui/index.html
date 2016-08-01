@@ -411,28 +411,13 @@
         </div>
     </div>
 
-    <!--<div id="window-eggs" class="window">
+    <div id="window-eggs" class="window">
         <span class="title">Eggs</span>
         <div class="content">
             <table id="eggs_table" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td><span class="progress" style="width: 50%"></span><span class="text">10 km</span></td>
-                    <td>10 km</td>
-                    <td>5 km</td>
-                </tr>
-                <tr>
-                    <td>2 km</td>
-                    <td>5 km</td>
-                    <td>2 km</td>
-                </tr>
-                <tr>
-                    <td>5 km</td>
-                    <td>10 km</td>
-                    <td>2 km</td>
-                </tr>
             </table>
         </div>
-    </div>-->
+    </div>
 
     <script>
         var icons = {
@@ -724,7 +709,6 @@
         });
 
         socket.on('eggs', function(data){
-            // console.log(data);
         });
 
         socket.on('log', function(data){
