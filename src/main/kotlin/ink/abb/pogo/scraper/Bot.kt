@@ -97,7 +97,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val sleepTimeout = 10L
         var reply: MapObjects?
         do {
-            reply = api.map.mapObjects
+            reply = api.map.getMapObjects(settings.initialMapSize)
             Log.normal("Got ${reply.pokestops.size} pokestops")
             if (reply == null || reply.pokestops.size == 0) {
                 Log.red("Retrying in $sleepTimeout seconds...")
@@ -133,7 +133,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         Log.setContext(ctx)
 
-        if(settings.guiPort > 0){
+        if(settings.guiPortSocket > 0){
             Log.normal("Running socket server on port ${settings.guiPortSocket}")
             ctx.server.start(ctx, settings.guiPortSocket)
             var needPort = ""

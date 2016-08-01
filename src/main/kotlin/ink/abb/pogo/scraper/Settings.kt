@@ -96,8 +96,9 @@ class SettingsParser(val properties: Properties) {
 
             export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
 
-            guiPort = getPropertyIfSet("Port where the webserver should listen", "gui_port", defaults.guiPort, String::toInt),
-            guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt)
+            guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
+
+            initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt)
         )
     }
 
@@ -200,8 +201,9 @@ data class Settings(
 
     val export: String = "",
 
-    val guiPort: Int = 8000,
-    val guiPortSocket: Int = 8001
+    val guiPortSocket: Int = 8001,
+
+    val initialMapSize: Int = 3
 ) {
 
     fun writeProperty(propertyFile: String, key: String, value: Any) {

@@ -11,6 +11,7 @@ package ink.abb.pogo.scraper.tasks
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse.Status
+import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -45,9 +46,10 @@ class CatchOneNearbyPokemon : Task {
 
             val encounterResult = catchablePokemon.encounterPokemon()
             if (encounterResult.wasSuccessful()) {
+                val pokemonData = encounterResult.pokemonData
                 Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
-                        "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV ${encounterResult.wildPokemon.pokemonData.getIvPercentage()}%")
-                val (shouldRelease, reason) = encounterResult.wildPokemon.pokemonData.shouldTransfer(settings)
+                        "with CP ${pokemonData.cp} and IV ${pokemonData.getIvPercentage()}%")
+                val (shouldRelease, reason) = pokemonData.shouldTransfer(settings)
                 val desiredCatchProbability = if (shouldRelease) {
                     Log.yellow("Using desired_catch_probability_unwanted because $reason")
                     settings.desiredCatchProbabilityUnwanted
@@ -76,16 +78,16 @@ class CatchOneNearbyPokemon : Task {
 
                 if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                     ctx.pokemonStats.first.andIncrement
-                    val iv = (encounterResult.wildPokemon.pokemonData.individualAttack + encounterResult.wildPokemon.pokemonData.individualDefense + encounterResult.wildPokemon.pokemonData.individualStamina) * 100 / 45
+                    val iv = (pokemonData.individualAttack + pokemonData.individualDefense + pokemonData.individualStamina) * 100 / 45
                     var message = "Caught a ${catchablePokemon.pokemonId} " +
-                            "with CP ${encounterResult.wildPokemon.pokemonData.cp} and IV $iv%"
-                    message += "\r\n ${encounterResult.wildPokemon.pokemonData.getStatsFormatted()}"
+                            "with CP ${pokemonData.cp} and IV $iv%"
+                    message += "\r\n ${pokemonData.getStatsFormatted()}"
                     if (settings.shouldDisplayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
                                 "Candy, ${result.stardustList.sum()}x Stardust]"
                     Log.cyan(message)
 
-                    ctx.server.newPokemon(catchablePokemon.latitude, catchablePokemon.longitude, encounterResult.wildPokemon.pokemonData)
+                    ctx.server.newPokemon(catchablePokemon.latitude, catchablePokemon.longitude, pokemonData)
                     ctx.server.sendProfile()
                 } else {
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
