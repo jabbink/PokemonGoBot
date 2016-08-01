@@ -97,22 +97,6 @@
             height: 400px;
         }
 
-        #pokemon_list, #window-pokevision .content {
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        .pokemon, #pokevision-button {
-            padding: 20px;
-            color: #fff;
-        }
-
-        .pokemon:nth-child(4n+1), #pokevision-button {
-            background: #FF3D00;
-        }
-
         .pokemon:nth-child(4n+2) {
             background: #33691E;
         }
@@ -299,7 +283,123 @@
             text-align: center;
             vertical-align: middle;
         }
-		
+
+        /* Better autofollow checkbox */
+        .autofollow-slide {
+          width: 80px;
+          height: 26px;
+          background: #ddd;
+          margin: 20px auto;
+          position: relative;
+          border-radius: 50px;
+          box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.2);
+        }
+        .autofollow-slide:after {
+          content: 'OFF';
+          color: #333;
+          position: absolute;
+          right: 10px;
+          z-index: 0;
+          font: 12px/26px Arial, sans-serif;
+          font-weight: bold;
+          text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);
+        }
+        .autofollow-slide:before {
+          content: 'ON';
+          color: #c0392b;
+          position: absolute;
+          left: 10px;
+          z-index: 0;
+          font: 12px/26px Arial, sans-serif;
+          font-weight: bold;
+        }
+        .autofollow-slide label {
+          display: block;
+          width: 34px;
+          height: 20px;
+          cursor: pointer;
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          z-index: 1;
+          background: #444;
+          /*background: -webkit-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);*/
+          /*background: linear-gradient(to bottom, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);*/
+          border-radius: 50px;
+          -webkit-transition: all 0.4s ease;
+          transition: all 0.4s ease;
+          box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
+        }
+        .autofollow-slide input[type=checkbox] {
+          visibility: hidden;
+        }
+        .autofollow-slide input[type=checkbox]:checked + label {
+          left: 43px;
+        }
+
+        /*Map button and dividers*/
+        .map-button {
+            display: inline-block;
+            padding: 5px 20px;
+        }
+
+        .map-button:not(:first-child) {
+            border-left: 1px solid #ccc;
+        }
+
+        /*Upload GPX file button*/
+        .input-file {
+            input[type="file"] {
+                visibility: hidden;
+                width: 1px;
+                height: 1px
+            }
+
+            .btn {
+                background-color: #ddd;
+                border-color: #ccc;
+                color: #333;
+            }
+            
+            .file-selected {
+                font-size: 10px;
+                text-align: center;
+                width: 100%;
+                display: block;
+                margin-top: 5px;
+            }
+        }
+
+        span.file-selected {
+            display: block
+        }
+
+        /*Extracted from bootstrap CSS*/
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-color: #ddd;
+            border-color: #ccc;
+            color: #333;
+        }
+
         /* === MORE IV INFORMATION === */
         .ivTooltip {
           position: relative;
@@ -328,7 +428,8 @@
           visibility: visible;
           opacity: 0.7;
         }
-	</style>
+
+    </style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
@@ -338,10 +439,22 @@
     <div id="window-map" class="window">
         <span class="title">Map</span>
         <div class="content">
-            <div>
-                <input type="button" id="gpx_upload_button" value="Upload GPX file">
-                <input type="file" id="gpx_upload" accept=".gpx">
-                <input type="checkbox" id="map_autofollow" checked><label for="map_autofollow">Autofollow</label>
+            <div style="display: block;" align="center">
+                <div class="map-button">
+                    <div class="gpx-upload">
+                        <input type="file" id="gpx_upload">
+                    </div>
+                </div>
+                <div class="map-button">
+                    <h4>Autofollow bot</h4>
+                    <div style="display: block" class="autofollow-slide">
+                        <input type="checkbox" value="None" id="autofollow-slide" name="check" checked />
+                        <label for="autofollow-slide"></label>
+                    </div>
+                </div>
+                <div class="map-button">
+                    <div class="btn" id="pokevision-button">Pokévision</div>
+                </div>
             </div>
             <div id="map"></div>
         </div>
@@ -361,12 +474,6 @@
         <span class="title">Pokebank</span>
         <div class="content">
             <div id="pokemon_list"></div>
-        </div>
-    </div>
-    <div id="window-pokevision" class="window">
-        <span class="title">Pokévision</span>
-        <div class="content">
-                <div align="center" style="cursor: pointer; cursor: hand;" id="pokevision-button"><h1>Go</h1></div>
         </div>
     </div>
 
@@ -814,9 +921,6 @@
                 window.open("https://pokevision.com/#/@"+map.center.lat()+","+map.center.lng(), "_blank");
             });
             
-            $('#gpx_upload_button').on('click', function(){
-                $('#gpx_upload').click();
-            });
             $('#gpx_upload').change(function (){
                 var file = $(this)[0].files[0];
                 if(file){
@@ -863,6 +967,38 @@
 
             socket.emit('init');
         }
+
+        $('input[type="file"]').each(function() {
+            // get label text
+            var label = $(this).parents('.gpx-upload').find('label').text();
+            label = (label) ? label : 'Upload GPX';
+
+            // wrap the file input
+            $(this).wrap('<div class="input-file"></div>');
+            // display label
+            $(this).before('<span class="btn">'+label+'</span>');
+            // we will display selected file here
+            $(this).before('<span class="file-selected"></span>');
+
+            // file input change listener 
+            $(this).change(function(e){
+                // Get this file input value
+                var val = $(this).val();
+                
+                // Let's only show filename.
+                // By default file input value is a fullpath, something like 
+                // C:\fakepath\Nuriootpa1.jpg depending on your browser.
+                var filename = val.replace(/^.*[\\\/]/, '');
+
+                // Display the filename
+                $(this).siblings('.file-selected').text(filename);
+            });
+        });
+
+        // Open the file browser when our custom button is clicked.
+        $('.input-file .btn').click(function() {
+            $(this).siblings('input[type="file"]').trigger('click');
+        });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMZB_Zo029aBahPYLVG7eNV9bMcy5elgM&callback=init" async defer></script>
 </body>
