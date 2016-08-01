@@ -23,7 +23,7 @@ $(function() {
              */
             var settings = {
                   notifications: {
-                        notification_caught_pokemon: false,
+                        notification_caught_pokemon: true,
                         notification_next_level: true
                   },
                   autofollow: true
@@ -302,47 +302,6 @@ $(function() {
 
                                     });
 
-                                    var caughtPokemonMarkers = [];
-                                    socket.on('newPokemon', function(data) {
-
-                                          if (settings.notifications.notification_caught_pokemon) {
-                                                
-                                                APP.Utils.sendNotification("Caught '" + data.name + "' with CP " + data.cp + "", {
-                                                      icon: icons.pokemon(data.pokemonId),
-                                                      lang: 'en'
-                                                }, 1500)
-
-                                          }
-
-                                          var marker = new google.maps.Marker({
-                                                position: {
-                                                      lat: data.lat,
-                                                      lng: data.lng
-                                                },
-                                                icon: {
-                                                      url: icons.pokemon(data.pokemonId),
-                                                      scaledSize: new google.maps.Size(70 , 70)
-                                                },
-                                                map: map,
-                                                title: data.name + ' with CP ' + data.cp
-                                          });
-
-                                          caughtPokemonMarkers.push(marker);
-
-                                          var id = String(data.id);
-
-                                          APP.Modules.Pokebank.pokebank[id] = {
-                                                pokemonId: data.pokemonId,
-                                                name: data.name,
-                                                cp: data.cp,
-                                                iv: data.iv,
-                                                stats: data.stats
-                                          };
-
-                                          APP.Modules.Pokebank.renderPokemon(data, id);
-
-                                    });
-
                                     socket.on('gotoDone', function(data) {
 
                                           APP.Modules.Map.gotoMarkers[0].setMap(null);
@@ -467,28 +426,26 @@ $(function() {
 
 						console.log("Notifications Module Initialized");
 
+                                    if (!("Notification" in window)) {
+
+                                          alert("This browser does not support notifications");
+
+                                    } else {
+                                          
+                                          if (Notification.permission !== 'granted') {
+
+                                                Notification.requestPermission(function(){});
+                                          
+                                          }
+                                    }
+
 						/* =======================
 						   COMPONENT FUNCTIONALITY
 						   ======================= */
 					   	$('.notification_check').on('click', function() {
 
                                           var name = $(this).attr('id');
-                                          
-                                          if (!("Notification" in window)) {
-
-                                                alert("This browser does not support notifications");
-
-                                          } else {
-                                          
-                                                settings.notifications[name] = $(this).prop('checked');
-                                                
-                                                if (Notification.permission !== 'granted') {
-                                                   
-                                                      alert('You will have to accept the following request.');
-                                                      Notification.requestPermission(function(){});
-                                                
-                                                }
-                                          }
+                                          settings.notifications[name] = $(this).prop('checked');
 
 						});
 
@@ -509,7 +466,7 @@ $(function() {
 
                                     var popOver = '<p><strong>CP: </strong>'+ pokemon.cp +' <br/> <strong>IV: </strong>'+ pokemon.iv +' <br/> <strong>Stats: </strong>'+ pokemon.stats +'</p>';
                                     
-                                    var elem = $('<a href="#" id="pokemon-id-' + id + '" class="col-sm-2"><img class="media-object img-thumbnail" src="'+ icons.pokemon(pokemon.pokemonId) +'" alt="'+ pokemon.name +'" /></a>').popover({
+                                    var elem = $('<a href="#" id="pokemon-id-' + id + '" class="col-sm-4"><img class="media-object img-thumbnail" src="'+ icons.pokemon(pokemon.pokemonId) +'" alt="'+ pokemon.name +'" /></a>').popover({
                                           title: pokemon.name,
                                           html: true,
                                           placement: 'top',
@@ -557,6 +514,47 @@ $(function() {
 
 						});
 
+                                    var caughtPokemonMarkers = [];
+                                    socket.on('newPokemon', function(data) {
+
+                                          if (settings.notifications.notification_caught_pokemon) {
+                                                
+                                                APP.Utils.sendNotification("Caught '" + data.name + "' with CP " + data.cp + "", {
+                                                      icon: icons.pokemon(data.pokemonId),
+                                                      lang: 'en'
+                                                }, 1500)
+
+                                          }
+
+                                          var marker = new google.maps.Marker({
+                                                position: {
+                                                      lat: data.lat,
+                                                      lng: data.lng
+                                                },
+                                                icon: {
+                                                      url: icons.pokemon(data.pokemonId),
+                                                      scaledSize: new google.maps.Size(70 , 70)
+                                                },
+                                                map: map,
+                                                title: data.name + ' with CP ' + data.cp
+                                          });
+
+                                          caughtPokemonMarkers.push(marker);
+
+                                          var id = String(data.id);
+
+                                          APP.Modules.Pokebank.pokebank[id] = {
+                                                pokemonId: data.pokemonId,
+                                                name: data.name,
+                                                cp: data.cp,
+                                                iv: data.iv,
+                                                stats: data.stats
+                                          };
+
+                                          APP.Modules.Pokebank.renderPokemon(data, id);
+
+                                    });
+
 						socket.on('releasePokemon', function(data) {
 
                                           var id = String(data.id);
@@ -597,7 +595,7 @@ $(function() {
                                                 var egg = data.eggs[i];
 
                                                 var popOver = '<p><strong>Target: </strong>'+ egg.distanceTarget +' Km / <strong>Walked: </strong>'+ egg.distanceWalked.toFixed(2) +' Km</p>';
-                                                var elem = $('<a href="#" class="col-sm-2"><img class="media-object img-thumbnail center-block" src="'+ icons.egg +'" alt="'+ egg.distanceTarget +'" /></a>').popover({
+                                                var elem = $('<a href="#" class="col-sm-4"><img class="media-object img-thumbnail center-block" src="'+ icons.egg +'" alt="'+ egg.distanceTarget +'" /></a>').popover({
                                                       title: 'Egg',
                                                       html: true,
                                                       placement: 'top',
@@ -637,6 +635,7 @@ $(function() {
                                     if (typeof data.username !== 'undefined') {
 
                                           elements.profile.name.text(data.username);
+                                          $('title').text(data.username + ' - Pok&eacute;mon Go Bot GUI');
 
                                     }
 
