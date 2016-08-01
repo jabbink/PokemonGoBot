@@ -51,7 +51,7 @@ having to answer the same question can really clog up the pipes for people who a
 4. Rename `./config.properties.template` to `./config.properties`
 5. Modify `config.properties` as you please
 6. To run the bot directly from console run `gradlew run`
-7. :exclamation: If you use JetBrains IntelliJ, install the Lombok plugin :exclamation:
+7. :exclamation: If you use JetBrains IntelliJ, install the Lombok plugin and enable Settings -> Compiler -> Annotation Processors -> Enable annotation processing :exclamation:
 
 # Contributing
 If you want to help and add a new feature, you can create a pull request to merge in the `develop` branch and not in the `master`.

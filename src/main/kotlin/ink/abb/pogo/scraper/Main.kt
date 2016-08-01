@@ -83,7 +83,6 @@ fun main(args: Array<String>) {
     input.close()
 
     val settings = SettingsParser(properties).createSettingsFromProperties()
-
     Log.normal("Logging in to game server...")
 
     val retryCount = 3

@@ -13,12 +13,20 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
 import java.io.BufferedReader
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.util.*
 
-
 class SettingsParser(val properties: Properties) {
+    val versionProperties = Properties()
+
+    init {
+        FileInputStream(SettingsParser::class.java.getResource("version.properties").file).use {
+            versionProperties.load(it)
+        }
+    }
+
     fun createSettingsFromProperties(): Settings {
         val defaults = Settings(credentials = GoogleCredentials(), startingLatitude = 0.0, startingLongitude = 0.0)
         val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.shouldDropItems, String::toBoolean)
@@ -98,7 +106,9 @@ class SettingsParser(val properties: Properties) {
 
             guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
-            initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt)
+            initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt),
+
+            version = versionProperties.getProperty("version")
         )
     }
 
@@ -203,7 +213,9 @@ data class Settings(
 
     val guiPortSocket: Int = 8001,
 
-    val initialMapSize: Int = 3
+    val initialMapSize: Int = 3,
+
+    val version: String = ""
 ) {
 
     fun writeProperty(propertyFile: String, key: String, value: Any) {

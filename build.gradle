@@ -39,7 +39,7 @@ sourceSets {
 
 dependencies {
 
-    compile project(':PokeGOAPI-Java')
+    compile project(':PokeGOAPI-Java:library')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
@@ -66,4 +66,17 @@ jar {
                 'Main-Class': mainClassName
         )
     }
+}
+task createProperties(dependsOn: processResources) << {
+    String versionDir = "$buildDir/resources/main/ink/abb/pogo/scraper"
+    new File(versionDir).mkdirs()
+    new File("$versionDir/version.properties").withWriter { w ->
+        Properties p = new Properties()
+        p['version'] = project.version.toString()
+        p.store w, null
+    }
+}
+
+classes {
+    dependsOn createProperties
 }
