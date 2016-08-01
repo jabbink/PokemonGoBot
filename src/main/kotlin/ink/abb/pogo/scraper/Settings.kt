@@ -22,7 +22,7 @@ class SettingsParser(val properties: Properties) {
     val versionProperties = Properties()
 
     init {
-        FileInputStream(SettingsParser::class.java.getResource("version.properties").file).use {
+        SettingsParser::class.java.getResourceAsStream("version.properties").use {
             versionProperties.load(it)
         }
     }
