@@ -31,6 +31,13 @@ follow_streets=false
 # Should the bot loot the pokestops (true/false)
 loot_pokestop=true
 
+# How a lure is more attractive than a standard pokestop ( 2 -> twice, etc )
+# Example with lure_pokestop_modifier=2.5
+# after the filter with random_next_pokestop_selection
+# a pokestop without lure at 100step and a pokestop at 250step have the same chance of being elected
+# -1 for always go to lure if available
+lure_pokestop_modifier=1.0
+
 # Should the bot catch pokemons (true/false)
 catch_pokemon=true
 
