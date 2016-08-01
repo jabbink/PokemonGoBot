@@ -69,6 +69,7 @@ class BotService {
         return bots.map { it.settings }
     }
 
+    @Synchronized
     fun doWithBot(name: String, action: (bot: Bot) -> Unit): Boolean {
         val bot = bots.find { it.settings.name == name } ?: return false
 
