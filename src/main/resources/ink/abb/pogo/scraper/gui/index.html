@@ -713,18 +713,19 @@
         
         socket.on('eggs', function(data){
             for(var i = 0; i < data.eggs.length; i++){
-            	var egg = data.eggs[i];
-            	var percentage = ((egg.distanceWalked / egg.distanceTarget) * 100);
+                var egg = data.eggs[i];
+                var percentage = ((egg.distanceWalked / egg.distanceTarget) * 100);
             	
             	hatchery[i] = {
             	    distanceWalked: egg.distanceWalked,
-       		    distanceTarget: egg.distanceTarget,
-                    eggPercentage: percentage
-                };
-                
-                var elem = $('<tr><td><span class="progress" style="width: ' + percentage + '%"></span><span class="text">' + egg.distanceTarget + ' km</span></td>');
-                elements.eggs.append(elem);
-            	}
+            	    distanceTarget: egg.distanceTarget,
+            	    eggPercentage: percentage
+            	};
+            	
+            	var elem = $('<tr><td><span class="progress" style="width: ' + percentage + '%"></span><span class="text">' + egg.distanceTarget + ' km | ' + percentage.toFixed(2) + '%</span></td>');
+            	elements.eggs.append(elem);
+            	
+            }
         });
 
         socket.on('log', function(data){
