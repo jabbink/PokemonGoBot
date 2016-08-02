@@ -6,6 +6,7 @@ buildscript {
 
     repositories {
         mavenCentral()
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -42,12 +43,10 @@ sourceSets {
 
 dependencies {
 
-    compile project(':PokeGOAPI-Java:library')
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:0bf486e221'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
-
-    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.21'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
