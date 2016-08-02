@@ -85,13 +85,13 @@ class CatchOneNearbyPokemon : Task {
                     var message = "Caught a ${catchablePokemon.pokemonId} " +
                             "with CP ${pokemonData.cp} and IV $iv%"
                     message += "\r\n ${pokemonData.getStatsFormatted()}"
-                    if (settings.shouldDisplayIfPokemonWasFromLure) {
+                    if (settings.displayIfPokemonFromLure) {
                         if (encounterResult is DiskEncounterResult)
                             message += " (lured pokemon) "
                         else
                             message += " (wild pokemon) "
                     }
-                    if (settings.shouldDisplayPokemonCatchRewards)
+                    if (settings.displayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
                                 "Candy, ${result.stardustList.sum()}x Stardust]"
                     Log.cyan(message)
@@ -109,7 +109,7 @@ class CatchOneNearbyPokemon : Task {
                 Log.red("Encounter failed with result: ${encounterResult.status}")
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
                     Log.red("Disabling catching of Pokemon")
-                    settings.shouldCatchPokemons = false
+                    settings.catchPokemon = false
                 }
             }
         }

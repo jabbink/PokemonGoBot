@@ -47,7 +47,7 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
         if (startPokeStop == null)
             startPokeStop = sortedPokestops.first()
 
-        if (settings.shouldLootPokestop) {
+        if (settings.lootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             bot.task(loot)
         }

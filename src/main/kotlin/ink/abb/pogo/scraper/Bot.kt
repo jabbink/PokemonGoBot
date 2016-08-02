@@ -41,8 +41,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     var ctx = Context(
             api,
             api.playerProfile,
-            AtomicDouble(settings.startingLatitude),
-            AtomicDouble(settings.startingLongitude),
+            AtomicDouble(settings.latitude),
+            AtomicDouble(settings.longitude),
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             AtomicInteger(0),
@@ -70,7 +70,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         val compareIv = Comparator<Pokemon> { a, b ->
             // compare b to a to get it descending
-            if (settings.sortByIV) {
+            if (settings.sortByIv) {
                 b.getIv().compareTo(a.getIv())
             } else {
                 b.cp.compareTo(a.cp)
@@ -119,11 +119,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
-            if (settings.shouldCatchPokemons)
+            if (settings.catchPokemon)
                 task(catch)
-            if (settings.shouldDropItems)
+            if (settings.dropItems)
                 task(drop)
-            if (settings.shouldAutoTransfer)
+            if (settings.autotransfer)
                 task(release)
 
             if (!prepareWalkBack.get())
@@ -145,11 +145,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
 
 
-        if (settings.timerWalkToStartPokeStop > 0)
-            runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), "BotWalkBackLoop") {
+        if (settings.timerWalkToStartPokestop > 0)
+            runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), "BotWalkBackLoop") {
                 if (!prepareWalkBack.get())
-                    Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokeStop} seconds")
-                runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), TimeUnit.MILLISECONDS)
+                    Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokestop} seconds")
+                runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), TimeUnit.MILLISECONDS)
                 prepareWalkBack.set(true)
                 while (walkBackLock.get()) {
                 }

@@ -19,15 +19,15 @@ import java.util.*
 
 class SettingsParser(val properties: Properties) {
     fun createSettingsFromProperties(): Settings {
-        val defaults = Settings(credentials = GoogleCredentials(), startingLatitude = 0.0, startingLongitude = 0.0)
-        val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.shouldDropItems, String::toBoolean)
+        val defaults = Settings(credentials = GoogleCredentials(), latitude = 0.0, longitude = 0.0)
+        val dropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.dropItems, String::toBoolean)
 
 
         return Settings(
                 profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
-                timerWalkToStartPokeStop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timerWalkToStartPokeStop", defaults.timerWalkToStartPokeStop, String::toLong),
-                startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
-                startingLongitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
+                timerWalkToStartPokestop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timer_walk_to_start_pokestop", defaults.timerWalkToStartPokestop, String::toLong),
+                latitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
+                longitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
 
                 credentials = if (properties.getProperty("username", "").isEmpty()) {
                     GoogleCredentials(properties.getProperty("token", ""))
@@ -38,10 +38,10 @@ class SettingsParser(val properties: Properties) {
                 },
 
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
-                shouldFollowStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.shouldFollowStreets, String::toBoolean),
-                shouldDropItems = shouldDropItems,
+                followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
+                dropItems = dropItems,
 
-                uselessItems = if (shouldDropItems) mapOf(
+                uselessItems = if (dropItems) mapOf(
                         Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
                         Pair(ItemId.ITEM_MAX_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_REVIVE", "item_max_revive", 10, String::toInt)),
                         Pair(ItemId.ITEM_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_POTION", "item_potion", 0, String::toInt)),
@@ -58,25 +58,25 @@ class SettingsParser(val properties: Properties) {
                         Pair(ItemId.ITEM_TROY_DISK, getPropertyIfSet("Max number of items to keep from type ITEM_TROY_DISK (lure module)", "item_lure_module", -1, String::toInt))
                 ) else mapOf(),
 
-                randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestop, String::toInt),
+                randomNextPokestopSelection = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestopSelection, String::toInt),
 
                 desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", defaults.desiredCatchProbability, String::toDouble),
                 desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", defaults.desiredCatchProbabilityUnwanted, String::toDouble),
-                shouldAutoTransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.shouldAutoTransfer, String::toBoolean),
+                autotransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.autotransfer, String::toBoolean),
                 keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", defaults.keepPokemonAmount, String::toInt),
                 maxPokemonAmount = getPropertyIfSet("maximum keep pokemon amount", "max_pokemon_amount", defaults.maxPokemonAmount, String::toInt),
-                shouldDisplayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", defaults.shouldDisplayKeepalive, String::toBoolean),
+                displayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", defaults.displayKeepalive, String::toBoolean),
 
-                shouldDisplayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", defaults.shouldDisplayPokestopName, String::toBoolean),
-                shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", defaults.shouldDisplayPokestopSpinRewards, String::toBoolean),
-                shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", defaults.shouldDisplayPokemonCatchRewards, String::toBoolean),
-                shouldDisplayIfPokemonWasFromLure = getPropertyIfSet("Display If Pokemon Was Caught From Lure", "display_if_pokemon_from_lure", defaults.shouldDisplayPokemonCatchRewards, String::toBoolean),
+                displayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", defaults.displayPokestopName, String::toBoolean),
+                displayPokestopRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", defaults.displayPokestopRewards, String::toBoolean),
+                displayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", defaults.displayPokemonCatchRewards, String::toBoolean),
+                displayIfPokemonFromLure = getPropertyIfSet("Display If Pokemon Was Caught From Lure", "display_if_pokemon_from_lure", defaults.displayPokemonCatchRewards, String::toBoolean),
 
-                shouldLootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", defaults.shouldLootPokestop, String::toBoolean),
-                shouldCatchPokemons = getPropertyIfSet("Catch Pokemons", "catch_pokemon", defaults.shouldCatchPokemons, String::toBoolean),
-                shouldAutoFillIncubators = getPropertyIfSet("Auto Fill Incubators", "auto_fill_incubator", defaults.shouldAutoFillIncubators, String::toBoolean),
+                lootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", defaults.lootPokestop, String::toBoolean),
+                catchPokemon = getPropertyIfSet("Catch Pokemons", "catch_pokemon", defaults.catchPokemon, String::toBoolean),
+                autoFillIncubator = getPropertyIfSet("Auto Fill Incubators", "auto_fill_incubator", defaults.autoFillIncubator, String::toBoolean),
 
-                sortByIV = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", defaults.sortByIV, String::toBoolean),
+                sortByIv = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", defaults.sortByIv, String::toBoolean),
 
                 alwaysCurve = getPropertyIfSet("Always throw curveballs", "always_curve", defaults.alwaysCurve, String::toBoolean),
 
@@ -88,9 +88,9 @@ class SettingsParser(val properties: Properties) {
 
                 banSpinCount = getPropertyIfSet("Number of times the pokestop should be spun to attempt softban bypass", "ban_spin_count", defaults.banSpinCount, String::toInt),
 
-                transferCPThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", defaults.transferCPThreshold, String::toInt),
+                transferCpThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", defaults.transferCpThreshold, String::toInt),
 
-                transferIVThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", defaults.transferIVThreshold, String::toInt),
+                transferIvThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", defaults.transferIvThreshold, String::toInt),
 
                 ignoredPokemon = getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", defaults.ignoredPokemon.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
@@ -147,15 +147,15 @@ class SettingsParser(val properties: Properties) {
 
 data class Settings(
         val profileUpdateTimer: Long = 60,
-        val timerWalkToStartPokeStop: Long = -1L,
-        val startingLatitude: Double,
-        val startingLongitude: Double,
+        val timerWalkToStartPokestop: Long = -1L,
+        val latitude: Double,
+        val longitude: Double,
 
-        val startingLocation: S2LatLng = S2LatLng.fromDegrees(startingLatitude, startingLongitude),
+        val startingLocation: S2LatLng = S2LatLng.fromDegrees(latitude, longitude),
         val credentials: Credentials,
         val speed: Double = 2.8,
-        val shouldFollowStreets: Boolean = false,
-        val shouldDropItems: Boolean = true,
+        val followStreets: Boolean = false,
+        val dropItems: Boolean = true,
         val uselessItems: Map<ItemId, Int> = mapOf(
                 Pair(ItemId.ITEM_REVIVE, 20),
                 Pair(ItemId.ITEM_MAX_REVIVE, 10),
@@ -171,34 +171,33 @@ data class Settings(
                 Pair(ItemId.ITEM_LUCKY_EGG, -1),
                 Pair(ItemId.ITEM_INCENSE_ORDINARY, -1),
                 Pair(ItemId.ITEM_TROY_DISK, -1)
-
         ),
 
-        val randomNextPokestop: Int = 5,
+        val randomNextPokestopSelection: Int = 5,
         val desiredCatchProbability: Double = 0.4,
         val desiredCatchProbabilityUnwanted: Double = 0.0,
-        val shouldAutoTransfer: Boolean = true,
+        val autotransfer: Boolean = true,
         val keepPokemonAmount: Int = 1,
         val maxPokemonAmount: Int = -1,
-        val shouldDisplayKeepalive: Boolean = true,
+        val displayKeepalive: Boolean = true,
 
-        val shouldDisplayPokestopName: Boolean = false,
-        val shouldDisplayPokestopSpinRewards: Boolean = true,
-        val shouldDisplayPokemonCatchRewards: Boolean = true,
-        val shouldDisplayIfPokemonWasFromLure: Boolean = true,
+        val displayPokestopName: Boolean = false,
+        val displayPokestopRewards: Boolean = true,
+        val displayPokemonCatchRewards: Boolean = true,
+        val displayIfPokemonFromLure: Boolean = true,
 
-        val shouldLootPokestop: Boolean = true,
-        var shouldCatchPokemons: Boolean = true,
-        val shouldAutoFillIncubators: Boolean = true,
+        val lootPokestop: Boolean = true,
+        var catchPokemon: Boolean = true,
+        val autoFillIncubator: Boolean = true,
 
-        val sortByIV: Boolean = false,
+        val sortByIv: Boolean = false,
         val alwaysCurve: Boolean = false,
         val neverUseBerries: Boolean = true,
         val allowLeaveStartArea: Boolean = false,
         val spawnRadius: Int = -1,
         val banSpinCount: Int = 0,
-        val transferCPThreshold: Int = 400,
-        val transferIVThreshold: Int = 80,
+        val transferCpThreshold: Int = 400,
+        val transferIvThreshold: Int = 80,
         val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
 
         val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),

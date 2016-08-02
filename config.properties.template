@@ -109,7 +109,7 @@ spawn_radius=-1
 ban_spin_count=0
 
 # Set timer in seconds to go back to the starting pokestop (-1 disabled)
-timerWalkToStartPokeStop=-1
+timer_walk_to_start_pokestop=-1
 
 # Set profile update timer (Default: 60)
 profile_update_timer=60

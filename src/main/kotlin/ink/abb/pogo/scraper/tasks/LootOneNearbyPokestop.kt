@@ -32,7 +32,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
         if (nearbyPokestops.isNotEmpty()) {
             val closest = nearbyPokestops.first()
             var pokestopID = closest.id
-            if (settings.shouldDisplayPokestopName)
+            if (settings.displayPokestopName)
                 pokestopID = "\"${closest.details.name}\""
             Log.normal("Looting nearby pokestop $pokestopID")
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
@@ -51,7 +51,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     ctx.server.sendPokestop(closest)
                     ctx.server.sendProfile()
                     var message = "Looted pokestop $pokestopID; +${result.experience} XP"
-                    if (settings.shouldDisplayPokestopSpinRewards)
+                    if (settings.displayPokestopRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
                     Log.green(message)
                     lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
@@ -61,7 +61,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     ctx.server.sendPokestop(closest)
                     ctx.server.sendProfile()
                     var message = "Looted pokestop $pokestopID; +${result.experience} XP, but inventory is full"
-                    if (settings.shouldDisplayPokestopSpinRewards)
+                    if (settings.displayPokestopRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
 
                     Log.red(message)

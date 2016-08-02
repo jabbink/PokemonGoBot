@@ -32,8 +32,8 @@ fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
     val ignoredPokemon = settings.ignoredPokemon
     val ivPercentage = getIvPercentage()
-    val minIVPercentage = settings.transferIVThreshold
-    val minCP = settings.transferCPThreshold
+    val minIVPercentage = settings.transferIvThreshold
+    val minCP = settings.transferCpThreshold
 
     var shouldRelease = obligatoryTransfer.contains(this.pokemonId)
     var reason: String = "Obligatory transfer"
