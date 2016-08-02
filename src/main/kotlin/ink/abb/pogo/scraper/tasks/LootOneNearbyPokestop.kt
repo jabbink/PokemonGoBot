@@ -19,7 +19,6 @@ import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.map.canLoot
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: HashMap<String, Long>) : Task {
 
@@ -43,7 +42,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                 ctx.itemStats.first.getAndAdd(result.itemsAwarded.size)
             }
 
-            if(result.experience > 0){
+            if (result.experience > 0) {
                 ctx.server.sendProfile()
             }
 
@@ -87,7 +86,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
         }
     }
 
-    private fun checkForBan(result: PokestopLootResult, pokestop:Pokestop, bot: Bot, settings: Settings) {
+    private fun checkForBan(result: PokestopLootResult, pokestop: Pokestop, bot: Bot, settings: Settings) {
         if (settings.banSpinCount > 0 && result.experience == 0 && result.itemsAwarded.isEmpty()) {
             Log.red("Looks like a ban. Trying to bypass softban by repeatedly spinning the pokestop.")
             bot.task(BypassSoftban(pokestop))

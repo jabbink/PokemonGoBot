@@ -82,7 +82,7 @@ class Log {
             ctx?.server?.sendLog("white", text)
         }
 
-        fun setContext(ctx: Context){
+        fun setContext(ctx: Context) {
             this.ctx = ctx
         }
     }

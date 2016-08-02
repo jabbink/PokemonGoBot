@@ -16,14 +16,12 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.InetSocketAddress
 import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.stream.Collectors
 
 class WebServer {
     @Throws(Exception::class)
     fun start(port: Int, socketPort: Int) {
-        Thread(){
+        Thread() {
             val server = HttpServer.create(InetSocketAddress(port), 0)
             server.createContext("/", RootHandler(socketPort))
             server.executor = null
