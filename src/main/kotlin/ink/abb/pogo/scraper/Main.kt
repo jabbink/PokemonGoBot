@@ -39,7 +39,7 @@ class Main {
 
                 // we should be able to login with this token
                 provider.login(access)
-                println("Refresh token:" + provider.getRefreshToken())
+                println("Refresh token:" + provider.refreshToken)
                 Log.normal("Setting Google refresh token in your config")
                 credentials.token = provider.refreshToken
                 settings.writeProperty("config.properties", "token", credentials.token)

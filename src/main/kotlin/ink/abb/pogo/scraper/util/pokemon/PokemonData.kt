@@ -54,5 +54,5 @@ fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String> {
             shouldRelease = ivTooLow && cpTooLow
         }
     }
-    return Pair(shouldRelease, reason);
+    return Pair(shouldRelease, reason)
 }

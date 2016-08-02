@@ -73,5 +73,5 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
             reason = "Too many"
         }
     }
-    return Pair(shouldRelease, reason);
+    return Pair(shouldRelease, reason)
 }

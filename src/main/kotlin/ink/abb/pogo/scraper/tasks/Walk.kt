@@ -284,7 +284,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         // Get random value between 0 and 1
         val random = Math.random()
-        var cumulativeProbability = 0.0;
+        var cumulativeProbability = 0.0
 
         for ((index, pokestop) in pokestops.withIndex()) {
             // Calculate probabilty proportional to the closeness
