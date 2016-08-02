@@ -63,6 +63,9 @@ item_lure_module=-1
 # Should the bot display rewards pokestop (true/false)
 display_pokestop_rewards=true
 
+# Should the bot display if it caught a pokemon from a lure (true/false)
+display_if_pokemon_from_lure=true
+
 # Should the bot display rewards when catching pokemon (true/false)
 display_pokemon_catch_rewards=true
 

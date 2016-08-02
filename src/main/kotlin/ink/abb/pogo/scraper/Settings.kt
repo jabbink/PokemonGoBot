@@ -79,6 +79,7 @@ class SettingsParser(val properties: Properties) {
             shouldDisplayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", defaults.shouldDisplayPokestopName, String::toBoolean),
             shouldDisplayPokestopSpinRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", defaults.shouldDisplayPokestopSpinRewards, String::toBoolean),
             shouldDisplayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", defaults.shouldDisplayPokemonCatchRewards, String::toBoolean),
+            shouldDisplayIfPokemonWasFromLure = getPropertyIfSet("Display If Pokemon Was Caught From Lure", "display_if_pokemon_from_lure", defaults.shouldDisplayPokemonCatchRewards, String::toBoolean),
 
             shouldLootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", defaults.shouldLootPokestop, String::toBoolean),
             shouldCatchPokemons = getPropertyIfSet("Catch Pokemons", "catch_pokemon", defaults.shouldCatchPokemons, String::toBoolean),
@@ -193,6 +194,7 @@ data class Settings(
     val shouldDisplayPokestopName: Boolean = false,
     val shouldDisplayPokestopSpinRewards: Boolean = true,
     val shouldDisplayPokemonCatchRewards: Boolean = true,
+    val shouldDisplayIfPokemonWasFromLure: Boolean = true,
 
     val shouldLootPokestop: Boolean = true,
     var shouldCatchPokemons: Boolean = true,
