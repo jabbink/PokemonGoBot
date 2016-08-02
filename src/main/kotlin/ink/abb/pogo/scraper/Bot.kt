@@ -22,6 +22,7 @@ import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Phaser
@@ -45,6 +46,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicDouble(settings.startingLatitude),
             AtomicDouble(settings.startingLongitude),
             AtomicLong(api.playerProfile.stats.experience),
+            LocalDateTime.now(),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             mutableSetOf(),
