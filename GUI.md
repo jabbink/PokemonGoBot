@@ -51,6 +51,7 @@ Each child of the pokemon array represents 1 Pokémon in your Pokébank, and con
 #### Eggs
 
 **UNDER DEVELOPMENT**
+
     socket.on('eggs', function(data){})
 Returns the eggs in your inventory and currently only tells distanceTarget.
 Returns as a nested array
