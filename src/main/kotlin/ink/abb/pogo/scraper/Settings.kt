@@ -10,6 +10,9 @@ package ink.abb.pogo.scraper
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
 import java.io.BufferedReader
@@ -20,11 +23,12 @@ import java.util.*
 
 class SettingsParser(val properties: Properties) {
     fun createSettingsFromProperties(): Settings {
-        val defaults = Settings(credentials = GoogleCredentials(), startingLatitude = 0.0, startingLongitude = 0.0)
+        val defaults = Settings(name = "", credentials = GoogleCredentials(), startingLatitude = 0.0, startingLongitude = 0.0)
         val shouldDropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.shouldDropItems, String::toBoolean)
 
 
         return Settings(
+                name = "default",
                 profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
                 timerWalkToStartPokeStop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timerWalkToStartPokeStop", defaults.timerWalkToStartPokeStop, String::toLong),
                 startingLatitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
@@ -42,7 +46,7 @@ class SettingsParser(val properties: Properties) {
                 shouldFollowStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.shouldFollowStreets, String::toBoolean),
                 shouldDropItems = shouldDropItems,
 
-                uselessItems = if (shouldDropItems) mapOf(
+                uselessItems = mapOf(
                         Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
                         Pair(ItemId.ITEM_MAX_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_REVIVE", "item_max_revive", 10, String::toInt)),
                         Pair(ItemId.ITEM_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_POTION", "item_potion", 0, String::toInt)),
@@ -57,7 +61,7 @@ class SettingsParser(val properties: Properties) {
                         Pair(ItemId.ITEM_LUCKY_EGG, getPropertyIfSet("Max number of items to keep from type ITEM_LUCKY_EGG", "item_lucky_egg", -1, String::toInt)),
                         Pair(ItemId.ITEM_INCENSE_ORDINARY, getPropertyIfSet("Max number of items to keep from type ITEM_INCENSE_ORDINARY", "item_incense", -1, String::toInt)),
                         Pair(ItemId.ITEM_TROY_DISK, getPropertyIfSet("Max number of items to keep from type ITEM_TROY_DISK (lure module)", "item_lure_module", -1, String::toInt))
-                ) else mapOf(),
+                ),
 
                 randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestop, String::toInt),
 
@@ -144,17 +148,20 @@ class SettingsParser(val properties: Properties) {
     }
 }
 
+@JsonIgnoreProperties("startingLocation", "name", ignoreUnknown = true)
 data class Settings(
-        val profileUpdateTimer: Long = 60,
-        val timerWalkToStartPokeStop: Long = -1L,
+        var name: String = "",
+
         val startingLatitude: Double,
         val startingLongitude: Double,
-
         val startingLocation: S2LatLng = S2LatLng.fromDegrees(startingLatitude, startingLongitude),
+
         val credentials: Credentials,
-        val speed: Double = 2.8,
+
+        val speed: Double = 2.778,
         val shouldFollowStreets: Boolean = false,
-        val shouldDropItems: Boolean = true,
+
+        val shouldDropItems: Boolean = false,
         val uselessItems: Map<ItemId, Int> = mapOf(
                 Pair(ItemId.ITEM_REVIVE, 20),
                 Pair(ItemId.ITEM_MAX_REVIVE, 10),
@@ -173,10 +180,12 @@ data class Settings(
 
         ),
 
+        val profileUpdateTimer: Long = 60,
+        val timerWalkToStartPokeStop: Long = -1L,
         val randomNextPokestop: Int = 5,
         val desiredCatchProbability: Double = 0.4,
         val desiredCatchProbabilityUnwanted: Double = 0.0,
-        val shouldAutoTransfer: Boolean = true,
+        val shouldAutoTransfer: Boolean = false,
         val keepPokemonAmount: Int = 1,
         val maxPokemonAmount: Int = -1,
         val shouldDisplayKeepalive: Boolean = true,
@@ -202,10 +211,13 @@ data class Settings(
         val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
 
         val export: String = "",
-
         val guiPort: Int = 8000,
         val guiPortSocket: Int = 8001
 ) {
+    fun withName(name: String): Settings {
+        this.name = name
+        return this
+    }
 
     fun writeProperty(propertyFile: String, key: String, value: Any) {
         // TODO: This function does not work with lists, like obligatory_transfer
@@ -236,6 +248,13 @@ data class Settings(
     }
 }
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+        JsonSubTypes.Type(value = GoogleCredentials::class, name = "google"),
+        JsonSubTypes.Type(value = GoogleAutoCredentials::class, name = "google-auto"),
+        JsonSubTypes.Type(value = PtcCredentials::class, name = "ptc")
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 interface Credentials
 
 data class GoogleCredentials(var token: String = "") : Credentials
