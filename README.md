@@ -8,4 +8,6 @@ See DOCS.md for information on how to create a web-based GUI to share with other
 
 ## User-created GUIs
 
-Please submit a PR if you want to add your GUI to this list
+* [Theme from 0.5.0-alpha4 by @jabbink](http://pogo.abb.ink/0.5.0-alpha4/map.html)
+
+**Please submit a PR if you want to add your GUI to this list**
