@@ -46,7 +46,7 @@ class SettingsParser(val properties: Properties) {
                 shouldFollowStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.shouldFollowStreets, String::toBoolean),
                 shouldDropItems = shouldDropItems,
 
-                uselessItems = if (shouldDropItems) mapOf(
+                uselessItems = mapOf(
                         Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
                         Pair(ItemId.ITEM_MAX_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_REVIVE", "item_max_revive", 10, String::toInt)),
                         Pair(ItemId.ITEM_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_POTION", "item_potion", 0, String::toInt)),
@@ -61,7 +61,7 @@ class SettingsParser(val properties: Properties) {
                         Pair(ItemId.ITEM_LUCKY_EGG, getPropertyIfSet("Max number of items to keep from type ITEM_LUCKY_EGG", "item_lucky_egg", -1, String::toInt)),
                         Pair(ItemId.ITEM_INCENSE_ORDINARY, getPropertyIfSet("Max number of items to keep from type ITEM_INCENSE_ORDINARY", "item_incense", -1, String::toInt)),
                         Pair(ItemId.ITEM_TROY_DISK, getPropertyIfSet("Max number of items to keep from type ITEM_TROY_DISK (lure module)", "item_lure_module", -1, String::toInt))
-                ) else mapOf(),
+                ),
 
                 randomNextPokestop = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestop, String::toInt),
 
@@ -206,7 +206,7 @@ data class Settings(
         val banSpinCount: Int = 0,
         val transferCPThreshold: Int = 400,
         val transferIVThreshold: Int = 80,
-        val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO),
+        val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
 
         val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
 

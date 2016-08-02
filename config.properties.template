@@ -23,7 +23,7 @@ random_next_pokestop_selection=5
 
 ## Walking
 # Meters per second
-speed=2.8
+speed=2.778
 
 # Should the bot follow the streets (true) or just go directly to pokestops/waypoints
 follow_streets=false
@@ -39,7 +39,7 @@ auto_fill_incubator=true
 
 ## Items drop
 # Should the bot EVER drop items (true/false)
-drop_items=true
+drop_items=false
 
 # Max number of each item that the bot should keep if "drop_items" is enabled
 # Use -1 in an item to never drop this specific item
@@ -78,7 +78,7 @@ display_pokestop_name=false
 
 ## Pokemon Transfer
 # Should the bot auto transfer duplicate pokemon
-autotransfer=true
+autotransfer=false
 
 # Minimum amount of pokemon type to keep
 keep_pokemon_amount=1
