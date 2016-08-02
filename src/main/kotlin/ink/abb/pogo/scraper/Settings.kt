@@ -240,11 +240,11 @@ data class Settings(
     }
 
     companion object Version {
-        val versionProperties = Properties()
 
         val version: String
 
         init {
+            val versionProperties = Properties()
             SettingsParser::class.java.getResourceAsStream("version.properties").use {
                 versionProperties.load(it)
             }

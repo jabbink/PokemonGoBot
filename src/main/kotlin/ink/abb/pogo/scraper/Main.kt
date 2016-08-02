@@ -77,11 +77,9 @@ class Main {
 
         val properties = Properties()
 
-        val input = FileInputStream("config.properties")
-        input.use {
+        FileInputStream("config.properties").use {
             properties.load(it)
         }
-        input.close()
 
         val settings = SettingsParser(properties).createSettingsFromProperties()
         Log.normal("Logging in to game server...")
