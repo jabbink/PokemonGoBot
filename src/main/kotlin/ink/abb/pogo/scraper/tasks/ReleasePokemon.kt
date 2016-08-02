@@ -42,13 +42,56 @@ class ReleasePokemon : Task {
                         if (shouldRelease) {
                             Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
                                     "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
-                            val result = pokemon.transferPokemon()
-                            if (result == Result.SUCCESS) {
-                                ctx.pokemonStats.second.andIncrement
-                                ctx.server.releasePokemon(pokemon.id)
-                                ctx.server.sendProfile()
+
+                            if (settings.obligatoryTransfer.contains(pokemon.pokemonId)) { //Obligatory = Evolve bcs I dont mind candies
+                                Log.yellow("Going to evolve ${pokemon.pokemonId.name} with " +
+                                        "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
+                                val evolveResult = pokemon.evolve()
+                                if (evolveResult.isSuccessful()) {
+                                    var evolvedPkmn = evolveResult.getEvolvedPokemon();
+                                    Log.yellow("${pokemon.pokemonId.name} has evolved to ${evolvedPkmn.pokemonId.name}")
+
+                                    val (shouldReleaseEvolved, reasonshouldReleaseEvolved) = evolvedPkmn.shouldTransfer(settings, pokemonCounts)
+                                    val ivPercentage = evolvedPkmn.getIvPercentage()
+
+
+                                    if (shouldReleaseEvolved) {
+                                        Log.yellow("Going to transfer evolved ${evolvedPkmn.pokemonId.name} with " +
+                                                "CP ${evolvedPkmn.cp} and IV $ivPercentage%; reason: $reasonshouldReleaseEvolved")
+                                        val result = evolvedPkmn.transferPokemon()
+                                        if (result == Result.SUCCESS) {
+                                            ctx.pokemonStats.second.andIncrement
+                                            ctx.server.releasePokemon(evolvedPkmn.id)
+                                            ctx.server.sendProfile()
+                                        } else {
+                                            Log.red("Failed to transfer evolved ${evolvedPkmn.pokemonId.name}: ${result.name}")
+                                        }
+                                    } else {
+                                        Log.yellow("Going to keep evolved ${evolvedPkmn.pokemonId.name} with " +
+                                                "CP ${evolvedPkmn.cp} and IV $ivPercentage%; reason: $reasonshouldReleaseEvolved")
+                                    }
+
+                                } else {
+                                    Log.red("Cannot evolve ${pokemon.pokemonId.name}, going to transfer")
+
+                                    val result = pokemon.transferPokemon()
+                                    if (result == Result.SUCCESS) {
+                                        ctx.pokemonStats.second.andIncrement
+                                        ctx.server.releasePokemon(pokemon.id)
+                                        ctx.server.sendProfile()
+                                    } else {
+                                        Log.red("Failed to transfer ${pokemon.pokemonId.name}: ${result.name}")
+                                    }
+                                }
                             } else {
-                                Log.red("Failed to transfer ${pokemon.pokemonId.name}: ${result.name}")
+                                val result = pokemon.transferPokemon()
+                                if (result == Result.SUCCESS) {
+                                    ctx.pokemonStats.second.andIncrement
+                                    ctx.server.releasePokemon(pokemon.id)
+                                    ctx.server.sendProfile()
+                                } else {
+                                    Log.red("Failed to transfer ${pokemon.pokemonId.name}: ${result.name}")
+                                }
                             }
                         }
                     }
