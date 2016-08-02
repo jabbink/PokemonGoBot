@@ -30,7 +30,7 @@ class SmartEvolve : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val pokebagFillPercent = ctx.api.inventories.pokebank.pokemons.size.toDouble() / ctx.profile.pokemonStorage
         Log.white("Pokebag ${pokebagFillPercent * 100} % full.")
-        if (pokebagFillPercent >= 0.5) {
+        if (pokebagFillPercent >= 0.8) {
             val pokemonFamilies = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonFamily }
 
             pokemonFamilies.forEach {
