@@ -17,7 +17,6 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
 import java.text.DecimalFormat
 import java.time.LocalDateTime
-import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 
 class UpdateProfile : Task {
@@ -30,7 +29,6 @@ class UpdateProfile : Task {
         val player = ctx.api.playerProfile
         val inventories = ctx.api.inventories
         try {
-            ctx.api.
             // update km walked, mainly
             inventories.updateInventories(true)
             player.updateProfile()
