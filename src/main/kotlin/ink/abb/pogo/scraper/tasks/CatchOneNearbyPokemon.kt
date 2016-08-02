@@ -9,10 +9,8 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse.Status
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult
-import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings

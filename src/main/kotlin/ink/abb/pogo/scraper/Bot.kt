@@ -128,13 +128,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
             if (!prepareWalkBack.get())
                 task(process)
-            else if(!ctx.walking.get())
+            else if (!ctx.walking.get())
                 task(WalkToStartPokeStop(process.startPokeStop as Pokestop))
         }
 
         Log.setContext(ctx)
 
-        if(settings.guiPortSocket > 0){
+        if (settings.guiPortSocket > 0) {
             Log.normal("Running socket server on port ${settings.guiPortSocket}")
             ctx.server.start(ctx, settings.guiPortSocket)
             var needPort = ""
@@ -147,11 +147,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         if (settings.timerWalkToStartPokeStop > 0)
             runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), "BotWalkBackLoop") {
-                if(!prepareWalkBack.get())
+                if (!prepareWalkBack.get())
                     Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokeStop} seconds")
                 runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), TimeUnit.MILLISECONDS)
                 prepareWalkBack.set(true)
-                while(walkBackLock.get()){}
+                while (walkBackLock.get()) {
+                }
             }
     }
 
@@ -175,10 +176,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                     val sleep = timeout - (api.currentTimeMillis() - start)
 
                     if (sleep > 0) {
-                        try {
-                            runningLatch.await(sleep, TimeUnit.MILLISECONDS)
-                        } catch (ignore: InterruptedException) {
-                        }
+                        runningLatchAwait(sleep, TimeUnit.MILLISECONDS)
                     }
                 }
             } finally {
@@ -195,6 +193,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         runningLatch.countDown()
         phaser.arriveAndAwaitAdvance()
         Log.red("All bot loops stopped.")
+    }
+
+    fun runningLatchAwait(timeout: Long, unit: TimeUnit) {
+        try {
+            runningLatch.await(timeout, unit)
+        } catch (ignore: InterruptedException) {
+        }
     }
 
     fun isRunning(): Boolean {

@@ -11,11 +11,10 @@ package ink.abb.pogo.scraper.util.io
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
-import java.util.ArrayList
-import java.util.StringJoiner
+import java.util.*
 
 class CSVWriter(val delimiter: String = ",") {
-    fun write (output: ArrayList<Array<String>>) {
+    fun write(output: ArrayList<Array<String>>) {
         // UTF-8 with BOM to fix borked UTF-8 chars in MS Excel (for nickname output)
         // https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
         val fos = FileOutputStream("export.csv")
@@ -24,8 +23,7 @@ class CSVWriter(val delimiter: String = ",") {
         fos.write(191)
         val pw = PrintWriter(OutputStreamWriter(fos, "UTF-8"))
 
-        for (line in output)
-        {
+        for (line in output) {
             pw.println(createCSVLine(line, delimiter))
         }
 

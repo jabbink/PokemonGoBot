@@ -84,3 +84,7 @@ task createProperties(dependsOn: processResources) << {
 classes {
     dependsOn createProperties
 }
+
+test {
+    dependsOn createProperties
+}
