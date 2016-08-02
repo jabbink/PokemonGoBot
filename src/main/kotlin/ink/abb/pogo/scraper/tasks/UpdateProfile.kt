@@ -15,7 +15,16 @@ import ink.abb.pogo.scraper.util.inventory.size
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+
+<<<<<<< efeb3ee7900c7b5f9c2ae379a03b6b72ce574a55
+import java.text.NumberFormat
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+=======
+import java.time.LocalDateTime
+import java.time.temporal.ChronoField
+>>>>>>> Added XP Per Hour in Profile Update
 import java.time.temporal.ChronoUnit
 
 class UpdateProfile : Task {
@@ -23,6 +32,7 @@ class UpdateProfile : Task {
         val player = ctx.api.playerProfile
         val inventories = ctx.api.inventories
         try {
+            ctx.api.
             // update km walked, mainly
             inventories.updateInventories(true)
             player.updateProfile()
@@ -34,6 +44,7 @@ class UpdateProfile : Task {
             Log.magenta("Profile update: ${NumberFormat.getInstance().format(player.stats.experience)} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}; " +
                     "XP gain: ${NumberFormat.getInstance().format(player.stats.experience - ctx.startXp.get())} XP in ${ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())} mins; " +
                     "XP rate: ${NumberFormat.getInstance().format(xpPerHour)}/hr")
+
             Log.magenta(
                     "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
                     "Pokemon caught from lures: ${ctx.luredPokemonStats.get()}; " +
