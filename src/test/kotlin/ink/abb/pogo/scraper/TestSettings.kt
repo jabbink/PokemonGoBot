@@ -28,7 +28,7 @@ class TestSettings {
         properties.setProperty("latitude", "0.0")
         properties.setProperty("longitude", "0.0")
         val settingsFromTemplate = SettingsParser(properties).createSettingsFromProperties()
-        val settingsFromCode = Settings(name="default", latitude = 0.0, longitude = 0.0, credentials = GoogleCredentials())
+        val settingsFromCode = Settings(name = "default", latitude = 0.0, longitude = 0.0, credentials = GoogleCredentials())
 
         Assert.assertEquals(settingsFromCode.toString().split(",").joinToString("\n"), settingsFromTemplate.toString().split(",").joinToString("\n"))
     }
@@ -71,7 +71,7 @@ class TestSettings {
         val properties = Properties()
         FileInputStream("config.properties.template").use {
             properties.load(it)
-}
+        }
         val memberNames = Settings::class.memberProperties.filter { !propertyBlacklist.contains(it.name) }.map { it.name }
         val propertyNames = properties.keys.map { it.toString() }.filter { !propertyBlacklist.contains(it) }
         propertyNames.forEach {

@@ -42,7 +42,7 @@ class BotController {
 
     @RequestMapping("/bot/{name}/reload")
     fun reloadBot(@PathVariable name: String): Boolean {
-        if(!unloadBot(name)) return false
+        if (!unloadBot(name)) return false
         loadBot(name)
         return true
     }

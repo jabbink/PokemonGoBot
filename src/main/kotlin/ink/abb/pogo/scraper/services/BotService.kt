@@ -58,7 +58,7 @@ class BotService {
 
     fun load(name: String): Settings {
         val save = File(root, "$name.json")
-        if(!save.isFile) {
+        if (!save.isFile) {
             throw IllegalArgumentException("No save file found for name: $name")
         }
 

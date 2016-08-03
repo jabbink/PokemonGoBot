@@ -10,8 +10,8 @@ buildscript {
 
     repositories {
         mavenCentral()
-        maven { url "https://jitpack.io" }
     }
+
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
@@ -30,6 +30,7 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    jcenter()
     maven { url "https://jitpack.io" }
 }
 
@@ -53,7 +54,7 @@ configurations {
 
 dependencies {
 
-    compile 'com.github.Grover-c13:PokeGOAPI-Java:0bf486e221'
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:ecd07a1401'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
