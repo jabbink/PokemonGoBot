@@ -1,4 +1,4 @@
 [submodule "RocketTheme"]
 	path = RocketTheme
-	url = git@github.com:eruecco87/PokemonGoBot-RocketTheme.git
+	url = https://github.com/eruecco87/PokemonGoBot-RocketTheme.git
 	branch = gh-pages
