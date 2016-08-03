@@ -11,7 +11,10 @@ package ink.abb.pogo.scraper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.util.Time
 import ink.abb.pogo.scraper.gui.SocketServer
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -23,6 +26,7 @@ data class Context(
         val lng: AtomicDouble,
 
         val startXp: AtomicLong,
+        val startTime: LocalDateTime,
         val pokemonStats: Pair<AtomicInteger, AtomicInteger>,
         val itemStats: Pair<AtomicInteger, AtomicInteger>,
 
