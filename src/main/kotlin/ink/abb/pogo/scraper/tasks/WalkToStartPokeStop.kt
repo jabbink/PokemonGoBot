@@ -73,7 +73,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                     pauseWalk.set(true)
                     return@runLoop
                 }
-
+            pauseCounter = 2
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
             ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
@@ -124,6 +124,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                     pauseWalk.set(true)
                     return@runLoop
                 }
+                pauseCounter = 2
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                 val step = coordinatesList.first()
                 coordinatesList.removeAt(0)
