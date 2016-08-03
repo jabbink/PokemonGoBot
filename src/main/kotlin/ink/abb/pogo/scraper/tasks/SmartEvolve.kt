@@ -28,7 +28,7 @@ class SmartEvolve : Task {
     }
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val pokebagFillPercent = ctx.api.inventories.pokebank.pokemons.size.toDouble() / ctx.profile.pokemonStorage
+        val pokebagFillPercent = ctx.api.inventories.pokebank.pokemons.size.toDouble() / ctx.profile.playerData.maxPokemonStorage
         Log.white("Pokebag ${pokebagFillPercent * 100} % full.")
         if (pokebagFillPercent >= 0.8) {
             val pokemonFamilies = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonFamily }
@@ -44,11 +44,6 @@ class SmartEvolve : Task {
 
                     Log.green("Evolving ${pokemon.pokemonId.name} with IV ${pokemon.ivRatio} and ${pokemon.cp}cp")
                     pokemon.evolve()
-
-                    // This might work. not sure
-//                    if (pokemon.pokemonFamily == PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_EEVEE) {
-//                        pokemon.renamePokemon("")
-//                    }
                 }
             }
 
