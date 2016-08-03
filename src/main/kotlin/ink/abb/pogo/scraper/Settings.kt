@@ -215,7 +215,7 @@ data class Settings(
 
         val guiPortSocket: Int = 8001,
 
-        val initialMapSize: Int = 3,
+        val initialMapSize: Int = 9,
 
         val version: String = Settings.version
 ) {
