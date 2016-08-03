@@ -328,6 +328,258 @@
           visibility: visible;
           opacity: 0.7;
         }
+
+
+
+        /* Better autofollow checkbox */
+        .autofollow-slide {
+          width: 80px;
+          height: 26px;
+          background: #ddd;
+          margin: 20px auto;
+          position: relative;
+          border-radius: 50px;
+          box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.2);
+        }
+        .autofollow-slide:after {
+          content: 'OFF';
+          color: #333;
+          position: absolute;
+          right: 10px;
+          z-index: 0;
+          font: 12px/26px Arial, sans-serif;
+          font-weight: bold;
+          text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.15);
+        }
+        .autofollow-slide:before {
+          content: 'ON';
+          color: #c0392b;
+          position: absolute;
+          left: 10px;
+          z-index: 0;
+          font: 12px/26px Arial, sans-serif;
+          font-weight: bold;
+        }
+        .autofollow-slide label {
+          display: block;
+          width: 34px;
+          height: 20px;
+          cursor: pointer;
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          z-index: 1;
+          background: #444;
+          /*background: -webkit-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);*/
+          /*background: linear-gradient(to bottom, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);*/
+          border-radius: 50px;
+          -webkit-transition: all 0.4s ease;
+          transition: all 0.4s ease;
+          box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
+        }
+        .autofollow-slide input[type=checkbox] {
+          visibility: hidden;
+        }
+        .autofollow-slide input[type=checkbox]:checked + label {
+          left: 43px;
+        }
+
+        /*Map button and dividers*/
+        .map-button {
+            display: inline-block;
+            padding: 5px 20px;
+        }
+
+        .map-button:not(:first-child) {
+            border-left: 1px solid #ccc;
+        }
+
+        /*Upload GPX file button*/
+        .input-file {
+            input[type="file"] {
+                visibility: hidden;
+                width: 1px;
+                height: 1px
+            }
+
+            .btn {
+                background-color: #ddd;
+                border-color: #ccc;
+                color: #333;
+            }
+            
+            .file-selected {
+                font-size: 10px;
+                text-align: center;
+                width: 100%;
+                display: block;
+                margin-top: 5px;
+            }
+        }
+
+        span.file-selected {
+            display: block
+        }
+
+        /*Extracted from bootstrap CSS*/
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-color: #ddd;
+            border-color: #ccc;
+            color: #333;
+        }
+
+
+        .dropup,
+        .dropdown {
+          position: relative;
+        }
+        .dropdown-toggle:focus {
+          outline: 0;
+        }
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          z-index: 1000;
+          display: none;
+          float: left;
+          min-width: 160px;
+          padding: 5px 0;
+          margin: 2px 0 0;
+          font-size: 14px;
+          text-align: left;
+          list-style: none;
+          background-color: #fff;
+          -webkit-background-clip: padding-box;
+                  background-clip: padding-box;
+          border: 1px solid #ccc;
+          border: 1px solid rgba(0, 0, 0, .15);
+          border-radius: 4px;
+          -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+                  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+        }
+        .dropdown-menu.pull-right {
+          right: 0;
+          left: auto;
+        }
+        .dropdown-menu .divider {
+          height: 1px;
+          margin: 9px 0;
+          overflow: hidden;
+          background-color: #e5e5e5;
+        }
+        .dropdown-menu > li > a {
+          display: block;
+          padding: 3px 20px;
+          clear: both;
+          font-weight: normal;
+          line-height: 1.42857143;
+          color: #333;
+          white-space: nowrap;
+        }
+        .dropdown-menu > li > a:hover,
+        .dropdown-menu > li > a:focus {
+          color: #262626;
+          text-decoration: none;
+          background-color: #f5f5f5;
+        }
+        .dropdown-menu > .active > a,
+        .dropdown-menu > .active > a:hover,
+        .dropdown-menu > .active > a:focus {
+          color: #fff;
+          text-decoration: none;
+          background-color: #337ab7;
+          outline: 0;
+        }
+        .dropdown-menu > .disabled > a,
+        .dropdown-menu > .disabled > a:hover,
+        .dropdown-menu > .disabled > a:focus {
+          color: #777;
+        }
+        .dropdown-menu > .disabled > a:hover,
+        .dropdown-menu > .disabled > a:focus {
+          text-decoration: none;
+          cursor: not-allowed;
+          background-color: transparent;
+          background-image: none;
+          filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+        }
+        .open > .dropdown-menu {
+          display: block;
+        }
+        .open > a {
+          outline: 0;
+        }
+        .dropdown-menu-right {
+          right: 0;
+          left: auto;
+        }
+        .dropdown-menu-left {
+          right: auto;
+          left: 0;
+        }
+        .dropdown-header {
+          display: block;
+          padding: 3px 20px;
+          font-size: 12px;
+          line-height: 1.42857143;
+          color: #777;
+          white-space: nowrap;
+        }
+        .dropdown-backdrop {
+          position: fixed;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          z-index: 990;
+        }
+        .pull-right > .dropdown-menu {
+          right: 0;
+          left: auto;
+        }
+        .dropup .caret,
+        .navbar-fixed-bottom .dropdown .caret {
+          content: "";
+          border-top: 0;
+          border-bottom: 4px dashed;
+          border-bottom: 4px solid \9;
+        }
+        .dropup .dropdown-menu,
+        .navbar-fixed-bottom .dropdown .dropdown-menu {
+          top: auto;
+          bottom: 100%;
+          margin-bottom: 2px;
+        }
+        @media (min-width: 768px) {
+          .navbar-right .dropdown-menu {
+            right: 0;
+            left: auto;
+          }
+          .navbar-right .dropdown-menu-left {
+            right: auto;
+            left: 0;
+          }
+        }
 	</style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -336,16 +588,38 @@
 </head>
 <body>
     <div id="window-map" class="window">
-        <span class="title">Map</span>
-        <div class="content">
-            <div>
-                <input type="button" id="gpx_upload_button" value="Upload GPX file">
-                <input type="file" id="gpx_upload" accept=".gpx">
-                <input type="checkbox" id="map_autofollow" checked><label for="map_autofollow">Autofollow</label>
+            <span class="title">Map</span>
+            <div class="content">
+                <div style="display: block;" align="center">
+                    <div class="map-button">
+                        <div class="gpx-upload">
+                            <div class="input-file"><!-- <span class="btn">Upload GPX</span> --><span class="file-selected"></span><input type="file" id="gpx_upload"></div>
+                        </div>
+                    </div>
+                    <div class="map-button">
+                        <h4>Autofollow bot</h4>
+                        <div style="display: block" class="autofollow-slide">
+                            <input type="checkbox" value="None" id="autofollow-slide" name="check" checked="">
+                            <label for="autofollow-slide"></label>
+                        </div>
+                    </div>
+                    <div class="map-button">
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">Map Links
+                            <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-header" id="latlng-dropdown"></li>
+                                <li class="disabled" id="pokevision-button" title="Down per Niantic's request"><a target="_blank" href="#" class="disabled" title="Down per Niantic's request">Pokévision</a></li>
+                                <li id="gmaps-button"><a target="_blank" href="#">Google Maps</a></li>
+                                <li id="bmaps-button"><a target="_blank" href="#">Bing Maps</a></li>
+                                <li id="osm-button"><a target="_blank" href="#">OpenStreetMaps</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="map"></div>
             </div>
-            <div id="map"></div>
         </div>
-    </div>
 
     <div id="window-GPX-Generator" class="window">
         <span class="title">Generate GPX file</span>
@@ -792,7 +1066,7 @@
                 map: map
             });
 
-            $('#map_autofollow').on('click', function() {
+            $('#autofollow-slide').on('click', function() {
                 settings.autofollow = $(this).prop('checked');
             });
 
@@ -851,8 +1125,246 @@
                 }
             });
 
+            map.addListener("center_changed", function() {
+                $("#latlng-dropdown").html(
+                    map.center.lat()+
+                    ", "+
+                    map.center.lng()
+                );
+                $("#pokevision-button a").attr(
+                    "href",
+                    "https://pokevision.com/#/@"+
+                    Math.round(map.center.lat()*10000000)/10000000+
+                    ","+
+                    Math.round(map.center.lng()*10000000)/10000000
+                );
+                $("#gmaps-button a").attr(
+                    "href",
+                    "https://www.google.com/maps/@"+
+                    Math.round(map.center.lat()*10000000)/10000000+
+                    ","+
+                    Math.round(map.center.lng()*10000000)/10000000+
+                    ",18z?"
+                );
+                $("#osm-button a").attr(
+                    "href",
+                    "https://www.openstreetmap.org/#map=16/"+
+                    Math.round(map.center.lat()*10000000)/10000000+
+                    "/"+
+                    Math.round(map.center.lng()*10000000)/10000000
+                );
+                $("#bmaps-button a").attr(
+                    "href",
+                    "http://bing.com/maps/default.aspx?cp="+
+                    Math.round(map.center.lat()*10000000)/10000000+
+                    "~"+
+                    Math.round(map.center.lng()*10000000)/10000000+
+                    "&lvl=17"
+                );
+            });
+
             socket.emit('init');
         }
+
+
+        $('input[type="file"]').each(function() {
+            // get label text
+            var label = $(this).parents('.gpx-upload').find('label').text();
+            label = (label) ? label : 'Upload GPX';
+
+            // wrap the file input
+            $(this).wrap('<div class="input-file"></div>');
+            // display label
+            $(this).before('<span class="btn">'+label+'</span>');
+            // we will display selected file here
+            $(this).before('<span class="file-selected"></span>');
+
+            // file input change listener 
+            $(this).change(function(e){
+                // Get this file input value
+                var val = $(this).val();
+                
+                // Let's only show filename.
+                // By default file input value is a fullpath, something like 
+                // C:\fakepath\Nuriootpa1.jpg depending on your browser.
+                var filename = val.replace(/^.*[\\\/]/, '');
+
+                // Display the filename
+                $(this).siblings('.file-selected').text(filename);
+            });
+        });
+
+        // Open the file browser when our custom button is clicked.
+        $('.input-file .btn').click(function() {
+            $(this).siblings('input[type="file"]').trigger('click');
+        });
+
+
+        /* ========================================================================
+         * Bootstrap: dropdown.js v3.3.7
+         * http://getbootstrap.com/javascript/#dropdowns
+         * ========================================================================
+         * Copyright 2011-2016 Twitter, Inc.
+         * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+         * ======================================================================== */
+
+
+        +function ($) {
+          'use strict';
+
+          // DROPDOWN CLASS DEFINITION
+          // =========================
+
+          var backdrop = '.dropdown-backdrop'
+          var toggle   = '[data-toggle="dropdown"]'
+          var Dropdown = function (element) {
+            $(element).on('click.bs.dropdown', this.toggle)
+          }
+
+          Dropdown.VERSION = '3.3.7'
+
+          function getParent($this) {
+            var selector = $this.attr('data-target')
+
+            if (!selector) {
+              selector = $this.attr('href')
+              selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+            }
+
+            var $parent = selector && $(selector)
+
+            return $parent && $parent.length ? $parent : $this.parent()
+          }
+
+          function clearMenus(e) {
+            if (e && e.which === 3) return
+            $(backdrop).remove()
+            $(toggle).each(function () {
+              var $this         = $(this)
+              var $parent       = getParent($this)
+              var relatedTarget = { relatedTarget: this }
+
+              if (!$parent.hasClass('open')) return
+
+              if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
+
+              $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
+
+              if (e.isDefaultPrevented()) return
+
+              $this.attr('aria-expanded', 'false')
+              $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
+            })
+          }
+
+          Dropdown.prototype.toggle = function (e) {
+            var $this = $(this)
+
+            if ($this.is('.disabled, :disabled')) return
+
+            var $parent  = getParent($this)
+            var isActive = $parent.hasClass('open')
+
+            clearMenus()
+
+            if (!isActive) {
+              if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+                // if mobile we use a backdrop because click events don't delegate
+                $(document.createElement('div'))
+                  .addClass('dropdown-backdrop')
+                  .insertAfter($(this))
+                  .on('click', clearMenus)
+              }
+
+              var relatedTarget = { relatedTarget: this }
+              $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
+
+              if (e.isDefaultPrevented()) return
+
+              $this
+                .trigger('focus')
+                .attr('aria-expanded', 'true')
+
+              $parent
+                .toggleClass('open')
+                .trigger($.Event('shown.bs.dropdown', relatedTarget))
+            }
+
+            return false
+          }
+
+          Dropdown.prototype.keydown = function (e) {
+            if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+
+            var $this = $(this)
+
+            e.preventDefault()
+            e.stopPropagation()
+
+            if ($this.is('.disabled, :disabled')) return
+
+            var $parent  = getParent($this)
+            var isActive = $parent.hasClass('open')
+
+            if (!isActive && e.which != 27 || isActive && e.which == 27) {
+              if (e.which == 27) $parent.find(toggle).trigger('focus')
+              return $this.trigger('click')
+            }
+
+            var desc = ' li:not(.disabled):visible a'
+            var $items = $parent.find('.dropdown-menu' + desc)
+
+            if (!$items.length) return
+
+            var index = $items.index(e.target)
+
+            if (e.which == 38 && index > 0)                 index--         // up
+            if (e.which == 40 && index < $items.length - 1) index++         // down
+            if (!~index)                                    index = 0
+
+            $items.eq(index).trigger('focus')
+          }
+
+
+          // DROPDOWN PLUGIN DEFINITION
+          // ==========================
+
+          function Plugin(option) {
+            return this.each(function () {
+              var $this = $(this)
+              var data  = $this.data('bs.dropdown')
+
+              if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
+              if (typeof option == 'string') data[option].call($this)
+            })
+          }
+
+          var old = $.fn.dropdown
+
+          $.fn.dropdown             = Plugin
+          $.fn.dropdown.Constructor = Dropdown
+
+
+          // DROPDOWN NO CONFLICT
+          // ====================
+
+          $.fn.dropdown.noConflict = function () {
+            $.fn.dropdown = old
+            return this
+          }
+
+
+          // APPLY TO STANDARD DROPDOWN ELEMENTS
+          // ===================================
+
+          $(document)
+            .on('click.bs.dropdown.data-api', clearMenus)
+            .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+            .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
+            .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
+            .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+
+        }(jQuery);
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMZB_Zo029aBahPYLVG7eNV9bMcy5elgM&callback=init" async defer></script>
 </body>
