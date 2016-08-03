@@ -41,7 +41,7 @@ having to answer the same question can really clog up the pipes for people who a
 5. Fill in the blanks
 6. Open a terminal (or `cmd.exe` on Windows)
 7. Use `cd` to go into the directory with your config and the downloaded `.jar`
-8. `java -jar PokemonGoBot-all-VERSION.jar` (replace version with the downloaded one, or type `PokemonGoBot-all` and press `TAB`)
+8. `java -jar PokemonGoBot-VERSION.jar` (replace version with the downloaded one, or type `PokemonGoBot-` and press `TAB`)
 
 ## From source
 

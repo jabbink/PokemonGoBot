@@ -71,16 +71,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title': 'Pokemon Go Bot',
-                'Implementation-Version': version,
-                'Main-Class': mainClassName
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
+
 jar {
     manifest {
         attributes(
@@ -89,6 +80,7 @@ jar {
         )
     }
 }
+
 task createProperties(dependsOn: processResources) << {
     String versionDir = "$buildDir/resources/main/ink/abb/pogo/scraper"
     new File(versionDir).mkdirs()
@@ -100,9 +92,5 @@ task createProperties(dependsOn: processResources) << {
 }
 
 classes {
-    dependsOn createProperties
-}
-
-test {
     dependsOn createProperties
 }
