@@ -17,7 +17,7 @@ class CSVWriter(val delimiter: String = ",") {
     fun write(output: ArrayList<Array<String>>) {
         // UTF-8 with BOM to fix borked UTF-8 chars in MS Excel (for nickname output)
         // https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
-        FileOutputStream("export.csv").use {
+        FileOutputStream("export_" + Thread.currentThread().name.replace(": ProfileLoop", "") + ".csv").use {
             it.write(239)
             it.write(187)
             it.write(191)
