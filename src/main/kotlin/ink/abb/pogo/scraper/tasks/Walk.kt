@@ -114,7 +114,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     pauseWalk.set(true)
                     return@runLoop
                 }
-
+            pauseCounter = 2
             ctx.lat.addAndGet(deltaLat)
             ctx.lng.addAndGet(deltaLng)
 
@@ -170,7 +170,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     pauseWalk.set(true)
                     return@runLoop
                 }
-
+                pauseCounter = 2
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                 val step = coordinatesList.first()
                 coordinatesList.removeAt(0)
