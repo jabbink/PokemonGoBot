@@ -18,8 +18,6 @@ import java.util.*
 
 /**
  * Task that handles catching pokemon, activating stops, and walking to a new target.
- *
- * @author Andrew Potter (apottere)
  */
 class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 

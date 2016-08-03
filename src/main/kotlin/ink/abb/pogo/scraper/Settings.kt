@@ -10,6 +10,9 @@ package ink.abb.pogo.scraper
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
 import java.io.BufferedReader
@@ -17,13 +20,15 @@ import java.io.FileOutputStream
 import java.io.FileReader
 import java.util.*
 
+
 class SettingsParser(val properties: Properties) {
     fun createSettingsFromProperties(): Settings {
-        val defaults = Settings(credentials = GoogleCredentials(), latitude = 0.0, longitude = 0.0)
+        val defaults = Settings(name = "", credentials = GoogleCredentials(), latitude = 0.0, longitude = 0.0)
         val dropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.dropItems, String::toBoolean)
 
 
         return Settings(
+                name = "default",
                 profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
                 timerWalkToStartPokestop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timer_walk_to_start_pokestop", defaults.timerWalkToStartPokestop, String::toLong),
                 latitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
@@ -41,7 +46,7 @@ class SettingsParser(val properties: Properties) {
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
                 dropItems = dropItems,
 
-                uselessItems = if (dropItems) mapOf(
+                uselessItems = mapOf(
                         Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
                         Pair(ItemId.ITEM_MAX_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_MAX_REVIVE", "item_max_revive", 10, String::toInt)),
                         Pair(ItemId.ITEM_POTION, getPropertyIfSet("Max number of items to keep from type ITEM_POTION", "item_potion", 0, String::toInt)),
@@ -56,7 +61,7 @@ class SettingsParser(val properties: Properties) {
                         Pair(ItemId.ITEM_LUCKY_EGG, getPropertyIfSet("Max number of items to keep from type ITEM_LUCKY_EGG", "item_lucky_egg", -1, String::toInt)),
                         Pair(ItemId.ITEM_INCENSE_ORDINARY, getPropertyIfSet("Max number of items to keep from type ITEM_INCENSE_ORDINARY", "item_incense", -1, String::toInt)),
                         Pair(ItemId.ITEM_TROY_DISK, getPropertyIfSet("Max number of items to keep from type ITEM_TROY_DISK (lure module)", "item_lure_module", -1, String::toInt))
-                ) else mapOf(),
+                ),
 
                 randomNextPokestopSelection = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestopSelection, String::toInt),
 
@@ -70,7 +75,7 @@ class SettingsParser(val properties: Properties) {
                 displayPokestopName = getPropertyIfSet("Display Pokestop Name", "display_pokestop_name", defaults.displayPokestopName, String::toBoolean),
                 displayPokestopRewards = getPropertyIfSet("Display Pokestop Rewards", "display_pokestop_rewards", defaults.displayPokestopRewards, String::toBoolean),
                 displayPokemonCatchRewards = getPropertyIfSet("Display Pokemon Catch Rewards", "display_pokemon_catch_rewards", defaults.displayPokemonCatchRewards, String::toBoolean),
-                displayIfPokemonFromLure = getPropertyIfSet("Display If Pokemon Was Caught From Lure", "display_if_pokemon_from_lure", defaults.displayPokemonCatchRewards, String::toBoolean),
+                displayIfPokemonFromLure = getPropertyIfSet("Display If Pokemon Was Caught From Lure", "display_if_pokemon_from_lure", defaults.displayIfPokemonFromLure, String::toBoolean),
 
                 lootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", defaults.lootPokestop, String::toBoolean),
                 catchPokemon = getPropertyIfSet("Catch Pokemons", "catch_pokemon", defaults.catchPokemon, String::toBoolean),
@@ -145,9 +150,10 @@ class SettingsParser(val properties: Properties) {
     }
 }
 
+@JsonIgnoreProperties("startingLocation", "name", ignoreUnknown = true)
 data class Settings(
-        val profileUpdateTimer: Long = 60,
-        val timerWalkToStartPokestop: Long = -1L,
+        var name: String = "",
+
         val latitude: Double,
         val longitude: Double,
 
@@ -171,16 +177,19 @@ data class Settings(
                 Pair(ItemId.ITEM_LUCKY_EGG, -1),
                 Pair(ItemId.ITEM_INCENSE_ORDINARY, -1),
                 Pair(ItemId.ITEM_TROY_DISK, -1)
+
         ),
 
+        val profileUpdateTimer: Long = 60,
+        val timerWalkToStartPokestop: Long = -1L,
         val randomNextPokestopSelection: Int = 5,
         val desiredCatchProbability: Double = 0.4,
         val desiredCatchProbabilityUnwanted: Double = 0.0,
         val autotransfer: Boolean = true,
         val keepPokemonAmount: Int = 1,
         val maxPokemonAmount: Int = -1,
-        val displayKeepalive: Boolean = true,
 
+        val displayKeepalive: Boolean = true,
         val displayPokestopName: Boolean = false,
         val displayPokestopRewards: Boolean = true,
         val displayPokemonCatchRewards: Boolean = true,
@@ -210,6 +219,10 @@ data class Settings(
 
         val version: String = Settings.version
 ) {
+    fun withName(name: String): Settings {
+        this.name = name
+        return this
+    }
 
     fun writeProperty(propertyFile: String, key: String, value: Any) {
         // TODO: This function does not work with lists, like obligatory_transfer
@@ -250,10 +263,16 @@ data class Settings(
             }
             version = versionProperties["version"].toString()
         }
-
     }
 }
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+        JsonSubTypes.Type(value = GoogleCredentials::class, name = "google"),
+        JsonSubTypes.Type(value = GoogleAutoCredentials::class, name = "google-auto"),
+        JsonSubTypes.Type(value = PtcCredentials::class, name = "ptc")
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 interface Credentials
 
 data class GoogleCredentials(var token: String = "") : Credentials

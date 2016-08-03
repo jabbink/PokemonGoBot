@@ -54,6 +54,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     @Synchronized
     fun start() {
         if (isRunning()) return
+        ctx.walking.set(false)
 
         Log.normal()
         Log.normal("Name: ${ctx.profile.playerData.username}")
@@ -158,7 +159,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
     fun runLoop(timeout: Long, name: String, block: (cancel: () -> Unit) -> Unit) {
         phaser.register()
-        thread(name = name) {
+        thread(name = "${settings.name}: $name") {
             try {
                 var cancelled = false
                 while (!cancelled && isRunning()) {
@@ -189,10 +190,20 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun stop() {
         if (!isRunning()) return
 
+        val socketServerStopLatch = CountDownLatch(1)
+        thread {
+            Log.red("Stopping SocketServer...")
+            ctx.server.stop()
+            Log.red("Stopped SocketServer.")
+            socketServerStopLatch.countDown()
+        }
+
         Log.red("Stopping bot loops...")
         runningLatch.countDown()
         phaser.arriveAndAwaitAdvance()
         Log.red("All bot loops stopped.")
+
+        socketServerStopLatch.await()
     }
 
     fun runningLatchAwait(timeout: Long, unit: TimeUnit) {

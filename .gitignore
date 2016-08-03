@@ -78,3 +78,5 @@ config.properties
 
 # exported file
 export.csv
+
+bot-settings/
