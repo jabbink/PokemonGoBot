@@ -32,7 +32,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             ctx.server.coordinatesToGoTo.removeAt(0)
             Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
 
-            if (settings.shouldFollowStreets) {
+            if (settings.followStreets) {
                 walkRoute(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
             } else {
                 walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
@@ -50,14 +50,14 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
             if (nearestUnused.isNotEmpty()) {
                 // Select random pokestop from the 5 nearest while taking the distance into account
-                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestop), ctx)
+                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestopSelection), ctx)
 
                 ctx.server.sendPokestop(chosenPokestop)
 
-                if (settings.shouldDisplayPokestopName)
+                if (settings.displayPokestopName)
                     Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
 
-                if (settings.shouldFollowStreets) {
+                if (settings.followStreets) {
                     walkRoute(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
                 } else {
                     walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
@@ -93,7 +93,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             if (pauseWalk.get()) {
                 Thread.sleep(timeout * 2)
                 pauseCounter--
-                if (!(ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons)) {
+                if (!(ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon)) {
                     // api break free
                     pauseWalk.set(false)
                     pauseCounter = 0
@@ -107,7 +107,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             }
             // don't run away when there are still Pokemon around
             if (remainingSteps.toInt().mod(20) == 0 && pauseCounter > 0)
-                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     pauseCounter = 2
@@ -150,7 +150,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 if (pauseWalk.get()) {
                     Thread.sleep(timeout * 2)
                     pauseCounter--
-                    if (!(ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons)) {
+                    if (!(ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon)) {
                         // api break free
                         pauseWalk.set(false)
                         pauseCounter = 0
@@ -163,7 +163,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     }
                 }
                 // don't run away when there are still Pokemon around
-                if (pauseCounter > 0 && ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                if (pauseCounter > 0 && ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     pauseCounter = 2
@@ -231,7 +231,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
             // don't run away when there are still Pokemon around
             if (remainingStepsGoing.toInt().mod(20) == 0 || remainingStepsComing.toInt().mod(20) == 0)
-                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     // Try to catch once, then wait for next walk loop
@@ -284,7 +284,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         // Get random value between 0 and 1
         val random = Math.random()
-        var cumulativeProbability = 0.0;
+        var cumulativeProbability = 0.0
 
         for ((index, pokestop) in pokestops.withIndex()) {
             // Calculate probabilty proportional to the closeness

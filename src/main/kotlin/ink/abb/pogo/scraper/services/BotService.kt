@@ -1,3 +1,11 @@
+/*
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -13,9 +21,6 @@ import java.util.concurrent.CountDownLatch
 import javax.annotation.PreDestroy
 import kotlin.concurrent.thread
 
-/**
- * @author Andrew Potter (apottere)
- */
 @Service
 class BotService {
 
@@ -53,7 +58,7 @@ class BotService {
 
     fun load(name: String): Settings {
         val save = File(root, "$name.json")
-        if(!save.isFile) {
+        if (!save.isFile) {
             throw IllegalArgumentException("No save file found for name: $name")
         }
 

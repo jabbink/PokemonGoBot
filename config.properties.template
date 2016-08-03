@@ -63,6 +63,9 @@ item_lure_module=-1
 # Should the bot display rewards pokestop (true/false)
 display_pokestop_rewards=true
 
+# Should the bot display if it caught a pokemon from a lure (true/false)
+display_if_pokemon_from_lure=true
+
 # Should the bot display rewards when catching pokemon (true/false)
 display_pokemon_catch_rewards=true
 
@@ -106,7 +109,7 @@ spawn_radius=-1
 ban_spin_count=0
 
 # Set timer in seconds to go back to the starting pokestop (-1 disabled)
-timerWalkToStartPokeStop=-1
+timer_walk_to_start_pokestop=-1
 
 # Set profile update timer (Default: 60)
 profile_update_timer=60
@@ -126,8 +129,6 @@ ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
 # List of pokemon you always want to transfer regardless of CP
 obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
 
-# Port where the webserver (gui) should listen, 0 = do not listen
-gui_port=8000
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
 
@@ -137,6 +138,9 @@ gui_port_socket=8001
 #   DSV      European CSV/DSV format (";" as delimiter and "," as decimal separator)
 #              Use this one if your MS Excel can't handle the default CSV option
 export=
+
+# Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
+initial_map_size=3
 
 # List of pokemon names
 #MISSINGNO

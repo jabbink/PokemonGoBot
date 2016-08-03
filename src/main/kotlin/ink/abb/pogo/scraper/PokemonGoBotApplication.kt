@@ -1,3 +1,11 @@
+/*
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper
 
 import ink.abb.pogo.scraper.services.BotService
@@ -13,9 +21,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
-/**
- * @author Andrew Potter (ddcapotter)
- */
 @SpringBootApplication
 open class PokemonGoBotApplication {
 
@@ -47,7 +52,7 @@ open class PokemonGoBotApplication {
 
         override fun run(vararg args: String?) {
             val names = botRunService.getSaveNames()
-            if(names.size < 1) {
+            if (names.size < 1) {
                 thread(name = "default") {
                     startDefaultBot(http, botRunService)
                 }
