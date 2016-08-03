@@ -33,7 +33,7 @@ class Export : Task {
         }
         val compareIv = Comparator<Pokemon> { a, b ->
             // compare b to a to get it descending
-            if (settings.sortByIV) {
+            if (settings.sortByIv) {
                 b.getIv().compareTo(a.getIv())
             } else {
                 b.cp.compareTo(a.cp)

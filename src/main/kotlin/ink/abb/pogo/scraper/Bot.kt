@@ -15,7 +15,6 @@ import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.gui.SocketServer
-import ink.abb.pogo.scraper.gui.WebServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
@@ -42,10 +41,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     var ctx = Context(
             api,
             api.playerProfile,
-            AtomicDouble(settings.startingLatitude),
-            AtomicDouble(settings.startingLongitude),
+            AtomicDouble(settings.latitude),
+            AtomicDouble(settings.longitude),
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
+            AtomicInteger(0),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             mutableSetOf(),
             SocketServer()
@@ -71,7 +71,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         val compareIv = Comparator<Pokemon> { a, b ->
             // compare b to a to get it descending
-            if (settings.sortByIV) {
+            if (settings.sortByIv) {
                 b.getIv().compareTo(a.getIv())
             } else {
                 b.cp.compareTo(a.cp)
@@ -99,7 +99,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val sleepTimeout = 10L
         var reply: MapObjects?
         do {
-            reply = api.map.mapObjects
+            reply = api.map.getMapObjects(settings.initialMapSize)
             Log.normal("Got ${reply.pokestops.size} pokestops")
             if (reply == null || reply.pokestops.size == 0) {
                 Log.red("Retrying in $sleepTimeout seconds...")
@@ -120,11 +120,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
-            if (settings.shouldCatchPokemons)
+            if (settings.catchPokemon)
                 task(catch)
-            if (settings.shouldDropItems)
+            if (settings.dropItems)
                 task(drop)
-            if (settings.shouldAutoTransfer)
+            if (settings.autotransfer)
                 task(release)
 
             if (!prepareWalkBack.get())
@@ -135,18 +135,22 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         Log.setContext(ctx)
 
-        if (settings.guiPort > 0) {
-            Log.normal("Running webserver on port ${settings.guiPort}")
-            WebServer().start(settings.guiPort, settings.guiPortSocket)
+        if (settings.guiPortSocket > 0) {
+            Log.normal("Running socket server on port ${settings.guiPortSocket}")
             ctx.server.start(ctx, settings.guiPortSocket)
+            var needPort = ""
+            if (settings.guiPortSocket != 8001) {
+                needPort = "#localhost:${settings.guiPortSocket}"
+            }
+            Log.green("Open the map on http://pogo.abb.ink/${settings.version}/map.html${needPort}")
         }
 
 
-        if (settings.timerWalkToStartPokeStop > 0)
-            runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), "BotWalkBackLoop") {
+        if (settings.timerWalkToStartPokestop > 0)
+            runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), "BotWalkBackLoop") {
                 if (!prepareWalkBack.get())
-                    Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokeStop} seconds")
-                runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), TimeUnit.MILLISECONDS)
+                    Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokestop} seconds")
+                runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), TimeUnit.MILLISECONDS)
                 prepareWalkBack.set(true)
                 while (walkBackLock.get()) {
                 }

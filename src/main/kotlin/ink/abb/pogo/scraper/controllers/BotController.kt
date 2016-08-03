@@ -1,3 +1,11 @@
+/*
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper.controllers
 
 import ink.abb.pogo.scraper.Settings
@@ -7,9 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-/**
- * @author Andrew Potter
- */
 @RestController
 @RequestMapping("/api")
 class BotController {
@@ -37,7 +42,7 @@ class BotController {
 
     @RequestMapping("/bot/{name}/reload")
     fun reloadBot(@PathVariable name: String): Boolean {
-        if(!unloadBot(name)) return false
+        if (!unloadBot(name)) return false
         loadBot(name)
         return true
     }

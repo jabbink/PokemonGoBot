@@ -11,6 +11,7 @@ buildscript {
     repositories {
         mavenCentral()
     }
+
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
@@ -29,8 +30,11 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    jcenter()
     maven { url "https://jitpack.io" }
 }
+
+def generatedResourcesFolder = "$projectDir/build/resources/main"
 
 sourceSets {
     main {
@@ -40,6 +44,7 @@ sourceSets {
         java {
             srcDir 'lib/com.google.guava'
         }
+        resources.srcDirs generatedResourcesFolder
     }
 }
 
@@ -49,7 +54,7 @@ configurations {
 
 dependencies {
 
-    compile project(':PokeGOAPI-Java')
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:ecd07a1401'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
@@ -64,7 +69,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: jacksonVersion
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
-
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 task fatJar(type: Jar) {
     manifest {
@@ -83,4 +88,21 @@ jar {
                 'Main-Class': mainClassName
         )
     }
+}
+task createProperties(dependsOn: processResources) << {
+    String versionDir = "$buildDir/resources/main/ink/abb/pogo/scraper"
+    new File(versionDir).mkdirs()
+    new File("$versionDir/version.properties").withWriter { w ->
+        Properties p = new Properties()
+        p['version'] = project.version.toString()
+        p.store w, null
+    }
+}
+
+classes {
+    dependsOn createProperties
+}
+
+test {
+    dependsOn createProperties
 }

@@ -16,11 +16,9 @@ import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.requiredXp
-import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
-import kotlin.concurrent.thread
 
 class SocketServer {
     private var ctx: Context? = null

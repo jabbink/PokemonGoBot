@@ -21,10 +21,7 @@ import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
 import java.io.FileInputStream
-import java.util.Properties
 import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
 val time = SystemTimeImpl()
 
@@ -41,7 +38,7 @@ fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit
 
             // we should be able to login with this token
             provider.login(access)
-            println("Refresh token:" + provider.getRefreshToken())
+            println("Refresh token:" + provider.refreshToken)
             Log.normal("Setting Google refresh token in your config")
             credentials.token = provider.refreshToken
             writeToken(credentials.token)
