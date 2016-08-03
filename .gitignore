@@ -75,3 +75,5 @@ config.properties
 
 #OS X files
 .DS_Store
+
+bot-settings/

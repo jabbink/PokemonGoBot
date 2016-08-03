@@ -25,9 +25,9 @@ class TestSettings {
         properties.setProperty("latitude", "0.0")
         properties.setProperty("longitude", "0.0")
         val settingsFromTemplate = SettingsParser(properties).createSettingsFromProperties()
-        val settingsFromCode = Settings(startingLatitude = 0.0, startingLongitude = 0.0, credentials = GoogleCredentials())
+        val settingsFromCode = Settings(name="default", startingLatitude = 0.0, startingLongitude = 0.0, credentials = GoogleCredentials())
 
-        Assert.assertEquals(settingsFromCode, settingsFromTemplate)
+        Assert.assertEquals(settingsFromCode.toString().split(",").joinToString("\n"), settingsFromTemplate.toString().split(",").joinToString("\n"))
     }
 
 }
