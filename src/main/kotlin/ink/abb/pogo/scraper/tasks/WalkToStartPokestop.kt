@@ -1,3 +1,11 @@
+/*
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper.tasks
 
 import com.pokegoapi.api.map.fort.Pokestop
@@ -12,10 +20,7 @@ import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * Created by Home on 27.07.2016.
- */
-class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
+class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         if (settings.followStreets) walkRoute(bot, ctx, settings)
         else walk(bot, ctx, settings)

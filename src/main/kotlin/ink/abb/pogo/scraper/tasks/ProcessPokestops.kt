@@ -14,6 +14,8 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.map.inRange
 import java.util.*
 
 /**
@@ -22,7 +24,7 @@ import java.util.*
 class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 
     private val lootTimeouts = HashMap<String, Long>()
-    var startPokeStop: Pokestop? = null
+    var startPokestop: Pokestop? = null
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         if (settings.allowLeaveStartArea) {
             try {
@@ -42,12 +44,21 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
             val distanceB = self.getEarthDistance(locationB)
             distanceA.compareTo(distanceB)
         })
-        if (startPokeStop == null)
-            startPokeStop = sortedPokestops.first()
+        if (startPokestop == null)
+            startPokestop = sortedPokestops.first()
 
         if (settings.lootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             bot.task(loot)
+        }
+        if (settings.campLurePokestop > 0) {
+            // TODO: grab that 70 from DOWNLOAD_SETTINGS
+            val luresInRange = sortedPokestops.filter { it.inRange(ctx.api, 70.0) && it.hasLure() }.size
+            if (luresInRange >= settings.campLurePokestop) {
+                Log.green("$luresInRange lures in range, pausing")
+                ctx.api.map.getMapObjects(3)
+                return
+            }
         }
         val walk = Walk(sortedPokestops, lootTimeouts)
 
