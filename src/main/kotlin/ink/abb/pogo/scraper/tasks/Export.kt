@@ -108,11 +108,11 @@ class Export : Task {
 
             when (settings.export) {
                 "CSV" -> {
-                    val writer = CSVWriter()
+                    val writer = CSVWriter("export_" + settings.name + ".csv")
                     writer.write(output)
                 }
                 "DSV" -> {
-                    val writer = CSVWriter(";")
+                    val writer = CSVWriter("export_" + settings.name + ".csv", ";")
                     writer.write(output)
                 }
                 else -> {
