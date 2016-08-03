@@ -8,10 +8,9 @@
 
 package ink.abb.pogo.scraper.util.map
 
-import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.api.map.fort.Pokestop
+import com.pokegoapi.api.map.Map
+import com.pokegoapi.api.map.pokemon.CatchablePokemon
 
-fun Pokestop.canLoot(ignoreDistance: Boolean = false, lootTimeouts: Map<String, Long>, api: PokemonGo): Boolean {
-    val canLoot = lootTimeouts.getOrElse(id, { cooldownCompleteTimestampMs }) < api.currentTimeMillis()
-    return (ignoreDistance || inRange()) && canLoot
+fun Map.getCatchablePokemon(blacklist: Set<Long>): List<CatchablePokemon> {
+    return catchablePokemon.filter { !blacklist.contains(it.encounterId) }
 }
