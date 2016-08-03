@@ -140,7 +140,7 @@ gui_port_socket=8001
 export=
 
 # Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
-initial_map_size=3
+initial_map_size=9
 
 # List of pokemon names
 #MISSINGNO
