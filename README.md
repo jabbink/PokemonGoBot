@@ -52,6 +52,13 @@ having to answer the same question can really clog up the pipes for people who a
 5. To run the bot directly from console run `gradlew run`
 6. :exclamation: If you use JetBrains IntelliJ, install the Lombok plugin and enable Settings -> Compiler -> Annotation Processors -> Enable annotation processing :exclamation:
 
+## Multiple bots (only available when building from source!)
+1. Create subfolder `bot-settings`
+2. Copy `multibotconfig.json` to `yourbotname.json` in the bot-settings folder
+3. Modify the json where needed (for explanation of the values check [config.properties.template](https://raw.githubusercontent.com/jabbink/PokemonGoBot/master/config.properties.template))
+4. Run the bot with `java -jar PokemonGoBot-VERSION.jar`
+5. Now you can start/stop/reload each bot individually from http://localhost:8080/api/bot/{name}/{command}
+
 # Contributing
 If you want to help and add a new feature, you can create a pull request to merge in the `develop` branch and not in the `master`.
 As the name says, the `develop` branch is for developing where we'll add new features, with your help; instead we'll update the `master` every now and then, and from that we'll release a new jar.
