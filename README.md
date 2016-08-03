@@ -8,7 +8,7 @@ See DOCS.md for information on how to create a web-based GUI to share with other
 
 ## User-created GUIs
 
-### [Theme from 0.5.0-alpha4 by @jabbink](http://pogo.abb.ink/0.5.0-alpha4/map.html)
+### [Theme from 0.5.0-alpha4 by @shilch](http://pogo.abb.ink/0.5.0-alpha4/map.html)
 ![Screenshot](img/0.5.0-alpha4-screenshot.png
 )
 The original theme that comes with 0.5.0-alpha4
