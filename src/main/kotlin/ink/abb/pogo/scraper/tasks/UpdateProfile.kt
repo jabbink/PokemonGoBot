@@ -37,7 +37,8 @@ class UpdateProfile : Task {
             val nextXP = requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]
             val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
             val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
-            val xpPerHour = ctx.startXp.get() / (ChronoUnit.SECONDS.between(ctx.startTime, LocalDateTime.now()) * 60 * 60)
+
+            val xpPerHour: Long = (player.stats.experience - ctx.startXp.get() / ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())) * 60
 
             Log.magenta("Profile update: ${NumberFormat.getInstance().format(player.stats.experience)} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}; " +
                     "XP gain: ${NumberFormat.getInstance().format(player.stats.experience - ctx.startXp.get())} XP in ${ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())} mins; " +
