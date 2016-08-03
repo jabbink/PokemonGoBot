@@ -13,11 +13,11 @@ import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.util.*
 
-class CSVWriter(val delimiter: String = ",") {
+class CSVWriter(val filename: String = "export.csv", val delimiter: String = ",") {
     fun write(output: ArrayList<Array<String>>) {
         // UTF-8 with BOM to fix borked UTF-8 chars in MS Excel (for nickname output)
         // https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
-        FileOutputStream("export.csv").use {
+        FileOutputStream(filename).use {
             it.write(239)
             it.write(187)
             it.write(191)

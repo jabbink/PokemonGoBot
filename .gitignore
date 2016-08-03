@@ -77,6 +77,6 @@ config.properties
 .DS_Store
 
 # exported file
-export.csv
+export_*.csv
 
 bot-settings/
