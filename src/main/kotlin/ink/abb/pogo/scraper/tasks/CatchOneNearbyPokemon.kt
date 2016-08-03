@@ -76,6 +76,8 @@ class CatchOneNearbyPokemon : Task {
                     return
                 }
 
+                // TODO: temp fix for server timing issues regarding GetMapObjects
+                ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                 if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                     ctx.pokemonStats.first.andIncrement
                     if (wasFromLure) {
@@ -102,7 +104,6 @@ class CatchOneNearbyPokemon : Task {
                     Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
                     if (result.status == CatchPokemonResponse.CatchStatus.CATCH_ERROR) {
                         Log.red("Blacklisting pokemon to prevent infinite loop")
-                        ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                     }
                 }
             } else {
