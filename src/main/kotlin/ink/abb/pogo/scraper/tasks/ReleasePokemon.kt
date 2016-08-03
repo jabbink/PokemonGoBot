@@ -9,7 +9,6 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result
-import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -22,7 +21,7 @@ import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
-        val sortByIV = settings.sortByIV
+        val sortByIV = settings.sortByIv
         val pokemonCounts = hashMapOf<String, Int>()
 
         groupedPokemon.forEach {

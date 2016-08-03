@@ -20,8 +20,8 @@ class BypassSoftban(val pokestop: Pokestop) : Task {
         repeat(settings.banSpinCount) { i ->
             pokestop.loot()
 
-            if ((i+1) % 10 == 0)
-                Log.yellow("${i+1}/${settings.banSpinCount}")
+            if ((i + 1) % 10 == 0)
+                Log.yellow("${i + 1}/${settings.banSpinCount}")
         }
     }
 }

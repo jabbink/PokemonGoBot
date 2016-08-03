@@ -29,7 +29,7 @@ class Log {
         var format = SimpleDateFormat("dd MMM HH:mm:ss")
 
         private fun output(text: String, color: String? = null) {
-            val output = "${format.format(Date())}: $text"
+            val output = "${format.format(Date())} (${Thread.currentThread().name}): $text"
             if (color != null) {
                 println("${color}$output ${reset}")
             } else {
@@ -82,7 +82,7 @@ class Log {
             ctx?.server?.sendLog("white", text)
         }
 
-        fun setContext(ctx: Context){
+        fun setContext(ctx: Context) {
             this.ctx = ctx
         }
     }

@@ -19,7 +19,6 @@ import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.map.canLoot
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: HashMap<String, Long>) : Task {
 
@@ -33,7 +32,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
         if (nearbyPokestops.isNotEmpty()) {
             val closest = nearbyPokestops.first()
             var pokestopID = closest.id
-            if (settings.shouldDisplayPokestopName)
+            if (settings.displayPokestopName)
                 pokestopID = "\"${closest.details.name}\""
             Log.normal("Looting nearby pokestop $pokestopID")
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
@@ -43,7 +42,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                 ctx.itemStats.first.getAndAdd(result.itemsAwarded.size)
             }
 
-            if(result.experience > 0){
+            if (result.experience > 0) {
                 ctx.server.sendProfile()
             }
 
@@ -52,7 +51,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     ctx.server.sendPokestop(closest)
                     ctx.server.sendProfile()
                     var message = "Looted pokestop $pokestopID; +${result.experience} XP"
-                    if (settings.shouldDisplayPokestopSpinRewards)
+                    if (settings.displayPokestopRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
                     Log.green(message)
                     lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
@@ -62,7 +61,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     ctx.server.sendPokestop(closest)
                     ctx.server.sendProfile()
                     var message = "Looted pokestop $pokestopID; +${result.experience} XP, but inventory is full"
-                    if (settings.shouldDisplayPokestopSpinRewards)
+                    if (settings.displayPokestopRewards)
                         message += ": ${result.itemsAwarded.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
 
                     Log.red(message)
@@ -87,7 +86,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
         }
     }
 
-    private fun checkForBan(result: PokestopLootResult, pokestop:Pokestop, bot: Bot, settings: Settings) {
+    private fun checkForBan(result: PokestopLootResult, pokestop: Pokestop, bot: Bot, settings: Settings) {
         if (settings.banSpinCount > 0 && result.experience == 0 && result.itemsAwarded.isEmpty()) {
             Log.red("Looks like a ban. Trying to bypass softban by repeatedly spinning the pokestop.")
             bot.task(BypassSoftban(pokestop))

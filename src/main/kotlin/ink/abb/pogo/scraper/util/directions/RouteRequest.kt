@@ -3,7 +3,6 @@ package ink.abb.pogo.scraper.util.directions
 import com.pokegoapi.google.common.geometry.S1Angle
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
-import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
@@ -11,6 +10,7 @@ import java.util.regex.Pattern
 
 var routeProvider = "http://yournavigation.org/api/dev/route.php"
 //var routeProvider = "http://router.project-osrm.org/viaroute"
+
 
 fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
     val connection = URL(createURLString(olat, olng, dlat, dlng)).openConnection() as HttpURLConnection
@@ -34,10 +34,12 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
     return routeFile
 }
 
+
 fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
     return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1"
     //return "$routeProvider?loc=$olat,$olng&loc=$dlat,$dlng&compression=false"
 }
+
 
 fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     var routeParsed = getRoutefile(olat, olng, dlat, dlng)
@@ -58,6 +60,7 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
     }
 
 }
+
 
 //Keep this in case yournavigation.org goes down
 /*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
