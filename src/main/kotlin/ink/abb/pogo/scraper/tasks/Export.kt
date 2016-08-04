@@ -33,7 +33,7 @@ class Export : Task {
         }
         val compareIv = Comparator<Pokemon> { a, b ->
             // compare b to a to get it descending
-            if (settings.sortByIV) {
+            if (settings.sortByIv) {
                 b.getIv().compareTo(a.getIv())
             } else {
                 b.cp.compareTo(a.cp)
@@ -76,13 +76,13 @@ class Export : Task {
             // Output Pokebank
             output.add(arrayOf("Pokebank overview"))
             output.add(arrayOf(
-                "Number", "Name", "Nickname", "Favorite?", "CP", "IV [%]", "Stamina (HP)", "Max Stamina (HP)", "Class",
-                "Type", "Move 1", "Move 1 Type", "Move 1 Power", "Move 1 Accuracy", "Move 1 Crit Chance", "Move 1 Time",
-                "Move 1 Energy", "Move 2", "Move 2 Type", "Move 2 Power", "Move 2 Accuracy", "Move 2 Crit Chance",
-                "Move 2 Time", "Move 2 Energy", "iStamina", "iAttack", "iDefense", "cpMultiplier", "Height [m]", "Weight [kg]",
-                "Candy", "Candies to evolve", "Candy costs for powerup", "Stardust costs for powerup", "Creation Time",
-                "Base Capture Rate", "Base Flee Rate", "Battles Attacked", "Battles Defended", "Injured?", "Fainted?",
-                "Level", "CP after powerup", "Max CP", "ID"))
+                    "Number", "Name", "Nickname", "Favorite?", "CP", "IV [%]", "Stamina (HP)", "Max Stamina (HP)", "Class",
+                    "Type", "Move 1", "Move 1 Type", "Move 1 Power", "Move 1 Accuracy", "Move 1 Crit Chance", "Move 1 Time",
+                    "Move 1 Energy", "Move 2", "Move 2 Type", "Move 2 Power", "Move 2 Accuracy", "Move 2 Crit Chance",
+                    "Move 2 Time", "Move 2 Energy", "iStamina", "iAttack", "iDefense", "cpMultiplier", "Height [m]", "Weight [kg]",
+                    "Candy", "Candies to evolve", "Candy costs for powerup", "Stardust costs for powerup", "Creation Time",
+                    "Base Capture Rate", "Base Flee Rate", "Battles Attacked", "Battles Defended", "Injured?", "Fainted?",
+                    "Level", "CP after powerup", "Max CP", "ID"))
 
             ctx.api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
                 val date = Date(it.creationTimeMs)
@@ -93,26 +93,26 @@ class Export : Task {
                 val pmmeta2 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.move2.number))
 
                 arrayOf(
-                    "${it.pokemonId.number}", "${it.pokemonId.name}", "${it.nickname}", "${it.isFavorite}", "${it.cp}",
-                    "${it.getIvPercentage()}", "${it.stamina}", "${it.maxStamina}", "${pmeta.pokemonClass.name}",
-                    formatType(pmeta.type1.name, pmeta.type2.name), "${it.move1.name}", "${pmmeta1.type.name}",
-                    "${pmmeta1.power}", "${pmmeta1.accuracy}", ds("${pmmeta1.critChance}", settings), "${pmmeta1.time}",
-                    "${pmmeta1.energy}", "${it.move2.name}", "${pmmeta2.type.name}", "${pmmeta2.power}", "${pmmeta2.accuracy}",
-                    ds("${pmmeta2.critChance}", settings), "${pmmeta2.time}", "${pmmeta2.energy}", "${it.individualStamina}",
-                    "${it.individualAttack}", "${it.individualDefense}", ds("${it.cpMultiplier}", settings), ds("${it.heightM}",
-                    settings), ds("${it.weightKg}", settings), "${it.candy}", "${it.candiesToEvolve}", "${it.candyCostsForPowerup}",
-                    "${it.stardustCostsForPowerup}", "${dateFormatter.format(date)}", ds("${it.baseCaptureRate}", settings),
-                    ds("${it.baseFleeRate}", settings), "${it.battlesAttacked}", "${it.battlesDefended}", "${it.isInjured}",
-                    "${it.isFainted}", ds("${it.level}", settings), "${it.cpAfterPowerup}", "${it.maxCp}", "${it.id}")
+                        "${it.pokemonId.number}", "${it.pokemonId.name}", "${it.nickname}", "${it.isFavorite}", "${it.cp}",
+                        "${it.getIvPercentage()}", "${it.stamina}", "${it.maxStamina}", "${pmeta.pokemonClass.name}",
+                        formatType(pmeta.type1.name, pmeta.type2.name), "${it.move1.name}", "${pmmeta1.type.name}",
+                        "${pmmeta1.power}", "${pmmeta1.accuracy}", ds("${pmmeta1.critChance}", settings), "${pmmeta1.time}",
+                        "${pmmeta1.energy}", "${it.move2.name}", "${pmmeta2.type.name}", "${pmmeta2.power}", "${pmmeta2.accuracy}",
+                        ds("${pmmeta2.critChance}", settings), "${pmmeta2.time}", "${pmmeta2.energy}", "${it.individualStamina}",
+                        "${it.individualAttack}", "${it.individualDefense}", ds("${it.cpMultiplier}", settings), ds("${it.heightM}",
+                        settings), ds("${it.weightKg}", settings), "${it.candy}", "${it.candiesToEvolve}", "${it.candyCostsForPowerup}",
+                        "${it.stardustCostsForPowerup}", "${dateFormatter.format(date)}", ds("${it.baseCaptureRate}", settings),
+                        ds("${it.baseFleeRate}", settings), "${it.battlesAttacked}", "${it.battlesDefended}", "${it.isInjured}",
+                        "${it.isFainted}", ds("${it.level}", settings), "${it.cpAfterPowerup}", "${it.maxCp}", "${it.id}")
             }.forEach { output.add(it) }
 
             when (settings.export) {
                 "CSV" -> {
-                    val writer = CSVWriter()
+                    val writer = CSVWriter("export_" + settings.name + ".csv")
                     writer.write(output)
                 }
                 "DSV" -> {
-                    val writer = CSVWriter(";")
+                    val writer = CSVWriter("export_" + settings.name + ".csv", ";")
                     writer.write(output)
                 }
                 else -> {
@@ -129,8 +129,7 @@ class Export : Task {
     // Detect if the "float" fields need to be forced to use "," instead of "." (DSV export)
     private fun ds(string: String, settings: Settings): String {
         var result = string
-        if (settings.export.equals("DSV"))
-        {
+        if (settings.export.equals("DSV")) {
             result = result.replace(".", ",")
         }
 

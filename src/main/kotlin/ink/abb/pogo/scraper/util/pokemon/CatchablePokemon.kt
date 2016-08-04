@@ -42,7 +42,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries)
 
         if (result == null ||
-                (result.getStatus() != CatchStatus.CATCH_ESCAPE && result.getStatus() != CatchStatus.CATCH_MISSED)) {
+                (result.status != CatchStatus.CATCH_ESCAPE && result.status != CatchStatus.CATCH_MISSED)) {
             break
         }
         numThrows++
@@ -64,7 +64,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         val probability = probabilities.get(index)
         val ballAmount = itemBag.getItem(ballType).count
         if (ballAmount == 0) {
-            continue;
+            continue
         } else {
             highestAvailable = ballType
             catchProbability = probability

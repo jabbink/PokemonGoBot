@@ -37,7 +37,7 @@ fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): Str
 
 fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     var routeParsed = getRoutefile(olat, olng, dlat, dlng)
-    if (!routeParsed.contains("<distance>0</distance>")){
+    if (!routeParsed.contains("<distance>0</distance>")) {
         routeParsed = routeParsed.split("<coordinates>")[1]
         val matcher = Pattern.compile("(|-)\\d+.(|-)\\d+,(|-)\\d+.(|-)\\d+").matcher(routeParsed)
         val coordinatesList = ArrayList<String>()
@@ -49,7 +49,7 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
             latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[1].toDouble()), S1Angle.degrees(it.toString().split(",")[0].toDouble())))
         }
         return latlngList
-    }else{
+    } else {
         return ArrayList()
     }
 

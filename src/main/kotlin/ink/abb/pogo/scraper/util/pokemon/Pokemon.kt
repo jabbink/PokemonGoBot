@@ -42,8 +42,8 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
     val obligatoryTransfer = settings.obligatoryTransfer
     val ignoredPokemon = settings.ignoredPokemon
     val ivPercentage = getIvPercentage()
-    val minIVPercentage = settings.transferIVThreshold
-    val minCP = settings.transferCPThreshold
+    val minIVPercentage = settings.transferIvThreshold
+    val minCP = settings.transferCpThreshold
 
     // add 1 to the map
     val isTooMany = isTooMany(settings, pokemonCounts, this)
@@ -73,5 +73,5 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
             reason = "Too many"
         }
     }
-    return Pair(shouldRelease, reason);
+    return Pair(shouldRelease, reason)
 }

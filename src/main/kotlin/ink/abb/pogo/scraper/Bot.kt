@@ -15,7 +15,6 @@ import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.gui.SocketServer
-import ink.abb.pogo.scraper.gui.WebServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.inventory.size
@@ -42,10 +41,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     var ctx = Context(
             api,
             api.playerProfile,
-            AtomicDouble(settings.startingLatitude),
-            AtomicDouble(settings.startingLongitude),
+            AtomicDouble(settings.latitude),
+            AtomicDouble(settings.longitude),
             AtomicLong(api.playerProfile.stats.experience),
             Pair(AtomicInteger(0), AtomicInteger(0)),
+            AtomicInteger(0),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             mutableSetOf(),
             SocketServer()
@@ -54,6 +54,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     @Synchronized
     fun start() {
         if (isRunning()) return
+        ctx.walking.set(false)
 
         Log.normal()
         Log.normal("Name: ${ctx.profile.playerData.username}")
@@ -70,7 +71,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         val compareIv = Comparator<Pokemon> { a, b ->
             // compare b to a to get it descending
-            if (settings.sortByIV) {
+            if (settings.sortByIv) {
                 b.getIv().compareTo(a.getIv())
             } else {
                 b.cp.compareTo(a.cp)
@@ -98,7 +99,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val sleepTimeout = 10L
         var reply: MapObjects?
         do {
-            reply = api.map.mapObjects
+            reply = api.map.getMapObjects(settings.initialMapSize)
             Log.normal("Got ${reply.pokestops.size} pokestops")
             if (reply == null || reply.pokestops.size == 0) {
                 Log.red("Retrying in $sleepTimeout seconds...")
@@ -119,41 +120,46 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
-            if (settings.shouldCatchPokemons)
+            if (settings.catchPokemon)
                 task(catch)
-            if (settings.shouldDropItems)
+            if (settings.dropItems)
                 task(drop)
-            if (settings.shouldAutoTransfer)
+            if (settings.autotransfer)
                 task(release)
 
             if (!prepareWalkBack.get())
                 task(process)
-            else if(!ctx.walking.get())
+            else if (!ctx.walking.get())
                 task(WalkToStartPokeStop(process.startPokeStop as Pokestop))
         }
 
         Log.setContext(ctx)
 
-        if(settings.guiPort > 0){
-            Log.normal("Running webserver on port ${settings.guiPort}")
-            WebServer().start(settings.guiPort, settings.guiPortSocket)
+        if (settings.guiPortSocket > 0) {
+            Log.normal("Running socket server on port ${settings.guiPortSocket}")
             ctx.server.start(ctx, settings.guiPortSocket)
+            var needPort = ""
+            if (settings.guiPortSocket != 8001) {
+                needPort = "#localhost:${settings.guiPortSocket}"
+            }
+            Log.green("Open the map on http://pogo.abb.ink/${settings.version}/map.html${needPort}")
         }
 
 
-        if (settings.timerWalkToStartPokeStop > 0)
-            runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), "BotWalkBackLoop") {
-                if(!prepareWalkBack.get())
-                    Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokeStop} seconds")
-                runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokeStop), TimeUnit.MILLISECONDS)
+        if (settings.timerWalkToStartPokestop > 0)
+            runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), "BotWalkBackLoop") {
+                if (!prepareWalkBack.get())
+                    Log.cyan("Will go back to starting PokeStop in ${settings.timerWalkToStartPokestop} seconds")
+                runningLatch.await(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), TimeUnit.MILLISECONDS)
                 prepareWalkBack.set(true)
-                while(walkBackLock.get()){}
+                while (walkBackLock.get()) {
+                }
             }
     }
 
     fun runLoop(timeout: Long, name: String, block: (cancel: () -> Unit) -> Unit) {
         phaser.register()
-        thread(name = name) {
+        thread(name = "${settings.name}: $name") {
             try {
                 var cancelled = false
                 while (!cancelled && isRunning()) {
@@ -171,10 +177,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                     val sleep = timeout - (api.currentTimeMillis() - start)
 
                     if (sleep > 0) {
-                        try {
-                            runningLatch.await(sleep, TimeUnit.MILLISECONDS)
-                        } catch (ignore: InterruptedException) {
-                        }
+                        runningLatchAwait(sleep, TimeUnit.MILLISECONDS)
                     }
                 }
             } finally {
@@ -187,10 +190,27 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun stop() {
         if (!isRunning()) return
 
+        val socketServerStopLatch = CountDownLatch(1)
+        thread {
+            Log.red("Stopping SocketServer...")
+            ctx.server.stop()
+            Log.red("Stopped SocketServer.")
+            socketServerStopLatch.countDown()
+        }
+
         Log.red("Stopping bot loops...")
         runningLatch.countDown()
         phaser.arriveAndAwaitAdvance()
         Log.red("All bot loops stopped.")
+
+        socketServerStopLatch.await()
+    }
+
+    fun runningLatchAwait(timeout: Long, unit: TimeUnit) {
+        try {
+            runningLatch.await(timeout, unit)
+        } catch (ignore: InterruptedException) {
+        }
     }
 
     fun isRunning(): Boolean {

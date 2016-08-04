@@ -18,8 +18,6 @@ import java.util.*
 
 /**
  * Task that handles catching pokemon, activating stops, and walking to a new target.
- *
- * @author Andrew Potter (apottere)
  */
 class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 
@@ -47,7 +45,7 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
         if (startPokeStop == null)
             startPokeStop = sortedPokestops.first()
 
-        if (settings.shouldLootPokestop) {
+        if (settings.lootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             bot.task(loot)
         }

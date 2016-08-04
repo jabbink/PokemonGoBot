@@ -1,0 +1,29 @@
+pokemongobot:
+  build: .
+  restart: always
+  environment:
+    - POGO_USERNAME=user@gmail.com
+    - POGO_PASSWORD=secret
+    - POGO_LATITUDE=40.767809
+    - POGO_LONGITUDE=-73.971792
+bastimon15-pogobot:
+  build: .
+  ports:
+    - "8001:8000"
+  environment:
+    - POGO_USERNAME=stefanie.konstantin@gmail.com
+    - POGO_PASSWORD=#
+    - POGO_BASE64_PASSWORD=YnQ4cjdmdDlwcQ==
+    - POGO_DISPLAY_KEEPALIVE=false
+      # Australia Magikarp
+    - POGO_LATITUDE=-33.9136269706758
+    - POGO_LONGITUDE=151.26773178577423
+      # New York Central Park Charmander
+      #    - POGO_LATITUDE=40.7813241
+      #    - POGO_LONGITUDE=-73.9739882
+    - POGO_ALLOW_LEAVE_START_AREA=true
+    - POGO_TRANSFER_CP_THRESHOLD=400
+    - POGO_KEEP_POKEMON_AMOUNT=1
+    - POGO_MAX_POKEMON_AMOUNT=3
+    - POGO_DESIRED_CATCH_PROBABILITY=0.6
+    - POGO_DESIRED_CATCH_PROBABILITY_UNWANTED=0.4
