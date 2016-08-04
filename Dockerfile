@@ -1,8 +1,5 @@
-FROM java
-RUN apt-get update \
- && apt-get install -y git wget \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+FROM anapsix/alpine-java:8_jdk
+RUN apk add --no-cache git bash wget grep sed
 ENV ROOT /PokemonGoBot
 WORKDIR ${ROOT}
 COPY . ${ROOT}

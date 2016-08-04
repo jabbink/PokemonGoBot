@@ -75,3 +75,6 @@ config.properties
 
 #OS X files
 .DS_Store
+
+#Docker Compose file for testing
+docker-compose.yml
