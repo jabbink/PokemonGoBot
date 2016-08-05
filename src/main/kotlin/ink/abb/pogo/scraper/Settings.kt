@@ -28,6 +28,7 @@ class SettingsParser(val properties: Properties) {
 
 
         return Settings(
+                unknown6ProviderJar = getPropertyOrDie("Unknown6 provider jar", "unknown_6_provider_jar", String::toString),
                 name = "default",
                 profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
                 timerWalkToStartPokestop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timer_walk_to_start_pokestop", defaults.timerWalkToStartPokestop, String::toLong),
@@ -152,6 +153,7 @@ class SettingsParser(val properties: Properties) {
 
 @JsonIgnoreProperties("startingLocation", "name", ignoreUnknown = true)
 data class Settings(
+        var unknown6ProviderJar: String = "",
         var name: String = "",
 
         val latitude: Double,
@@ -258,10 +260,14 @@ data class Settings(
 
         init {
             val versionProperties = Properties()
-            SettingsParser::class.java.getResourceAsStream("version.properties").use {
-                versionProperties.load(it)
+            try {
+                SettingsParser::class.java.getResourceAsStream("version.properties").use {
+                    versionProperties.load(it)
+                }
+                version = versionProperties["version"].toString()
+            } catch (e: Exception) {
+                version = ""
             }
-            version = versionProperties["version"].toString()
         }
     }
 }
