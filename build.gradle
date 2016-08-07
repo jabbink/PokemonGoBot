@@ -1,5 +1,5 @@
 group 'ink.abb'
-version '0.5.0-alpha4'
+version '0.5.0'
 
 buildscript {
     ext {
@@ -53,8 +53,8 @@ configurations {
 }
 
 dependencies {
-
-    compile 'com.github.Grover-c13:PokeGOAPI-Java:6996e028c783f78c3292adfad5bfec316962412c'
+    //compile files('../PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar')
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:ef1f52f1f0621f94b97125975c961a8ad8129e92'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"

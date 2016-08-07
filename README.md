@@ -1,7 +1,3 @@
-# Warning: the API is currently broken. This bot does not work (like all others).
-
-When it's fixed, the Issues page will be unlocked again.
-
 # Pokemon Go Bot
 
 [![Build Status](https://travis-ci.org/jabbink/PokemonGoBot.svg?branch=develop)](https://travis-ci.org/jabbink/PokemonGoBot)
@@ -99,7 +95,7 @@ Separate the windows as they're conjoined together.
 
 ## Where did the GUI go?
 
-The GUI is now hosted on http://pogo.abb.ink/map.html
+The GUI is now hosted on http://pogo.abb.ink/RocketTheme/
 
 This URL is also shown in the console when you launch the bot.
 
