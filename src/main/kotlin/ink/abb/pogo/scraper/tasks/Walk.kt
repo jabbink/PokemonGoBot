@@ -50,13 +50,17 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
             if (nearestUnused.isNotEmpty()) {
                 // Select random pokestop from the 5 nearest while taking the distance into account
-                val chosenPokestop = selectRandom(nearestUnused.take(settings.randomNextPokestopSelection), ctx)
+                val chosenPokestop = select(nearestUnused.take(settings.randomNextPokestopSelection), ctx, settings)
 
                 ctx.server.sendPokestop(chosenPokestop)
 
-                if (settings.displayPokestopName)
-                    Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
-
+                if (settings.displayPokestopName) {
+                    if (chosenPokestop.hasLure()) {
+                        Log.magenta("Walking to pokestop \"${chosenPokestop.details.name}\" with lure")
+                    }else {
+                        Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
+                    }
+                }
                 if (settings.followStreets) {
                     walkRoute(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
                 } else {
@@ -267,7 +271,33 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
     }
 
-    private fun selectRandom(pokestops: List<Pokestop>, ctx: Context): Pokestop {
+    private fun select(pokestops: List<Pokestop>, ctx: Context, settings: Settings): Pokestop {
+        // Select a pokestop from config
+        // if no special rules, use selectRandom
+
+        // Rule 1 : lurePokestopModifier = -1
+        // always go to neareast lure ( at range )
+        if (settings.lurePokestopModifier < 0) {
+
+            val pokestopsWithLure: List<Pokestop> = pokestops.filter {
+                it.hasLure()
+            }
+            if (pokestopsWithLure.isNotEmpty()) {
+                val currentPosition = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
+
+                val pokestopsOrder: List<Pokestop> = pokestopsWithLure.sortedBy {
+                    val end = S2LatLng.fromDegrees(it.latitude, it.longitude)
+                    currentPosition.getEarthDistance(end)
+                }
+
+                return pokestopsOrder.first()
+            }
+        }
+
+        return selectRandom(pokestops, ctx, settings)
+    }
+
+    private fun selectRandom(pokestops: List<Pokestop>, ctx: Context, settings: Settings): Pokestop {
         // Select random pokestop while taking the distance into account
         // E.g. pokestop is closer to the user -> higher probabilty to be chosen
 
@@ -278,7 +308,11 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         val distances = pokestops.map {
             val end = S2LatLng.fromDegrees(it.latitude, it.longitude)
-            currentPosition.getEarthDistance(end)
+            if (it.hasLure()) {
+                currentPosition.getEarthDistance(end) / settings.lurePokestopModifier
+            } else {
+                currentPosition.getEarthDistance(end)
+            }
         }
         val totalDistance = distances.sum()
 
