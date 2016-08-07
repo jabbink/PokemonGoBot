@@ -1,7 +1,3 @@
-# Warning: the API is currently broken. This bot does not work (like all others).
-
-When it's fixed, the Issues page will be unlocked again.
-
 # Pokemon Go Bot
 
 [![Build Status](https://travis-ci.org/jabbink/PokemonGoBot.svg?branch=develop)](https://travis-ci.org/jabbink/PokemonGoBot)
