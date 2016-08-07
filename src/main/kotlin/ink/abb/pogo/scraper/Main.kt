@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper
 
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.CredentialProvider
 import com.pokegoapi.auth.GoogleAutoCredentialProvider
@@ -22,8 +21,6 @@ import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
 import java.io.FileInputStream
-import java.net.URLClassLoader
-import java.nio.file.Paths
 import java.util.*
 
 val time = SystemTimeImpl()
@@ -90,10 +87,6 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
 }
 
 fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit = {}): Bot {
-    if (settings.unknown6ProviderJar.isBlank()) {
-        throw Exception("Unknown 6 provider is required for now")
-    }
-
     Log.normal("Logging in to game server...")
 
     val retryCount = 3
@@ -147,19 +140,6 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     println(".")
 
     val bot = Bot(api, settings)
-
-    // TODO: hacky way to get the provider
-    val child = URLClassLoader(
-            arrayOf(Paths.get(settings.unknown6ProviderJar).toUri().toURL()),
-            Thread.currentThread().javaClass.classLoader)
-    val classToLoad = Class.forName("Unknown6Provider", true, child)
-    val method = classToLoad.getDeclaredMethod("getUnknown6s", java.lang.Double.TYPE, java.lang.Double.TYPE)
-    val instance = classToLoad.newInstance()
-
-    bot.getUnknown6s = { lat: Double, lng: Double ->
-        method.invoke(instance, lat, lng) as? List<Unknown6> ?: emptyList()
-    }
-
     bot.start()
 
     return bot

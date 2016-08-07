@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper
 
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
@@ -139,11 +138,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         if (settings.guiPortSocket > 0) {
             Log.normal("Running socket server on port ${settings.guiPortSocket}")
             ctx.server.start(ctx, settings.guiPortSocket)
-            var needPort = ""
+            /*var needPort = ""
             if (settings.guiPortSocket != 8001) {
                 needPort = "#localhost:${settings.guiPortSocket}"
-            }
-            Log.green("Open the map on http://pogo.abb.ink/${settings.version}/map.html${needPort}")
+            }*/
+            Log.green("Open the map on http://pogo.abb.ink/RocketTheme/")
         }
 
 
@@ -221,6 +220,4 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun task(task: Task) {
         task.run(this, ctx, settings)
     }
-
-    lateinit var getUnknown6s: (Double, Double) -> List<Unknown6>
 }

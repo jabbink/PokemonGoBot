@@ -1,7 +1,3 @@
-# path to jar that includes a Unknown6Provider class with function
-# public List<Unknown6> getUnknown6s(double latitude, double longitude)
-unknown_6_provider_jar=
-
 # PTC/Google login credentials
 username=
 
