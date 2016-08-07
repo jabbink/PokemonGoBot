@@ -118,11 +118,6 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             val lat = ctx.lat.addAndGet(deltaLat)
             val lng = ctx.lng.addAndGet(deltaLng)
 
-<<<<<<< HEAD
-=======
-            bot.api.unknown6s = bot.getUnknown6s(lat, lng)
-
->>>>>>> origin/develop
             ctx.server.setLocation(lat, lng)
 
             remainingSteps--

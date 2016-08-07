@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper
 
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
@@ -221,6 +220,4 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun task(task: Task) {
         task.run(this, ctx, settings)
     }
-
-    lateinit var getUnknown6s: (Double, Double) -> List<Unknown6>
 }
