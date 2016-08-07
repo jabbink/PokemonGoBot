@@ -4,6 +4,10 @@
 
 ## Welcome to _the_ Pokemon Go Bot
 
+[Join our Discord](https://discord.gg/7Dr84MT)
+
+[*Do you need multiple bots? Define them in multiple JSON files in the `bot-settings` directory: https://github.com/jabbink/PokemonGoBot/issues/777](https://github.com/jabbink/PokemonGoBot/issues/777#issuecomment-237219032)
+
 ### Screenshot
 
 ![GUI Screenshot](http://pogo.abb.ink/img/gui-screenshot-01.png)
