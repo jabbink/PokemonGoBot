@@ -18,14 +18,22 @@ import java.util.*
 
 /**
  * Task that handles catching pokemon, activating stops, and walking to a new target.
- *
- * @author Andrew Potter (apottere)
  */
-class ProcessPokestops(val pokestops: MutableCollection<Pokestop>) : Task {
+class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 
     private val lootTimeouts = HashMap<String, Long>()
-
+    var startPokeStop: Pokestop? = null
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        if (settings.allowLeaveStartArea) {
+            try {
+                val newStops = ctx.api.map.mapObjects.pokestops
+                if (newStops.size > 0) {
+                    pokestops = newStops
+                }
+            } catch (e: Exception) {
+                // ignored failed request
+            }
+        }
         val sortedPokestops = pokestops.sortedWith(Comparator { a, b ->
             val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)
             val locationB = S2LatLng.fromDegrees(b.latitude, b.longitude)
@@ -34,12 +42,14 @@ class ProcessPokestops(val pokestops: MutableCollection<Pokestop>) : Task {
             val distanceB = self.getEarthDistance(locationB)
             distanceA.compareTo(distanceB)
         })
+        if (startPokeStop == null)
+            startPokeStop = sortedPokestops.first()
 
-        if (settings.shouldLootPokestop) {
+        if (settings.lootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             bot.task(loot)
         }
-        val walk = WalkToUnusedPokestop(sortedPokestops, lootTimeouts)
+        val walk = Walk(sortedPokestops, lootTimeouts)
 
         bot.task(walk)
     }

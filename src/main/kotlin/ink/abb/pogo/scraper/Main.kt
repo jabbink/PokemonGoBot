@@ -9,51 +9,69 @@
 package ink.abb.pogo.scraper
 
 import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.auth.*
+import com.pokegoapi.auth.CredentialProvider
+import com.pokegoapi.auth.GoogleAutoCredentialProvider
+import com.pokegoapi.auth.GoogleUserCredentialProvider
+import com.pokegoapi.auth.PtcCredentialProvider
 import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
+import com.pokegoapi.util.SystemTimeImpl
+import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
+import org.springframework.boot.SpringApplication
 import java.io.FileInputStream
 import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
-fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
-    val username = settings.username
-    val password = settings.password
+val time = SystemTimeImpl()
 
-    val token = settings.token()
+fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit): CredentialProvider {
+    val credentials = settings.credentials
+    val auth = if (credentials is GoogleCredentials) {
+        if (credentials.token.isBlank()) {
+            val provider = GoogleUserCredentialProvider(http, time)
 
-    val auth = if (username.contains('@')) {
-        if (token.isBlank()) {
-            GoogleCredentialProvider(http, object : GoogleCredentialProvider.OnGoogleLoginOAuthCompleteListener {
-                override fun onInitialOAuthComplete(googleAuthJson: GoogleAuthJson?) {
-                }
+            println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL)
+            println("Enter authorisation code:")
 
-                override fun onTokenIdReceived(googleAuthTokenJson: GoogleAuthTokenJson) {
-                    Log.normal("Setting Google refresh token in your config")
-                    settings.setToken(googleAuthTokenJson.refreshToken)
-                    settings.writeToken("config.properties")
-                }
-            })
+            val access = readLine()
+
+            // we should be able to login with this token
+            provider.login(access)
+            println("Refresh token:" + provider.refreshToken)
+            Log.normal("Setting Google refresh token in your config")
+            credentials.token = provider.refreshToken
+            writeToken(credentials.token)
+
+            provider
         } else {
-            GoogleCredentialProvider(http, token)
+            GoogleUserCredentialProvider(http, credentials.token, time)
+        }
+    } else if (credentials is GoogleAutoCredentials) {
+        GoogleAutoCredentialProvider(http, credentials.username, credentials.password, time)
+    } else if (credentials is PtcCredentials) {
+        try {
+            PtcCredentialProvider(http, credentials.username, credentials.password, time)
+        } catch (e: LoginFailedException) {
+            throw e
+        } catch (e: RemoteServerException) {
+            throw e
+        } catch (e: Exception) {
+            // sometimes throws ArrayIndexOutOfBoundsException or other RTE's
+            throw RemoteServerException(e)
         }
     } else {
-        PtcCredentialProvider(http, username, password)
+        throw IllegalStateException("Unknown credentials: ${credentials.javaClass}")
     }
 
     return auth
 }
 
 fun main(args: Array<String>) {
-    val builder = OkHttpClient.Builder()
-    builder.connectTimeout(60, TimeUnit.SECONDS)
-    builder.readTimeout(60, TimeUnit.SECONDS)
-    builder.writeTimeout(60, TimeUnit.SECONDS)
-    val http = builder.build()
+    SpringApplication.run(PokemonGoBotApplication::class.java, *args)
+}
 
+fun startDefaultBot(http: OkHttpClient, service: BotService) {
     val properties = Properties()
 
     val input = FileInputStream("config.properties")
@@ -62,8 +80,13 @@ fun main(args: Array<String>) {
     }
     input.close()
 
-    val settings = Settings(properties)
+    val settings = SettingsParser(properties).createSettingsFromProperties()
+    service.addBot(startBot(settings, http, {
+        settings.writeProperty("config.properties", "token", it)
+    }))
+}
 
+fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit = {}): Bot {
     Log.normal("Logging in to game server...")
 
     val retryCount = 3
@@ -74,13 +97,11 @@ fun main(args: Array<String>) {
     var auth: CredentialProvider? = null
     do {
         try {
-            auth = getAuth(settings, http)
+            auth = getAuth(settings, http, writeToken)
         } catch (e: LoginFailedException) {
-            Log.red("Server refused your login credentials. Are they correct?")
-            System.exit(1)
-            return
+            throw IllegalStateException("Server refused your login credentials. Are they correct?")
         } catch (e: RemoteServerException) {
-            Log.red("Server returned unexpected error")
+            Log.red("Server returned unexpected error: ${e.message}")
             if (retries-- > 0) {
                 Log.normal("Retrying...")
                 Thread.sleep(errorTimeout)
@@ -93,13 +114,11 @@ fun main(args: Array<String>) {
     var api: PokemonGo? = null
     do {
         try {
-            api = PokemonGo(auth, http)
+            api = PokemonGo(auth, http, time)
         } catch (e: LoginFailedException) {
-            Log.red("Server refused your login credentials. Are they correct?")
-            System.exit(1)
-            return
+            throw IllegalStateException("Server refused your login credentials. Are they correct?")
         } catch (e: RemoteServerException) {
-            Log.red("Server returned unexpected error")
+            Log.red("Server returned unexpected error: ${e.message}")
             if (retries-- > 0) {
                 Log.normal("Retrying...")
                 Thread.sleep(errorTimeout)
@@ -108,12 +127,10 @@ fun main(args: Array<String>) {
     } while (api == null && retries >= 0)
 
     if (api == null) {
-        Log.red("Failed to login. Stopping")
-        System.exit(1)
-        return
+        throw IllegalStateException("Failed to login. Stopping")
     }
 
-    Log.normal("Logged in as ${settings.username}")
+    Log.normal("Logged in successfully")
 
     print("Getting profile data from pogo server")
     while (api.playerProfile == null) {
@@ -123,7 +140,8 @@ fun main(args: Array<String>) {
     println(".")
 
     val bot = Bot(api, settings)
-    Runtime.getRuntime().addShutdownHook(thread(start = false) { bot.stop() })
 
     bot.start()
+
+    return bot
 }

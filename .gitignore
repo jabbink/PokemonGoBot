@@ -73,5 +73,10 @@ fabric.properties
 # PTC Login credentials
 config.properties
 
-#OS X files
+# OS X files
 .DS_Store
+
+# exported file
+export_*.csv
+
+bot-settings/
