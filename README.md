@@ -6,7 +6,11 @@
 
 [Join our Discord](https://discord.gg/7Dr84MT)
 
-[*Do you need multiple bots? Define them in multiple JSON files in the `bot-settings` directory: https://github.com/jabbink/PokemonGoBot/issues/777](https://github.com/jabbink/PokemonGoBot/issues/777#issuecomment-237219032)
+FAQ for 0.5.0 (up here because people won't scroll)
+
+[*Do you need multiple bots?* Define them in multiple JSON files in the `bot-settings` directory: https://github.com/jabbink/PokemonGoBot/issues/777](https://github.com/jabbink/PokemonGoBot/issues/777#issuecomment-237219032)
+
+[java.lang.RuntimeException: java.lang.reflect.InvocationTargetException ... Address already in use?](https://github.com/jabbink/PokemonGoBot/issues/806#issuecomment-238089960)
 
 ### Screenshot
 
