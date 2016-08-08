@@ -131,7 +131,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             if (!prepareWalkBack.get())
                 task(process)
             else if (!ctx.walking.get())
-                task(WalkToStartPokeStop(process.startPokeStop as Pokestop))
+                task(WalkToStartPokestop(process.startPokestop as Pokestop))
         }
 
         Log.setContext(ctx)

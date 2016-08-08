@@ -123,6 +123,7 @@ class SocketServer {
         newPokemon.name = pokemon.pokemonId.name
         newPokemon.cp = pokemon.cp
         newPokemon.iv = pokemon.getIvPercentage()
+        newPokemon.stats = pokemon.getStatsFormatted()
         server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
     }
 
@@ -207,6 +208,7 @@ class SocketServer {
         var name: String? = null
         var cp: Int? = null
         var iv: Int? = null
+        var stats: String? = null
     }
 
     class EventReleasePokemon {
