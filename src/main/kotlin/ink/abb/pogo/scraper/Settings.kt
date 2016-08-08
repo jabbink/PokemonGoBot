@@ -276,7 +276,7 @@ data class Settings(
         JsonSubTypes.Type(value = GoogleAutoCredentials::class, name = "google-auto"),
         JsonSubTypes.Type(value = PtcCredentials::class, name = "ptc")
 )
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties("username", "password", ignoreUnknown = true)
 interface Credentials
 
 data class GoogleCredentials(var token: String = "") : Credentials
