@@ -115,10 +115,10 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     return@runLoop
                 }
 
-            ctx.lat.addAndGet(deltaLat)
-            ctx.lng.addAndGet(deltaLng)
+            val lat = ctx.lat.addAndGet(deltaLat)
+            val lng = ctx.lng.addAndGet(deltaLng)
 
-            ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+            ctx.server.setLocation(lat, lng)
 
             remainingSteps--
             if (remainingSteps <= 0) {

@@ -140,6 +140,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     println(".")
 
     val bot = Bot(api, settings)
+
     bot.start()
 
     return bot

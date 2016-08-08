@@ -259,10 +259,14 @@ data class Settings(
 
         init {
             val versionProperties = Properties()
-            SettingsParser::class.java.getResourceAsStream("version.properties").use {
-                versionProperties.load(it)
+            try {
+                SettingsParser::class.java.getResourceAsStream("version.properties").use {
+                    versionProperties.load(it)
+                }
+                version = versionProperties["version"].toString()
+            } catch (e: Exception) {
+                version = ""
             }
-            version = versionProperties["version"].toString()
         }
     }
 }
