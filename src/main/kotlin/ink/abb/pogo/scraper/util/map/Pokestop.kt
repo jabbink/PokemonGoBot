@@ -10,16 +10,12 @@ package ink.abb.pogo.scraper.util.map
 
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.fort.Pokestop
-import com.pokegoapi.google.common.geometry.S2LatLng
 
 fun Pokestop.canLoot(ignoreDistance: Boolean = false, lootTimeouts: Map<String, Long>, api: PokemonGo): Boolean {
     val canLoot = lootTimeouts.getOrElse(id, { cooldownCompleteTimestampMs }) < api.currentTimeMillis()
     return (ignoreDistance || inRange()) && canLoot
 }
 
-fun Pokestop.inRange(api: PokemonGo, distance: Double): Boolean {
-    val pokestop = S2LatLng.fromDegrees(latitude, longitude)
-    val player = S2LatLng.fromDegrees(api.latitude, api.longitude)
-    val distanceToStop = pokestop.getEarthDistance(player)
-    return distanceToStop < distance
+fun Pokestop.inRange(api: PokemonGo, maxDistance: Double): Boolean {
+    return distance < maxDistance
 }

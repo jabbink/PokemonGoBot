@@ -15,7 +15,6 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.map.inRange
 import java.util.*
 
 /**
@@ -52,11 +51,11 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
             bot.task(loot)
         }
         if (settings.campLurePokestop > 0) {
-            // TODO: grab that 70 from DOWNLOAD_SETTINGS
-            val luresInRange = sortedPokestops.filter { it.inRange(ctx.api, 70.0) && it.hasLure() }.size
+            val luresInRange = sortedPokestops.filter {
+                it.inRangeForLuredPokemon() && it.fortData.hasLureInfo()
+            }.size
             if (luresInRange >= settings.campLurePokestop) {
-                Log.green("$luresInRange lures in range, pausing")
-                ctx.api.map.getMapObjects(3)
+                //Log.green("$luresInRange lures in range, pausing")
                 return
             }
         }

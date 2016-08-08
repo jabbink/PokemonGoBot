@@ -53,8 +53,10 @@ configurations {
 }
 
 dependencies {
-    compile files('../PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar')
-    //compile 'com.github.Grover-c13:PokeGOAPI-Java:ef1f52f1f0621f94b97125975c961a8ad8129e92'
+    //compile files('../PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar')
+
+    // TODO: Wait for jitpack to fix itself...
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
