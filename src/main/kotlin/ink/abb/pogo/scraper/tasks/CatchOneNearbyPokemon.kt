@@ -112,8 +112,8 @@ class CatchOneNearbyPokemon : Task {
                     Log.red("Disabling catching of Pokemon")
                     
                     // Save previous value for restore
-                    context.pokemonInventoryFullStatus.first = settings.catchPokemon 
-                    context.pokemonInventoryFullStatus.second = true
+                    ctx.pokemonInventoryFullStatus.first.set(settings.catchPokemon)
+                    ctx.pokemonInventoryFullStatus.second.set(true)
                     
                     settings.catchPokemon = false
                 }
