@@ -21,6 +21,9 @@ desired_catch_probability_unwanted=0.0
 # The next pokestop from (1/infinite)
 random_next_pokestop_selection=5
 
+# Should the bot camp around lured x pokestops (-1 = off; 1 = one needs to be in range; 2 = two..., etc)
+camp_lure_pokestop=-1
+
 ## Walking
 # Meters per second
 speed=2.8

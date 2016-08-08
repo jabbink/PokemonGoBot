@@ -63,7 +63,7 @@ class SettingsParser(val properties: Properties) {
                 ),
 
                 randomNextPokestopSelection = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestopSelection, String::toInt),
-
+                campLurePokestop = getPropertyIfSet("Camp around x lured pokestops", "camp_lure_pokestop", defaults.campLurePokestop, String::toInt),
                 desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", defaults.desiredCatchProbability, String::toDouble),
                 desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", defaults.desiredCatchProbabilityUnwanted, String::toDouble),
                 autotransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.autotransfer, String::toBoolean),
@@ -182,6 +182,7 @@ data class Settings(
         val profileUpdateTimer: Long = 60,
         val timerWalkToStartPokestop: Long = -1L,
         val randomNextPokestopSelection: Int = 5,
+        val campLurePokestop: Int = -1,
         val desiredCatchProbability: Double = 0.4,
         val desiredCatchProbabilityUnwanted: Double = 0.0,
         val autotransfer: Boolean = true,
