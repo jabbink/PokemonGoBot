@@ -97,15 +97,28 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal("Getting initial pokestops...")
 
         val sleepTimeout = 10L
+        val originalInitialMapSize = settings.initialMapSize
+        var retries = 0
         var reply: MapObjects?
         do {
             reply = api.map.getMapObjects(settings.initialMapSize)
             Log.normal("Got ${reply.pokestops.size} pokestops")
             if (reply == null || reply.pokestops.size == 0) {
+                retries++
+                if (retries % 3 == 0) {
+                    if (settings.initialMapSize > 1) {
+                        settings.initialMapSize -= 2
+                        Log.red("Decreasing initialMapSize to ${settings.initialMapSize}")
+                    }
+                }
                 Log.red("Retrying in $sleepTimeout seconds...")
                 Thread.sleep(sleepTimeout * 1000)
             }
         } while (reply == null || reply.pokestops.size == 0)
+        if (originalInitialMapSize != settings.initialMapSize) {
+            Log.red("Too high initialMapSize (${originalInitialMapSize}) found, " +
+                    "please change the setting in your config to ${settings.initialMapSize}")
+        }
         val process = ProcessPokestops(reply.pokestops)
 
         runningLatch = CountDownLatch(1)
