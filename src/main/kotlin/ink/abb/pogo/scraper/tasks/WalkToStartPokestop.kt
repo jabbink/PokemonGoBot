@@ -70,7 +70,7 @@ class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
                 }
             }
             // don't run away when there are still Pokemon around
-            if (remainingSteps.toInt().mod(20) == 0 && pauseCounter > 0)
+            if (remainingSteps.toInt().mod(20) == 0 && pauseCounter > 0) {
                 if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
@@ -78,10 +78,14 @@ class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
                     pauseWalk.set(true)
                     return@runLoop
                 }
+            }
 
-            ctx.lat.addAndGet(deltaLat)
-            ctx.lng.addAndGet(deltaLng)
-            ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+            pauseCounter = 2
+            val lat = ctx.lat.addAndGet(deltaLat)
+            val lng = ctx.lng.addAndGet(deltaLng)
+
+            ctx.server.setLocation(lat, lng)
+
             remainingSteps--
             if (remainingSteps.toInt().mod(20) == 0) Log.cyan("Starting Pokestop reached in ${remainingSteps.toInt()} steps.")
             if (remainingSteps <= 0) {
@@ -129,6 +133,7 @@ class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
                     pauseWalk.set(true)
                     return@runLoop
                 }
+                pauseCounter = 2
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                 val step = coordinatesList.first()
                 coordinatesList.removeAt(0)
