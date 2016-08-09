@@ -111,8 +111,6 @@ class CatchOneNearbyPokemon : Task {
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
                     Log.red("Disabling catching of Pokemon")
                     
-                    // Save previous value for restore
-                    ctx.pokemonInventoryFullStatus.first.set(settings.catchPokemon)
                     ctx.pokemonInventoryFullStatus.second.set(true)
                     
                     settings.catchPokemon = false

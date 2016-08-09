@@ -51,7 +51,8 @@ class ReleasePokemon : Task {
                               settings.catchPokemon = ctx.pokemonInventoryFullStatus.first.get()
                               ctx.pokemonInventoryFullStatus.second.set(false)
                               
-                              Log.green("Enabling catching of Pokemon")
+                              if(settings.catchPokemon)
+                                Log.green("Enabling catching of Pokemon")
                             }
                             
                             if (result == Result.SUCCESS) {
