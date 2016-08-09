@@ -117,6 +117,12 @@ timer_walk_to_start_pokestop=-1
 # Set profile update timer (Default: 60)
 profile_update_timer=60
 
+# Number of exceptions allowed to occur until the bot is restarted (-1 to disable auto restarts, suggested value: 5)
+auto_restart_threshold=-1
+
+# Period (in seconds) in which the exceptions must occur to restart the bot (Default: 300)
+auto_restart_period=300
+
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
 transfer_iv_threshold=80

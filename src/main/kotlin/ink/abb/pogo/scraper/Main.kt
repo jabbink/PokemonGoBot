@@ -40,14 +40,14 @@ fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit
         if (credentials.token.isBlank()) {
             val provider = GoogleUserCredentialProvider(http, time)
 
-            println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL)
-            println("Enter authorisation code:")
+            Log.yellow("Please go to " + GoogleUserCredentialProvider.LOGIN_URL)
+            Log.yellow("Enter authorisation code:")
 
             val access = readLine()
 
             // we should be able to login with this token
             provider.login(access)
-            println("Refresh token:" + provider.refreshToken)
+            Log.yellow("Refresh token:" + provider.refreshToken)
             Log.normal("Setting Google refresh token in your config")
             credentials.token = provider.refreshToken
             writeToken(credentials.token)
@@ -96,7 +96,7 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
     try {
         properties = loadProperties(filename)
     } catch (e: FileNotFoundException) {
-        Log.red("${filename} file not found. Trying config.properties.txt...")
+        Log.red("$filename file not found. Trying config.properties.txt...")
         try {
             // Fix for Windows users...
             filename += ".txt"
@@ -161,12 +161,12 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
 
     Log.normal("Logged in successfully")
 
-    print("Getting profile data from pogo server")
+    Log.normal("Getting profile data from pogo server...")
     while (api.playerProfile == null) {
-        print(".")
+        Log.normal("Still waiting for profile data...")
         Thread.sleep(1000)
     }
-    println(".")
+    Log.normal("Received profile data...")
     Thread.sleep(1000)
 
     val stats = try {

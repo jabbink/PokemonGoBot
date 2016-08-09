@@ -14,10 +14,12 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.credentials.*
 import ink.abb.pogo.scraper.startBot
+import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
+import java.time.LocalDateTime
 import java.util.concurrent.CountDownLatch
 import javax.annotation.PreDestroy
 import kotlin.concurrent.thread
@@ -44,6 +46,41 @@ class BotService {
     @Synchronized
     fun addBot(bot: Bot) {
         bots.add(bot)
+
+        if (bot.settings.autoRestartThreshold > -1) {
+            Log.normal("Enabling bot auto restart")
+
+            var counter = 0
+            var counterReset = LocalDateTime.now().plusSeconds(bot.settings.autoRestartPeriod)
+            var stopped = false
+
+            bot.exceptionHandler = { throwable ->
+                synchronized(bot) {
+                    if (!stopped && bot.isRunning()) {
+                        if (LocalDateTime.now().isAfter(counterReset)) {
+                            counter = 0
+                            counterReset = LocalDateTime.now().plusSeconds(bot.settings.autoRestartPeriod)
+                            Log.normal("Reset restart counter. Next reset: $counterReset")
+                        }
+
+                        counter++
+                        Log.normal("Increasing restart counter to $counter/${bot.settings.autoRestartThreshold}")
+
+                        if (counter > bot.settings.autoRestartThreshold) {
+                            Log.yellow("Restarting bot due to reached restart threshold!")
+                            thread {
+                                bot.stop()
+                                bots.remove(bot)
+                                Log.yellow("Stopped bot")
+                                Log.yellow("Restarting...")
+                                submitBot(bot.settings)
+                            }
+                            stopped = true
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Synchronized
