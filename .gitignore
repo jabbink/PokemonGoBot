@@ -80,3 +80,4 @@ config.properties
 export_*.csv
 
 bot-settings/
+logs/
