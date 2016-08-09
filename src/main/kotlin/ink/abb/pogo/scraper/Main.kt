@@ -8,6 +8,10 @@
 
 package ink.abb.pogo.scraper
 
+import POGOProtos.Enums.TutorialStateOuterClass
+import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass
+import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass
+import POGOProtos.Networking.Requests.RequestTypeOuterClass
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.auth.CredentialProvider
 import com.pokegoapi.auth.GoogleAutoCredentialProvider
@@ -15,12 +19,14 @@ import com.pokegoapi.auth.GoogleUserCredentialProvider
 import com.pokegoapi.auth.PtcCredentialProvider
 import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
+import com.pokegoapi.main.ServerRequest
 import com.pokegoapi.util.SystemTimeImpl
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.util.*
 
 val time = SystemTimeImpl()
@@ -71,18 +77,37 @@ fun main(args: Array<String>) {
     SpringApplication.run(PokemonGoBotApplication::class.java, *args)
 }
 
-fun startDefaultBot(http: OkHttpClient, service: BotService) {
+fun loadProperties(filename: String): Properties {
     val properties = Properties()
-
-    val input = FileInputStream("config.properties")
-    input.use {
+    FileInputStream(filename).use {
         properties.load(it)
     }
-    input.close()
+    return properties
+}
+
+fun startDefaultBot(http: OkHttpClient, service: BotService) {
+    var properties: Properties
+
+    var filename = "config.properties"
+
+    try {
+        properties = loadProperties(filename)
+    } catch (e: FileNotFoundException) {
+        Log.red("${filename} file not found. Trying config.properties.txt...")
+        try {
+            // Fix for Windows users...
+            filename += ".txt"
+            properties = loadProperties(filename)
+        } catch (e: FileNotFoundException) {
+            Log.red("${filename} not found as well. Exiting.")
+            System.exit(1);
+            return
+        }
+    }
 
     val settings = SettingsParser(properties).createSettingsFromProperties()
     service.addBot(startBot(settings, http, {
-        settings.writeProperty("config.properties", "token", it)
+        settings.writeProperty(filename, "token", it)
     }))
 }
 
@@ -138,6 +163,23 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
         Thread.sleep(1000)
     }
     println(".")
+
+    if (api.playerProfile.stats == null) {
+        // apparently the account didn't except the ToS yet
+        val getPlayerMessageBuilder = GetPlayerMessageOuterClass.GetPlayerMessage.newBuilder()
+
+        val tosBuilder = MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage.newBuilder()
+                .addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
+                .setSendMarketingEmails(false)
+                .setSendPushNotifications(false)
+
+        val serverRequestsPlayer = ServerRequest(RequestTypeOuterClass.RequestType.GET_PLAYER, getPlayerMessageBuilder.build())
+        val serverRequestsTutorial = ServerRequest(RequestTypeOuterClass.RequestType.MARK_TUTORIAL_COMPLETE, tosBuilder.build())
+
+        api.getRequestHandler().sendServerRequests(serverRequestsPlayer, serverRequestsTutorial)
+        // set stats
+        api.inventories.updateInventories(true)
+    }
 
     val bot = Bot(api, settings)
 
