@@ -22,9 +22,14 @@ fun Pokemon.getIvPercentage(): Int {
     return ivPercentage
 }
 
+fun Pokemon.getCpPercentageToPlayer(): Int {
+    return (cp.toDouble() / maxCpForPlayer.toDouble() * 100).toInt()
+}
+
 fun Pokemon.getStatsFormatted(): String {
     val details = "Stamina: $individualStamina | Attack: $individualAttack | Defense: $individualDefense"
-    return details + " | IV: ${getIv()} (${(getIvPercentage())}%)"
+    val maxCpDetails = "Max Trainer CP: $maxCpForPlayer (${getCpPercentageToPlayer()}%)"
+    return details + " | IV: ${getIv()} (${(getIvPercentage())}%) | $maxCpDetails "
 }
 
 fun isTooMany(settings: Settings, pokemonCounts: MutableMap<String, Int>, pokemon: Pokemon): Boolean {
@@ -44,6 +49,7 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
     val ivPercentage = getIvPercentage()
     val minIVPercentage = settings.transferIvThreshold
     val minCP = settings.transferCpThreshold
+    val minCpPercentage = settings.transferCpMinThreshold
 
     // add 1 to the map
     val isTooMany = isTooMany(settings, pokemonCounts, this)
@@ -55,6 +61,7 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
         if (!shouldRelease) {
             var ivTooLow = false
             var cpTooLow = false
+            var maxCpInRange = false
 
             // never transfer > min IV percentage (unless set to -1)
             if (ivPercentage < minIVPercentage || minIVPercentage == -1) {
@@ -65,7 +72,12 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
                 cpTooLow = true
             }
             reason = "CP < $minCP and IV < $minIVPercentage%"
-            shouldRelease = ivTooLow && cpTooLow
+
+            if (minCpPercentage != -1 && minCpPercentage >= getCpPercentageToPlayer()) {
+                maxCpInRange = true
+                reason += " and CP max $maxCpForPlayer: achieved ${getCpPercentageToPlayer()}% <= $minCpPercentage%"
+            }
+            shouldRelease = ivTooLow && cpTooLow && (maxCpInRange || minCpPercentage == -1)
         }
         // still shouldn't release? Check if we have too many
         if (!shouldRelease && isTooMany) {

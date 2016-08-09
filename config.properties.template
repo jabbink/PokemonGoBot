@@ -124,6 +124,11 @@ transfer_iv_threshold=80
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
 
+# Minimum CP % in relation to max CP of pokemon to your current trainer lvl to keep pokemon (to disable CP%:use -1)
+# e.g. Trainer lvl is 33, captured EEVEE has 490 CP which results in max possible CP of 984 with 15/14/15 IV
+# that however is below the threshold of 60% because its 49%
+transfer_cp_min_threshold=-1
+
 # List of pokemon you don't want to transfer regardless of CP
 # The names must be divided by a ","
 # If you want all pokemons to be transferred just leave it blank

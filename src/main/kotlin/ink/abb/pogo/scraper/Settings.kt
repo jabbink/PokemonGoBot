@@ -94,6 +94,8 @@ class SettingsParser(val properties: Properties) {
 
                 transferCpThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", defaults.transferCpThreshold, String::toInt),
 
+                transferCpMinThreshold = getPropertyIfSet("Minimum CP % in relation to max CP of pokemon to your current trainer lvl to keep pokemon", "transfer_cp_min_threshold", defaults.transferCpMinThreshold, String::toInt),
+
                 transferIvThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", defaults.transferIvThreshold, String::toInt),
 
                 ignoredPokemon = getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", defaults.ignoredPokemon.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
@@ -206,6 +208,7 @@ data class Settings(
         val spawnRadius: Int = -1,
         val banSpinCount: Int = 0,
         val transferCpThreshold: Int = 400,
+        val transferCpMinThreshold: Int = -1,
         val transferIvThreshold: Int = 80,
         val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
 

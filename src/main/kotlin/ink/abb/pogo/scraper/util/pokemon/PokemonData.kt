@@ -22,6 +22,11 @@ fun PokemonData.getIvPercentage(): Int {
     return ivPercentage
 }
 
+fun PokemonData.getCpPercentageToPlayer(playerlvel: Int): Int {
+    // TODO replace this when api has implemented this see Pokemon.kt
+    return -1
+}
+
 fun PokemonData.getStatsFormatted(): String {
     val details = "Stamina: $individualStamina | Attack: $individualAttack | Defense: $individualDefense"
     return details + " | IV: ${getIv()} (${(getIvPercentage())}%)"
