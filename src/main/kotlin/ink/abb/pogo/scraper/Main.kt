@@ -167,8 +167,16 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
         Thread.sleep(1000)
     }
     println(".")
+    Thread.sleep(1000)
 
-    if (api.playerProfile.stats == null) {
+    val stats = try {
+        api.playerProfile.stats
+    } catch (e: Exception) {
+        null
+    }
+
+    if (stats == null) {
+        Log.yellow("Accepting ToS")
         // apparently the account didn't except the ToS yet
         val getPlayerMessageBuilder = GetPlayerMessageOuterClass.GetPlayerMessage.newBuilder()
 
@@ -181,6 +189,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
         val serverRequestsTutorial = ServerRequest(RequestTypeOuterClass.RequestType.MARK_TUTORIAL_COMPLETE, tosBuilder.build())
 
         api.getRequestHandler().sendServerRequests(serverRequestsPlayer, serverRequestsTutorial)
+        Thread.sleep(1000)
         // set stats
         api.inventories.updateInventories(true)
     }
