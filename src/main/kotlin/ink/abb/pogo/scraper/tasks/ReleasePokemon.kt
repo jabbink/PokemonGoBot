@@ -43,6 +43,18 @@ class ReleasePokemon : Task {
                             Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
                                     "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
                             val result = pokemon.transferPokemon()
+                            
+                            if(ctx.pokemonInventoryFullStatus.second.get() && !settings.catchPokemon) {
+                              // Just released a pokemon so the inventory is not full anymore
+                              
+                              // Restore previous value
+                              settings.catchPokemon = ctx.pokemonInventoryFullStatus.first.get()
+                              ctx.pokemonInventoryFullStatus.second.set(false)
+                              
+                              if(settings.catchPokemon)
+                                Log.green("Enabling catching of Pokemon")
+                            }
+                            
                             if (result == Result.SUCCESS) {
                                 ctx.pokemonStats.second.andIncrement
                                 ctx.server.releasePokemon(pokemon.id)
