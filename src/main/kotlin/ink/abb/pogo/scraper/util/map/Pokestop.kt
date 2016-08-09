@@ -16,6 +16,6 @@ fun Pokestop.canLoot(ignoreDistance: Boolean = false, lootTimeouts: Map<String, 
     return (ignoreDistance || inRange()) && canLoot
 }
 
-fun Pokestop.inRange(api: PokemonGo, maxDistance: Double): Boolean {
+fun Pokestop.inRange(maxDistance: Double): Boolean {
     return distance < maxDistance
 }
