@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Settings
+import ink.abb.pogo.scraper.util.credentials.*
 import ink.abb.pogo.scraper.startBot
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
@@ -71,7 +72,7 @@ class BotService {
 
     @Synchronized
     fun getAllBotSettings(): List<Settings> {
-        return bots.map { it.settings }
+        return bots.map {it.settings.copy(credentials = GoogleAutoCredentials())}
     }
 
     @Synchronized

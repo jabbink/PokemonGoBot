@@ -48,7 +48,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicInteger(0),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             mutableSetOf(),
-            SocketServer()
+            SocketServer(),
+            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false))
     )
 
     @Synchronized
@@ -97,15 +98,32 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal("Getting initial pokestops...")
 
         val sleepTimeout = 10L
+        val originalInitialMapSize = settings.initialMapSize
+        var retries = 0
         var reply: MapObjects?
         do {
             reply = api.map.getMapObjects(settings.initialMapSize)
             Log.normal("Got ${reply.pokestops.size} pokestops")
             if (reply == null || reply.pokestops.size == 0) {
+                retries++
+                if (retries % 3 == 0) {
+                    if (settings.initialMapSize > 1) {
+                        settings.initialMapSize -= 2
+                        Log.red("Decreasing initialMapSize to ${settings.initialMapSize}")
+                    } else {
+                        Log.red("Cannot decrease initialMapSize even further. Are your sure your latitude/longitude is correct?")
+                        Log.yellow("This is what I am trying to fetch: " +
+                                "https://www.google.com/maps/@${settings.latitude},${settings.longitude},15z")
+                    }
+                }
                 Log.red("Retrying in $sleepTimeout seconds...")
                 Thread.sleep(sleepTimeout * 1000)
             }
         } while (reply == null || reply.pokestops.size == 0)
+        if (originalInitialMapSize != settings.initialMapSize) {
+            Log.red("Too high initialMapSize (${originalInitialMapSize}) found, " +
+                    "please change the setting in your config to ${settings.initialMapSize}")
+        }
         val process = ProcessPokestops(reply.pokestops)
 
         runningLatch = CountDownLatch(1)
@@ -130,7 +148,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             if (!prepareWalkBack.get())
                 task(process)
             else if (!ctx.walking.get())
-                task(WalkToStartPokeStop(process.startPokeStop as Pokestop))
+                task(WalkToStartPokestop(process.startPokestop as Pokestop))
         }
 
         Log.setContext(ctx)
@@ -138,11 +156,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         if (settings.guiPortSocket > 0) {
             Log.normal("Running socket server on port ${settings.guiPortSocket}")
             ctx.server.start(ctx, settings.guiPortSocket)
-            var needPort = ""
+            /*var needPort = ""
             if (settings.guiPortSocket != 8001) {
                 needPort = "#localhost:${settings.guiPortSocket}"
-            }
-            Log.green("Open the map on http://pogo.abb.ink/${settings.version}/map.html${needPort}")
+            }*/
+            Log.green("Open the map on http://pogo.abb.ink/RocketTheme/")
         }
 
 

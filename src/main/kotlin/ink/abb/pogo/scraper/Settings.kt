@@ -8,13 +8,12 @@
 
 package ink.abb.pogo.scraper
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.credentials.*
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -64,7 +63,7 @@ class SettingsParser(val properties: Properties) {
                 ),
 
                 randomNextPokestopSelection = getPropertyIfSet("Number of pokestops to select next", "random_next_pokestop_selection", defaults.randomNextPokestopSelection, String::toInt),
-
+                campLurePokestop = getPropertyIfSet("Camp around x lured pokestops", "camp_lure_pokestop", defaults.campLurePokestop, String::toInt),
                 desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", defaults.desiredCatchProbability, String::toDouble),
                 desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", defaults.desiredCatchProbabilityUnwanted, String::toDouble),
                 autotransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.autotransfer, String::toBoolean),
@@ -183,6 +182,7 @@ data class Settings(
         val profileUpdateTimer: Long = 60,
         val timerWalkToStartPokestop: Long = -1L,
         val randomNextPokestopSelection: Int = 5,
+        val campLurePokestop: Int = -1,
         val desiredCatchProbability: Double = 0.4,
         val desiredCatchProbabilityUnwanted: Double = 0.0,
         val autotransfer: Boolean = true,
@@ -215,7 +215,7 @@ data class Settings(
 
         val guiPortSocket: Int = 8001,
 
-        val initialMapSize: Int = 9,
+        var initialMapSize: Int = 9,
 
         val version: String = Settings.version
 ) {
@@ -258,24 +258,14 @@ data class Settings(
 
         init {
             val versionProperties = Properties()
-            SettingsParser::class.java.getResourceAsStream("version.properties").use {
-                versionProperties.load(it)
+            try {
+                SettingsParser::class.java.getResourceAsStream("version.properties").use {
+                    versionProperties.load(it)
+                }
+                version = versionProperties["version"].toString()
+            } catch (e: Exception) {
+                version = ""
             }
-            version = versionProperties["version"].toString()
         }
     }
 }
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes(
-        JsonSubTypes.Type(value = GoogleCredentials::class, name = "google"),
-        JsonSubTypes.Type(value = GoogleAutoCredentials::class, name = "google-auto"),
-        JsonSubTypes.Type(value = PtcCredentials::class, name = "ptc")
-)
-@JsonIgnoreProperties(ignoreUnknown = true)
-interface Credentials
-
-data class GoogleCredentials(var token: String = "") : Credentials
-data class GoogleAutoCredentials(var username: String = "", var password: String = "") : Credentials
-
-data class PtcCredentials(val username: String = "", val password: String = "") : Credentials

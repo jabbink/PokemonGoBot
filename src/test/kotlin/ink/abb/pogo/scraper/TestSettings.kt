@@ -10,6 +10,7 @@ package ink.abb.pogo.scraper
 
 import ink.abb.pogo.scraper.util.camelToUnderscores
 import ink.abb.pogo.scraper.util.underscoreToCamel
+import ink.abb.pogo.scraper.util.credentials.*
 import org.junit.Assert
 import org.junit.Test
 import java.io.FileInputStream

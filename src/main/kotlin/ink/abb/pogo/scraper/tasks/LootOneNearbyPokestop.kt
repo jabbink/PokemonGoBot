@@ -25,6 +25,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
     private var cooldownPeriod = 5
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
         val nearbyPokestops = sortedPokestops.filter {
             it.canLoot(lootTimeouts = lootTimeouts, api = ctx.api)
         }
@@ -35,7 +36,6 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
             if (settings.displayPokestopName)
                 pokestopID = "\"${closest.details.name}\""
             Log.normal("Looting nearby pokestop $pokestopID")
-            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
             val result = closest.loot()
 
             if (result?.itemsAwarded != null) {
@@ -68,10 +68,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                 }
                 Result.OUT_OF_RANGE -> {
-                    val location = S2LatLng.fromDegrees(closest.latitude, closest.longitude)
-                    val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
-                    val distance = self.getEarthDistance(location)
-                    Log.red("Pokestop out of range; distance: $distance")
+                    Log.red("Pokestop out of range; distance: ${closest.distance}")
                 }
                 Result.IN_COOLDOWN_PERIOD -> {
                     lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
