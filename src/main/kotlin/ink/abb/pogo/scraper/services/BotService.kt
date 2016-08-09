@@ -70,7 +70,7 @@ class BotService {
                             Log.yellow("Restarting bot due to reached restart threshold!")
                             thread {
                                 bot.stop()
-                                bots.remove(bot)
+                                removeBot(bot)
                                 Log.yellow("Stopped bot")
                                 Log.yellow("Restarting...")
                                 submitBot(bot.settings)
