@@ -22,6 +22,7 @@ import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
 import com.pokegoapi.main.ServerRequest
 import com.pokegoapi.util.SystemTimeImpl
+import ink.abb.pogo.scraper.util.credentials.*
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.toHexString

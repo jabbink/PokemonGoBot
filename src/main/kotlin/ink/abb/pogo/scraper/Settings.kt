@@ -8,13 +8,12 @@
 
 package ink.abb.pogo.scraper
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.credentials.*
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -270,17 +269,3 @@ data class Settings(
         }
     }
 }
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes(
-        JsonSubTypes.Type(value = GoogleCredentials::class, name = "google"),
-        JsonSubTypes.Type(value = GoogleAutoCredentials::class, name = "google-auto"),
-        JsonSubTypes.Type(value = PtcCredentials::class, name = "ptc")
-)
-@JsonIgnoreProperties(ignoreUnknown = true)
-interface Credentials
-
-data class GoogleCredentials(var token: String = "") : Credentials
-data class GoogleAutoCredentials(var username: String = "", var password: String = "") : Credentials
-
-data class PtcCredentials(val username: String = "", val password: String = "") : Credentials
