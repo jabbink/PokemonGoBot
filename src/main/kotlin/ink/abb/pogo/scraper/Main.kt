@@ -21,6 +21,7 @@ import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.util.*
 
 val time = SystemTimeImpl()
@@ -71,18 +72,37 @@ fun main(args: Array<String>) {
     SpringApplication.run(PokemonGoBotApplication::class.java, *args)
 }
 
-fun startDefaultBot(http: OkHttpClient, service: BotService) {
+fun loadProperties(filename: String): Properties {
     val properties = Properties()
-
-    val input = FileInputStream("config.properties")
-    input.use {
+    FileInputStream(filename).use {
         properties.load(it)
     }
-    input.close()
+    return properties
+}
+
+fun startDefaultBot(http: OkHttpClient, service: BotService) {
+    var properties: Properties
+
+    var filename = "config.properties"
+
+    try {
+        properties = loadProperties(filename)
+    } catch (e: FileNotFoundException) {
+        Log.red("${filename} file not found. Trying config.properties.txt...")
+        try {
+            // Fix for Windows users...
+            filename += ".txt"
+            properties = loadProperties(filename)
+        } catch (e: FileNotFoundException) {
+            Log.red("${filename} not found as well. Exiting.")
+            System.exit(1);
+            return
+        }
+    }
 
     val settings = SettingsParser(properties).createSettingsFromProperties()
     service.addBot(startBot(settings, http, {
-        settings.writeProperty("config.properties", "token", it)
+        settings.writeProperty(filename, "token", it)
     }))
 }
 
