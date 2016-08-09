@@ -78,6 +78,7 @@ class SettingsParser(val properties: Properties) {
                 displayIfPokemonFromLure = getPropertyIfSet("Display If Pokemon Was Caught From Lure", "display_if_pokemon_from_lure", defaults.displayIfPokemonFromLure, String::toBoolean),
 
                 lootPokestop = getPropertyIfSet("Loot Pokestops", "loot_pokestop", defaults.lootPokestop, String::toBoolean),
+                lurePokestopModifier = getPropertyIfSet("Lure Pokestops modifier", "lure_pokestop_modifier", defaults.lurePokestopModifier, String::toDouble),
                 catchPokemon = getPropertyIfSet("Catch Pokemons", "catch_pokemon", defaults.catchPokemon, String::toBoolean),
                 autoFillIncubator = getPropertyIfSet("Auto Fill Incubators", "auto_fill_incubator", defaults.autoFillIncubator, String::toBoolean),
 
@@ -197,6 +198,7 @@ data class Settings(
         val displayIfPokemonFromLure: Boolean = true,
 
         val lootPokestop: Boolean = true,
+        val lurePokestopModifier: Double = 1.0,
         var catchPokemon: Boolean = true,
         val autoFillIncubator: Boolean = true,
 
