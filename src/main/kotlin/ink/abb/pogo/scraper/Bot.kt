@@ -109,6 +109,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                     if (settings.initialMapSize > 1) {
                         settings.initialMapSize -= 2
                         Log.red("Decreasing initialMapSize to ${settings.initialMapSize}")
+                    } else {
+                        Log.red("Cannot decrease initialMapSize even further. Are your sure your latitude/longitude is correct?")
+                        Log.yellow("This is what I am trying to fetch: " +
+                                "https://www.google.com/maps/@${settings.latitude},${settings.longitude},15z")
                     }
                 }
                 Log.red("Retrying in $sleepTimeout seconds...")
