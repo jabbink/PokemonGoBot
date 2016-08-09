@@ -14,6 +14,7 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.credentials.*
 import ink.abb.pogo.scraper.startBot
+import ink.abb.pogo.scraper.Context
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -68,6 +69,11 @@ class BotService {
 
     fun getSaveNames(): List<String> {
         return root.list().filter { it.endsWith(".json") }.map { it.replace(Regex("\\.json$"), "") }
+    }
+    
+    fun getBotContext(name: String): Context {
+      var bot = bots.find {it.settings.name == name}
+      return bot!!.ctx;
     }
 
     @Synchronized

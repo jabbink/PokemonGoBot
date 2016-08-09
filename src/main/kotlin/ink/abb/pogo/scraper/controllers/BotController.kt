@@ -15,12 +15,20 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+
+
+import com.pokegoapi.api.pokemon.Pokemon;
+
 @RestController
 @RequestMapping("/api")
 class BotController {
 
     @Autowired
     lateinit var service: BotService
+    
+    val mapper: ObjectMapper = ObjectMapper().registerKotlinModule()
 
     @RequestMapping("/bots")
     fun bots(): List<Settings> {
@@ -55,5 +63,19 @@ class BotController {
     @RequestMapping("/bot/{name}/stop")
     fun stopBot(@PathVariable name: String): Boolean {
         return service.doWithBot(name) { it.stop() }
+    }
+    
+    
+    @RequestMapping("/bot/{name}/pokemons")
+    fun getPokemons(@PathVariable name: String): List<String> {
+      
+      var pokemons = service.getBotContext(name).api.inventories.pokebank.pokemons
+      var lis = mutableListOf<String>()
+      
+      for(pokemon in pokemons) {
+
+          lis.add(mapper.writeValueAsString(pokemon))
+        }
+      return lis
     }
 }
