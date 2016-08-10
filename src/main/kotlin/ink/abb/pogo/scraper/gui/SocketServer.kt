@@ -70,7 +70,11 @@ class SocketServer {
             profile.level = ctx!!.api.playerProfile.stats.level
             val curLevelXP = ctx!!.api.playerProfile.stats.experience - requiredXp[ctx!!.api.playerProfile.stats.level - 1]
             profile.levelXp = curLevelXP
-            val nextXP = requiredXp[ctx!!.api.playerProfile.stats.level] - requiredXp[ctx!!.api.playerProfile.stats.level - 1]
+            val nextXP = if (ctx!!.api.playerProfile.stats.level == requiredXp.size) {
+                curLevelXP
+            } else {
+                (requiredXp[ctx!!.api.playerProfile.stats.level] - requiredXp[ctx!!.api.playerProfile.stats.level - 1]).toLong()
+            }
             val ratio = ((curLevelXP.toDouble() / nextXP.toDouble()) * 100).toInt()
             profile.levelRatio = ratio
             profile.pokebank = ctx!!.api.inventories.pokebank.pokemons.size

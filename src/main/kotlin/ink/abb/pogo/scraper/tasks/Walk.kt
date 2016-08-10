@@ -84,7 +84,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (speed.equals(0)) {
             return
         }
-        if(path.isEmpty()) {
+        if (path.isEmpty()) {
             return
         }
 
@@ -99,7 +99,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         bot.runLoop(timeout, "WalkingLoop") { cancel ->
 
-            if(remainingSteps <= 0) {
+            // check if other task really needs us to stop for a second.
+            // other task is responsible of unlocking this!
+            if (ctx.pauseWalking.get()) {
+                return@runLoop
+            }
+
+            if (remainingSteps <= 0) {
                 if (path.isEmpty()) {
                     Log.normal("Destination reached.")
                     if (sendDone) {

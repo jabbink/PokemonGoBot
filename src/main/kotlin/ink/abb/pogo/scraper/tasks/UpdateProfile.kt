@@ -22,8 +22,12 @@ class UpdateProfile : Task {
             // update km walked, mainly
             inventories.updateInventories(true)
             player.updateProfile()
-            val nextXP = requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]
             val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
+            val nextXP = if (player.stats.level == requiredXp.size) {
+                curLevelXP
+            } else {
+                (requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]).toLong()
+            }
             val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
             Log.magenta("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
             Log.magenta("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
