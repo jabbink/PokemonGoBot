@@ -35,14 +35,18 @@ class PowerUp : Task {
     }
 
     fun powerUp(pokemon: Pokemon, ctx: Context) {
-        if (pokemon.candyCostsForPowerup <= ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily) &&
-                pokemon.stardustCostsForPowerup <= ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!) {
-            Log.red("${ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily)}/${pokemon.candyCostsForPowerup} candy")
-            Log.red("${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!}/${pokemon.stardustCostsForPowerup} stardust")
-            Log.blue("PowerUp ${pokemon.pokemonId.name} IV ${pokemon.getIvPercentage()}% ${pokemon.cp} cp -> ${pokemon.cpAfterPowerup}")
-            val powerUpCostCandies = pokemon.candyCostsForPowerup
-            pokemon.powerUp()
-            ctx.api.cachedInventories.candyjar.removeCandy(pokemon.pokemonFamily, powerUpCostCandies)
+        while (pokemon.level < ctx.profile.stats.level + 2) {
+            if (pokemon.candyCostsForPowerup <= ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily) &&
+                    pokemon.stardustCostsForPowerup <= ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!) {
+                Log.red("${ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily)}/${pokemon.candyCostsForPowerup} candy")
+                Log.red("${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!}/${pokemon.stardustCostsForPowerup} stardust")
+                Log.blue("PowerUp ${pokemon.pokemonId.name} IV ${pokemon.getIvPercentage()}% ${pokemon.cp} cp -> ${pokemon.cpAfterPowerup}")
+                val powerUpCostCandies = pokemon.candyCostsForPowerup
+                pokemon.powerUp()
+                ctx.api.cachedInventories.candyjar.removeCandy(pokemon.pokemonFamily, powerUpCostCandies)
+            } else {
+                return
+            }
         }
     }
 }
