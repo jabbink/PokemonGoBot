@@ -29,7 +29,7 @@ class IvMaximizingStrategy : EvolutionStrategy {
         pokemonFamilies.forEach {
             var run = true
             while (run) {
-                val pokemon = nextPokemonToEvolve(ctx, it.key)
+                val pokemon = nextPokemonToEvolve(ctx, settings, it.key)
                 if (pokemon == null) {
                     run = false
                     continue
@@ -41,22 +41,20 @@ class IvMaximizingStrategy : EvolutionStrategy {
         }
     }
 
-    fun nextPokemonToEvolve(ctx: Context, family: PokemonFamilyIdOuterClass.PokemonFamilyId) : Pokemon? {
+    fun nextPokemonToEvolve(ctx: Context, settings: Settings, family: PokemonFamilyIdOuterClass.PokemonFamilyId) : Pokemon? {
         val candies = ctx.api.inventories.candyjar.getCandies(family)
         val pokemonFamily = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonFamily }.get(family)
 
         var evolvePriority = pokemonFamily.orEmpty().sortedByDescending { it.ivRatio }
         var pokemonToEvolve = evolvePriority[0]
 
-        if (pokemonToEvolve.candiesToEvolve == 0) {
-            val generations = pokemonFamily.orEmpty().filter { it.candiesToEvolve > 0 }.groupBy { it.candiesToEvolve }
-            if (generations.size == 0) { // When you don't have any pokemon in the family that can evolve
-                return null
-            }
-
-            evolvePriority = generations.getOrElse(generations.keys.sorted()[0]){ listOf() }.sortedByDescending { it.ivRatio }
-            pokemonToEvolve = evolvePriority[0]
+        // Highest in family cannot evolve and no others are high enough priority
+        if (pokemonToEvolve.ivRatio * 100 < settings.transferIvThreshold && pokemonToEvolve.candiesToEvolve == 0) {
+            return null
         }
+
+        val priorityEvolves = evolvePriority.filter { it.ivRatio * 100 >= settings.transferIvThreshold }
+        pokemonToEvolve = priorityEvolves.find { it.candiesToEvolve > 0 }
 
         if (pokemonToEvolve.candiesToEvolve > candies) {
             Log.yellow("Would like to evolve ${pokemonToEvolve.pokemonId.name} with IV ${pokemonToEvolve.ivRatio * 100}%,\n" +
