@@ -14,6 +14,10 @@ import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.api.pokemon.PokemonMetaRegistry
 import com.pokegoapi.api.pokemon.PokemonMoveMetaRegistry
+import com.pokegoapi.google.common.geometry.S2
+import com.pokegoapi.google.common.geometry.S2Cell
+import com.pokegoapi.google.common.geometry.S2CellId
+import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -78,14 +82,16 @@ class Export : Task {
 
             // Output Eggs
             output.add(arrayOf("Overview Eggs"))
-            output.add(arrayOf("Walked [km]", "Target [km]", "Found"))
+            output.add(arrayOf("Walked [km]", "Target [km]", "Incubated?", "Found", "Found Lat", "Found Long"))
 
             for (egg in ctx.api.cachedInventories.hatchery.eggs)
             {
                 val date = Date(egg.creationTimeMs)
+                val latLng = S2LatLng(S2CellId(egg.capturedCellId).toPoint())
 
                 output.add(arrayOf(
-                        ds("${egg.eggKmWalked}", settings), ds("${egg.eggKmWalkedTarget}", settings), "${dateFormatter.format(date)}"))
+                        ds("${egg.eggKmWalked}", settings), ds("${egg.eggKmWalkedTarget}", settings), "${egg.isIncubate}",
+                        "${dateFormatter.format(date)}", ds("${latLng.latDegrees()}", settings), ds("${latLng.lngDegrees()}", settings)))
             }
             output.add(arrayOf(""))
 
@@ -96,12 +102,13 @@ class Export : Task {
                     "Type", "Move 1", "Move 1 Type", "Move 1 Power", "Move 1 Accuracy", "Move 1 Crit Chance", "Move 1 Time",
                     "Move 1 Energy", "Move 2", "Move 2 Type", "Move 2 Power", "Move 2 Accuracy", "Move 2 Crit Chance",
                     "Move 2 Time", "Move 2 Energy", "iStamina", "iAttack", "iDefense", "cpMultiplier", "Height [m]", "Weight [kg]",
-                    "Candy", "Candies to evolve", "Candy costs for powerup", "Stardust costs for powerup", "Creation Time",
-                    "Base Capture Rate", "Base Flee Rate", "Battles Attacked", "Battles Defended", "Injured?", "Fainted?",
-                    "Level", "CP after powerup", "Max CP", "ID"))
+                    "Candy", "Candies to evolve", "Candy costs for powerup", "Stardust costs for powerup", "Found",
+                    "Found Lat", "Found Long", "Base Capture Rate", "Base Flee Rate", "Battles Attacked", "Battles Defended",
+                    "Injured?", "Fainted?", "Level", "CP after powerup", "Max CP", "ID"))
 
             ctx.api.cachedInventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
                 val date = Date(it.creationTimeMs)
+                val latLng = S2LatLng(S2CellId(it.capturedS2CellId).toPoint())
 
                 val pmeta = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.forNumber(it.pokemonId.number))
                 val pmmeta1 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.move1.number))
@@ -116,7 +123,8 @@ class Export : Task {
                         ds("${pmmeta2.critChance}", settings), "${pmmeta2.time}", "${pmmeta2.energy}", "${it.individualStamina}",
                         "${it.individualAttack}", "${it.individualDefense}", ds("${it.cpMultiplier}", settings), ds("${it.heightM}",
                         settings), ds("${it.weightKg}", settings), "${it.candy}", "${it.candiesToEvolve}", "${it.candyCostsForPowerup}",
-                        "${it.stardustCostsForPowerup}", "${dateFormatter.format(date)}", ds("${it.baseCaptureRate}", settings),
+                        "${it.stardustCostsForPowerup}", "${dateFormatter.format(date)}", ds("${latLng.latDegrees()}", settings),
+                        ds("${latLng.lngDegrees()}", settings), ds("${it.baseCaptureRate}", settings),
                         ds("${it.baseFleeRate}", settings), "${it.battlesAttacked}", "${it.battlesDefended}", "${it.isInjured}",
                         "${it.isFainted}", ds("${it.level}", settings), "${it.cpAfterPowerup}", "${it.maxCp}", "${it.id}")
             }.forEach { output.add(it) }
