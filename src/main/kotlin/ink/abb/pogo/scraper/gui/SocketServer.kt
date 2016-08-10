@@ -93,9 +93,8 @@ class SocketServer {
 
             for (pokemon in ctx!!.api.inventories.pokebank.pokemons) {
                 pokebank.pokemon.add(PokemonData().buildFromPokemon(pokemon))
-
-                server?.broadcastOperations?.sendEvent("pokebank", pokebank)
             }
+            server?.broadcastOperations?.sendEvent("pokebank", pokebank)
         }
     }
 
