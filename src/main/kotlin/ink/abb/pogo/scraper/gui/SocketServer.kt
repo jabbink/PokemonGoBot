@@ -16,6 +16,7 @@ import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.requiredXp
+import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.data.PokemonData
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
@@ -71,12 +72,16 @@ class SocketServer {
             profile.level = ctx!!.api.playerProfile.stats.level
             val curLevelXP = ctx!!.api.playerProfile.stats.experience - requiredXp[ctx!!.api.playerProfile.stats.level - 1]
             profile.levelXp = curLevelXP
-            val nextXP = requiredXp[ctx!!.api.playerProfile.stats.level] - requiredXp[ctx!!.api.playerProfile.stats.level - 1]
+            val nextXP = if (ctx!!.api.playerProfile.stats.level == requiredXp.size) {
+                curLevelXP
+            } else {
+                (requiredXp[ctx!!.api.playerProfile.stats.level] - requiredXp[ctx!!.api.playerProfile.stats.level - 1]).toLong()
+            }
             val ratio = ((curLevelXP.toDouble() / nextXP.toDouble()) * 100).toInt()
             profile.levelRatio = ratio
-            profile.pokebank = ctx!!.api.inventories.pokebank.pokemons.size
+            profile.pokebank = ctx!!.api.cachedInventories.pokebank.pokemons.size
             profile.pokebankMax = ctx!!.api.playerProfile.playerData.maxPokemonStorage
-            profile.items = ctx!!.api.inventories.itemBag.size()
+            profile.items = ctx!!.api.cachedInventories.itemBag.size()
             profile.itemsMax = ctx!!.api.playerProfile.playerData.maxItemStorage
             server?.broadcastOperations?.sendEvent("profile", profile)
         }
@@ -85,10 +90,12 @@ class SocketServer {
     fun sendPokebank() {
         if (ctx != null) {
             val pokebank = EventPokebank()
+
             for (pokemon in ctx!!.api.inventories.pokebank.pokemons) {
                 pokebank.pokemon.add(PokemonData().buildFromPokemon(pokemon))
+
+                server?.broadcastOperations?.sendEvent("pokebank", pokebank)
             }
-            server?.broadcastOperations?.sendEvent("pokebank", pokebank)
         }
     }
 
@@ -137,7 +144,7 @@ class SocketServer {
     fun sendEggs() {
         if (ctx != null) {
             val eggs = EventEggs()
-            for (egg in ctx!!.api.inventories.hatchery.eggs) {
+            for (egg in ctx!!.api.cachedInventories.hatchery.eggs) {
                 val eggObj = EventEggs.Egg()
                 // eggObj.distanceWalked = egg.eggKmWalked
                 eggObj.distanceTarget = egg.eggKmWalkedTarget

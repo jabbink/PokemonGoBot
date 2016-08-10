@@ -14,16 +14,17 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class HatchEggs : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val result = ctx.api.inventories.hatchery.queryHatchedEggs()
+        val result = ctx.api.cachedInventories.hatchery.queryHatchedEggs()
         if (result.isNotEmpty()) {
             ctx.api.inventories.updateInventories(true)
             result.forEachIndexed { index, it ->
-                val newPokemon = ctx.api.inventories.pokebank.getPokemonById(it.id)
+                val newPokemon = ctx.api.cachedInventories.pokebank.getPokemonById(it.id)
                 val stats = "+${it.candy} candy; +${it.experience} XP; +${it.stardust} stardust"
                 if (newPokemon == null) {
                     Log.cyan("Hatched pokemon; $stats")
@@ -34,8 +35,8 @@ class HatchEggs : Task {
             }
         }
 
-        val freeIncubators = ctx.api.inventories.incubators.filter { !it.isInUse }
-        val eggs = ctx.api.inventories.hatchery.eggs
+        val freeIncubators = ctx.api.cachedInventories.incubators.filter { !it.isInUse }
+        val eggs = ctx.api.cachedInventories.hatchery.eggs
                 .filter { !it.isIncubate }
                 .sortedByDescending { it.eggKmWalkedTarget }
         if (freeIncubators.isNotEmpty() && eggs.isNotEmpty() && settings.autoFillIncubator) {

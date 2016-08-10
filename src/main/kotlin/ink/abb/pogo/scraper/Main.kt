@@ -22,15 +22,20 @@ import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
 import com.pokegoapi.main.ServerRequest
 import com.pokegoapi.util.SystemTimeImpl
-import ink.abb.pogo.scraper.util.credentials.*
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
+import ink.abb.pogo.scraper.util.credentials.GoogleCredentials
+import ink.abb.pogo.scraper.util.credentials.PtcCredentials
 import ink.abb.pogo.scraper.util.toHexString
 import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.nio.file.Paths
 import java.util.*
+import javax.swing.text.rtf.RTFEditorKit
 
 val time = SystemTimeImpl()
 
@@ -77,41 +82,70 @@ fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit
 }
 
 fun main(args: Array<String>) {
+    com.pokegoapi.util.Log.setLevel(com.pokegoapi.util.Log.Level.NONE)
     SpringApplication.run(PokemonGoBotApplication::class.java, *args)
 }
 
 fun loadProperties(filename: String): Properties {
     val properties = Properties()
-    FileInputStream(filename).use {
-        properties.load(it)
+    Log.green("Trying to read ${Paths.get(filename).toAbsolutePath()}")
+    var failed = false
+    try {
+        FileInputStream(filename).use {
+            try {
+                properties.load(it)
+            } catch (e: Exception) {
+                failed = true
+            }
+        }
+    } catch (e: FileNotFoundException) {
+        throw e
+    }
+
+    if (failed) {
+        FileInputStream(filename).use {
+            val rtfParser = RTFEditorKit()
+            val document = rtfParser.createDefaultDocument()
+            rtfParser.read(it.reader(), document, 0)
+            val text = document.getText(0, document.getLength())
+            properties.load(text.byteInputStream())
+            Log.red("Config file encoded as Rich Text Format (RTF)!")
+        }
     }
     return properties
 }
 
 fun startDefaultBot(http: OkHttpClient, service: BotService) {
-    var properties: Properties
+    var properties: Properties? = null
 
-    var filename = "config.properties"
+    val attemptFilenames = arrayOf("config.properties", "config.properties.txt", "config.properties.rtf")
 
-    try {
-        properties = loadProperties(filename)
-    } catch (e: FileNotFoundException) {
-        Log.red("${filename} file not found. Trying config.properties.txt...")
-        try {
-            // Fix for Windows users...
-            filename += ".txt"
-            properties = loadProperties(filename)
-        } catch (e: FileNotFoundException) {
-            Log.red("${filename} not found as well. Exiting.")
-            System.exit(1);
-            return
+    val dir = File(System.getProperty("java.class.path")).absoluteFile.parentFile
+
+    var filename = "";
+
+    fileLoop@ for (path in arrayOf(Paths.get("").toAbsolutePath(), dir)) {
+        for (attemptFilename in attemptFilenames) {
+            try {
+                filename = attemptFilename
+                properties = loadProperties("${path.toString()}/$filename")
+                break@fileLoop
+            } catch (e: FileNotFoundException) {
+                Log.red("${filename} file not found")
+            }
         }
     }
 
-    val settings = SettingsParser(properties).createSettingsFromProperties()
-    service.addBot(startBot(settings, http, {
-        settings.writeProperty(filename, "token", it)
-    }))
+    if (properties == null) {
+        Log.red("No config files found. Exiting.")
+        System.exit(1);
+        return
+    } else {
+        val settings = SettingsParser(properties).createSettingsFromProperties()
+        service.addBot(startBot(settings, http, {
+            settings.writeProperty(filename, "token", it)
+        }))
+    }
 }
 
 

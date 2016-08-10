@@ -10,12 +10,14 @@ package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse.Status
+import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 import ink.abb.pogo.scraper.util.pokemon.catch
@@ -25,11 +27,18 @@ import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        // STOP WALKING
+        ctx.pauseWalking.set(true)
         val pokemon = ctx.api.map.getCatchablePokemon(ctx.blacklistedEncounters)
 
-        val hasPokeballs = ctx.api.inventories.itemBag.hasPokeballs()
+        val hasPokeballs = ctx.api.cachedInventories.itemBag.hasPokeballs()
+
+        /*Pokeball.values().forEach {
+            Log.yellow("${it.ballType}: ${ctx.api.cachedInventories.itemBag.getItem(it.ballType).count}")
+        }*/
 
         if (!hasPokeballs) {
+            ctx.pauseWalking.set(false)
             return
         }
 
@@ -38,6 +47,7 @@ class CatchOneNearbyPokemon : Task {
             if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId) && settings.desiredCatchProbabilityUnwanted == -1.0) {
                 ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                 Log.normal("Found pokemon ${catchablePokemon.pokemonId}; blacklisting because it's unwanted")
+                ctx.pauseWalking.set(false)
                 return
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
@@ -59,11 +69,12 @@ class CatchOneNearbyPokemon : Task {
                 if (desiredCatchProbability == -1.0) {
                     ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                     Log.normal("CP/IV of encountered pokemon ${catchablePokemon.pokemonId} turns out to be too low; blacklisting encounter")
+                    ctx.pauseWalking.set(false)
                     return
                 }
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
-                        ctx.api.inventories.itemBag,
+                        ctx.api.cachedInventories.itemBag,
                         desiredCatchProbability,
                         settings.alwaysCurve,
                         !settings.neverUseBerries,
@@ -73,6 +84,7 @@ class CatchOneNearbyPokemon : Task {
                     // prevent trying it in the next iteration
                     ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                     Log.red("No Pokeballs in your inventory; blacklisting Pokemon")
+                    ctx.pauseWalking.set(false)
                     return
                 }
 
@@ -117,5 +129,6 @@ class CatchOneNearbyPokemon : Task {
                 }
             }
         }
+        ctx.pauseWalking.set(false)
     }
 }
