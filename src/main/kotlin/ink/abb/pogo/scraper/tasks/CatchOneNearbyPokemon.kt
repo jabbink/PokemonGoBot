@@ -25,11 +25,14 @@ import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        // STOP WALKING
+        ctx.pauseWalking.set(true)
         val pokemon = ctx.api.map.getCatchablePokemon(ctx.blacklistedEncounters)
 
         val hasPokeballs = ctx.api.inventories.itemBag.hasPokeballs()
 
         if (!hasPokeballs) {
+            ctx.pauseWalking.set(false)
             return
         }
 
@@ -38,6 +41,7 @@ class CatchOneNearbyPokemon : Task {
             if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId) && settings.desiredCatchProbabilityUnwanted == -1.0) {
                 ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                 Log.normal("Found pokemon ${catchablePokemon.pokemonId}; blacklisting because it's unwanted")
+                ctx.pauseWalking.set(false)
                 return
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
@@ -59,6 +63,7 @@ class CatchOneNearbyPokemon : Task {
                 if (desiredCatchProbability == -1.0) {
                     ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                     Log.normal("CP/IV of encountered pokemon ${catchablePokemon.pokemonId} turns out to be too low; blacklisting encounter")
+                    ctx.pauseWalking.set(false)
                     return
                 }
                 val result = catchablePokemon.catch(
@@ -73,6 +78,7 @@ class CatchOneNearbyPokemon : Task {
                     // prevent trying it in the next iteration
                     ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                     Log.red("No Pokeballs in your inventory; blacklisting Pokemon")
+                    ctx.pauseWalking.set(false)
                     return
                 }
 
@@ -117,5 +123,6 @@ class CatchOneNearbyPokemon : Task {
                 }
             }
         }
+        ctx.pauseWalking.set(false)
     }
 }
