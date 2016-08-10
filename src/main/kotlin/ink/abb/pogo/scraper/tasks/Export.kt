@@ -47,6 +47,7 @@ class Export : Task {
             val output = ArrayList<Array<String>>()
 
             // Output player information
+            output.add(arrayOf("Overview Profile"))
             output.add(arrayOf("Name", ctx.profile.playerData.username))
             output.add(arrayOf("Team", ctx.profile.playerData.team.name))
             output.add(arrayOf("Pokecoin", "${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}"))
@@ -72,10 +73,24 @@ class Export : Task {
             output.add(arrayOf("Pokebank", "${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.cachedInventories.hatchery.eggs.size}", "${ctx.profile.playerData.maxPokemonStorage}"))
             output.add(arrayOf("Inventory", "${ctx.api.cachedInventories.itemBag.size()}", "${ctx.profile.playerData.maxItemStorage}"))
             output.add(arrayOf("Last Update", dateFormatter.format(dateNow)))
+            output.add(arrayOf("Location Lat/Long", ds("${ctx.lat.get()}", settings), ds("${ctx.lng.get()}", settings)))
+            output.add(arrayOf(""))
+
+            // Output Eggs
+            output.add(arrayOf("Overview Eggs"))
+            output.add(arrayOf("Walked [km]", "Target [km]", "Found"))
+
+            for (egg in ctx.api.cachedInventories.hatchery.eggs)
+            {
+                val date = Date(egg.creationTimeMs)
+
+                output.add(arrayOf(
+                        ds("${egg.eggKmWalked}", settings), ds("${egg.eggKmWalkedTarget}", settings), "${dateFormatter.format(date)}"))
+            }
             output.add(arrayOf(""))
 
             // Output Pokebank
-            output.add(arrayOf("Pokebank overview"))
+            output.add(arrayOf("Overview Pokebank"))
             output.add(arrayOf(
                     "Number", "Name", "Nickname", "Favorite?", "CP", "IV [%]", "Stamina (HP)", "Max Stamina (HP)", "Class",
                     "Type", "Move 1", "Move 1 Type", "Move 1 Power", "Move 1 Accuracy", "Move 1 Crit Chance", "Move 1 Time",
@@ -87,7 +102,6 @@ class Export : Task {
 
             ctx.api.cachedInventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
                 val date = Date(it.creationTimeMs)
-                dateFormatter.format(date)
 
                 val pmeta = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.forNumber(it.pokemonId.number))
                 val pmmeta1 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.move1.number))
