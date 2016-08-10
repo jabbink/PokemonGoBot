@@ -113,7 +113,6 @@ class SocketServer {
                 pokemonObj.cp = pokemon.cp
                 pokemonObj.iv = pokemon.getIvPercentage()
 				pokemonObj.stats = pokemon.getStatsFormatted()
-				
 				pokemonObj.individualStamina = pokemon.individualStamina
 				pokemonObj.individualAttack = pokemon.individualAttack
 				pokemonObj.individualDefense = pokemon.individualDefense
@@ -129,10 +128,9 @@ class SocketServer {
 				pokemonObj.maxStamina = pokemon.maxStamina
 				pokemonObj.maxCp = pokemon.maxCp
 				pokemonObj.absMaxCp = pokemon.getAbsoluteMaxCp()
-				
 				pokemonObj.creationTimes = pokemon.getCreationTimeMs()
 				
-                pokebank.pokemon.add(pokemonObj)
+				pokebank.pokemon.add(pokemonObj)
             }
             server?.broadcastOperations?.sendEvent("pokebank", pokebank)
         }
@@ -168,7 +166,6 @@ class SocketServer {
         newPokemon.cp = pokemon.cp
         newPokemon.iv = pokemon.getIvPercentage()
 		newPokemon.stats = pokemon.getStatsFormatted()
-		
 		newPokemon.individualStamina = pokemon.individualStamina
 		newPokemon.individualAttack = pokemon.individualAttack
 		newPokemon.individualDefense = pokemon.individualDefense
