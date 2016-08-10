@@ -16,6 +16,7 @@ import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.requiredXp
+import ink.abb.pogo.scraper.util.data.PokemonData
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
@@ -85,14 +86,7 @@ class SocketServer {
         if (ctx != null) {
             val pokebank = EventPokebank()
             for (pokemon in ctx!!.api.inventories.pokebank.pokemons) {
-                val pokemonObj = EventPokebank.Pokemon()
-                pokemonObj.id = pokemon.id
-                pokemonObj.pokemonId = pokemon.pokemonId.number
-                pokemonObj.name = pokemon.pokemonId.name
-                pokemonObj.cp = pokemon.cp
-                pokemonObj.iv = pokemon.getIvPercentage()
-                pokemonObj.stats = pokemon.getStatsFormatted()
-                pokebank.pokemon.add(pokemonObj)
+                pokebank.pokemon.add(PokemonData().buildFromPokemon(pokemon))
             }
             server?.broadcastOperations?.sendEvent("pokebank", pokebank)
         }
@@ -176,16 +170,7 @@ class SocketServer {
     }
 
     class EventPokebank {
-        var pokemon = mutableListOf<Pokemon>()
-
-        class Pokemon {
-            var id: Long? = null
-            var pokemonId: Int? = null
-            var name: String? = null
-            var cp: Int? = null
-            var iv: Int? = null
-            var stats: String? = null
-        }
+        var pokemon = mutableListOf<PokemonData>()
     }
 
     class EventPokestop {
