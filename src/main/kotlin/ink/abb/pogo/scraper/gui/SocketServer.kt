@@ -10,16 +10,19 @@ package ink.abb.pogo.scraper.gui
 
 import POGOProtos.Data.PokemonDataOuterClass
 import com.corundumstudio.socketio.Configuration
+import com.corundumstudio.socketio.SocketConfig
 import com.corundumstudio.socketio.SocketIOServer
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.requiredXp
+import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import io.netty.util.concurrent.Future
 
 class SocketServer {
     private var ctx: Context? = null
@@ -30,6 +33,9 @@ class SocketServer {
     fun start(ctx: Context, port: Int) {
         val config = Configuration()
         config.port = port
+        config.socketConfig = SocketConfig().apply {
+            isReuseAddress = true
+        }
 
         this.ctx = ctx
 
@@ -51,7 +57,17 @@ class SocketServer {
             }
         }
 
-        server?.start()
+        var startAttempt: Future<Void>? = null
+        do {
+            Log.normal("Attempting to bind Socket Server to port ${port}")
+            try {
+                startAttempt = server?.startAsync()?.syncUninterruptibly()
+            } catch (e: Exception) {
+                Log.red("Failed to bind Socket Server to port ${port}; retrying in 5 seconds")
+                Thread.sleep(5000)
+            }
+        } while (startAttempt == null)
+        Log.green("Bound Socket Server to port ${port}")
     }
 
     fun stop() {
@@ -106,7 +122,11 @@ class SocketServer {
     fun sendPokestop(pokestop: Pokestop) {
         val pokestopObj = EventPokestop()
         pokestopObj.id = pokestop.id
-        pokestopObj.name = pokestop.details.name
+        pokestopObj.name = try {
+             pokestop.details.name
+        } catch (e: Exception) {
+            ""
+        }
         pokestopObj.lat = pokestop.latitude
         pokestopObj.lng = pokestop.longitude
         server?.broadcastOperations?.sendEvent("pokestop", pokestopObj)
