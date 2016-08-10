@@ -26,7 +26,6 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.util.data.ItemData
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/api")

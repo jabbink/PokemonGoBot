@@ -24,7 +24,7 @@ import javax.annotation.PreDestroy
 import kotlin.concurrent.thread
 
 @Service
-class BotService {
+open class BotService {
 
     @Autowired
     lateinit var http: OkHttpClient
@@ -72,8 +72,11 @@ class BotService {
     }
     
     fun getBotContext(name: String): Context {
-      var bot = bots.find {it.settings.name == name}
-      return bot!!.ctx;
+        var bot = bots.find {it.settings.name == name}
+        if(bot == null) {
+            throw IllegalArgumentException("Bot " + name + "doesn't exists !")
+        }
+        return bot.ctx
     }
 
     @Synchronized

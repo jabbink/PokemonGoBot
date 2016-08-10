@@ -52,7 +52,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Pair(AtomicInteger(0), AtomicInteger(0)),
             mutableSetOf(),
             SocketServer(),
-            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false))
+            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
+            "testtoken"
     )
 
     @Synchronized

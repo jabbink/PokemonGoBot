@@ -9,6 +9,7 @@
 package ink.abb.pogo.scraper
 
 import ink.abb.pogo.scraper.services.BotService
+import ink.abb.pogo.scraper.util.ApiAuthProvider
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -16,10 +17,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
+
 
 @SpringBootApplication
 open class PokemonGoBotApplication {
@@ -41,6 +44,16 @@ open class PokemonGoBotApplication {
             }
         }
     }
+
+    @Bean
+    open fun interceptorConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurerAdapter() {
+            override fun addInterceptors(registry: InterceptorRegistry) {
+                registry.addInterceptor(ApiAuthProvider()).addPathPatterns("/api/**")
+            }
+        }
+    }
+
 
     @Component
     open class BotRunner : CommandLineRunner {
