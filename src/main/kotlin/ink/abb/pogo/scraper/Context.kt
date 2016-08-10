@@ -29,9 +29,11 @@ data class Context(
 
         val blacklistedEncounters: MutableSet<Long>,
         val server: SocketServer,
-        
+
         val pokemonInventoryFullStatus: Pair<AtomicBoolean, AtomicBoolean>,
 
-        var walking: AtomicBoolean = AtomicBoolean(false)
-        
+        val walking: AtomicBoolean = AtomicBoolean(false),
+
+        val pauseWalking: AtomicBoolean = AtomicBoolean(false)
+
 )
