@@ -21,7 +21,9 @@ import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val groupedPokemon = ctx.api.cachedInventories.pokebank.pokemons.groupBy { it.pokemonId }
+        val pokemon = ctx.api.cachedInventories.pokebank.pokemons
+        // prevent concurrent modification exception
+        val groupedPokemon = pokemon.groupBy { it.pokemonId }
         val sortByIV = settings.sortByIv
         val pokemonCounts = hashMapOf<String, Int>()
 
