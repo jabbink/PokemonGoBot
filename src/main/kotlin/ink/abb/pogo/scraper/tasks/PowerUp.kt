@@ -11,9 +11,6 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
-/**
- * Created by ddcbdevins on 8/10/16.
- */
 class PowerUp : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val eligblePokes = ctx.api.cachedInventories.pokebank.pokemons.filter {
