@@ -33,7 +33,7 @@ class PowerUp : Task {
     }
 
     fun powerUp(pokemon: Pokemon, ctx: Context) {
-        if (pokemon.candiesToEvolve <= ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily)) {
+        if (pokemon.candyCostsForPowerup <= ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily)) {
             while (pokemon.level < ctx.profile.stats.level + 2) {
                 if (pokemon.stardustCostsForPowerup <= ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!) {
                     Log.red("${ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily)}/${pokemon.candyCostsForPowerup} candy")
@@ -45,7 +45,7 @@ class PowerUp : Task {
                 }
 
                 // Update the candyjar to see if we should loop again
-                if (pokemon.candiesToEvolve > ctx.api.inventories.candyjar.getCandies(pokemon.pokemonFamily)) {
+                if (pokemon.candyCostsForPowerup > ctx.api.inventories.candyjar.getCandies(pokemon.pokemonFamily)) {
                     return
                 }
             }
