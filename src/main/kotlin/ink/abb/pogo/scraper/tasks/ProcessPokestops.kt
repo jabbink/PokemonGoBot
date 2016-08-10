@@ -52,7 +52,11 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 
         if (settings.lootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
-            bot.task(loot)
+            try {
+                bot.task(loot)
+            } catch (e: Exception) {
+                ctx.pauseWalking.set(false)
+            }
         }
         if (settings.campLurePokestop > 0 && settings.catchPokemon) {
             val luresInRange = sortedPokestops.filter {

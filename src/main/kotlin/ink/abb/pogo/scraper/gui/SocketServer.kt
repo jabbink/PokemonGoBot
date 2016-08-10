@@ -117,7 +117,11 @@ class SocketServer {
     fun sendPokestop(pokestop: Pokestop) {
         val pokestopObj = EventPokestop()
         pokestopObj.id = pokestop.id
-        pokestopObj.name = pokestop.details.name
+        pokestopObj.name = try {
+             pokestop.details.name
+        } catch (e: Exception) {
+            ""
+        }
         pokestopObj.lat = pokestop.latitude
         pokestopObj.lng = pokestop.longitude
         server?.broadcastOperations?.sendEvent("pokestop", pokestopObj)
