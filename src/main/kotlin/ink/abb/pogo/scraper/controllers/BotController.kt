@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.pokegoapi.api.inventory.Item
 import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.map.pokemon.EvolutionResult
@@ -38,12 +35,6 @@ class BotController {
 
     @Autowired
     lateinit var service: BotService
-    
-    val mapper: ObjectMapper = ObjectMapper().registerKotlinModule()
-
-    init {
-        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-    }
 
     @RequestMapping("/bots")
     fun bots(): List<Settings> {
