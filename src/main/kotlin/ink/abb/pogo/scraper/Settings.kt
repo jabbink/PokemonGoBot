@@ -113,7 +113,7 @@ class SettingsParser(val properties: Properties) {
     }
 
     fun getPasswordProperty(): String {
-        return if (properties.containsKey("password")) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
+        return if (properties.containsKey("password") && properties.getProperty("password").isNotBlank()) properties.getProperty("password") else String(Base64.getDecoder().decode(properties.getProperty("base64_password", "")))
     }
 
     fun <T> getPropertyOrDie(description: String, property: String, conversion: (String) -> T): T {
