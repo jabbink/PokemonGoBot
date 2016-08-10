@@ -8,6 +8,9 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.Log
 
+/*
+ * Evolution strategy that prioritizes maximizing IV, then prioritizes getting to highest evolution
+ */
 class IvMaximizingStrategy : EvolutionStrategy {
 
     lateinit private var EEVEE_EVOLUTION_DATA: Map<PokemonIdOuterClass.PokemonId, String>
@@ -47,7 +50,7 @@ class IvMaximizingStrategy : EvolutionStrategy {
 
         if (pokemonToEvolve.candiesToEvolve == 0) {
             val generations = pokemonFamily.orEmpty().filter { it.candiesToEvolve > 0 }.groupBy { it.candiesToEvolve }
-            if (generations.size == 0) {
+            if (generations.size == 0) { // When you don't have any pokemon in the family that can evolve
                 return null
             }
 
@@ -56,6 +59,8 @@ class IvMaximizingStrategy : EvolutionStrategy {
         }
 
         if (pokemonToEvolve.candiesToEvolve > candies) {
+            Log.yellow("Would like to evolve ${pokemonToEvolve.pokemonId.name} with IV ${pokemonToEvolve.ivRatio * 100}%,\n" +
+                    "\tbut only have ${candies}/${pokemonToEvolve.candiesToEvolve} candies")
             return null
         }
 
