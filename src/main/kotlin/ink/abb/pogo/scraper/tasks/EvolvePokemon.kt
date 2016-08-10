@@ -10,6 +10,7 @@ package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass
 import com.pokegoapi.api.pokemon.Pokemon
+import com.pokegoapi.api.pokemon.PokemonMetaRegistry
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -23,10 +24,10 @@ class EvolvePokemon : Task {
         var countEvolveStack = 0
         val groupedPokemonForCount = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
         groupedPokemonForCount.forEach {
-            if(settings.evolveBeforeTransfer.contains(it.key)){
-                // Get pokemonFamily through this val (can get this somewhere else?):
-                val lastPokemonInGroup = it.value.last()
-                var maxPossibleEvolves = bot.api.inventories.candyjar.getCandies(lastPokemonInGroup.pokemonFamily) / lastPokemonInGroup.candiesToEvolve
+            if (settings.evolveBeforeTransfer.contains(it.key)){
+                // Get pokemonFamily meta information
+                val pokemonMeta = PokemonMetaRegistry.getMeta(it.key)
+                var maxPossibleEvolves = bot.api.inventories.candyjar.getCandies(pokemonMeta.family) / pokemonMeta.candyToEvolve
                 // Add the minimum value, depending on which is the bottleneck, amount of candy, or pokemon of this type in pokebank:
                 countEvolveStack +=  Math.min(maxPossibleEvolves,it.value.count())
                 // Release pokemon we wont be able to evolve anyway, because of lack of candy:
