@@ -10,6 +10,7 @@ buildscript {
 
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
@@ -56,7 +57,8 @@ dependencies {
     //compile files('../PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar')
 
     // TODO: Wait for jitpack to fix itself...
-    compile 'com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'
+    //compile 'com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'
+    compile 'com.pokegoapi:PokeGOAPI-library:0.4.0'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
