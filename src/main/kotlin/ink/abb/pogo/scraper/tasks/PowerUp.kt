@@ -42,8 +42,10 @@ class PowerUp : Task {
                 Log.red("${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!}/${pokemon.stardustCostsForPowerup} stardust")
                 Log.blue("PowerUp ${pokemon.pokemonId.name} IV ${pokemon.getIvPercentage()}% ${pokemon.cp} cp -> ${pokemon.cpAfterPowerup}")
                 val powerUpCostCandies = pokemon.candyCostsForPowerup
+                val powerUpCostStardust = pokemon.stardustCostsForPowerup
                 pokemon.powerUp()
                 ctx.api.cachedInventories.candyjar.removeCandy(pokemon.pokemonFamily, powerUpCostCandies)
+                ctx.api.playerProfile.addCurrency(PlayerProfile.Currency.STARDUST.name, powerUpCostStardust * -1)
             } else {
                 return
             }
