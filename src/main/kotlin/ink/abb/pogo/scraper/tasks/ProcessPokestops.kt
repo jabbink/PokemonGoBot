@@ -9,7 +9,6 @@
 package ink.abb.pogo.scraper.tasks
 
 import com.pokegoapi.api.map.fort.Pokestop
-import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -36,12 +35,7 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
             }
         }
         val sortedPokestops = pokestops.sortedWith(Comparator { a, b ->
-            val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)
-            val locationB = S2LatLng.fromDegrees(b.latitude, b.longitude)
-            val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
-            val distanceA = self.getEarthDistance(locationA)
-            val distanceB = self.getEarthDistance(locationB)
-            distanceA.compareTo(distanceB)
+            a.distance.compareTo(b.distance)
         })
         if (startPokestop == null)
             startPokestop = sortedPokestops.first()
