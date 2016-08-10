@@ -112,25 +112,25 @@ class SocketServer {
                 pokemonObj.name = pokemon.pokemonId.name
                 pokemonObj.cp = pokemon.cp
                 pokemonObj.iv = pokemon.getIvPercentage()
-				pokemonObj.stats = pokemon.getStatsFormatted()
-				pokemonObj.individualStamina = pokemon.individualStamina
-				pokemonObj.individualAttack = pokemon.individualAttack
-				pokemonObj.individualDefense = pokemon.individualDefense
-				pokemonObj.favorite = pokemon.isFavorite()
-				pokemonObj.candy = pokemon.candy
-				pokemonObj.candiesToEvolve = pokemon.candiesToEvolve
-				pokemonObj.level = pokemon.level
-				pokemonObj.move1 = pokemon.move1.name
-				pokemonObj.move2 = pokemon.move2.name
-				pokemonObj.nickname = pokemon.nickname
-				pokemonObj.deployedFortId = pokemon.deployedFortId
-				pokemonObj.stamina = pokemon.stamina
-				pokemonObj.maxStamina = pokemon.maxStamina
-				pokemonObj.maxCp = pokemon.maxCp
-				pokemonObj.absMaxCp = pokemon.getAbsoluteMaxCp()
-				pokemonObj.creationTimes = pokemon.getCreationTimeMs()
+                pokemonObj.stats = pokemon.getStatsFormatted()
+                pokemonObj.individualStamina = pokemon.individualStamina
+                pokemonObj.individualAttack = pokemon.individualAttack
+                pokemonObj.individualDefense = pokemon.individualDefense
+                pokemonObj.favorite = pokemon.isFavorite()
+                pokemonObj.candy = pokemon.candy
+                pokemonObj.candiesToEvolve = pokemon.candiesToEvolve
+                pokemonObj.level = pokemon.level
+                pokemonObj.move1 = pokemon.move1.name
+                pokemonObj.move2 = pokemon.move2.name
+                pokemonObj.nickname = pokemon.nickname
+                pokemonObj.deployedFortId = pokemon.deployedFortId
+                pokemonObj.stamina = pokemon.stamina
+                pokemonObj.maxStamina = pokemon.maxStamina
+                pokemonObj.maxCp = pokemon.maxCp
+                pokemonObj.absMaxCp = pokemon.getAbsoluteMaxCp()
+                pokemonObj.creationTimes = pokemon.getCreationTimeMs()
 				
-				pokebank.pokemon.add(pokemonObj)
+                pokebank.pokemon.add(pokemonObj)
             }
             server?.broadcastOperations?.sendEvent("pokebank", pokebank)
         }
@@ -165,15 +165,15 @@ class SocketServer {
         newPokemon.name = pokemon.pokemonId.name
         newPokemon.cp = pokemon.cp
         newPokemon.iv = pokemon.getIvPercentage()
-		newPokemon.stats = pokemon.getStatsFormatted()
-		newPokemon.individualStamina = pokemon.individualStamina
-		newPokemon.individualAttack = pokemon.individualAttack
-		newPokemon.individualDefense = pokemon.individualDefense
-		newPokemon.move1 = pokemon.move1.name
-		newPokemon.move2 = pokemon.move2.name
-		newPokemon.stamina = pokemon.stamina
+        newPokemon.stats = pokemon.getStatsFormatted()
+        newPokemon.individualStamina = pokemon.individualStamina
+        newPokemon.individualAttack = pokemon.individualAttack
+        newPokemon.individualDefense = pokemon.individualDefense
+        newPokemon.move1 = pokemon.move1.name
+        newPokemon.move2 = pokemon.move2.name
+        newPokemon.stamina = pokemon.stamina
 		
-        server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
+		server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
     }
 
     fun releasePokemon(id: Long) {
