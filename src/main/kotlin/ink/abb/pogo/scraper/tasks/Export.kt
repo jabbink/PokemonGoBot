@@ -24,6 +24,7 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.io.CSVWriter
+import ink.abb.pogo.scraper.util.io.JSONWriter
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.text.SimpleDateFormat
@@ -134,6 +135,10 @@ class Export : Task {
                 }
                 "DSV" -> {
                     val writer = CSVWriter("export_" + settings.name + ".csv", ";")
+                    writer.write(output)
+                }
+                "JSON" -> {
+                    val writer = JSONWriter("export_" + settings.name + ".json")
                     writer.write(output)
                 }
                 else -> {
