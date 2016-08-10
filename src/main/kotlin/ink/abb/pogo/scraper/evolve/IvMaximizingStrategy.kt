@@ -6,12 +6,8 @@ import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
-import ink.abb.pogo.scraper.tasks.ReleasePokemon
 import ink.abb.pogo.scraper.util.Log
 
-/**
- * Created by ddcbdevins on 8/10/16.
- */
 class IvMaximizingStrategy : EvolutionStrategy {
 
     lateinit private var EEVEE_EVOLUTION_DATA: Map<PokemonIdOuterClass.PokemonId, String>
