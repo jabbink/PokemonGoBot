@@ -14,13 +14,14 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val groupedPokemon = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }
+        val groupedPokemon = ctx.api.cachedInventories.pokebank.pokemons.groupBy { it.pokemonId }
         val sortByIV = settings.sortByIv
         val pokemonCounts = hashMapOf<String, Int>()
 
