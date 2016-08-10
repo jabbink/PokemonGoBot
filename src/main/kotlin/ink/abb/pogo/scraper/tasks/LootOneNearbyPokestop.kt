@@ -50,7 +50,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                 return
             }
 
-            if (result?.itemsAwarded != null) {
+            if (result.itemsAwarded != null) {
                 ctx.itemStats.first.getAndAdd(result.itemsAwarded.size)
             }
 
