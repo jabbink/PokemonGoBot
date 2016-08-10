@@ -44,6 +44,7 @@ class SettingsParser(val properties: Properties) {
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
                 dropItems = dropItems,
+                groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
 
                 uselessItems = mapOf(
                         Pair(ItemId.ITEM_REVIVE, getPropertyIfSet("Max number of items to keep from type ITEM_REVIVE", "item_revive", 20, String::toInt)),
@@ -160,6 +161,7 @@ data class Settings(
         val credentials: Credentials,
         val speed: Double = 2.8,
         val followStreets: Boolean = false,
+        val groupItemsByType : Boolean = false,
         val dropItems: Boolean = true,
         val uselessItems: Map<ItemId, Int> = mapOf(
                 Pair(ItemId.ITEM_REVIVE, 20),
