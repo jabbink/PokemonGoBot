@@ -104,7 +104,11 @@ class SettingsParser(val properties: Properties) {
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
-                initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt)
+                initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt),
+
+                autoRestartThreshold = getPropertyIfSet("Number of exceptions allowed to occur until the bot is restarted", "auto_restart_threshold", defaults.autoRestartThreshold, String::toInt),
+                autoRestartPeriod = getPropertyIfSet ("Period (in seconds) in which the exceptions must occur to restart the bot", "auto_restart_period", defaults.autoRestartPeriod, String::toLong)
+
         )
     }
 
@@ -216,6 +220,9 @@ data class Settings(
         val guiPortSocket: Int = 8001,
 
         var initialMapSize: Int = 9,
+
+        val autoRestartThreshold: Int = -1,
+        val autoRestartPeriod: Long = 300,
 
         val version: String = Settings.version
 ) {

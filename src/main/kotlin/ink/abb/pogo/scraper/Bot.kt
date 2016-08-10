@@ -36,6 +36,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     private var runningLatch = CountDownLatch(0)
     var prepareWalkBack = AtomicBoolean(false)
     var walkBackLock = AtomicBoolean(true)
+    var exceptionHandler: ((Throwable) -> Unit)? = null
 
     lateinit private var phaser: Phaser
 
@@ -189,6 +190,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                     } catch (t: Throwable) {
                         Log.red("Error running loop $name!")
                         t.printStackTrace()
+                        exceptionHandler?.invoke(t)
                     }
 
                     if (cancelled) continue

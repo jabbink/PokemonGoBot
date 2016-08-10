@@ -47,6 +47,8 @@
   "allowLeaveStartArea" : false,
   "spawnRadius" : -1,
   "banSpinCount" : 0,
+  "autoRestartThreshold" : -1,
+  "autoRestartPeriod" : 300,
   "transferCpThreshold" : 400,
   "transferIvThreshold" : 80,
   "ignoredPokemon" : [ "EEVEE", "MEWTWO", "CHARMANDER" ],
