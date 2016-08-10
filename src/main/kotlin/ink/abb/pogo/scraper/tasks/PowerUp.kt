@@ -1,5 +1,6 @@
 package ink.abb.pogo.scraper.tasks
 
+import POGOProtos.Enums.PokemonIdOuterClass
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Bot
@@ -37,7 +38,7 @@ class PowerUp : Task {
     fun powerUp(pokemon: Pokemon, ctx: Context) {
         if (pokemon.candyCostsForPowerup <= ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily) &&
                 pokemon.stardustCostsForPowerup <= ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!) {
-            while (true) {
+            while (pokemon.level < ctx.profile.stats.level + 2) {
                 Log.blue("PowerUp ${pokemon.pokemonId.name} IV ${pokemon.getIvPercentage()}% ${pokemon.cp} cp -> ${pokemon.cpAfterPowerup}")
                 pokemon.powerUp()
             }
