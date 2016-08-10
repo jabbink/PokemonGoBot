@@ -35,7 +35,7 @@ class UpdateProfile : Task {
             val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
             val timeDiff = ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())
             val xpPerHour: Long = if (timeDiff != 0L) {
-                (player.stats.experience - ctx.startXp.get() / timeDiff) * 60
+                (player.stats.experience - ctx.startXp.get()) / timeDiff * 60
             } else {
                 0
             }
