@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.pokegoapi.api.inventory.Item
@@ -28,9 +28,9 @@ import com.pokegoapi.api.map.pokemon.EvolutionResult
 
 
 import com.pokegoapi.api.pokemon.Pokemon;
+import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.util.data.ItemData
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
-import org.springframework.web.bind.annotation.RequestMethod
 
 @RestController
 @RequestMapping("/api")
@@ -94,7 +94,7 @@ class BotController {
     }
 
     @RequestMapping("/bot/{name}/pokemon/{id}/{method}")
-    fun pokemonEndPointgit (
+    fun pokemonEndPoint (
             @PathVariable name: String,
             @PathVariable id: Long,
             @PathVariable method: String
@@ -102,10 +102,12 @@ class BotController {
         val pokemon: Pokemon? = service.getBotContext(name).api.inventories.pokebank.pokemons.find { it.id == id }
         val result: String
         when(method) {
+
             "transfer" -> {
                 result = pokemon!!.transferPokemon().toString()
                 Log.magenta("REST API :transferring pokemon " + pokemon.pokemonId.name + " with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ")")
             }
+
             "evolve" -> {
                 if(pokemon!!.candiesToEvolve > pokemon.candy) {
                     result = "Not enough candies" + pokemon.candiesToEvolve + " " + pokemon.candy
@@ -121,6 +123,7 @@ class BotController {
                     result = evolutionResult.result.toString()
                 }
             }
+
             "powerup" -> {
                 if(pokemon!!.candyCostsForPowerup > pokemon.candy) {
                     result = "Not enough candies" + pokemon.candyCostsForPowerup + " " + pokemon.candy
@@ -130,11 +133,22 @@ class BotController {
                     Log.magenta("REST API : pokemon new CP " + pokemon.cp)
                 }
             }
+
+            // IMPORTANT! Toggle favorite, this do not set to true
+            "favorite" -> {
+                result = pokemon!!.setFavoritePokemon(!pokemon.isFavorite).toString()
+                when(pokemon.isFavorite) {
+                    true -> Log.magenta("REST API : pokemon " + pokemon.pokemonId.name + "with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ") is favorited")
+                    false -> Log.magenta("REST API : pokemon " + pokemon.pokemonId.name + "with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ") is now unfavorited")
+                }
+            }
+
             "candies" -> {
                 result = ""+pokemon!!.candy
             }
+
             else -> {
-                result = "Unknown action (transfer/evolve/powerup/candies"
+                result = "Unknown action (transfer/evolve/powerup/candies/favorite"
             }
         }
 
@@ -149,6 +163,7 @@ class BotController {
 
         val data = service.getBotContext(name).api.inventories.itemBag.items
         val returnData = mutableListOf<ItemData>()
+
         for(item in data) {
             returnData.add(ItemData().buildFromItem(item))
         }
@@ -197,6 +212,27 @@ class BotController {
         } else {
             return itemBag.useLuckyEgg().toString()
         }
+    }
+
+    @RequestMapping("/bot/{name}/location/{latitude}/{longitude}")
+    fun changeLocation(
+            @PathVariable name: String,
+            @PathVariable latitude: Double,
+            @PathVariable longitude: Double
+    ): String {
+        val ctx: Context = service.getBotContext(name)
+
+        // Stop walking
+        ctx.pauseWalking.set(true)
+
+        ctx.lat.set(latitude)
+        ctx.lng.set(longitude)
+
+        ctx.pauseWalking.set(false)
+
+        ctx.server.setLocation(latitude, longitude)
+
+        return "SUCCESS"
     }
 
 }
