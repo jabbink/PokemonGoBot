@@ -97,6 +97,10 @@ class SettingsParser(val properties: Properties) {
 
                 transferIvThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", defaults.transferIvThreshold, String::toInt),
 
+                autoPowerUp = getPropertyIfSet("Automatically powerup pokemon that meet the threshold", "auto_power_up", defaults.autoPowerUp, String::toBoolean),
+                powerUpIvThreshold = getPropertyIfSet("Minimum IV percentage to powerup a pokemon", "power_up_iv_threshold", defaults.transferIvThreshold, String::toInt),
+                powerUpOnlyBest = getPropertyIfSet("Power up only the best of each species", "power_up_only_best", defaults.powerUpOnlyBest, String::toBoolean),
+
                 ignoredPokemon = getPropertyIfSet("Never transfer these Pokemon", "ignored_pokemon", defaults.ignoredPokemon.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
                 obligatoryTransfer = getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", defaults.obligatoryTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
@@ -210,6 +214,10 @@ data class Settings(
         val transferCpThreshold: Int = 400,
         val transferIvThreshold: Int = 80,
         val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
+
+        val autoPowerUp: Boolean = false,
+        val powerUpIvThreshold: Int = 90,
+        val powerUpOnlyBest: Boolean = true,
 
         val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
 

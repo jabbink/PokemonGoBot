@@ -154,6 +154,10 @@ export=
 # Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
 initial_map_size=9
 
+auto_power_up=false
+power_up_iv_threshold=90
+power_up_only_best=true
+
 # List of pokemon names
 #MISSINGNO
 #BULBASAUR

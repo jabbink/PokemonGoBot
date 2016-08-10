@@ -93,6 +93,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val release = ReleasePokemon()
         val hatchEggs = HatchEggs()
         val export = Export()
+        val powerUp = PowerUp()
 
         if (settings.export.length > 0)
             task(export)
@@ -137,6 +138,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             task(hatchEggs)
             if (settings.export.length > 0)
                 task(export)
+            if (settings.autoPowerUp)
+                task(powerUp)
         }
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
