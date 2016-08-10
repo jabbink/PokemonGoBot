@@ -27,16 +27,21 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 
     private val lootTimeouts = HashMap<String, Long>()
     var startPokestop: Pokestop? = null
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (lastFetch + refetchTime < bot.api.currentTimeMillis() && settings.allowLeaveStartArea) {
+        var writeCampStatus = false
+        if (lastFetch + refetchTime < bot.api.currentTimeMillis()) {
+            writeCampStatus = true
             lastFetch = bot.api.currentTimeMillis()
-            try {
-                val newStops = ctx.api.map.mapObjects.pokestops
-                if (newStops.size > 0) {
-                    pokestops = newStops
+            if (settings.allowLeaveStartArea) {
+                try {
+                    val newStops = ctx.api.map.mapObjects.pokestops
+                    if (newStops.size > 0) {
+                        pokestops = newStops
+                    }
+                } catch (e: Exception) {
+                    // ignored failed request
                 }
-            } catch (e: Exception) {
-                // ignored failed request
             }
         }
         val sortedPokestops = pokestops.sortedWith(Comparator { a, b ->
@@ -54,7 +59,9 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
                 it.inRangeForLuredPokemon() && it.fortData.hasLureInfo()
             }.size
             if (luresInRange >= settings.campLurePokestop) {
-                Log.green("$luresInRange lure(s) in range, pausing")
+                if (writeCampStatus) {
+                    Log.green("$luresInRange lure(s) in range, pausing")
+                }
                 return
             }
         }
