@@ -16,6 +16,7 @@ import com.pokegoapi.api.inventory.Pokeball
 import com.pokegoapi.api.map.pokemon.CatchResult
 import com.pokegoapi.api.map.pokemon.CatchablePokemon
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 
 /**
  * Extension function to make the code more readable in the CatchOneNearbyPokemon task
@@ -54,6 +55,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
 fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false): CatchResult? {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
+    //Log.yellow(probabilities.toString())
     var ball: ItemId? = null
     var needCurve = alwaysCurve
     var needRazzBerry = false
@@ -64,8 +66,10 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         val probability = probabilities.get(index)
         val ballAmount = itemBag.getItem(ballType).count
         if (ballAmount == 0) {
+            //Log.yellow("Don't have any ${ballType}")
             continue
         } else {
+            //Log.yellow("Have ${ballAmount} of ${ballType}")
             highestAvailable = ballType
             catchProbability = probability
         }
@@ -88,6 +92,8 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     }
 
     if (highestAvailable == null) {
+        /*Log.red("No pokeballs?!")
+        Log.red("Has pokeballs: ${itemBag.hasPokeballs()}")*/
         return null
     }
 

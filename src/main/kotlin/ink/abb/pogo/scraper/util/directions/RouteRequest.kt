@@ -2,6 +2,7 @@ package ink.abb.pogo.scraper.util.directions
 
 import com.pokegoapi.google.common.geometry.S1Angle
 import com.pokegoapi.google.common.geometry.S2LatLng
+import ink.abb.pogo.scraper.util.Log
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
@@ -23,8 +24,12 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
     connection.setRequestProperty("Upgrade-Insecure-Requests", "1")
     connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36")
     var routeFile = String()
-    connection.inputStream.bufferedReader().lines().forEach {
-        routeFile += "$it\n"
+    try {
+        connection.inputStream.bufferedReader().lines().forEach {
+            routeFile += "$it\n"
+        }
+    } catch (e: Exception) {
+        Log.red("Error fetching route from provider: " + e.message)
     }
     return routeFile
 }
@@ -35,9 +40,10 @@ fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): Str
     //return "$routeProvider?loc=$olat,$olng&loc=$dlat,$dlng&compression=false"
 }
 
+
 fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     var routeParsed = getRoutefile(olat, olng, dlat, dlng)
-    if (!routeParsed.contains("<distance>0</distance>")) {
+    if (routeParsed.length > 0 && !routeParsed.contains("<distance>0</distance>")) {
         routeParsed = routeParsed.split("<coordinates>")[1]
         val matcher = Pattern.compile("(|-)\\d+.(|-)\\d+,(|-)\\d+.(|-)\\d+").matcher(routeParsed)
         val coordinatesList = ArrayList<String>()

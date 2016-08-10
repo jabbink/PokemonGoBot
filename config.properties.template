@@ -62,6 +62,15 @@ item_lucky_egg=-1
 item_incense=-1
 item_lure_module=-1
 
+# Groups the items that are kept by type so it keeps best of same type
+# Ex: if you have item_revive=20 and item_max_revive=10 and set this
+#   to true, if you get 25 item_revive and 20 item_max_revive it will
+#   drop 15 item_revive and keep 10 item_revive and 20 item_max_revive
+# Items that have -1 are excluded from groups
+# Ex: if you set item_potion=-1 it will only group the other potions and
+#   ignore item_potion (never dropping item_potion)
+group_items_by_type=false
+
 ## Extra Info
 # Should the bot display rewards pokestop (true/false)
 display_pokestop_rewards=true

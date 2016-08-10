@@ -25,6 +25,8 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
     private var cooldownPeriod = 5
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        // STOP WALKING! until loot is done
+        ctx.pauseWalking.set(true)
         ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
         val nearbyPokestops = sortedPokestops.filter {
             it.canLoot(lootTimeouts = lootTimeouts, api = ctx.api)
@@ -36,9 +38,19 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
             if (settings.displayPokestopName)
                 pokestopID = "\"${closest.details.name}\""
             Log.normal("Looting nearby pokestop $pokestopID")
-            val result = closest.loot()
+            val result = try {
+                closest.loot()
+            } catch (e: Exception) {
+                null
+            }
 
-            if (result?.itemsAwarded != null) {
+            if (result == null) {
+                // unlock walk block
+                ctx.pauseWalking.set(false)
+                return
+            }
+
+            if (result.itemsAwarded != null) {
                 ctx.itemStats.first.getAndAdd(result.itemsAwarded.size)
             }
 
@@ -81,6 +93,8 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                 else -> Log.yellow(result.result.toString())
             }
         }
+        // unlock walk block
+        ctx.pauseWalking.set(false)
     }
 
     private fun checkForBan(result: PokestopLootResult, pokestop: Pokestop, bot: Bot, settings: Settings) {

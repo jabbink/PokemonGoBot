@@ -19,6 +19,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.io.CSVWriter
 import ink.abb.pogo.scraper.util.pokemon.getIv
@@ -68,8 +69,8 @@ class Export : Task {
             output.add(arrayOf("Prestige Raised Total", "${ctx.profile.stats.prestigeRaisedTotal}"))
             output.add(arrayOf("Prestige Dropped Total", "${ctx.profile.stats.prestigeDroppedTotal}"))
             output.add(arrayOf("Pokemon Deployed", "${ctx.profile.stats.pokemonDeployed}"))
-            output.add(arrayOf("Pokebank", "${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}", "${ctx.profile.playerData.maxPokemonStorage}"))
-            output.add(arrayOf("Inventory", "${ctx.api.inventories.itemBag.size()}", "${ctx.profile.playerData.maxItemStorage}"))
+            output.add(arrayOf("Pokebank", "${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.cachedInventories.hatchery.eggs.size}", "${ctx.profile.playerData.maxPokemonStorage}"))
+            output.add(arrayOf("Inventory", "${ctx.api.cachedInventories.itemBag.size()}", "${ctx.profile.playerData.maxItemStorage}"))
             output.add(arrayOf("Last Update", dateFormatter.format(dateNow)))
             output.add(arrayOf(""))
 
@@ -84,7 +85,7 @@ class Export : Task {
                     "Base Capture Rate", "Base Flee Rate", "Battles Attacked", "Battles Defended", "Injured?", "Fainted?",
                     "Level", "CP after powerup", "Max CP", "ID"))
 
-            ctx.api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
+            ctx.api.cachedInventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
                 val date = Date(it.creationTimeMs)
                 dateFormatter.format(date)
 
