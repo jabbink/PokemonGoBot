@@ -173,7 +173,7 @@ class SocketServer {
         newPokemon.move2 = pokemon.move2.name
         newPokemon.stamina = pokemon.stamina
 		
-		server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
+        server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
     }
 
     fun releasePokemon(id: Long) {
