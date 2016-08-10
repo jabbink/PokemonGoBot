@@ -35,14 +35,17 @@ class HatchEggs : Task {
             }
         }
 
-        val freeIncubators = ctx.api.cachedInventories.incubators.filter { !it.isInUse }
+        val incubators = ctx.api.cachedInventories.incubators
         val eggs = ctx.api.cachedInventories.hatchery.eggs
+
+        val freeIncubators = incubators.filter { !it.isInUse }
+        val filteredEggs = eggs
                 .filter { !it.isIncubate }
                 .sortedByDescending { it.eggKmWalkedTarget }
-        if (freeIncubators.isNotEmpty() && eggs.isNotEmpty() && settings.autoFillIncubator) {
-            val incubateResult = eggs.first().incubate(freeIncubators.first())
+        if (freeIncubators.isNotEmpty() && filteredEggs.isNotEmpty() && settings.autoFillIncubator) {
+            val incubateResult = filteredEggs.first().incubate(freeIncubators.first())
             if (incubateResult == UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse.Result.SUCCESS) {
-                Log.cyan("Put egg of ${eggs.first().eggKmWalkedTarget}km in unused incubator")
+                Log.cyan("Put egg of ${filteredEggs.first().eggKmWalkedTarget}km in unused incubator")
             } else {
                 Log.red("Failed to put egg in incubator; error: $incubateResult")
             }
