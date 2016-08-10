@@ -16,6 +16,8 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.cachedInventories
+import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class EvolvePokemon : Task {
@@ -30,8 +32,15 @@ class EvolvePokemon : Task {
                 var maxPossibleEvolves = bot.api.inventories.candyjar.getCandies(pokemonMeta.family) / pokemonMeta.candyToEvolve
                 // Add the minimum value, depending on which is the bottleneck, amount of candy, or pokemon of this type in pokebank:
                 countEvolveStack +=  Math.min(maxPossibleEvolves,it.value.count())
+
+                // Use Iv sorting if this is configured:
+                val sorted = if (settings.sortByIv) {
+                    it.value.sortedByDescending { it.getIv() }
+                } else {
+                    it.value.sortedByDescending { it.cp }
+                }
                 // Release pokemon we wont be able to evolve anyway, because of lack of candy:
-                it.value.sortedByDescending { it.cp }.forEach {
+                sorted.forEach {
                     maxPossibleEvolves--
                     if (maxPossibleEvolves < 0) {
                         releasePokemon(it,"Not enough candy to save for evolve",ctx)
@@ -46,8 +55,13 @@ class EvolvePokemon : Task {
         if (countEvolveStack >= settings.evolveStackLimit) {
             val startingXP = ctx.api.playerProfile.stats.experience
             Log.yellow("Using Lucky Egg before evolving stack of $countEvolveStack pokemons")
-            var resultLuckyEgg = ctx.api.inventories.itemBag.useLuckyEgg()
-            Log.yellow("Result of using lucky egg: ${resultLuckyEgg.result.toString()}")
+            try {
+                var resultLuckyEgg = ctx.api.cachedInventories.itemBag.useLuckyEgg()
+                Log.yellow("Result of using lucky egg: ${resultLuckyEgg.result.toString()}")
+            }
+            catch (exc: Exception) {
+                Log.red("Lucky egg usage failed! Will continue evolving stack without one.")
+            }
             var countEvolved = 0
             ctx.api.inventories.pokebank.pokemons.forEach {
                 if (settings.evolveBeforeTransfer.contains(it.pokemonId)) {
