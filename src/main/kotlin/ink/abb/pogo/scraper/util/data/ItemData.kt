@@ -3,7 +3,7 @@ package ink.abb.pogo.scraper.util.data
 import com.pokegoapi.api.inventory.Item
 
 /**
- * Created by bertrand on 8/10/16.
+ * Created by Peyphour on 8/10/16.
  */
 data class ItemData(
     var itemId: Int? = null,
