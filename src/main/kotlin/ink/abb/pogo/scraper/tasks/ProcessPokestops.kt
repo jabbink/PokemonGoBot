@@ -15,16 +15,21 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Task that handles catching pokemon, activating stops, and walking to a new target.
  */
 class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 
+    val refetchTime = TimeUnit.SECONDS.toMillis(30)
+    var lastFetch: Long = 0
+
     private val lootTimeouts = HashMap<String, Long>()
     var startPokestop: Pokestop? = null
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (settings.allowLeaveStartArea) {
+        if (lastFetch + refetchTime < bot.api.currentTimeMillis() && settings.allowLeaveStartArea) {
+            lastFetch = bot.api.currentTimeMillis()
             try {
                 val newStops = ctx.api.map.mapObjects.pokestops
                 if (newStops.size > 0) {
