@@ -14,8 +14,6 @@ import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.api.pokemon.PokemonMetaRegistry
 import com.pokegoapi.api.pokemon.PokemonMoveMetaRegistry
-import com.pokegoapi.google.common.geometry.S2
-import com.pokegoapi.google.common.geometry.S2Cell
 import com.pokegoapi.google.common.geometry.S2CellId
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
