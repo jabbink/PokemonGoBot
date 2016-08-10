@@ -50,12 +50,12 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             bot.task(loot)
         }
-        if (settings.campLurePokestop > 0) {
+        if (settings.campLurePokestop > 0 && settings.catchPokemon) {
             val luresInRange = sortedPokestops.filter {
                 it.inRangeForLuredPokemon() && it.fortData.hasLureInfo()
             }.size
             if (luresInRange >= settings.campLurePokestop) {
-                //Log.green("$luresInRange lures in range, pausing")
+                Log.green("$luresInRange lure(s) in range, pausing")
                 return
             }
         }
