@@ -147,6 +147,11 @@ timer_walk_to_start_pokestop=-1
 # Set profile update timer (Default: 60)
 profile_update_timer=60
 
+# Whether to run an evolution strategy every time the profile is updated
+auto_evolve=false
+# Evolution strategy to use, blank will use max_iv by default
+evolution_strategy=
+
 # Minimum IV percentage to keep a pokemon (to ignore IV: use -1)
 # between 0 and 100, suggested 80
 transfer_iv_threshold=80
