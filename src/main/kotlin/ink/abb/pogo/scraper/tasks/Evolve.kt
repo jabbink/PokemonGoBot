@@ -1,8 +1,5 @@
 package ink.abb.pogo.scraper.tasks
 
-import POGOProtos.Enums.PokemonFamilyIdOuterClass
-import POGOProtos.Enums.PokemonIdOuterClass
-import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -11,9 +8,6 @@ import ink.abb.pogo.scraper.evolve.EvolutionStrategy
 import ink.abb.pogo.scraper.evolve.IvMaximizingStrategy
 import ink.abb.pogo.scraper.util.Log
 
-/**
- * Created by ddcbdevins on 7/26/16.
- */
 class Evolve : Task {
 
     private val DEFAULT_EVOLUTION_STRATEGY = "max_iv"
