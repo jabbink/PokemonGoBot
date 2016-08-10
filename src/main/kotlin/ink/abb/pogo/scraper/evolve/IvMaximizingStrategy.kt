@@ -49,12 +49,18 @@ class IvMaximizingStrategy : EvolutionStrategy {
         var pokemonToEvolve = evolvePriority[0]
 
         // Highest in family cannot evolve and no others are high enough priority
-        if (pokemonToEvolve.ivRatio * 100 < settings.transferIvThreshold && pokemonToEvolve.candiesToEvolve == 0) {
-            return null
-        }
+        if (pokemonToEvolve.ivRatio * 100 < settings.transferIvThreshold) {
+            if (pokemonToEvolve.candiesToEvolve == 0) {
+                return null
+            }
+        } else {
+            val priorityEvolves = evolvePriority.filter { it.ivRatio * 100 >= settings.transferIvThreshold }
+            pokemonToEvolve = priorityEvolves.find { it.candiesToEvolve > 0 }
 
-        val priorityEvolves = evolvePriority.filter { it.ivRatio * 100 >= settings.transferIvThreshold }
-        pokemonToEvolve = priorityEvolves.find { it.candiesToEvolve > 0 }
+            if (pokemonToEvolve == null) {
+                return null
+            }
+        }
 
         if (pokemonToEvolve.candiesToEvolve > candies) {
             Log.yellow("Would like to evolve ${pokemonToEvolve.pokemonId.name} with IV ${pokemonToEvolve.ivRatio * 100}%,\n" +
