@@ -13,42 +13,36 @@ import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 class PowerUp : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val eligblePokes = ctx.api.cachedInventories.pokebank.pokemons.filter {
-            it.getIvPercentage() >= settings.powerUpIvThreshold && it.candiesToEvolve == 0
+        var eligiblePokemon = ctx.api.cachedInventories.pokebank.pokemons.filter {
+            it.getIvPercentage() >= settings.powerUpIvThreshold &&
+                    it.candiesToEvolve == 0 &&
+                    it.level < ctx.profile.stats.level + 2
         }.sortedByDescending {
             it.ivRatio
-        }.groupBy {
-            it.pokemonId
         }
 
-        eligblePokes.forEach {
-            if (settings.powerUpOnlyBest) {
-                powerUp(it.value[0], ctx)
-            } else {
-                it.value.forEach {
-                    powerUp(it, ctx)
-                }
+        if (settings.powerUpOnlyBest) {
+            eligiblePokemon = eligiblePokemon.groupBy {
+                it.pokemonId
+            }.flatMap {
+                listOf(it.value[0])
             }
+        }
+
+        eligiblePokemon.forEach {
+            powerUp(it, ctx)
         }
     }
 
     fun powerUp(pokemon: Pokemon, ctx: Context) {
-        if (pokemon.candyCostsForPowerup <= ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily)) {
-            while (pokemon.level < ctx.profile.stats.level + 2) {
-                if (pokemon.stardustCostsForPowerup <= ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!) {
-                    Log.red("${ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily)}/${pokemon.candyCostsForPowerup} candy")
-                    Log.red("${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!}/${pokemon.stardustCostsForPowerup} stardust")
-                    Log.blue("PowerUp ${pokemon.pokemonId.name} IV ${pokemon.getIvPercentage()}% ${pokemon.cp} cp -> ${pokemon.cpAfterPowerup}")
-                    pokemon.powerUp()
-                } else {
-                    return
-                }
-
-                // Update the candyjar to see if we should loop again
-                if (pokemon.candyCostsForPowerup > ctx.api.inventories.candyjar.getCandies(pokemon.pokemonFamily)) {
-                    return
-                }
-            }
+        if (pokemon.candyCostsForPowerup <= ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily) &&
+                pokemon.stardustCostsForPowerup <= ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!) {
+            Log.red("${ctx.api.cachedInventories.candyjar.getCandies(pokemon.pokemonFamily)}/${pokemon.candyCostsForPowerup} candy")
+            Log.red("${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!!}/${pokemon.stardustCostsForPowerup} stardust")
+            Log.blue("PowerUp ${pokemon.pokemonId.name} IV ${pokemon.getIvPercentage()}% ${pokemon.cp} cp -> ${pokemon.cpAfterPowerup}")
+            val powerUpCostCandies = pokemon.candyCostsForPowerup
+            pokemon.powerUp()
+            ctx.api.cachedInventories.candyjar.removeCandy(pokemon.pokemonFamily, powerUpCostCandies)
         }
     }
 }
