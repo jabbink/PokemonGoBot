@@ -146,6 +146,9 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             if (settings.autotransfer)
                 task(release)
 
+        }
+
+        runLoop(500, "PokestopLoop") {
             if (!prepareWalkBack.get())
                 task(process)
             else if (!ctx.walking.get())
