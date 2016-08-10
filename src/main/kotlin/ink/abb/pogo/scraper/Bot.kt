@@ -17,6 +17,7 @@ import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
@@ -63,8 +64,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
         Log.normal("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        Log.normal("Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
-        Log.normal("Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
+        Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
+        Log.normal("Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
         //Log.normal("Inventory bag ${ctx.api.bag}")
 
         val compareName = Comparator<Pokemon> { a, b ->
@@ -78,7 +79,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 b.cp.compareTo(a.cp)
             }
         }
-        api.inventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
+        api.cachedInventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
             val IV = it.getIvPercentage()
             "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV% \r\n ${it.getStatsFormatted()}"
         }.forEach { Log.normal(it) }

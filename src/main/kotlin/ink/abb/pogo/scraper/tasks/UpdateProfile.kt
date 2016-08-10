@@ -11,28 +11,33 @@ package ink.abb.pogo.scraper.tasks
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.*
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.inventory.size
 import java.text.DecimalFormat
 
 class UpdateProfile : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val player = ctx.api.playerProfile
-        val inventories = ctx.api.inventories
+        ctx.api.inventories.updateInventories(true)
         try {
             // update km walked, mainly
-            inventories.updateInventories(true)
+            val inventories = ctx.api.cachedInventories
             player.updateProfile()
-            val nextXP = requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]
             val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
+            val nextXP = if (player.stats.level == requiredXp.size) {
+                curLevelXP
+            } else {
+                (requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]).toLong()
+            }
             val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
             Log.magenta("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
             Log.magenta("XP gain: ${player.stats.experience - ctx.startXp.get()} XP; " +
                     "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
                     "Pokemon caught from lures: ${ctx.luredPokemonStats.get()}; " +
                     "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};\r\n" +
-                    "Pokebank ${ctx.api.inventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; " +
+                    "Pokebank ${inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; " +
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
-                    "Inventory ${ctx.api.inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}"
+                    "Inventory ${inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}"
 
             )
             ctx.server.sendProfile()
