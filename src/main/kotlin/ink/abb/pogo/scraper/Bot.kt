@@ -141,8 +141,14 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
-            if (settings.catchPokemon)
-                task(catch)
+            if (settings.catchPokemon) {
+                try {
+                    task(catch)
+                } catch (e: Exception) {
+                    // might have errored and paused walking
+                    ctx.pauseWalking.set(false)
+                }
+            }
             if (settings.dropItems)
                 task(drop)
             if (settings.autotransfer)
