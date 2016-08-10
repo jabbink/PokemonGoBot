@@ -22,7 +22,7 @@ fun PokemonData.getIvPercentage(): Int {
     return ivPercentage
 }
 
-fun PokemonData.getCpPercentageToPlayer(playerlvel: Int): Int {
+fun PokemonData.getCpPercentageToPlayer(playerlevel: Int): Int {
     // TODO replace this when api has implemented this see Pokemon.kt
     return -1
 }
