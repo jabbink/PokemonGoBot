@@ -1,20 +1,27 @@
 group 'ink.abb'
-version '0.5.0-alpha4'
+version '0.5.1'
 
 buildscript {
-    ext.kotlin_version = '1.0.3'
+    ext {
+        kotlin_version = '1.0.3'
+        springBootVersion = '1.3.6.RELEASE'
+        jacksonVersion = '2.8.0'
+    }
 
     repositories {
         mavenCentral()
     }
+
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'application'
+apply plugin: 'spring-boot'
 
 mainClassName = 'ink.abb.pogo.scraper.MainKt'
 
@@ -23,8 +30,11 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    jcenter()
     maven { url "https://jitpack.io" }
 }
+
+def sourceResourcesFolder = "$projectDir/src/main/resources"
 
 sourceSets {
     main {
@@ -34,31 +44,36 @@ sourceSets {
         java {
             srcDir 'lib/com.google.guava'
         }
+        resources.srcDirs sourceResourcesFolder
     }
 }
 
-dependencies {
+configurations {
+    compile.exclude module: "spring-boot-starter-tomcat"
+}
 
-    compile project(':PokeGOAPI-Java')
+dependencies {
+    //compile files('../PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar')
+
+    // TODO: Wait for jitpack to fix itself...
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
 
-    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.21'
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-undertow'
+
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: jacksonVersion
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+}
 
-}
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title': 'Pokemon Go Bot',
-                'Implementation-Version': version,
-                'Main-Class': mainClassName
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
 jar {
     manifest {
         attributes(
@@ -66,4 +81,18 @@ jar {
                 'Main-Class': mainClassName
         )
     }
+}
+
+task createProperties(dependsOn: processResources) << {
+    String versionDir = "$buildDir/resources/main/ink/abb/pogo/scraper"
+    new File(versionDir).mkdirs()
+    new File("$versionDir/version.properties").withWriter { w ->
+        Properties p = new Properties()
+        p['version'] = project.version.toString()
+        p.store w, null
+    }
+}
+
+classes {
+    dependsOn createProperties
 }

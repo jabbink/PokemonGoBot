@@ -1,3 +1,11 @@
+/*
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper.tasks
 
 import com.pokegoapi.api.map.fort.Pokestop
@@ -7,17 +15,15 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * Created by Home on 27.07.2016.
- */
-class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
+class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (settings.shouldFollowStreets) walkRoute(bot, ctx, settings)
+        if (settings.followStreets) walkRoute(bot, ctx, settings)
         else walk(bot, ctx, settings)
 
     }
@@ -52,7 +58,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
             if (pauseWalk.get()) {
                 Thread.sleep(timeout * 2)
                 pauseCounter--
-                if (!(ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons)) {
+                if (!(ctx.api.cachedInventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon)) {
                     // api break free
                     pauseWalk.set(false)
                     pauseCounter = 0
@@ -65,18 +71,22 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                 }
             }
             // don't run away when there are still Pokemon around
-            if (remainingSteps.toInt().mod(20) == 0 && pauseCounter > 0)
-                if (ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+            if (remainingSteps.toInt().mod(20) == 0 && pauseCounter > 0) {
+                if (ctx.api.cachedInventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     pauseCounter = 2
                     pauseWalk.set(true)
                     return@runLoop
                 }
+            }
 
-            ctx.lat.addAndGet(deltaLat)
-            ctx.lng.addAndGet(deltaLng)
-            ctx.server.setLocation(ctx.lat.get(), ctx.lng.get())
+            pauseCounter = 2
+            val lat = ctx.lat.addAndGet(deltaLat)
+            val lng = ctx.lng.addAndGet(deltaLng)
+
+            ctx.server.setLocation(lat, lng)
+
             remainingSteps--
             if (remainingSteps.toInt().mod(20) == 0) Log.cyan("Starting Pokestop reached in ${remainingSteps.toInt()} steps.")
             if (remainingSteps <= 0) {
@@ -104,7 +114,7 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                 if (pauseWalk.get()) {
                     Thread.sleep(timeout * 2)
                     pauseCounter--
-                    if (!(ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons)) {
+                    if (!(ctx.api.cachedInventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon)) {
                         // api break free
                         pauseWalk.set(false)
                         pauseCounter = 0
@@ -117,13 +127,14 @@ class WalkToStartPokeStop(val startPokeStop: Pokestop) : Task {
                     }
                 }
                 // don't run away when there are still Pokemon around
-                if (pauseCounter > 0 && ctx.api.inventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.shouldCatchPokemons) {
+                if (pauseCounter > 0 && ctx.api.cachedInventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && settings.catchPokemon) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     pauseCounter = 2
                     pauseWalk.set(true)
                     return@runLoop
                 }
+                pauseCounter = 2
                 val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
                 val step = coordinatesList.first()
                 coordinatesList.removeAt(0)

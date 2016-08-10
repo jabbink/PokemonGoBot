@@ -9,80 +9,93 @@
 package ink.abb.pogo.scraper.util
 
 import ink.abb.pogo.scraper.Context
-import java.text.SimpleDateFormat
-import java.util.*
+import org.slf4j.LoggerFactory
+import org.slf4j.Marker
+import org.slf4j.MarkerFactory
 
 class Log {
     companion object {
         private var ctx: Context? = null
 
-        private val black_ = "\u001B[30m"
-        private val red_ = "\u001B[31;1m"
-        private val green_ = "\u001B[32;1m"
-        private val yellow_ = "\u001B[33;1m"
-        private val blue_ = "\u001B[34;1m"
-        private val magenta_ = "\u001B[35;1m"
-        private val cyan_ = "\u001B[36;1m"
-        private val white_ = "\u001B[1m"
-        private val reset = "\u001B[0m"
+        private val LOGGER = LoggerFactory.getLogger(Log::class.java)
 
-        var format = SimpleDateFormat("dd MMM HH:mm:ss")
+        enum class Color(val marker: Marker) {
+            BLACK(MarkerFactory.getMarker("black")),
+            RED(MarkerFactory.getMarker("red")),
+            GREEN(MarkerFactory.getMarker("green")),
+            YELLOW(MarkerFactory.getMarker("yellow")),
+            BLUE(MarkerFactory.getMarker("blue")),
+            MAGENTA(MarkerFactory.getMarker("magenta")),
+            CYAN(MarkerFactory.getMarker("cyan")),
+            WHITE(MarkerFactory.getMarker("white"));
+        }
 
-        private fun output(text: String, color: String? = null) {
-            val output = "${format.format(Date())}: $text"
-            if (color != null) {
-                println("${color}$output ${reset}")
-            } else {
-                println(output)
-            }
+        fun info(text: String, color: Color = Color.WHITE, vararg args: Any) {
+            LOGGER.info(color.marker, text, args)
+        }
+
+        fun debug(text: String, color: Color = Color.WHITE, vararg args: Any) {
+            LOGGER.debug(color.marker, text, args)
+        }
+
+        fun error(text: String, color: Color = Color.WHITE, vararg args: Any) {
+            LOGGER.error(color.marker, text, args)
+        }
+
+        fun warn(text: String, color: Color = Color.WHITE, vararg args: Any) {
+            LOGGER.warn(color.marker, text, args)
+        }
+
+        fun trace(text: String, color: Color = Color.WHITE, vararg args: Any) {
+            LOGGER.trace(color.marker, text, args)
         }
 
         fun normal(text: String = "") {
-            output(text)
+            info(text, Color.WHITE)
             ctx?.server?.sendLog("normal", text)
         }
 
         fun black(text: String = "") {
-            output(text, black_)
+            info(text, Color.BLACK)
             ctx?.server?.sendLog("black", text)
         }
 
         fun red(text: String = "") {
-            output(text, red_)
+            warn(text, Color.RED)
             ctx?.server?.sendLog("red", text)
         }
 
         fun green(text: String = "") {
-            output(text, green_)
+            info(text, Color.GREEN)
             ctx?.server?.sendLog("green", text)
         }
 
         fun yellow(text: String = "") {
-            output(text, yellow_)
+            info(text, Color.YELLOW)
             ctx?.server?.sendLog("yellow", text)
         }
 
         fun blue(text: String = "") {
-            output(text, blue_)
+            info(text, Color.BLUE)
             ctx?.server?.sendLog("blue", text)
         }
 
         fun magenta(text: String = "") {
-            output(text, magenta_)
+            info(text, Color.MAGENTA)
             ctx?.server?.sendLog("magenta", text)
         }
 
         fun cyan(text: String = "") {
-            output(text, cyan_)
+            info(text, Color.CYAN)
             ctx?.server?.sendLog("cyan", text)
         }
 
         fun white(text: String = "") {
-            output(text, white_)
+            info(text, Color.WHITE)
             ctx?.server?.sendLog("white", text)
         }
 
-        fun setContext(ctx: Context){
+        fun setContext(ctx: Context) {
             this.ctx = ctx
         }
     }

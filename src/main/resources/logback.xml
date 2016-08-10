@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="STDOUT_BLACK" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ink.abb.pogo.scraper.util.logback.MarkerFilter">
+            <marker>black</marker>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%black(%d{dd MMM HH:mm:ss} [%thread] - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT_RED" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ink.abb.pogo.scraper.util.logback.MarkerFilter">
+            <marker>red</marker>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%red(%d{dd MMM HH:mm:ss} [%thread] - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT_GREEN" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ink.abb.pogo.scraper.util.logback.MarkerFilter">
+            <marker>green</marker>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%green(%d{dd MMM HH:mm:ss} [%thread] - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT_YELLOW" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ink.abb.pogo.scraper.util.logback.MarkerFilter">
+            <marker>yellow</marker>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%yellow(%d{dd MMM HH:mm:ss} [%thread] - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT_BLUE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ink.abb.pogo.scraper.util.logback.MarkerFilter">
+            <marker>blue</marker>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%blue(%d{dd MMM HH:mm:ss} [%thread] - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT_MAGENTA" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ink.abb.pogo.scraper.util.logback.MarkerFilter">
+            <marker>magenta</marker>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%magenta(%d{dd MMM HH:mm:ss} [%thread] - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT_CYAN" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ink.abb.pogo.scraper.util.logback.MarkerFilter">
+            <marker>cyan</marker>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%cyan(%d{dd MMM HH:mm:ss} [%thread] - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT_WHITE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ink.abb.pogo.scraper.util.logback.MarkerFilter">
+            <marker>white</marker>
+            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%white(%d{dd MMM HH:mm:ss} [%thread] - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/bot.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/bot.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{dd MMM HH:mm:ss} [%thread] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT_BLACK"/>
+        <appender-ref ref="STDOUT_RED"/>
+        <appender-ref ref="STDOUT_GREEN"/>
+        <appender-ref ref="STDOUT_YELLOW"/>
+        <appender-ref ref="STDOUT_BLUE"/>
+        <appender-ref ref="STDOUT_MAGENTA"/>
+        <appender-ref ref="STDOUT_CYAN"/>
+        <appender-ref ref="STDOUT_WHITE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="ink.abb.pogo" level="DEBUG"/>
+</configuration>

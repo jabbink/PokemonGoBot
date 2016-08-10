@@ -21,6 +21,9 @@ desired_catch_probability_unwanted=0.0
 # The next pokestop from (1/infinite)
 random_next_pokestop_selection=5
 
+# Should the bot camp around lured x pokestops (-1 = off; 1 = one needs to be in range; 2 = two..., etc)
+camp_lure_pokestop=-1
+
 ## Walking
 # Meters per second
 speed=2.8
@@ -63,6 +66,9 @@ item_lure_module=-1
 # Should the bot display rewards pokestop (true/false)
 display_pokestop_rewards=true
 
+# Should the bot display if it caught a pokemon from a lure (true/false)
+display_if_pokemon_from_lure=true
+
 # Should the bot display rewards when catching pokemon (true/false)
 display_pokemon_catch_rewards=true
 
@@ -102,8 +108,11 @@ allow_leave_start_area=false
 # (-1: only limited by the initial pokestops (~3*3km); with allow_leave_start_area=true unlimited)
 spawn_radius=-1
 
+# Number of times the pokestop should be spun to attempt softban bypass (0 to disable, 40 recommended value to work)
+ban_spin_count=0
+
 # Set timer in seconds to go back to the starting pokestop (-1 disabled)
-timerWalkToStartPokeStop=-1
+timer_walk_to_start_pokestop=-1
 
 # Set profile update timer (Default: 60)
 profile_update_timer=60
@@ -123,8 +132,6 @@ ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
 # List of pokemon you always want to transfer regardless of CP
 obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
 
-# Port where the webserver (gui) should listen, 0 = do not listen
-gui_port=8000
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
 
@@ -134,6 +141,9 @@ gui_port_socket=8001
 #   DSV      European CSV/DSV format (";" as delimiter and "," as decimal separator)
 #              Use this one if your MS Excel can't handle the default CSV option
 export=
+
+# Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
+initial_map_size=9
 
 # List of pokemon names
 #MISSINGNO

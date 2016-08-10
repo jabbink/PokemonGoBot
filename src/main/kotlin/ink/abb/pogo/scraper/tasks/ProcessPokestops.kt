@@ -9,24 +9,27 @@
 package ink.abb.pogo.scraper.tasks
 
 import com.pokegoapi.api.map.fort.Pokestop
-import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
+import ink.abb.pogo.scraper.util.Log
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Task that handles catching pokemon, activating stops, and walking to a new target.
- *
- * @author Andrew Potter (apottere)
  */
 class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
 
+    val refetchTime = TimeUnit.SECONDS.toMillis(30)
+    var lastFetch: Long = 0
+
     private val lootTimeouts = HashMap<String, Long>()
-    var startPokeStop: Pokestop? = null
+    var startPokestop: Pokestop? = null
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (settings.allowLeaveStartArea) {
+        if (lastFetch + refetchTime < bot.api.currentTimeMillis() && settings.allowLeaveStartArea) {
+            lastFetch = bot.api.currentTimeMillis()
             try {
                 val newStops = ctx.api.map.mapObjects.pokestops
                 if (newStops.size > 0) {
@@ -37,19 +40,23 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
             }
         }
         val sortedPokestops = pokestops.sortedWith(Comparator { a, b ->
-            val locationA = S2LatLng.fromDegrees(a.latitude, a.longitude)
-            val locationB = S2LatLng.fromDegrees(b.latitude, b.longitude)
-            val self = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
-            val distanceA = self.getEarthDistance(locationA)
-            val distanceB = self.getEarthDistance(locationB)
-            distanceA.compareTo(distanceB)
+            a.distance.compareTo(b.distance)
         })
-        if (startPokeStop == null)
-            startPokeStop = sortedPokestops.first()
+        if (startPokestop == null)
+            startPokestop = sortedPokestops.first()
 
-        if (settings.shouldLootPokestop) {
+        if (settings.lootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             bot.task(loot)
+        }
+        if (settings.campLurePokestop > 0 && settings.catchPokemon) {
+            val luresInRange = sortedPokestops.filter {
+                it.inRangeForLuredPokemon() && it.fortData.hasLureInfo()
+            }.size
+            if (luresInRange >= settings.campLurePokestop) {
+                Log.green("$luresInRange lure(s) in range, pausing")
+                return
+            }
         }
         val walk = Walk(sortedPokestops, lootTimeouts)
 

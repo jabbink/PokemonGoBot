@@ -15,3 +15,7 @@ fun Pokestop.canLoot(ignoreDistance: Boolean = false, lootTimeouts: Map<String, 
     val canLoot = lootTimeouts.getOrElse(id, { cooldownCompleteTimestampMs }) < api.currentTimeMillis()
     return (ignoreDistance || inRange()) && canLoot
 }
+
+fun Pokestop.inRange(maxDistance: Double): Boolean {
+    return distance < maxDistance
+}
