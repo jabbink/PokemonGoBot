@@ -31,7 +31,8 @@ class CatchOneNearbyPokemon : Task {
         ctx.pauseWalking.set(true)
         val pokemon = ctx.api.map.getCatchablePokemon(ctx.blacklistedEncounters)
 
-        val hasPokeballs = ctx.api.cachedInventories.itemBag.hasPokeballs()
+        val itemBag = ctx.api.cachedInventories.itemBag
+        val hasPokeballs = itemBag.hasPokeballs()
 
         /*Pokeball.values().forEach {
             Log.yellow("${it.ballType}: ${ctx.api.cachedInventories.itemBag.getItem(it.ballType).count}")
@@ -74,7 +75,7 @@ class CatchOneNearbyPokemon : Task {
                 }
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
-                        ctx.api.cachedInventories.itemBag,
+                        itemBag,
                         desiredCatchProbability,
                         settings.alwaysCurve,
                         !settings.neverUseBerries,
