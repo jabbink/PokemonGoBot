@@ -8,10 +8,11 @@
 
 package ink.abb.pogo.scraper.controllers
 
+import POGOProtos.Data.PokedexEntryOuterClass
+import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Inventory.Item.ItemIdOuterClass
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
-import ink.abb.pogo.scraper.util.data.PokemonData
 import ink.abb.pogo.scraper.util.Log
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,9 +24,10 @@ import com.pokegoapi.api.map.pokemon.EvolutionResult
 
 import com.pokegoapi.api.pokemon.Pokemon;
 import ink.abb.pogo.scraper.Context
-import ink.abb.pogo.scraper.util.data.ItemData
+import ink.abb.pogo.scraper.util.data.*
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import org.springframework.web.bind.annotation.*
+import sun.java2d.cmm.Profile
 
 @RestController
 @RequestMapping("/api")
@@ -193,7 +195,7 @@ class BotController {
         return returnData
     }
 
-    @RequestMapping("/bot/{name}/item/{id}/drop/{quantity}")
+    @RequestMapping(value = "/bot/{name}/item/{id}/drop/{quantity}", method = arrayOf(RequestMethod.DELETE))
     fun dropItem(
             @PathVariable name: String,
             @PathVariable id: Int,
@@ -211,7 +213,7 @@ class BotController {
         }
     }
 
-    @RequestMapping("/bot/{name}/useIncense")
+    @RequestMapping(value = "/bot/{name}/useIncense", method = arrayOf(RequestMethod.POST))
     fun useIncense(@PathVariable name: String): String {
         val itemBag = service.getBotContext(name).api.inventories.itemBag
         val count = itemBag.items.find { it.itemId == ItemIdOuterClass.ItemId.ITEM_INCENSE_ORDINARY }?.count
@@ -223,7 +225,7 @@ class BotController {
         }
     }
 
-    @RequestMapping("/bot/{name}/useLuckyEgg")
+    @RequestMapping(value = "/bot/{name}/useLuckyEgg", method = arrayOf(RequestMethod.POST))
     fun useLuckyEgg(@PathVariable name: String): String {
         val itemBag = service.getBotContext(name).api.inventories.itemBag
         val count = itemBag.items.find { it.itemId == ItemIdOuterClass.ItemId.ITEM_LUCKY_EGG }?.count
@@ -235,7 +237,7 @@ class BotController {
         }
     }
 
-    @RequestMapping("/bot/{name}/location/{latitude}/{longitude}")
+    @RequestMapping(value = "/bot/{name}/location/{latitude}/{longitude}", method = arrayOf(RequestMethod.POST))
     fun changeLocation(
             @PathVariable name: String,
             @PathVariable latitude: Double,
@@ -254,6 +256,29 @@ class BotController {
         ctx.server.setLocation(latitude, longitude)
 
         return "SUCCESS"
+    }
+
+    @RequestMapping(value = "/bot/{name}/profile", method = arrayOf(RequestMethod.GET))
+    fun getProfile(@PathVariable name: String): ProfileData {
+        return ProfileData().buildFromApi(service.getBotContext(name).api)
+    }
+
+    @RequestMapping(value = "/bot/{name}/pokedex", method = arrayOf(RequestMethod.GET))
+    fun getPokedex(@PathVariable name: String): List<PokedexEntry> {
+
+        var pokedex = mutableListOf<PokedexEntry>()
+        val api = service.getBotContext(name).api
+        var i: Int = 1
+
+        while(i < 151) {
+            i++
+            var entry : PokedexEntryOuterClass.PokedexEntry? = api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.forNumber(i))
+            entry ?: continue
+
+            pokedex.add(PokedexEntry().buildFromEntry(entry))
+        }
+
+        return pokedex
     }
 
     // FIXME! currently, the IDs returned by the API are not unique. It seems that only the last 6 digits change so we remove them
