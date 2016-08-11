@@ -224,7 +224,7 @@ data class Settings(
         var initialMapSize: Int = 9,
 
         var gpxFile: String = "",
-        var gpxRepeat: Int = 0,
+        var gpxRepeat: Int = -1,
 
         val version: String = Settings.version
 ) {
