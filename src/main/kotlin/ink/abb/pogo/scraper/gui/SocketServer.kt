@@ -113,6 +113,23 @@ class SocketServer {
                 pokemonObj.cp = pokemon.cp
                 pokemonObj.iv = pokemon.getIvPercentage()
                 pokemonObj.stats = pokemon.getStatsFormatted()
+                pokemonObj.individualStamina = pokemon.individualStamina
+                pokemonObj.individualAttack = pokemon.individualAttack
+                pokemonObj.individualDefense = pokemon.individualDefense
+                pokemonObj.favorite = pokemon.isFavorite()
+                pokemonObj.candy = pokemon.candy
+                pokemonObj.candiesToEvolve = pokemon.candiesToEvolve
+                pokemonObj.level = pokemon.level
+                pokemonObj.move1 = pokemon.move1.name
+                pokemonObj.move2 = pokemon.move2.name
+                pokemonObj.nickname = pokemon.nickname
+                pokemonObj.deployedFortId = pokemon.deployedFortId
+                pokemonObj.stamina = pokemon.stamina
+                pokemonObj.maxStamina = pokemon.maxStamina
+                pokemonObj.maxCp = pokemon.maxCp
+                pokemonObj.absMaxCp = pokemon.getAbsoluteMaxCp()
+                pokemonObj.creationTimes = pokemon.getCreationTimeMs()
+				
                 pokebank.pokemon.add(pokemonObj)
             }
             server?.broadcastOperations?.sendEvent("pokebank", pokebank)
@@ -149,6 +166,13 @@ class SocketServer {
         newPokemon.cp = pokemon.cp
         newPokemon.iv = pokemon.getIvPercentage()
         newPokemon.stats = pokemon.getStatsFormatted()
+        newPokemon.individualStamina = pokemon.individualStamina
+        newPokemon.individualAttack = pokemon.individualAttack
+        newPokemon.individualDefense = pokemon.individualDefense
+        newPokemon.move1 = pokemon.move1.name
+        newPokemon.move2 = pokemon.move2.name
+        newPokemon.stamina = pokemon.stamina
+		
         server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
     }
 
@@ -170,7 +194,7 @@ class SocketServer {
             val eggs = EventEggs()
             for (egg in ctx!!.api.cachedInventories.hatchery.eggs) {
                 val eggObj = EventEggs.Egg()
-                // eggObj.distanceWalked = egg.eggKmWalked
+                eggObj.distanceWalked = egg.eggKmWalked
                 eggObj.distanceTarget = egg.eggKmWalkedTarget
                 eggs.eggs.add(eggObj)
             }
@@ -210,6 +234,24 @@ class SocketServer {
             var cp: Int? = null
             var iv: Int? = null
             var stats: String? = null
+
+            var individualStamina: Int? = null
+            var individualAttack: Int? = null
+            var individualDefense: Int? = null
+            var favorite: Boolean? = null
+            var candy: Int? = null
+            var candiesToEvolve: Int? = null
+            var level: Float? = null
+            var move1: String? = null
+            var move2: String? = null
+            var nickname: String? = null
+            var deployedFortId: String? = null
+            var stamina: Int? = null
+            var maxStamina: Int? = null
+            var maxCp: Int? = null
+            var absMaxCp: Int? = null
+            var maxCpFullEvolveAndPowerup: Int? = null
+            var creationTimes: Long? = null
         }
     }
 
@@ -234,6 +276,15 @@ class SocketServer {
         var cp: Int? = null
         var iv: Int? = null
         var stats: String? = null
+
+        var individualStamina: Int? = null
+        var individualAttack: Int? = null
+        var individualDefense: Int? = null
+        var move1: String? = null
+        var move2: String? = null
+        var stamina: Int? = null
+        var maxStamina: Int? = null
+        var creationTimes: Long? = null
     }
 
     class EventReleasePokemon {
