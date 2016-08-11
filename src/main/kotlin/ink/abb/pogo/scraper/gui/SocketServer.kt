@@ -28,7 +28,6 @@ class SocketServer {
     private var ctx: Context? = null
     private var server: SocketIOServer? = null
 
-    val coordinatesToGoTo = mutableListOf<S2LatLng>()
 
     fun start(ctx: Context, port: Int) {
         val config = Configuration()
@@ -52,7 +51,7 @@ class SocketServer {
             run {
                 if (data.lat != null && data.lng != null) {
                     val coord = S2LatLng.fromRadians(data.lat!!, data.lng!!)
-                    coordinatesToGoTo.add(coord)
+                    ctx.coordinatesToGoTo.add(coord)
                 }
             }
         }

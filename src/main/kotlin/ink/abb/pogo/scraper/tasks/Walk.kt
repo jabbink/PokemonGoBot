@@ -28,9 +28,9 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             return
         }
 
-        if (ctx.server.coordinatesToGoTo.size > 0) {
-            val coordinates = ctx.server.coordinatesToGoTo.first()
-            ctx.server.coordinatesToGoTo.removeAt(0)
+        if (ctx.coordinatesToGoTo.size > 0) {
+            val coordinates = ctx.coordinatesToGoTo.first()
+            ctx.coordinatesToGoTo.removeAt(0)
             Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
 
             walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)

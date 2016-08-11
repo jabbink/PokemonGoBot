@@ -93,7 +93,9 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val release = ReleasePokemon()
         val hatchEggs = HatchEggs()
         val export = Export()
+        val readGpx = ReadGpx()
 
+        task(readGpx)
         if (settings.export.length > 0)
             task(export)
 
