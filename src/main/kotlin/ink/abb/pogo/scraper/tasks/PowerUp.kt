@@ -45,7 +45,7 @@ class PowerUp : Task {
                 val powerUpCostStardust = pokemon.stardustCostsForPowerup
                 pokemon.powerUp()
                 ctx.api.cachedInventories.candyjar.removeCandy(pokemon.pokemonFamily, powerUpCostCandies)
-                ctx.api.playerProfile.addCurrency(PlayerProfile.Currency.STARDUST.name, powerUpCostStardust * -1)
+                ctx.api.playerProfile.currencies.put(PlayerProfile.Currency.STARDUST, ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)!! - powerUpCostStardust)
             } else {
                 return
             }
