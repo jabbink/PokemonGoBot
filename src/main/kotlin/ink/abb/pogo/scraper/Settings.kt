@@ -152,7 +152,7 @@ class SettingsParser(val properties: Properties) {
     }
 }
 
-@JsonIgnoreProperties("startingLocation", "name", ignoreUnknown = true)
+@JsonIgnoreProperties("startingLocation", "restApiPassword", ignoreUnknown = true)
 data class Settings(
         var name: String = "",
 
