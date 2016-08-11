@@ -180,15 +180,6 @@ class BotController {
         return pokemon!!.renamePokemon(newName).toString()
     }
 
-    @RequestMapping(value = "/bot/{name}/pokemon/{id}/candies", method = arrayOf(RequestMethod.GET))
-    fun getPokemonCandies(
-            @PathVariable name: String,
-            @PathVariable id: Long
-    ): String {
-        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
-        return ""+pokemon!!.candy
-    }
-
     @RequestMapping("/bot/{name}/items")
     fun listItems(@PathVariable name: String): List<ItemData> {
 
