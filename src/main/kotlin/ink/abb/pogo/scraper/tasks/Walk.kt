@@ -51,8 +51,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
                 ctx.server.sendPokestop(chosenPokestop)
 
-                if (settings.displayPokestopName)
-                    Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
+                if (settings.displayPokestopName) {
+                    try {
+                        Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
+                    } catch (e: Exception) {
+                        Log.normal("Walking to pokestop \"${chosenPokestop.id}\"")
+                    }
+                }
 
                 walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
             }
