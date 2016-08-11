@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
@@ -18,11 +19,77 @@ import ink.abb.pogo.scraper.util.cachedInventories
 
 class DropUselessItems : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        settings.uselessItems.forEach {
-            val item = ctx.api.cachedInventories.itemBag.getItem(it.key)
+        // ignores the items that have -1
+        val itemsToDrop = settings.uselessItems.filter { it.value != -1 }
+        if (settings.groupItemsByType) dropGroupedItems(ctx, itemsToDrop) else dropItems(ctx, itemsToDrop)
+    }
+
+    /**
+     * Drops the excess items by group
+     */
+    fun dropGroupedItems(ctx: Context, items: Map<ItemId, Int>) {
+        // map with what items to keep in what amounts
+        val itemsToDrop = mutableMapOf<ItemId, Int>()
+        // adds not groupable items on map
+        itemsToDrop.putAll(items.filter { singlesFilter.contains(it.key) })
+        // groups items
+        val groupedItems = groupItems(items)
+        // adds new items to the map
+        val itemBag = ctx.api.cachedInventories.itemBag
+        groupedItems.forEach groupedItems@ {
+            var groupCount = 0
+            it.key.forEach { groupCount += itemBag.getItem(it).count }
+            var neededToDrop = groupCount - it.value
+            if (neededToDrop > 0)
+                it.key.forEach {
+                    val item = itemBag.getItem(it)
+                    if (neededToDrop <= item.count) {
+                        itemsToDrop.put(it, item.count - neededToDrop)
+                        return@groupedItems
+                    } else {
+                        neededToDrop -= item.count
+                        itemsToDrop.put(it, 0)
+                    }
+                }
+        }
+        // drops excess items
+        dropItems(ctx, itemsToDrop)
+    }
+
+    /**
+     * Groups the items using the groupFilters
+     * Each group contains the list of itemIds of the group and sum of all its number
+     */
+    fun groupItems(items: Map<ItemId, Int>): Map<Array<ItemId>, Int> {
+        val groupedItems = mutableMapOf<Array<ItemId>, Int>()
+        groupFilters.forEach {
+            val filter = it
+            val filteredItems = items.filter { filter.contains(it.key) }
+            groupedItems.put(filteredItems.keys.toTypedArray(), filteredItems.values.sum())
+        }
+        return groupedItems
+    }
+
+    // Items that can be grouped
+    val groupFilters = arrayOf(
+            arrayOf(ItemId.ITEM_REVIVE, ItemId.ITEM_MAX_REVIVE),
+            arrayOf(ItemId.ITEM_POTION, ItemId.ITEM_SUPER_POTION, ItemId.ITEM_HYPER_POTION, ItemId.ITEM_MAX_POTION),
+            arrayOf(ItemId.ITEM_POKE_BALL, ItemId.ITEM_GREAT_BALL, ItemId.ITEM_ULTRA_BALL, ItemId.ITEM_MASTER_BALL)
+    )
+
+    // Items that cant be grouped
+    val singlesFilter = arrayOf(ItemId.ITEM_RAZZ_BERRY, ItemId.ITEM_LUCKY_EGG, ItemId.ITEM_INCENSE_ORDINARY, ItemId.ITEM_TROY_DISK)
+
+    /**
+     * Drops the excess items by item
+     */
+    fun dropItems(ctx: Context, items: Map<ItemId, Int>) {
+        val itemBag = ctx.api.cachedInventories.itemBag
+        items.forEach {
+            val item = itemBag.getItem(it.key)
             val count = item.count - it.value
-            if (it.value != -1 && count > 0) {
-                val result = ctx.api.cachedInventories.itemBag.removeItem(it.key, count)
+            if (count > 0) {
+                val result = itemBag.removeItem(it.key, count)
                 if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
                     ctx.itemStats.second.getAndAdd(count)
                     Log.yellow("Dropped ${count}x ${it.key.name}")
