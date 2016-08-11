@@ -95,9 +95,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val export = Export()
         val readGpx = ReadGpx()
 
-        task(readGpx)
         if (settings.export.length > 0)
             task(export)
+
+        task(readGpx)
 
         task(keepalive)
         Log.normal("Getting initial pokestops...")

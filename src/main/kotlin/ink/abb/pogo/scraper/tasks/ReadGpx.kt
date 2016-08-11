@@ -1,5 +1,6 @@
 package ink.abb.pogo.scraper.tasks
 
+import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -16,21 +17,29 @@ import java.io.File
 
 class ReadGpx : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+
         var builder: SAXBuilder = SAXBuilder()
         var document: Document
         try {
             document = builder.build(File(settings.gpxFile))
         } catch(e: Exception) {
-            e.printStackTrace()
+            // Invalid file or no file specified : Expected behaviour
             return
         }
 
-        val root = document.rootElement
-        for(element in root.children) {
-            for(element1 in element.children)
-                for(element2 in element1.children)
-                    Log.magenta(element2.name)
-        }
+        val coords = document.rootElement.getChild("trk", document.rootElement.namespace)
+                        .getChild("trkseg", document.rootElement.namespace)
 
+        var i: Int = settings.gpxRepeat
+
+        // gpxRepeat == 0 or -1 : No coordinates will be added
+        while(i > 0) {
+            for (element in coords.children)
+                ctx.coordinatesToGoTo.add(S2LatLng.fromRadians(
+                        element.getAttribute("lat").doubleValue,
+                        element.getAttribute("lon").doubleValue
+                ))
+            i--
+        }
     }
 }
