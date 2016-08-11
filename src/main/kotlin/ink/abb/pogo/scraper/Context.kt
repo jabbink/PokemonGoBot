@@ -34,7 +34,7 @@ data class Context(
 
         val pokemonInventoryFullStatus: Pair<AtomicBoolean, AtomicBoolean>,
 
-        var apiToken: String,
+        var apiToken: String = "",
 
         val walking: AtomicBoolean = AtomicBoolean(false),
 

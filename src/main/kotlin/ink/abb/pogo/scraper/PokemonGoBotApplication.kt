@@ -27,6 +27,9 @@ import kotlin.concurrent.thread
 @SpringBootApplication
 open class PokemonGoBotApplication {
 
+    @Autowired
+    lateinit var authProvider: ApiAuthProvider
+
     @Bean
     open fun httpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
@@ -49,7 +52,7 @@ open class PokemonGoBotApplication {
     open fun interceptorConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurerAdapter() {
             override fun addInterceptors(registry: InterceptorRegistry) {
-                registry.addInterceptor(ApiAuthProvider()).addPathPatterns("/api/**")
+                registry.addInterceptor(authProvider).addPathPatterns("/api/bot/**")
             }
         }
     }
@@ -63,16 +66,21 @@ open class PokemonGoBotApplication {
         @Autowired
         lateinit var botRunService: BotService
 
+        @Autowired
+        lateinit var authProvider: ApiAuthProvider
+
         override fun run(vararg args: String?) {
             val names = botRunService.getSaveNames()
             if (names.size < 1) {
                 thread(name = "default") {
                     startDefaultBot(http, botRunService)
+                    authProvider.generateAuthToken("default")
                 }
             } else {
                 names.forEach {
                     thread(name = it) {
                         botRunService.submitBot(botRunService.load(it))
+                        authProvider.generateAuthToken(it)
                     }
                 }
             }

@@ -16,12 +16,14 @@ import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
+import ink.abb.pogo.scraper.util.ApiAuthProvider
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -52,8 +54,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Pair(AtomicInteger(0), AtomicInteger(0)),
             mutableSetOf(),
             SocketServer(),
-            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
-            "testtoken"
+            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false))
     )
 
     @Synchronized

@@ -224,7 +224,6 @@ class BotController {
     fun useIncense(@PathVariable name: String): String {
         val itemBag = service.getBotContext(name).api.inventories.itemBag
         val count = itemBag.items.find { it.itemId == ItemIdOuterClass.ItemId.ITEM_INCENSE_ORDINARY }?.count
-
         if (count == 0) {
             return "Not enough incense"
         } else {
