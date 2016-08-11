@@ -8,26 +8,23 @@
 
 package ink.abb.pogo.scraper.controllers
 
+
 import POGOProtos.Data.PokedexEntryOuterClass
 import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Inventory.Item.ItemIdOuterClass
-import ink.abb.pogo.scraper.Settings
-import ink.abb.pogo.scraper.services.BotService
-import ink.abb.pogo.scraper.util.Log
-
-import org.springframework.beans.factory.annotation.Autowired
-
 import com.pokegoapi.api.inventory.Item
 import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.map.pokemon.EvolutionResult
-
-
-import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.Context
+import ink.abb.pogo.scraper.Settings
+import ink.abb.pogo.scraper.services.BotService
+import ink.abb.pogo.scraper.util.ApiAuthProvider
+import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.data.*
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import sun.java2d.cmm.Profile
 
 @RestController
 @RequestMapping("/api")
@@ -36,9 +33,27 @@ class BotController {
     @Autowired
     lateinit var service: BotService
 
+    @Autowired
+    lateinit var authProvider: ApiAuthProvider
+
     @RequestMapping("/bots")
     fun bots(): List<Settings> {
         return service.getAllBotSettings()
+    }
+
+    @RequestMapping(value = "/bot/{name}/auth", method = arrayOf(RequestMethod.POST))
+    fun auth(
+            @PathVariable name: String,
+            @RequestBody pass: String
+    ): String {
+
+        authProvider.generateAuthToken(name)
+
+        val ctx = service.getBotContext(name)
+        if(pass.equals(ctx.restApiPassword))
+            return ctx.restApiToken
+        else
+            return "Unauthorized"
     }
 
     @RequestMapping("/bot/{name}/load")
@@ -88,7 +103,7 @@ class BotController {
     fun transferPokemon(
             @PathVariable name: String,
             @PathVariable id: Long
-    ) : String {
+    ): String {
         val result: String
         val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
 
@@ -105,7 +120,7 @@ class BotController {
     fun evolvePokemon(
             @PathVariable name: String,
             @PathVariable id: Long
-    ) : String {
+    ): String {
         val result: String
         val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
 
@@ -133,7 +148,7 @@ class BotController {
     fun powerUpPokemon(
             @PathVariable name: String,
             @PathVariable id: Long
-    ) : String {
+    ): String {
 
         val result: String
         val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
@@ -156,7 +171,7 @@ class BotController {
     fun togglePokemonFavorite(
             @PathVariable name: String,
             @PathVariable id: Long
-    ) : String {
+    ): String {
         val result: String
         val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
 
@@ -270,9 +285,9 @@ class BotController {
         val api = service.getBotContext(name).api
         var i: Int = 1
 
-        while(i < 151) {
+        while (i < 151) {
             i++
-            var entry : PokedexEntryOuterClass.PokedexEntry? = api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.forNumber(i))
+            var entry: PokedexEntryOuterClass.PokedexEntry? = api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.forNumber(i))
             entry ?: continue
 
             pokedex.add(PokedexEntry().buildFromEntry(entry))
@@ -286,7 +301,7 @@ class BotController {
 
         val eggs = mutableListOf<EggData>()
 
-        for(egg in service.getBotContext(name).api.inventories.hatchery.eggs) {
+        for (egg in service.getBotContext(name).api.inventories.hatchery.eggs) {
             eggs.add(EggData().buildFromEggPokemon(egg))
         }
 
@@ -296,7 +311,7 @@ class BotController {
     // FIXME! currently, the IDs returned by the API are not unique. It seems that only the last 6 digits change so we remove them
     fun getPokemonById(ctx: Context, id: Long): Pokemon? {
         return ctx.api.inventories.pokebank.pokemons.find {
-            ((""+id).substring(0, (""+id).length - 6)).equals((""+it.id).substring(0, (""+it.id).length - 6))
+            (("" + id).substring(0, ("" + id).length - 6)).equals(("" + it.id).substring(0, ("" + it.id).length - 6))
         }
     }
 

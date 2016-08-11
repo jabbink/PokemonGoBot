@@ -25,7 +25,7 @@ open class ApiAuthProvider : HandlerInterceptorAdapter() {
         val pattern = Pattern.compile("\\/api/bot/([A-Za-z0-9\\-_]*)")
         val matcher = pattern.matcher(request.requestURI)
         if(matcher.find()) {
-            val token = service.getBotContext(matcher.group(1)).apiToken
+            val token = service.getBotContext(matcher.group(1)).restApiToken
 
             // If the token is invalid or isn't in the request, nothing will be done
             return request.getHeader("X-PGB-ACCESS-TOKEN")!!.equals(token)
@@ -36,7 +36,8 @@ open class ApiAuthProvider : HandlerInterceptorAdapter() {
 
     fun generateAuthToken(botName: String) {
         val token: String = BigInteger(130, random).toString(32)
-        service.getBotContext(botName).apiToken = token
-        Log.cyan("REST API token for bot $botName : $token")
+        service.getBotContext(botName).restApiToken = token
+
+        Log.cyan("REST API token for bot $botName : $token has been generated")
     }
 }

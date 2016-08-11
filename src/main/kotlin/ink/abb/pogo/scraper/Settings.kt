@@ -105,6 +105,8 @@ class SettingsParser(val properties: Properties) {
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
+                restApiPassword = getPropertyIfSet("REST API password for the bot", "rest_api_password", defaults.restApiPassword, String::toString),
+
                 initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt)
         )
     }
@@ -216,6 +218,8 @@ data class Settings(
         val export: String = "",
 
         val guiPortSocket: Int = 8001,
+
+        val restApiPassword: String = "ultra_secure_password",
 
         var initialMapSize: Int = 9,
 
