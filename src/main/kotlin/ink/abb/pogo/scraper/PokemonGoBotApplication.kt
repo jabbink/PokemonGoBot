@@ -33,9 +33,9 @@ open class PokemonGoBotApplication {
     @Bean
     open fun httpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
-        builder.connectTimeout(60, TimeUnit.SECONDS)
-        builder.readTimeout(60, TimeUnit.SECONDS)
-        builder.writeTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
         return builder.build()
     }
 
