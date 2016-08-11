@@ -1,8 +1,6 @@
 package ink.abb.pogo.scraper.util.data
 
 import POGOProtos.Data.PokedexEntryOuterClass
-import com.pokegoapi.api.PokemonGo
-import kotlin.collections.mutableListOf
 /**
  * Created by Peyphour on 8/11/16.
  */

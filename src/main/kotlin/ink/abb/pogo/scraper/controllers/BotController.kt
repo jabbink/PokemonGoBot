@@ -76,12 +76,12 @@ class BotController {
     fun listPokemons(@PathVariable name: String): List<PokemonData> {
 
         val data = service.getBotContext(name).api.inventories.pokebank.pokemons
-        val returnData = mutableListOf<PokemonData>()
+        val pokemons = mutableListOf<PokemonData>()
         for (pokemon in data) {
-            returnData.add(PokemonData().buildFromPokemon(pokemon))
+            pokemons.add(PokemonData().buildFromPokemon(pokemon))
         }
 
-        return returnData
+        return pokemons
     }
 
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/transfer", method = arrayOf(RequestMethod.POST))
@@ -186,13 +186,13 @@ class BotController {
     fun listItems(@PathVariable name: String): List<ItemData> {
 
         val data = service.getBotContext(name).api.inventories.itemBag.items
-        val returnData = mutableListOf<ItemData>()
+        val items = mutableListOf<ItemData>()
 
         for (item in data) {
-            returnData.add(ItemData().buildFromItem(item))
+            items.add(ItemData().buildFromItem(item))
         }
 
-        return returnData
+        return items
     }
 
     @RequestMapping(value = "/bot/{name}/item/{id}/drop/{quantity}", method = arrayOf(RequestMethod.DELETE))
@@ -279,6 +279,18 @@ class BotController {
         }
 
         return pokedex
+    }
+
+    @RequestMapping(value = "/bot/{name}/eggs", method = arrayOf(RequestMethod.GET))
+    fun getEggs(@PathVariable name: String): List<EggData> {
+
+        val eggs = mutableListOf<EggData>()
+
+        for(egg in service.getBotContext(name).api.inventories.hatchery.eggs) {
+            eggs.add(EggData().buildFromEggPokemon(egg))
+        }
+
+        return eggs
     }
 
     // FIXME! currently, the IDs returned by the API are not unique. It seems that only the last 6 digits change so we remove them
