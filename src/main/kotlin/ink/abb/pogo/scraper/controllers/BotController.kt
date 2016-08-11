@@ -88,7 +88,7 @@ class BotController {
             @PathVariable id: Long
     ) : String {
         val result: String
-        val pokemon: Pokemon? = service.getBotContext(name).api.inventories.pokebank.pokemons.find { it.id == id }
+        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
 
         result = pokemon!!.transferPokemon().toString()
         Log.magenta("REST API :transferring pokemon " + pokemon.pokemonId.name + " with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ")")
@@ -105,7 +105,7 @@ class BotController {
             @PathVariable id: Long
     ) : String {
         val result: String
-        val pokemon: Pokemon? = service.getBotContext(name).api.inventories.pokebank.pokemons.find { it.id == id }
+        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
 
         if (pokemon!!.candiesToEvolve > pokemon.candy) {
             result = "Not enough candies" + pokemon.candiesToEvolve + " " + pokemon.candy
@@ -134,7 +134,7 @@ class BotController {
     ) : String {
 
         val result: String
-        val pokemon: Pokemon? = service.getBotContext(name).api.inventories.pokebank.pokemons.find { it.id == id }
+        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
 
         if (pokemon!!.candyCostsForPowerup > pokemon.candy) {
             result = "Not enough candies" + pokemon.candyCostsForPowerup + " " + pokemon.candy
@@ -156,7 +156,7 @@ class BotController {
             @PathVariable id: Long
     ) : String {
         val result: String
-        val pokemon: Pokemon? = service.getBotContext(name).api.inventories.pokebank.pokemons.find { it.id == id }
+        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
 
         result = pokemon!!.setFavoritePokemon(!pokemon.isFavorite).toString()
         when (pokemon.isFavorite) {
@@ -176,7 +176,7 @@ class BotController {
             @PathVariable id: Long,
             @RequestBody newName: String
     ): String {
-        val pokemon: Pokemon? = service.getBotContext(name).api.inventories.pokebank.pokemons.find { it.id == id }
+        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
         return pokemon!!.renamePokemon(newName).toString()
     }
 
@@ -185,7 +185,7 @@ class BotController {
             @PathVariable name: String,
             @PathVariable id: Long
     ): String {
-        val pokemon: Pokemon? = service.getBotContext(name).api.inventories.pokebank.pokemons.find { it.id == id }
+        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
         return ""+pokemon!!.candy
     }
 
@@ -240,7 +240,7 @@ class BotController {
         if (count == 0) {
             return "Not enough lucky egg"
         } else {
-            return itemBag.useLuckyEgg().toString()
+            return itemBag.useLuckyEgg().result.toString()
         }
     }
 
@@ -263,6 +263,13 @@ class BotController {
         ctx.server.setLocation(latitude, longitude)
 
         return "SUCCESS"
+    }
+
+    // FIXME! currently, the IDs returned by the API are not unique. It seems that only the last 6 digits change so we remove them
+    fun getPokemonById(ctx: Context, id: Long): Pokemon? {
+        return ctx.api.inventories.pokebank.pokemons.find {
+            ((""+id).substring(0, (""+id).length - 6)).equals((""+it.id).substring(0, (""+it.id).length - 6))
+        }
     }
 
 }

@@ -74,7 +74,7 @@ class BotService {
     fun getBotContext(name: String): Context {
         var bot = bots.find {it.settings.name == name}
 
-        bot ?: throw IllegalArgumentException("Bot " + name + "doesn't exists !")
+        bot ?: throw IllegalArgumentException("Bot $name doesn't exists !")
 
         return bot.ctx
     }
