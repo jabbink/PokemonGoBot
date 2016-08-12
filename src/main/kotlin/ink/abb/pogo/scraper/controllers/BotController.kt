@@ -258,6 +258,9 @@ class BotController {
             @PathVariable latitude: Double,
             @PathVariable longitude: Double
     ): String {
+
+        return "UNSUPPORTED"
+
         val ctx: Context = service.getBotContext(name)
 
         // Stop walking
@@ -265,6 +268,8 @@ class BotController {
 
         ctx.lat.set(latitude)
         ctx.lng.set(longitude)
+
+        ctx.api.setLocation(latitude, longitude, 10.0)
 
         ctx.pauseWalking.set(false)
 
