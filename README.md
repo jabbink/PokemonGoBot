@@ -20,7 +20,7 @@ The original theme that comes with 0.5.0-alpha4
 Original theme with map links on the toolbar, as well as easy coordinate access
 
 ### [Poppo by @pureexe](http://pogo.abb.ink/Poppo/)
-![Screenshot](Poppo/preview/preview.png)
+![Screenshot](img/poppo-screenshot.png)
 More maps less data
 
 
