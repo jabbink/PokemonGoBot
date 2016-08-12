@@ -17,6 +17,7 @@ import ink.abb.pogo.scraper.util.credentials.*
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
+import java.net.Proxy
 import java.util.*
 
 
@@ -40,6 +41,12 @@ class SettingsParser(val properties: Properties) {
                 } else {
                     PtcCredentials(properties.getProperty("username"), getPasswordProperty())
                 },
+
+                proxyServer = getPropertyIfSet("Proxy server to be used by the bot", "proxy_server", defaults.proxyServer, String::toString),
+                proxyPort = getPropertyIfSet("Proxy server port to be used by the bot", "proxy_port", defaults.proxyPort, String::toInt),
+                proxyType = getPropertyIfSet("Type of the proxy server (HTTP/SOCKS/DIRECT)", "proxy_type", defaults.proxyType, String::toString),
+                proxyUsername = getPropertyIfSet("Username for the proxy server", "proxy_username", defaults.proxyUsername, String::toString),
+                proxyPassword = getPropertyIfSet("Password for the proxy server", "proxy_password", defaults.proxyPassword, String::toString),
 
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
@@ -101,6 +108,10 @@ class SettingsParser(val properties: Properties) {
 
                 obligatoryTransfer = getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", defaults.obligatoryTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
+                evolveBeforeTransfer = getPropertyIfSet("list of pokemon you always want to evolve before transfer to maximize XP", "evolve_before_transfer", defaults.obligatoryTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
+
+                evolveStackLimit = getPropertyIfSet("The stack of evolves needed to pop lucky egg and evolve all", "evolve_stack_limit", defaults.evolveStackLimit, String::toInt),
+
                 export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
@@ -159,6 +170,13 @@ data class Settings(
 
         val startingLocation: S2LatLng = S2LatLng.fromDegrees(latitude, longitude),
         val credentials: Credentials,
+
+        val proxyServer: String = "",
+        val proxyPort: Int = -1,
+        var proxyType: String = "SOCKS",
+        var proxyUsername: String = "",
+        var proxyPassword: String = "",
+
         val speed: Double = 2.8,
         val followStreets: Boolean = false,
         val groupItemsByType : Boolean = false,
@@ -212,6 +230,9 @@ data class Settings(
         val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
 
         val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
+
+        val evolveBeforeTransfer: List<PokemonId> = listOf(PokemonId.CATERPIE, PokemonId.RATTATA, PokemonId.WEEDLE, PokemonId.PIDGEY),
+        val evolveStackLimit: Int = 100,
 
         val export: String = "",
 
