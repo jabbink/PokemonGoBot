@@ -19,6 +19,10 @@ The original theme that comes with 0.5.0-alpha4
 ![Screenshot](img/better-map-screenshot2.png)
 Original theme with map links on the toolbar, as well as easy coordinate access
 
+### [Poppo by @pureexe](http://pogo.abb.ink/Poppo/)
+![Screenshot](Poppo/preview/preview.png)
+More maps less data
+
 
 **Please submit a PR if you want to add your GUI to this list**
 **Pleace place the code in this branch, not on an external server**

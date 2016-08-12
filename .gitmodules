@@ -2,3 +2,6 @@
 	path = RocketTheme
 	url = https://github.com/eruecco87/PokemonGoBot-RocketTheme.git
 	branch = gh-pages
+[submodule "Poppo"]
+	path = Poppo
+	url = https://github.com/pureexe/Poppo
