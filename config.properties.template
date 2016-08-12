@@ -5,6 +5,10 @@ username=
 password=
 base64_password=
 
+# Proxy server and port to be used by the bot. Only HTTP proxy are supported at the moment
+proxy_server=
+proxy_port=-1
+
 # Token to login directly
 token=
 latitude=

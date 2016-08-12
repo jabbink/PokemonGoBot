@@ -41,6 +41,9 @@ class SettingsParser(val properties: Properties) {
                     PtcCredentials(properties.getProperty("username"), getPasswordProperty())
                 },
 
+                proxyServer = getPropertyIfSet("Proxy server to be used by the bot", "proxy_server", defaults.proxyServer, String::toString),
+                proxyPort = getPropertyIfSet("Proxy server port to be used by the bot", "proxy_port", defaults.proxyPort, String::toInt),
+
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
                 dropItems = dropItems,
@@ -159,6 +162,8 @@ data class Settings(
 
         val startingLocation: S2LatLng = S2LatLng.fromDegrees(latitude, longitude),
         val credentials: Credentials,
+        val proxyServer: String = "",
+        val proxyPort: Int = -1,
         val speed: Double = 2.8,
         val followStreets: Boolean = false,
         val groupItemsByType : Boolean = false,

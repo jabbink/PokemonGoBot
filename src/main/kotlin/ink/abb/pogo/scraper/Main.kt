@@ -14,6 +14,7 @@ import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterC
 import POGOProtos.Networking.Requests.RequestTypeOuterClass
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.device.DeviceInfo
+import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.auth.CredentialProvider
 import com.pokegoapi.auth.GoogleAutoCredentialProvider
 import com.pokegoapi.auth.GoogleUserCredentialProvider
@@ -33,6 +34,8 @@ import org.springframework.boot.SpringApplication
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.net.InetSocketAddress
+import java.net.Proxy
 import java.nio.file.Paths
 import java.util.*
 import javax.swing.text.rtf.RTFEditorKit
@@ -150,6 +153,15 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
 
 
 fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit = {}): Bot {
+
+    var proxyHttp: OkHttpClient? = null
+
+    if(!settings.proxyServer.equals("") && settings.proxyPort > 0) {
+        Log.normal("Setting up proxy server for bot " + settings.name + ": " + settings.proxyServer + ":" + settings.proxyPort)
+        proxyHttp = http.newBuilder().proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(settings.proxyServer, settings.proxyPort))).build()
+    }
+
+
     Log.normal("Logging in to game server...")
 
     val retryCount = 3
@@ -160,7 +172,10 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     var auth: CredentialProvider? = null
     do {
         try {
-            auth = getAuth(settings, http, writeToken)
+            if(proxyHttp == null)
+                auth = getAuth(settings, http, writeToken)
+            else
+                auth = getAuth(settings, proxyHttp, writeToken)
         } catch (e: LoginFailedException) {
             throw IllegalStateException("Server refused your login credentials. Are they correct?")
         } catch (e: RemoteServerException) {
@@ -177,7 +192,10 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     var api: PokemonGo? = null
     do {
         try {
-            api = PokemonGo(auth, http, time)
+            if(proxyHttp == null)
+                api = PokemonGo(auth, http, time)
+            else
+                api = PokemonGo(auth, proxyHttp, time)
         } catch (e: LoginFailedException) {
             throw IllegalStateException("Server refused your login credentials. Are they correct?")
         } catch (e: RemoteServerException) {
