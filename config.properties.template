@@ -5,6 +5,15 @@ username=
 password=
 base64_password=
 
+# Proxy server and port to be used by the bot. Only HTTP proxy are supported at the moment
+proxy_server=
+proxy_port=-1
+# Proxy type, among SOCKS/HTTP/DIRECT. DIRECT means a direct connection i.e : no proxy
+proxy_type=SOCKS
+# Proxy authentication
+proxy_username=
+proxy_password
+
 # Token to login directly
 token=
 latitude=
@@ -145,6 +154,12 @@ ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
 
 # List of pokemon you always want to transfer regardless of CP
 obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
+
+# list of pokemon you always want to evolve before transfer to maximize XP
+evolve_before_transfer=CATERPIE,RATTATA,WEEDLE,PIDGEY
+
+# The stack of evolves needed to pop lucky egg and evolve all
+evolve_stack_limit=100
 
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001

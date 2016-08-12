@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
+import java.net.Proxy
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -27,9 +28,9 @@ open class PokemonGoBotApplication {
     @Bean
     open fun httpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
-        builder.connectTimeout(60, TimeUnit.SECONDS)
-        builder.readTimeout(60, TimeUnit.SECONDS)
-        builder.writeTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
         return builder.build()
     }
 

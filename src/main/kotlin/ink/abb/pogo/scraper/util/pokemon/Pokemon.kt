@@ -84,6 +84,10 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
             shouldRelease = true
             reason = "Too many"
         }
+        // Save pokemon for evolve stacking
+        if (settings.evolveBeforeTransfer.contains(this.pokemonId) && settings.evolveStackLimit > 0){
+            shouldRelease = false
+        }
     }
     return Pair(shouldRelease, reason)
 }

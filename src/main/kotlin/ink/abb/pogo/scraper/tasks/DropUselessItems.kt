@@ -35,13 +35,14 @@ class DropUselessItems : Task {
         // groups items
         val groupedItems = groupItems(items)
         // adds new items to the map
+        val itemBag = ctx.api.cachedInventories.itemBag
         groupedItems.forEach groupedItems@ {
             var groupCount = 0
-            it.key.forEach { groupCount += ctx.api.cachedInventories.itemBag.getItem(it).count }
+            it.key.forEach { groupCount += itemBag.getItem(it).count }
             var neededToDrop = groupCount - it.value
             if (neededToDrop > 0)
                 it.key.forEach {
-                    val item = ctx.api.cachedInventories.itemBag.getItem(it)
+                    val item = itemBag.getItem(it)
                     if (neededToDrop <= item.count) {
                         itemsToDrop.put(it, item.count - neededToDrop)
                         return@groupedItems
@@ -83,11 +84,12 @@ class DropUselessItems : Task {
      * Drops the excess items by item
      */
     fun dropItems(ctx: Context, items: Map<ItemId, Int>) {
+        val itemBag = ctx.api.cachedInventories.itemBag
         items.forEach {
-            val item = ctx.api.cachedInventories.itemBag.getItem(it.key)
+            val item = itemBag.getItem(it.key)
             val count = item.count - it.value
             if (count > 0) {
-                val result = ctx.api.cachedInventories.itemBag.removeItem(it.key, count)
+                val result = itemBag.removeItem(it.key, count)
                 if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
                     ctx.itemStats.second.getAndAdd(count)
                     Log.yellow("Dropped ${count}x ${it.key.name}")
