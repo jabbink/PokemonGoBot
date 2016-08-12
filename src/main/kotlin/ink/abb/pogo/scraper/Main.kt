@@ -14,7 +14,6 @@ import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterC
 import POGOProtos.Networking.Requests.RequestTypeOuterClass
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.device.DeviceInfo
-import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.auth.CredentialProvider
 import com.pokegoapi.auth.GoogleAutoCredentialProvider
 import com.pokegoapi.auth.GoogleUserCredentialProvider
@@ -29,11 +28,12 @@ import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.credentials.GoogleCredentials
 import ink.abb.pogo.scraper.util.credentials.PtcCredentials
 import ink.abb.pogo.scraper.util.toHexString
-import okhttp3.OkHttpClient
+import okhttp3.*
 import org.springframework.boot.SpringApplication
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.nio.file.Paths
@@ -167,7 +167,14 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
         else
             proxyType = Proxy.Type.DIRECT
 
-        proxyHttp = http.newBuilder().proxy(Proxy(proxyType, InetSocketAddress(settings.proxyServer, settings.proxyPort))).build()
+        proxyHttp = http.newBuilder()
+                .proxy(Proxy(proxyType, InetSocketAddress(settings.proxyServer, settings.proxyPort)))
+                .proxyAuthenticator { route, response ->
+                    response.request().newBuilder()
+                            .header("ProxyAuthorization", Credentials.basic(settings.proxyUsername, settings.proxyPassword))
+                            .build()
+                }
+                .build()
     }
 
 
