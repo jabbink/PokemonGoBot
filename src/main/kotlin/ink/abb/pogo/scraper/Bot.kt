@@ -91,6 +91,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val profile = UpdateProfile()
         val catch = CatchOneNearbyPokemon()
         val release = ReleasePokemon()
+        val evolve = EvolvePokemon()
         val hatchEggs = HatchEggs()
         val export = Export()
 
@@ -137,6 +138,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             task(hatchEggs)
             if (settings.export.length > 0)
                 task(export)
+            if (settings.evolveStackLimit > 0)
+                task(evolve)
         }
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
