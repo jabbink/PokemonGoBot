@@ -5,6 +5,15 @@ username=
 password=
 base64_password=
 
+# Proxy server and port to be used by the bot. Only HTTP proxy are supported at the moment
+proxy_server=
+proxy_port=-1
+# Proxy type, among SOCKS/HTTP/DIRECT. DIRECT means a direct connection i.e : no proxy
+proxy_type=SOCKS
+# Proxy authentication
+proxy_username=
+proxy_password
+
 # Token to login directly
 token=
 latitude=
