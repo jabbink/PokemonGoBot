@@ -132,7 +132,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     deltaLat = diff.latDegrees() / stepsRequired
                     deltaLng = diff.lngDegrees() / stepsRequired
 
-                    Log.normal("Walking to ${nextPoint.toStringDegrees()} in $stepsRequired steps.")
+                    if (settings.displayKeepalive) Log.normal("Walking to ${nextPoint.toStringDegrees()} in $stepsRequired steps.")
                     remainingSteps = stepsRequired
                 }
             }

@@ -150,6 +150,12 @@ ignored_pokemon=EEVEE,MEWTWO,CHARMANDER
 # List of pokemon you always want to transfer regardless of CP
 obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
 
+# list of pokemon you always want to evolve before transfer to maximize XP
+evolve_before_transfer=CATERPIE,RATTATA,WEEDLE,PIDGEY
+
+# The stack of evolves needed to pop lucky egg and evolve all
+evolve_stack_limit=100
+
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
 
