@@ -158,7 +158,16 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
 
     if(!settings.proxyServer.equals("") && settings.proxyPort > 0) {
         Log.normal("Setting up proxy server for bot " + settings.name + ": " + settings.proxyServer + ":" + settings.proxyPort)
-        proxyHttp = http.newBuilder().proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(settings.proxyServer, settings.proxyPort))).build()
+
+        val proxyType: Proxy.Type
+        if(settings.proxyType.equals("HTTP"))
+            proxyType = Proxy.Type.HTTP
+        else if(settings.proxyType.equals("SOCKS"))
+            proxyType = Proxy.Type.SOCKS
+        else
+            proxyType = Proxy.Type.DIRECT
+
+        proxyHttp = http.newBuilder().proxy(Proxy(proxyType, InetSocketAddress(settings.proxyServer, settings.proxyPort))).build()
     }
 
 

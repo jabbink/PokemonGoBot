@@ -17,6 +17,7 @@ import ink.abb.pogo.scraper.util.credentials.*
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
+import java.net.Proxy
 import java.util.*
 
 
@@ -43,6 +44,7 @@ class SettingsParser(val properties: Properties) {
 
                 proxyServer = getPropertyIfSet("Proxy server to be used by the bot", "proxy_server", defaults.proxyServer, String::toString),
                 proxyPort = getPropertyIfSet("Proxy server port to be used by the bot", "proxy_port", defaults.proxyPort, String::toInt),
+                proxyType = getPropertyIfSet("Type of the proxy server (HTTP/SOCKS/DIRECT)", "proxy_type", defaults.proxyType, String::toString),
 
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
@@ -164,6 +166,8 @@ data class Settings(
         val credentials: Credentials,
         val proxyServer: String = "",
         val proxyPort: Int = -1,
+        var proxyType: String = "SOCKS",
+
         val speed: Double = 2.8,
         val followStreets: Boolean = false,
         val groupItemsByType : Boolean = false,
