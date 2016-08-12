@@ -39,14 +39,19 @@ class UpdateProfile : Task {
             } else {
                 0
             }
+            val nextLevel: String = if (xpPerHour != 0L) {
+                DecimalFormat("#0.00").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())
+            } else {
+                "0"
+            }
 
             Log.magenta("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
             Log.magenta("XP gain: ${NumberFormat.getInstance().format(player.stats.experience - ctx.startXp.get())} XP in ${ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())} mins; " +
-                    "XP rate: ${NumberFormat.getInstance().format(xpPerHour)}/hr\n" +
-                    "Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
+                    "XP rate: ${NumberFormat.getInstance().format(xpPerHour)}/hr; Next level in: ${nextLevel} hr")
+            Log.magenta("Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
                     "Pokemon caught from lures: ${ctx.luredPokemonStats.get()}; " +
-                    "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};\r\n" +
-                    "Pokebank ${inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; " +
+                    "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};")
+            Log.magenta("Pokebank ${inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; " +
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
                     "Inventory ${inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}"
 
