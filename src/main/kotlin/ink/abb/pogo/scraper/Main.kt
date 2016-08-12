@@ -171,7 +171,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
                 .proxy(Proxy(proxyType, InetSocketAddress(settings.proxyServer, settings.proxyPort)))
                 .proxyAuthenticator { route, response ->
                     response.request().newBuilder()
-                            .header("ProxyAuthorization", Credentials.basic(settings.proxyUsername, settings.proxyPassword))
+                            .header("Proxy-Authorization", Credentials.basic(settings.proxyUsername, settings.proxyPassword))
                             .build()
                 }
                 .build()
