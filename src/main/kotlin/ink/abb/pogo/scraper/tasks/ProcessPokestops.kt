@@ -29,6 +29,10 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
     var startPokestop: Pokestop? = null
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        if (ctx.pauseForSniping.get()) {
+            return
+        }
+
         var writeCampStatus = false
         if (lastFetch + refetchTime < bot.api.currentTimeMillis()) {
             writeCampStatus = true
