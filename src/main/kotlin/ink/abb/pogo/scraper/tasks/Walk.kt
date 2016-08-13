@@ -100,7 +100,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             val waitTimeMax = settings.waitTimeMax
             if(waitTimeMax > waitTimeMin){
                 val sleepTime: Long = (Math.random() * (waitTimeMax - waitTimeMin) + waitTimeMin).toLong()
-                Log.red("Trainer grew tired, needs to rest a little (for ${sleepTime} seconds)")
+                Log.yellow("Trainer grew tired, needs to rest a little (for ${sleepTime} seconds)")
                 Thread.sleep(sleepTime * 1000)
             }
 
