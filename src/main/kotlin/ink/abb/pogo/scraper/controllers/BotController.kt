@@ -252,6 +252,14 @@ class BotController {
         }
     }
 
+    @RequestMapping(value = "/bot/{name}/location", method = arrayOf(RequestMethod.GET))
+    fun getLocation(@PathVariable name: String) : LocationData {
+        return LocationData(
+                service.getBotContext(name).api.latitude,
+                service.getBotContext(name).api.longitude
+        )
+    }
+
     @RequestMapping(value = "/bot/{name}/location/{latitude}/{longitude}", method = arrayOf(RequestMethod.POST))
     fun changeLocation(
             @PathVariable name: String,
