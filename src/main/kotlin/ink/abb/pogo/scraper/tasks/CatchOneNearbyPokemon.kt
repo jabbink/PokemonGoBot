@@ -73,11 +73,12 @@ class CatchOneNearbyPokemon : Task {
                     ctx.pauseWalking.set(false)
                     return
                 }
+                val curvedResult = (Math.random() < settings.desiredCurveRate)
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         itemBag,
                         desiredCatchProbability,
-                        settings.alwaysCurve,
+                        curvedResult,
                         !settings.neverUseBerries,
                         -1)
 

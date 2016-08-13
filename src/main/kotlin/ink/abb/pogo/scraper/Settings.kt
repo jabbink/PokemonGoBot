@@ -90,7 +90,7 @@ class SettingsParser(val properties: Properties) {
 
                 sortByIv = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", defaults.sortByIv, String::toBoolean),
 
-                alwaysCurve = getPropertyIfSet("Always throw curveballs", "always_curve", defaults.alwaysCurve, String::toBoolean),
+                desiredCurveRate = getPropertyIfSet("Define curved balls probability", "always_curve", defaults.desiredCurveRate, String::toDouble),
 
                 neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", defaults.neverUseBerries, String::toBoolean),
 
@@ -220,7 +220,7 @@ data class Settings(
         val autoFillIncubator: Boolean = true,
 
         val sortByIv: Boolean = false,
-        val alwaysCurve: Boolean = false,
+        val desiredCurveRate: Double = 0.0,
         val neverUseBerries: Boolean = true,
         val allowLeaveStartArea: Boolean = false,
         val spawnRadius: Int = -1,

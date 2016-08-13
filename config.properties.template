@@ -113,8 +113,8 @@ max_pokemon_amount=-1
 # Sort by IV first instead of CP
 sort_by_iv=false
 
-# Always throw curveballs
-always_curve=false
+# Rate for bot to throw a curveball, between 0 (never) and 1 (always)
+desired_curve_rate = 0.0
 
 # Never use berries
 never_use_berries=true
