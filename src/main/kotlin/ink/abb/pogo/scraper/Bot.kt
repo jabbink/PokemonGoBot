@@ -177,6 +177,9 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Log.green("Open the map on http://pogo.abb.ink/RocketTheme/")
         }
 
+        if (settings.snipingPort > 0) {
+            Log.normal("Listening for snipe info on port ${settings.snipingPort}")
+        }
 
         if (settings.timerWalkToStartPokestop > 0)
             runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), "BotWalkBackLoop") {

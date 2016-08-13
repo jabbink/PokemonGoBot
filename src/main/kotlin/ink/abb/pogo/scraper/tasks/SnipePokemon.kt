@@ -25,7 +25,7 @@ import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
-class SnipePokemon : Task {
+class SnipePokemon (val latitude: Double, val longitude: Double, val pokemonName: String): Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         ctx.pauseWalking.set(true)
         ctx.pauseForSniping.set(true)
@@ -37,20 +37,15 @@ class SnipePokemon : Task {
 
         var oldLatitude = ctx.lat.get()
         var oldLongitude = ctx.lng.get()
-        ctx.lat.set(ctx.snipeLat.get())
-        ctx.lng.set(ctx.snipeLong.get())
 
-        ctx.api.setLocation(ctx.snipeLat.get(), ctx.snipeLong.get(), 0.0)
-        ctx.pauseForSniping.set(false)
+        ctx.lat.set(latitude); ctx.lng.set(longitude)
+        ctx.api.setLocation(latitude, longitude, 0.0)
         bot.task(GetMapRandomDirection(isForSniping=true))
-        ctx.pauseForSniping.set(true)
+
         val pokemon = ctx.api.map.getCatchablePokemon(ctx.blacklistedEncounters)
 
         Log.cyan("Sniper Found $pokemon at long/lat ${ctx.lng.get()}/${ctx.lat.get()}")
-        val catchablePokemon = pokemon.find { it.pokemonId.toString().toLowerCase().equals(ctx.snipeName.toLowerCase()) }
-
-        // TODO: If PokeSnipers sends us multiple snipes, the bot goes for the first one sent.
-        // TODO: Put port, and task time as a configuration variable. Defaults: port = 16969, time = 5000 ms (5 sec)
+        val catchablePokemon = pokemon.find { it.pokemonId.toString().toLowerCase().equals(pokemonName.toLowerCase()) }
 
         Log.cyan(text="$catchablePokemon")
         if (null != catchablePokemon) {
@@ -68,7 +63,12 @@ class SnipePokemon : Task {
                 val pokemonData = encounterResult.pokemonData
                 Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
                         "with CP ${pokemonData.cp} and IV ${pokemonData.getIvPercentage()}%")
+
+                ctx.lat.set(oldLatitude); ctx.lng.set(oldLongitude)
                 ctx.api.setLocation(oldLatitude, oldLongitude, 0.0)
+
+                bot.task(GetMapRandomDirection(isForSniping=true))
+
                 val (shouldRelease, reason) = pokemonData.shouldTransfer(settings)
                 val desiredCatchProbability = if (shouldRelease) {
                     Log.yellow("Using desired_catch_probability_unwanted because $reason")
@@ -82,6 +82,7 @@ class SnipePokemon : Task {
                     ctx.pauseWalking.set(false)
                     return
                 }
+
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.cachedInventories.itemBag,
@@ -125,9 +126,12 @@ class SnipePokemon : Task {
                     if (result.status == CatchPokemonResponse.CatchStatus.CATCH_ERROR) {
                         Log.red("Blacklisting pokemon to prevent infinite loop")
                     }
-                    ctx.api.setLocation(oldLatitude, oldLongitude, 0.0)
                 }
             } else {
+                // We need to set this back to the old value.
+                ctx.lat.set(oldLatitude); ctx.lng.set(oldLongitude)
+                ctx.api.setLocation(oldLatitude, oldLongitude, 0.0)
+
                 Log.red("Encounter failed with result: ${encounterResult.status}")
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
                     Log.red("Disabling catching of Pokemon")
@@ -139,6 +143,8 @@ class SnipePokemon : Task {
             }
         }
         ctx.pauseWalking.set(false)
+        bot.task(GetMapRandomDirection(isForSniping=false))
         ctx.pauseForSniping.set(false)
+
     }
 }

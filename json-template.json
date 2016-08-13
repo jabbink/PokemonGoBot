@@ -53,5 +53,6 @@
   "obligatoryTransfer" : [ "DODUO", "RATTATA", "CATERPIE", "PIDGEY" ],
   "export" : "",
   "guiPortSocket" : 8001,
+  "snipingPort": 16969,
   "initialMapSize" : 9
 }

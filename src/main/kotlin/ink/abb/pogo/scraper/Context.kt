@@ -37,9 +37,6 @@ data class Context(
         val walking: AtomicBoolean = AtomicBoolean(false),
 
         val pauseWalking: AtomicBoolean = AtomicBoolean(false),
-        val pauseForSniping: AtomicBoolean = AtomicBoolean(false),
+        val pauseForSniping: AtomicBoolean = AtomicBoolean(false)
 
-        val snipeLat: AtomicDouble = AtomicDouble(0.0),
-        val snipeLong: AtomicDouble = AtomicDouble(0.0),
-        var snipeName: String = ""
 )

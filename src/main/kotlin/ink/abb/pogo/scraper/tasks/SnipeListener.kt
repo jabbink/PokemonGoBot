@@ -16,40 +16,50 @@ import ink.abb.pogo.scraper.pokedexId2Names
 import kotlin.collections.Map
 import java.io.*
 import java.net.*
+import java.util.ArrayList
 import com.fasterxml.jackson.databind.*
 import ink.abb.pogo.scraper.util.Log
 
 class SnipeListener : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val clientSocket = Socket("localhost", 16969)
+        val clientSocket = Socket("localhost", settings.snipingPort)
 
         while (true) {
             val dataReceived: BufferedReader
-            val result: Map<*,*>
+            val multipleSnipes = ArrayList<Map<*,*>>()
+
             try {
                 dataReceived = BufferedReader(InputStreamReader(clientSocket.inputStream))
-                result = ObjectMapper().readValue(dataReceived, Map::class.java)
+                val results = dataReceived.readLine().split("\n")
+                Log.red("$results")
+                for (result in results)
+                {
+                    val result_map = ObjectMapper().readValue(result, Map::class.java)
+                    multipleSnipes.add(result_map)
+                }
+
             }
             catch (e: Exception) {
                 continue
             }
 
-            val latitude = result["Latitude"].toString().toDouble()
-            val longitude = result["Longitude"].toString().toDouble()
-            val pokemonId = result["Id"].toString().toInt()
-            val pokemonName: String = (pokedexId2Names[pokemonId + 1]).toString()
-
-            if (latitude == null || longitude == null)
+            // We use a for loop because it processes multiple pokemon snipes at once.
+            for (snipe in multipleSnipes)
             {
-                continue
+                val latitude = snipe["Latitude"].toString().toDouble()
+                val longitude = snipe["Longitude"].toString().toDouble()
+                val pokemonId = snipe["Id"].toString().toInt()
+                val pokemonName: String = (pokedexId2Names[pokemonId + 1]).toString()
+
+                if (latitude == null || longitude == null)
+                {
+                    continue
+                }
+
+                Log.green(text="ayo data: $snipe with name $pokemonName")
+                bot.task(SnipePokemon(latitude, longitude, pokemonName))
             }
 
-            ctx.snipeLat.set(latitude)
-            ctx.snipeLong.set(longitude)
-            ctx.snipeName = pokemonName
-
-            Log.green(text="ayo data: $result with name ${ctx.snipeName}")
-            bot.task(SnipePokemon())
         }
     }
 }

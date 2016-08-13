@@ -105,6 +105,8 @@ class SettingsParser(val properties: Properties) {
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
+                snipingPort = getPropertyIfSet("Port where the sniping information will be sent to", "sniping_port", defaults.snipingPort, String::toInt),
+
                 initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt)
         )
     }
@@ -216,6 +218,8 @@ data class Settings(
         val export: String = "",
 
         val guiPortSocket: Int = 8001,
+
+        val snipingPort: Int = 16969,
 
         var initialMapSize: Int = 9,
 

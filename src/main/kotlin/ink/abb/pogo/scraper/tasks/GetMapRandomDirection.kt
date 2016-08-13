@@ -18,7 +18,7 @@ class GetMapRandomDirection(val isForSniping: Boolean) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // query a small area to keep alive
 
-        if (!isForSniping) {
+        if (ctx.pauseForSniping.get() && !isForSniping) {
             return
         }
 
