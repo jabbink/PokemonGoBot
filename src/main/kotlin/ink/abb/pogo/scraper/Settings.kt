@@ -91,7 +91,7 @@ class SettingsParser(val properties: Properties) {
 
                 sortByIv = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", defaults.sortByIv, String::toBoolean),
 
-                desiredCurveRate = getPropertyIfSet("Define curved balls probability", "always_curve", defaults.desiredCurveRate, String::toDouble),
+                desiredCurveRate = getPropertyIfSet("Define curved balls probability", "desired_curve_rate", defaults.desiredCurveRate, String::toDouble),
 
                 neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", defaults.neverUseBerries, String::toBoolean),
 
