@@ -49,6 +49,7 @@ class SettingsParser(val properties: Properties) {
                 proxyPassword = getPropertyIfSet("Password for the proxy server", "proxy_password", defaults.proxyPassword, String::toString),
 
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
+                randomSpeedRange = getPropertyIfSet("Define random speed range around the original speed", "random_speed_range", defaults.randomSpeedRange, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
                 dropItems = dropItems,
                 groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
@@ -90,7 +91,7 @@ class SettingsParser(val properties: Properties) {
 
                 sortByIv = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", defaults.sortByIv, String::toBoolean),
 
-                alwaysCurve = getPropertyIfSet("Always throw curveballs", "always_curve", defaults.alwaysCurve, String::toBoolean),
+                desiredCurveRate = getPropertyIfSet("Define curved balls probability", "always_curve", defaults.desiredCurveRate, String::toDouble),
 
                 neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", defaults.neverUseBerries, String::toBoolean),
 
@@ -101,6 +102,8 @@ class SettingsParser(val properties: Properties) {
                 banSpinCount = getPropertyIfSet("Number of times the pokestop should be spun to attempt softban bypass", "ban_spin_count", defaults.banSpinCount, String::toInt),
 
                 transferCpThreshold = getPropertyIfSet("Minimum CP to keep a pokemon", "transfer_cp_threshold", defaults.transferCpThreshold, String::toInt),
+
+                transferCpMinThreshold = getPropertyIfSet("Minimum CP % in relation to max CP of pokemon to your current trainer lvl to keep pokemon", "transfer_cp_min_threshold", defaults.transferCpMinThreshold, String::toInt),
 
                 transferIvThreshold = getPropertyIfSet("Minimum IV percentage to keep a pokemon", "transfer_iv_threshold", defaults.transferIvThreshold, String::toInt),
 
@@ -116,7 +119,13 @@ class SettingsParser(val properties: Properties) {
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
-                initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt)
+                initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt),
+
+                waitChance = getPropertyIfSet("Chance to wait on a pokestop", "wait_chance", defaults.waitChance, String::toDouble),
+
+                waitTimeMin = getPropertyIfSet("Minimal time to wait", "wait_time_min", defaults.waitTimeMin, String::toInt),
+
+                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt)
         )
     }
 
@@ -178,6 +187,7 @@ data class Settings(
         var proxyPassword: String = "",
 
         val speed: Double = 2.8,
+        val randomSpeedRange: Double = 0.0,
         val followStreets: Boolean = false,
         val groupItemsByType : Boolean = false,
         val dropItems: Boolean = true,
@@ -220,12 +230,13 @@ data class Settings(
         val autoFillIncubator: Boolean = true,
 
         val sortByIv: Boolean = false,
-        val alwaysCurve: Boolean = false,
+        val desiredCurveRate: Double = 0.0,
         val neverUseBerries: Boolean = true,
         val allowLeaveStartArea: Boolean = false,
         val spawnRadius: Int = -1,
         val banSpinCount: Int = 0,
         val transferCpThreshold: Int = 400,
+        val transferCpMinThreshold: Int = -1,
         val transferIvThreshold: Int = 80,
         val ignoredPokemon: List<PokemonId> = listOf(PokemonId.EEVEE, PokemonId.MEWTWO, PokemonId.CHARMANDER),
 
@@ -240,7 +251,11 @@ data class Settings(
 
         var initialMapSize: Int = 9,
 
-        val version: String = Settings.version
+        val version: String = Settings.version,
+
+        val waitChance: Double = 0.0,
+        val waitTimeMin: Int = 0,
+        val waitTimeMax: Int = 0
 ) {
     fun withName(name: String): Settings {
         this.name = name

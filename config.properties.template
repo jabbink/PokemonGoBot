@@ -37,6 +37,9 @@ camp_lure_pokestop=-1
 # Meters per second
 speed=2.8
 
+# Random speed range around the original speed value in Meters per Second
+random_speed_range=0.0
+
 # Should the bot follow the streets (true) or just go directly to pokestops/waypoints
 follow_streets=false
 
@@ -113,8 +116,8 @@ max_pokemon_amount=-1
 # Sort by IV first instead of CP
 sort_by_iv=false
 
-# Always throw curveballs
-always_curve=false
+# Rate for bot to throw a curveball, between 0 (never) and 1 (always)
+desired_curve_rate = 0.0
 
 # Never use berries
 never_use_berries=true
@@ -142,6 +145,11 @@ transfer_iv_threshold=80
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
 
+# Minimum CP % in relation to max CP of pokemon to your current trainer lvl to keep pokemon (to disable CP%:use -1)
+# e.g. Trainer lvl is 33, captured EEVEE has 490 CP which results in max possible CP of 984 with 15/14/15 IV
+# that however is below the threshold of 60% because its 49%
+transfer_cp_min_threshold=-1
+
 # List of pokemon you don't want to transfer regardless of CP
 # The names must be divided by a ","
 # If you want all pokemons to be transferred just leave it blank
@@ -164,10 +172,19 @@ gui_port_socket=8001
 #   CSV      Correct USA/UK CSV format ("," as delimiter and "." as decimal separator)
 #   DSV      European CSV/DSV format (";" as delimiter and "," as decimal separator)
 #              Use this one if your MS Excel can't handle the default CSV option
+#   JSON     JSON format
 export=
 
 # Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
 initial_map_size=9
+
+# For artificial pauses/rests
+# Chance to wait randomly at a pokestop in %, recommended about 10 or less, default disabled
+wait_chance=0.0
+
+# Time to wait in seconds, recommended 5-30, default disabled
+wait_time_min=0
+wait_time_max=0
 
 # List of pokemon names
 #MISSINGNO

@@ -94,6 +94,21 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             return
         }
 
+        //random waiting
+        if(Math.random() * 100 < settings.waitChance){
+            val waitTimeMin = settings.waitTimeMin
+            val waitTimeMax = settings.waitTimeMax
+            if(waitTimeMax > waitTimeMin){
+                val sleepTime: Long = (Math.random() * (waitTimeMax - waitTimeMin) + waitTimeMin).toLong()
+                Log.yellow("Trainer grew tired, needs to rest a little (for ${sleepTime} seconds)")
+                Thread.sleep(sleepTime * 1000)
+            }
+
+        }
+
+        val randomSpeed = randomizeSpeed(speed, settings.randomSpeedRange)
+        Log.green("Your character now moves with: ${randomSpeed} Meters per second")
+
         val timeout = 200L
 
         var remainingSteps = 0.0
@@ -126,7 +141,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     path.removeAt(0)
                     val diff = nextPoint.sub(start)
                     val distance = start.getEarthDistance(nextPoint)
-                    val timeRequired = distance / speed
+                    val timeRequired = distance / randomSpeed
                     val stepsRequired = timeRequired / (timeout.toDouble() / 1000.toDouble())
 
                     deltaLat = diff.latDegrees() / stepsRequired
@@ -210,5 +225,12 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         // should not happen
         return pokestops.first()
+    }
+
+    private fun randomizeSpeed(speed : Double, randomSpeedRange: Double): Double {
+        if(randomSpeedRange > speed){
+            return speed
+        }
+        return speed - randomSpeedRange + (Math.random()*randomSpeedRange*2)
     }
 }
