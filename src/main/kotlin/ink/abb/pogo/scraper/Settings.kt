@@ -117,7 +117,13 @@ class SettingsParser(val properties: Properties) {
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
-                initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt)
+                initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt),
+
+                waitChance = getPropertyIfSet("Chance to wait on a pokestop", "wait_chance", defaults.waitChance, String::toDouble),
+
+                waitTimeMin = getPropertyIfSet("Minimal time to wait", "wait_time_min", defaults.waitTimeMin, String::toInt),
+
+                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt)
         )
     }
 
@@ -242,7 +248,11 @@ data class Settings(
 
         var initialMapSize: Int = 9,
 
-        val version: String = Settings.version
+        val version: String = Settings.version,
+
+        val waitChance: Double = 0.0,
+        val waitTimeMin: Int = 0,
+        val waitTimeMax: Int = 0
 ) {
     fun withName(name: String): Settings {
         this.name = name

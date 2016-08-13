@@ -172,6 +172,14 @@ export=
 # Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
 initial_map_size=9
 
+# For artificial pauses/rests
+# Chance to wait randomly at a pokestop in %, recommended about 10 or less, default disabled
+wait_chance=0.0
+
+# Time to wait in seconds, recommended 5-30, default disabled
+wait_time_min=0
+wait_time_max=0
+
 # List of pokemon names
 #MISSINGNO
 #BULBASAUR

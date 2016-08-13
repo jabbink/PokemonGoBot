@@ -94,6 +94,18 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             return
         }
 
+        //random waiting
+        if(Math.random() * 100 < settings.waitChance){
+            val waitTimeMin = settings.waitTimeMin
+            val waitTimeMax = settings.waitTimeMax
+            if(waitTimeMax > waitTimeMin){
+                val sleepTime: Long = (Math.random() * (waitTimeMax - waitTimeMin) + waitTimeMin).toLong()
+                Log.red("Trainer grew tired, needs to rest a little (for ${sleepTime} seconds)")
+                Thread.sleep(sleepTime * 1000)
+            }
+
+        }
+
         val randomSpeed = randomizeSpeed(speed, settings.randomSpeedRange)
         Log.green("Your character now moves with: ${randomSpeed} Meters per second")
 
