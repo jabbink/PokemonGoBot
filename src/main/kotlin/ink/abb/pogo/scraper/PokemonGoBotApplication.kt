@@ -52,6 +52,9 @@ open class PokemonGoBotApplication {
         lateinit var botRunService: BotService
 
         override fun run(vararg args: String?) {
+            if(args.contains("--run=no"))
+                return
+                
             val names = botRunService.getSaveNames()
             if (names.size < 1) {
                 thread(name = "default") {
