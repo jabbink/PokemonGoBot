@@ -167,6 +167,7 @@ gui_port_socket=8001
 #   CSV      Correct USA/UK CSV format ("," as delimiter and "." as decimal separator)
 #   DSV      European CSV/DSV format (";" as delimiter and "," as decimal separator)
 #              Use this one if your MS Excel can't handle the default CSV option
+#   JSON     JSON format
 export=
 
 # Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
