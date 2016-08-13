@@ -37,6 +37,9 @@ camp_lure_pokestop=-1
 # Meters per second
 speed=2.8
 
+# Random speed range around the original speed value in Meters per Second
+random_speed_range=0.0
+
 # Should the bot follow the streets (true) or just go directly to pokestops/waypoints
 follow_streets=false
 

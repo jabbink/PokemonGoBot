@@ -49,6 +49,7 @@ class SettingsParser(val properties: Properties) {
                 proxyPassword = getPropertyIfSet("Password for the proxy server", "proxy_password", defaults.proxyPassword, String::toString),
 
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
+                randomSpeedRange = getPropertyIfSet("Define random speed range around the original speed", "random_speed_range", defaults.randomSpeedRange, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
                 dropItems = dropItems,
                 groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
@@ -178,6 +179,7 @@ data class Settings(
         var proxyPassword: String = "",
 
         val speed: Double = 2.8,
+        val randomSpeedRange: Double = 0.0,
         val followStreets: Boolean = false,
         val groupItemsByType : Boolean = false,
         val dropItems: Boolean = true,
