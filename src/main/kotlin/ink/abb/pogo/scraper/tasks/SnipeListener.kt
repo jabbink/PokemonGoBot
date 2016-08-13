@@ -51,11 +51,6 @@ class SnipeListener : Task {
                 val pokemonId = snipe["Id"].toString().toInt()
                 val pokemonName: String = (pokedexId2Names[pokemonId + 1]).toString()
 
-                if (latitude == null || longitude == null)
-                {
-                    continue
-                }
-
                 Log.green(text="ayo data: $snipe with name $pokemonName")
                 bot.task(SnipePokemon(latitude, longitude, pokemonName))
             }
