@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import com.pokegoapi.api.player.PlayerLevelUpRewards
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.*
 import ink.abb.pogo.scraper.util.Log
@@ -17,11 +18,50 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 class UpdateProfile : Task {
+    var lastLevelCheck: Int = 1
+
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         val player = ctx.api.playerProfile
         ctx.api.inventories.updateInventories(true)
+
+        for (i in lastLevelCheck..player.stats.level)
+        {
+            val msg = ctx.api.playerProfile.acceptLevelUpRewards(i)
+
+            if (msg.status == PlayerLevelUpRewards.Status.ALREADY_ACCEPTED)
+            {
+                continue
+            }
+
+            var message = "Accepting rewards for level $i"
+
+            val sb_rewards = StringJoiner(", ")
+            for (reward in msg.rewards) {
+                sb_rewards.add("${reward.itemCount}x ${reward.itemId.name}")
+            }
+            message += "; Rewards: [${sb_rewards.toString()}]"
+
+            if (msg.unlockedItems.size > 0) {
+                val sb_unlocks = StringJoiner(", ")
+                for (item in msg.unlockedItems) {
+                    sb_unlocks.add("${item.name}")
+                }
+                message += "; Unlocks: [${sb_unlocks.toString()}]"
+            }
+
+            Log.magenta(message)
+
+            lastLevelCheck = i
+
+            if (lastLevelCheck != player.stats.level) Thread.sleep(500)
+        }
+
+        // No messages to show? Booo!
+        ctx.api.playerProfile.checkAndEquipBadges()
+
         try {
             // update km walked, mainly
             val inventories = ctx.api.cachedInventories
