@@ -27,7 +27,7 @@ having to answer the same question can really clog up the pipes for people who a
 ## From source
 
 1. Clone this repo: `git clone https://github.com/jabbink/PokemonGoBot.git && cd PokemonGoBot` or download the zip
-2. Run from terminal/cmd: `gradlew build`
+2. Run from terminal/cmd: `gradle build`
 3. Rename `./config.properties.template` to `./config.properties`
 4. Modify `config.properties` as you please
 5. To run the bot directly from console run `gradlew run`
