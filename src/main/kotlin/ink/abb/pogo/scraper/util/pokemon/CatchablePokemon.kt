@@ -123,13 +123,14 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     var recticleSize = 1.7 + Math.random()*0.3
     if(randomBallThrows){
         recticleSize = catchProbability*2 + Math.random()*2*(1-catchProbability)
+
         if (recticleSize > 2){
             recticleSize = 2.0
         }
+
         if( recticleSize < 1){
             Log.blue("Your trainer threw a normal ball, no xp/catching bonus, good for pretending to be not a bot however")
-        }
-        if ( recticleSize >= 1 && recticleSize < 1.3){
+        } else if ( recticleSize >= 1 && recticleSize < 1.3){
             Log.blue("Your trainer got a 'Nice throw' - nice")
         } else if ( recticleSize >= 1.3 && recticleSize < 1.7){
             Log.blue("Your trainer got a 'Great throw!'")
