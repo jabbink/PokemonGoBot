@@ -26,6 +26,10 @@ desired_catch_probability=0.4
 # Set to -1 to not attempt catching at all
 desired_catch_probability_unwanted=0.0
 
+# Set if random ball throws should be enabled
+# Currently decides if the throw is nice/great/excellent/normal by using the desired_catch_probability(_unwanted), decreasing earned exp and fang rate however
+random_ball_throws=false
+
 # Number of nearest unused pokestops to randomly select
 # The next pokestop from (1/infinite)
 random_next_pokestop_selection=5
@@ -117,7 +121,7 @@ max_pokemon_amount=-1
 sort_by_iv=false
 
 # Rate for bot to throw a curveball, between 0 (never) and 1 (always)
-desired_curve_rate = 0.0
+desired_curve_rate=0.0
 
 # Never use berries
 never_use_berries=true

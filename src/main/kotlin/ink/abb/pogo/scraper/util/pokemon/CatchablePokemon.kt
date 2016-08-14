@@ -36,11 +36,11 @@ val itemToPokeball = mapOf(
         Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL)
 )
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, amount: Int): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false, amount: Int): CatchResult? {
     var result: CatchResult?
     var numThrows = 0
     do {
-        result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries)
+        result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries, randomBallThrows)
 
         if (result == null ||
                 (result.status != CatchStatus.CATCH_ESCAPE && result.status != CatchStatus.CATCH_MISSED)) {
@@ -52,7 +52,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     return result
 }
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false): CatchResult? {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     //Log.yellow(probabilities.toString())
@@ -118,6 +118,26 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     }
     logMessage += "; achieved catch probability: ${catchProbability}, desired: ${desiredCatchProbability}"
     Log.yellow(logMessage)
+
+    //always excellent throw
+    var recticleSize = 1.7 + Math.random()*0.3
+    if(randomBallThrows){
+        recticleSize = catchProbability*2 + Math.random()*2*(1-catchProbability)
+        if (recticleSize > 2){
+            recticleSize = 2.0
+        }
+        if( recticleSize < 1){
+            Log.blue("Your trainer threw a normal ball, no xp/catching bonus, good for pretending to be not a bot however")
+        }
+        if ( recticleSize >= 1 && recticleSize < 1.3){
+            Log.blue("Your trainer got a 'Nice throw' - nice")
+        } else if ( recticleSize >= 1.3 && recticleSize < 1.7){
+            Log.blue("Your trainer got a 'Great throw!'")
+        } else if ( recticleSize > 1.7){
+            Log.blue("Your trainer got an 'Excellent throw!' - that's suspicious, might he be a bot?")
+        }
+    }
+
     return catch(
             normalizedHitPosition = 1.0,
             normalizedReticleSize = 1.95 + Math.random() * 0.05,

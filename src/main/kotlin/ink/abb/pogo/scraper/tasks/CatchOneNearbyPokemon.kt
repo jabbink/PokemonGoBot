@@ -80,6 +80,7 @@ class CatchOneNearbyPokemon : Task {
                         desiredCatchProbability,
                         isBallCurved,
                         !settings.neverUseBerries,
+                        settings.randomBallThrows,
                         -1)
 
                 if (result == null) {
