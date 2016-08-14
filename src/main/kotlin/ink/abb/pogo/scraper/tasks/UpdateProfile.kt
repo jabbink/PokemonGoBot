@@ -42,14 +42,14 @@ class UpdateProfile : Task {
             for (reward in msg.rewards) {
                 sb_rewards.add("${reward.itemCount}x ${reward.itemId.name}")
             }
-            message += "; Rewards: [${sb_rewards.toString()}]"
+            message += "; Rewards: [$sb_rewards]"
 
             if (msg.unlockedItems.size > 0) {
                 val sb_unlocks = StringJoiner(", ")
                 for (item in msg.unlockedItems) {
                     sb_unlocks.add("${item.name}")
                 }
-                message += "; Unlocks: [${sb_unlocks.toString()}]"
+                message += "; Unlocks: [$sb_unlocks]"
             }
 
             Log.magenta(message)
