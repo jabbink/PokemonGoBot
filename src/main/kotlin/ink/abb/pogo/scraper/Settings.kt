@@ -75,7 +75,7 @@ class SettingsParser(val properties: Properties) {
                 campLurePokestop = getPropertyIfSet("Camp around x lured pokestops", "camp_lure_pokestop", defaults.campLurePokestop, String::toInt),
                 desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", defaults.desiredCatchProbability, String::toDouble),
                 desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", defaults.desiredCatchProbabilityUnwanted, String::toDouble),
-                randomBallThrows = getPropertyIfSet("Randomize Ball Throwing", "random_ball_throwing", defaults.randomBallThrows, String::toBoolean),
+                randomBallThrows = getPropertyIfSet("Randomize Ball Throwing", "random_ball_throws", defaults.randomBallThrows, String::toBoolean),
                 autotransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.autotransfer, String::toBoolean),
                 keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", defaults.keepPokemonAmount, String::toInt),
                 maxPokemonAmount = getPropertyIfSet("maximum keep pokemon amount", "max_pokemon_amount", defaults.maxPokemonAmount, String::toInt),
