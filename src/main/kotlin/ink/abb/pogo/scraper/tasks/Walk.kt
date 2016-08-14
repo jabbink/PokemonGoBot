@@ -78,7 +78,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
     private fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
         val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end)
-        if (coordinatesList.size >= 0) {
+        if (coordinatesList.size > 0) {
             walkPath(bot, ctx, settings, coordinatesList, speed, sendDone)
         } else {
             walkDirectly(bot, ctx, settings, end, speed, sendDone)
