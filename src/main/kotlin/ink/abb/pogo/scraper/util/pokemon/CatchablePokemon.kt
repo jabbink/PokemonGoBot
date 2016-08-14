@@ -140,7 +140,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
 
     return catch(
             normalizedHitPosition = 1.0,
-            normalizedReticleSize = 1.95 + Math.random() * 0.05,
+            normalizedReticleSize = recticleSize,
             spinModifier = if (needCurve) 0.85 + Math.random() * 0.15 else Math.random() * 0.10,
             ballType = itemToPokeball.get(ball),
             amount = 0,
