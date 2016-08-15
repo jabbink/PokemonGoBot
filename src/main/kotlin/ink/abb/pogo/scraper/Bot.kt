@@ -91,6 +91,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val profile = UpdateProfile()
         val catch = CatchOneNearbyPokemon()
         val release = ReleasePokemon()
+        val evolve = EvolvePokemon()
         val hatchEggs = HatchEggs()
         val export = Export()
         val readGpx = ReadGpx()
@@ -140,6 +141,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             task(hatchEggs)
             if (settings.export.length > 0)
                 task(export)
+            if (settings.evolveStackLimit > 0)
+                task(evolve)
         }
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
@@ -175,7 +178,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             if (settings.guiPortSocket != 8001) {
                 needPort = "#localhost:${settings.guiPortSocket}"
             }*/
-            Log.green("Open the map on http://pogo.abb.ink/RocketTheme/")
+            Log.green("Open the map on http://ui.pogobot.club/")
         }
 
 

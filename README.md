@@ -16,7 +16,7 @@ Before opening an issue or explaining your problem on Discord, please refer to t
 
 ### Screenshot
 
-[![GUI Screenshot](http://pogo.abb.ink/img/gui-screenshot-01.png)](https://github.com/jabbink/PokemonGoBot/blob/gh-pages/README.md)
+[![GUI Screenshot](http://ui.pogobot.club/img/gui-screenshot-01.png)](https://github.com/jabbink/PokemonGoBot/blob/gh-pages/README.md)
 
 ## Features
 

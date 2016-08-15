@@ -169,7 +169,7 @@ class SocketServer {
             val eggs = EventEggs()
             for (egg in ctx!!.api.cachedInventories.hatchery.eggs) {
                 val eggObj = EventEggs.Egg()
-                // eggObj.distanceWalked = egg.eggKmWalked
+                eggObj.distanceWalked = egg.eggKmWalked
                 eggObj.distanceTarget = egg.eggKmWalkedTarget
                 eggs.eggs.add(eggObj)
             }
