@@ -11,6 +11,7 @@
   "followStreets" : false,
   "groupItemsByType" : false,
   "dropItems" : true,
+  "itemDropDelay" : -1,
   "uselessItems" : {
     "ITEM_REVIVE" : 20,
     "ITEM_MAX_REVIVE" : 10,
@@ -34,6 +35,7 @@
   "desiredCatchProbability" : 0.4,
   "desiredCatchProbabilityUnwanted" : 0.0,
   "autotransfer" : true,
+  "autotransferTimeDelay" : -1,
   "randomBallThrows" : false,
   "waitBetweenThrows" : false,
   "keepPokemonAmount" : 1,
@@ -60,6 +62,7 @@
   "evolveBeforeTransfer" : [ "DODUO", "RATTATA", "CATERPIE", "PIDGEY" ],
   "evolveStackLimit" : 100,
   "useLuckyEgg" : 1,
+  "evolveTimeDelay" : 300,
   "export" : "",
   "guiPortSocket" : 8001,
   "initialMapSize" : 9,

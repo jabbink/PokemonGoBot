@@ -44,9 +44,12 @@ class EvolvePokemon : Task {
                     maxPossibleEvolves--
                     if (maxPossibleEvolves < 0) {
                         releasePokemon(it,"Not enough candy to save for evolve",ctx)
+                        if(settings.autotransferTimeDelay != (-1).toLong()){
+                            val transferWaitTime = settings.autotransferTimeDelay/2 + (Math.random()*settings.autotransferTimeDelay).toLong()
+                            Thread.sleep(transferWaitTime)
+                        }
                     }
                 }
-
             }
         }
         Log.yellow("Stack of pokemon ready to evolve: $countEvolveStack pokemons")
@@ -71,11 +74,20 @@ class EvolvePokemon : Task {
                 if (settings.evolveBeforeTransfer.contains(it.pokemonId)) {
                     Log.yellow("Evolving ${it.pokemonId.name} before transfer")
                     val evolveResult = it.evolve()
-                    Thread.sleep(300)
+                    if( settings.evolveTimeDelay > 300){
+                        Thread.sleep(settings.evolveTimeDelay/2 + (Math.random()*settings.evolveTimeDelay).toLong())
+                    } else {
+                        Thread.sleep(300)
+                    }
                     if (evolveResult.isSuccessful()) {
                         countEvolved++
                         releasePokemon(evolveResult.getEvolvedPokemon(),"Evolved for XP only",ctx)
-                        Thread.sleep(300)
+
+                        if(settings.autotransferTimeDelay.toInt() != -1 && settings.autotransferTimeDelay > 300){
+                            Thread.sleep(settings.autotransferTimeDelay/2 + (Math.random()*settings.autotransferTimeDelay).toLong())
+                        } else {
+                            Thread.sleep(300)
+                        }
                     }
                 }
             }

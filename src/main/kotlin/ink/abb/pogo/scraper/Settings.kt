@@ -52,6 +52,7 @@ class SettingsParser(val properties: Properties) {
                 randomSpeedRange = getPropertyIfSet("Define random speed range around the original speed", "random_speed_range", defaults.randomSpeedRange, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
                 dropItems = dropItems,
+                itemDropDelay = getPropertyIfSet("Delay between each drop of items","item_drop_delay",defaults.itemDropDelay, String::toLong),
                 groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
 
                 uselessItems = mapOf(
@@ -78,6 +79,7 @@ class SettingsParser(val properties: Properties) {
                 randomBallThrows = getPropertyIfSet("Randomize Ball Throwing", "random_ball_throws", defaults.randomBallThrows, String::toBoolean),
                 waitBetweenThrows = getPropertyIfSet("Waiting between throws", "wait_between_throws", defaults.waitBetweenThrows, String::toBoolean),
                 autotransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.autotransfer, String::toBoolean),
+                autotransferTimeDelay = getPropertyIfSet("Delay between each transfer","autotransfer_time_delay", defaults.autotransferTimeDelay, String::toLong),
                 keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", defaults.keepPokemonAmount, String::toInt),
                 maxPokemonAmount = getPropertyIfSet("maximum keep pokemon amount", "max_pokemon_amount", defaults.maxPokemonAmount, String::toInt),
                 displayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", defaults.displayKeepalive, String::toBoolean),
@@ -118,6 +120,8 @@ class SettingsParser(val properties: Properties) {
                 evolveStackLimit = getPropertyIfSet("The stack of evolves needed to pop lucky egg and evolve all", "evolve_stack_limit", defaults.evolveStackLimit, String::toInt),
 
                 useLuckyEgg = getPropertyIfSet("Use lucky egg before evolves", "use_lucky_egg", defaults.useLuckyEgg, String::toInt),
+
+                evolveTimeDelay =  getPropertyIfSet("Set time delay between evolutions", "evolve_time_delay", defaults.evolveTimeDelay, String::toLong),
 
                 export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
 
@@ -199,6 +203,7 @@ data class Settings(
         val followStreets: Boolean = false,
         val groupItemsByType : Boolean = false,
         val dropItems: Boolean = true,
+        val itemDropDelay: Long = -1,
         val uselessItems: Map<ItemId, Int> = mapOf(
                 Pair(ItemId.ITEM_REVIVE, 20),
                 Pair(ItemId.ITEM_MAX_REVIVE, 10),
@@ -224,6 +229,7 @@ data class Settings(
         val desiredCatchProbability: Double = 0.4,
         val desiredCatchProbabilityUnwanted: Double = 0.0,
         val autotransfer: Boolean = true,
+        val autotransferTimeDelay: Long = -1,
         val randomBallThrows: Boolean = false,
         val waitBetweenThrows: Boolean = false,
         val keepPokemonAmount: Int = 1,
@@ -255,6 +261,7 @@ data class Settings(
         val evolveBeforeTransfer: List<PokemonId> = listOf(PokemonId.CATERPIE, PokemonId.RATTATA, PokemonId.WEEDLE, PokemonId.PIDGEY),
         val evolveStackLimit: Int = 100,
         val useLuckyEgg: Int = 1,
+        val evolveTimeDelay: Long = 300,
 
         val export: String = "",
 

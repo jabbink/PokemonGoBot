@@ -46,7 +46,10 @@ class ReleasePokemon : Task {
                             Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
                                     "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
                             val result = pokemon.transferPokemon()
-                            
+                            if(settings.autotransferTimeDelay != (-1).toLong()){
+                                val transferWaitTime = settings.autotransferTimeDelay/2 + (Math.random()*settings.autotransferTimeDelay).toLong()
+                                Thread.sleep(transferWaitTime)
+                            }
                             if(ctx.pokemonInventoryFullStatus.second.get() && !settings.catchPokemon) {
                               // Just released a pokemon so the inventory is not full anymore
                               
