@@ -36,15 +36,20 @@ val itemToPokeball = mapOf(
         Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL)
 )
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, amount: Int): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false, waitBetweenThrows:Boolean = false, amount: Int): CatchResult? {
     var result: CatchResult?
     var numThrows = 0
     do {
-        result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries)
+        result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries, randomBallThrows)
 
         if (result == null ||
                 (result.status != CatchStatus.CATCH_ESCAPE && result.status != CatchStatus.CATCH_MISSED)) {
             break
+        }
+        if(waitBetweenThrows){
+            val waitTime = (Math.random()*2900 + 100)
+            Log.blue("Missed, waiting for ${waitTime/1000} seconds")
+            Thread.sleep(waitTime.toLong())
         }
         numThrows++
     } while (amount < 0 || numThrows < amount)
@@ -52,7 +57,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     return result
 }
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false): CatchResult? {
+fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false): CatchResult? {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     //Log.yellow(probabilities.toString())
@@ -118,9 +123,37 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     }
     logMessage += "; achieved catch probability: ${catchProbability}, desired: ${desiredCatchProbability}"
     Log.yellow(logMessage)
+    //excellent throw value
+    var recticleSize = 1.7 + Math.random()*0.3
+
+    if(randomBallThrows){
+        //excellent throw if capture probability is still less then desired
+        if( catchProbability <= desiredCatchProbability){
+            // the recticle size is already set for an excelent throw
+        }
+        //if catch probability is too high...
+        else{
+            // we substract the difference from the recticle size, the lower this size, the worse the ball
+            recticleSize = 1 + Math.random() - (catchProbability - desiredCatchProbability)*0.5
+
+            if (recticleSize > 2){ recticleSize = 2.0 }
+            else if(recticleSize < 0){ recticleSize = 0.01 }
+
+            if( recticleSize < 1){
+                Log.blue("Your trainer threw a normal ball, no xp/catching bonus, good for pretending to be not a bot however")
+            } else if ( recticleSize >= 1 && recticleSize < 1.3){
+                Log.blue("Your trainer got a 'Nice throw' - nice")
+            } else if ( recticleSize >= 1.3 && recticleSize < 1.7){
+                Log.blue("Your trainer got a 'Great throw!'")
+            } else if ( recticleSize > 1.7){
+                Log.blue("Your trainer got an 'Excellent throw!' - that's suspicious, might he be a bot?")
+            }
+        }
+    }
+
     return catch(
             normalizedHitPosition = 1.0,
-            normalizedReticleSize = 1.95 + Math.random() * 0.05,
+            normalizedReticleSize = recticleSize,
             spinModifier = if (needCurve) 0.85 + Math.random() * 0.15 else Math.random() * 0.10,
             ballType = itemToPokeball.get(ball),
             amount = 0,

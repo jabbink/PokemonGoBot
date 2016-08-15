@@ -12,7 +12,7 @@ proxy_port=-1
 proxy_type=SOCKS
 # Proxy authentication
 proxy_username=
-proxy_password
+proxy_password=
 
 # Token to login directly
 token=
@@ -26,6 +26,14 @@ desired_catch_probability=0.4
 # Set to -1 to not attempt catching at all
 desired_catch_probability_unwanted=0.0
 
+# Set if random ball throws should be enabled
+# Currently decides if the throw is nice/great/excellent/normal by using the desired_catch_probability(_unwanted), decreasing earned exp and fang rate however
+# Heavily depends on the desired catch rates now, if you have too few excellent/great throws try increasing those values
+random_ball_throws=false
+
+# Set if you want to wait a little between throws (0-3 secs)
+wait_between_throws=false
+
 # Number of nearest unused pokestops to randomly select
 # The next pokestop from (1/infinite)
 random_next_pokestop_selection=5
@@ -36,6 +44,10 @@ camp_lure_pokestop=-1
 ## Walking
 # Meters per second
 speed=2.8
+
+# Random speed range around the original speed value in Meters per Second
+# Example: If speed is 2.8, and the range 0.5, the speed will be between 2.3 and 3.3
+random_speed_range=0.0
 
 # Should the bot follow the streets (true) or just go directly to pokestops/waypoints
 follow_streets=false
@@ -113,8 +125,8 @@ max_pokemon_amount=-1
 # Sort by IV first instead of CP
 sort_by_iv=false
 
-# Always throw curveballs
-always_curve=false
+# Rate for bot to throw a curveball, between 0 (never) and 1 (always)
+desired_curve_rate=0.0
 
 # Never use berries
 never_use_berries=true
@@ -142,6 +154,11 @@ transfer_iv_threshold=80
 # Minimum CP to keep a pokemon (to ignore CP: use -1)
 transfer_cp_threshold=400
 
+# Minimum CP % in relation to max CP of pokemon to your current trainer lvl to keep pokemon (to disable CP%:use -1)
+# e.g. Trainer lvl is 33, captured EEVEE has 490 CP which results in max possible CP of 984 with 15/14/15 IV
+# that however is below the threshold of 60% because its 49%
+transfer_cp_min_threshold=-1
+
 # List of pokemon you don't want to transfer regardless of CP
 # The names must be divided by a ","
 # If you want all pokemons to be transferred just leave it blank
@@ -155,6 +172,9 @@ evolve_before_transfer=CATERPIE,RATTATA,WEEDLE,PIDGEY
 
 # The stack of evolves needed to pop lucky egg and evolve all
 evolve_stack_limit=100
+
+# Use lucky egg before transfer (1 = yes, anything else = no)
+use_lucky_egg=1
 
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
@@ -170,10 +190,19 @@ sniping_port = 16969
 #   CSV      Correct USA/UK CSV format ("," as delimiter and "." as decimal separator)
 #   DSV      European CSV/DSV format (";" as delimiter and "," as decimal separator)
 #              Use this one if your MS Excel can't handle the default CSV option
+#   JSON     JSON format
 export=
 
 # Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
 initial_map_size=9
+
+# For artificial pauses/rests
+# Chance to wait randomly at a pokestop in %, recommended about 10 or less, default disabled
+wait_chance=0.0
+
+# Time to wait in seconds, recommended 5-30, default disabled
+wait_time_min=0
+wait_time_max=0
 
 # List of pokemon names
 #MISSINGNO

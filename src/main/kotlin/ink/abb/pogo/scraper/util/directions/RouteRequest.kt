@@ -30,6 +30,9 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
         }
     } catch (e: Exception) {
         Log.red("Error fetching route from provider: " + e.message)
+
+        // Clean the variable on errors so it does not bork the next part when some chars are already saved
+        routeFile = String()
     }
     return routeFile
 }

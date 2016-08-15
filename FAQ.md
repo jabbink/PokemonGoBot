@@ -37,15 +37,15 @@ Separate the windows as they're conjoined together.
 
 ## Where did the GUI go?
 
-The GUI is now hosted on http://pogo.abb.ink/RocketTheme/
+The GUI is now hosted on http://ui.pogobot.club/
 
 This URL is also shown in the console when you launch the bot.
 
 ## Where did the GPX support go?
 
-If you like the old UI with GPX support, go to http://pogo.abb.ink/0.5.0-alpha4/map.html
+If you like the old UI with GPX support, go to http://ui.pogobot.club/0.5.0-alpha4/map.html
 
-If your bot runs the GUI socket on port `8001`, everything should work automatically, if not, append your IP address and port to the URL like this: http://pogo.abb.ink/0.5.0-alpha4/map.html#127.0.0.1:8001
+If your bot runs the GUI socket on port `8001`, everything should work automatically, if not, append your IP address and port to the URL like this: http://ui.pogobot.club/0.5.0-alpha4/map.html#127.0.0.1:8001
 
 ## The bot refuses to login to my Google account
 
