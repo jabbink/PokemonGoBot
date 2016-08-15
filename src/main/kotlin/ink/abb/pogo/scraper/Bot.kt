@@ -166,7 +166,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(WalkToStartPokestop(process.startPokestop as Pokestop))
         }
 
-        task(sniper)
+        
 
         Log.setContext(ctx)
 
@@ -180,7 +180,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Log.green("Open the map on http://pogo.abb.ink/RocketTheme/")
         }
 
-        if (settings.snipingPort > 0) {
+        if (settings.wantSniping) && (settings.snipingPort > 0) {
+            task(sniper)
             Log.normal("Listening for snipe info on port ${settings.snipingPort}")
         }
 
