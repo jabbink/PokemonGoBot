@@ -159,6 +159,9 @@ evolve_stack_limit=100
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
 
+# Allow sniping (Recommended value: false)
+want_sniping = false
+
 # Port where the sniping information is sent to
 sniping_port = 16969
 
