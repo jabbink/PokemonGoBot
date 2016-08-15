@@ -47,9 +47,16 @@ class BotController {
             @RequestBody pass: String
     ): String {
 
+        val ctx = service.getBotContext(name)
+
+        if(ctx.restApiPassword.equals("")) {
+            Log.red("WARNING : REST API password isn't set. Generating one.")
+            authProvider.generateRestPassword(name)
+            return "Password generated. See in your console output"
+        }
+
         authProvider.generateAuthToken(name)
 
-        val ctx = service.getBotContext(name)
         if(pass.equals(ctx.restApiPassword))
             return ctx.restApiToken
         else
@@ -85,7 +92,6 @@ class BotController {
     fun stopBot(@PathVariable name: String): Boolean {
         return service.doWithBot(name) { it.stop() }
     }
-
 
     @RequestMapping(value = "/bot/{name}/pokemons", method = arrayOf(RequestMethod.GET))
     fun listPokemons(@PathVariable name: String): List<PokemonData> {

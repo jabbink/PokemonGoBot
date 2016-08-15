@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.util
 
+import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.services.BotService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -42,10 +43,24 @@ open class ApiAuthProvider : HandlerInterceptorAdapter() {
         return false
     }
 
+    fun generateRandomString(): String {
+        return BigInteger(130, random).toString(32)
+    }
+
     fun generateAuthToken(botName: String) {
-        val token: String = BigInteger(130, random).toString(32)
+        val token: String = this.generateRandomString()
         service.getBotContext(botName).restApiToken = token
 
         Log.cyan("REST API token for bot $botName : $token has been generated")
+    }
+
+    fun generateRestPassword(botName: String) {
+        val password: String = this.generateRandomString()
+        service.getBotContext(botName).restApiPassword = password
+        service.doWithBot(botName) {
+            it.settings.restApiPassword = password
+        }
+
+        Log.red("Generated restApiPassword: $password")
     }
 }

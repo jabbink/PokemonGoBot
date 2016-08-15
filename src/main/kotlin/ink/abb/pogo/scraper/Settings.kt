@@ -176,7 +176,7 @@ class SettingsParser(val properties: Properties) {
     }
 }
 
-@JsonIgnoreProperties("startingLocation", "restApiPassword", ignoreUnknown = true)
+@JsonIgnoreProperties("startingLocation", ignoreUnknown = true)
 data class Settings(
         var name: String = "",
 
@@ -258,7 +258,7 @@ data class Settings(
 
         val guiPortSocket: Int = 8001,
 
-        val restApiPassword: String = "ultra_secure_password",
+        var restApiPassword: String = "",
 
         var initialMapSize: Int = 9,
 

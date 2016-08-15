@@ -180,7 +180,7 @@ use_lucky_egg=1
 gui_port_socket=8001
 
 # REST API password, CHANGE THIS
-rest_api_password=ultra_secure_password
+rest_api_password=
 
 # Export player/pokemondata on Profile Update. Options are:
 #   *empty*  Don't export (default)

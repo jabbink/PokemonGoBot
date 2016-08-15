@@ -15,6 +15,7 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.credentials.*
 import ink.abb.pogo.scraper.startBot
 import ink.abb.pogo.scraper.Context
+import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -52,7 +53,8 @@ class BotService {
         bots.remove(bot)
     }
 
-    private fun save(settings: Settings) {
+    fun save(settings: Settings) {
+        Log.normal("Saving settings for " + settings.name)
         File(root, "${settings.name}.json").bufferedWriter().use {
             it.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(settings))
         }
@@ -81,7 +83,7 @@ class BotService {
 
     @Synchronized
     fun getAllBotSettings(): List<Settings> {
-        return bots.map {it.settings.copy(credentials = GoogleAutoCredentials())}
+        return bots.map {it.settings.copy(credentials = GoogleAutoCredentials(), restApiPassword = "")}
     }
 
     @Synchronized
@@ -98,6 +100,7 @@ class BotService {
         val latch = CountDownLatch(bots.size)
         bots.forEach {
             thread {
+                save(it.settings)
                 it.stop()
                 latch.countDown()
             }
