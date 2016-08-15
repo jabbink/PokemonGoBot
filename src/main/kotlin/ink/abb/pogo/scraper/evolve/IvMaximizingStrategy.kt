@@ -7,6 +7,7 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
 /*
  * Evolution strategy that prioritizes maximizing IV, then prioritizes getting to highest evolution
@@ -49,7 +50,7 @@ class IvMaximizingStrategy : EvolutionStrategy {
         var pokemonToEvolve = evolvePriority[0]
 
         // Highest in family cannot evolve and no others are high enough priority
-        if (pokemonToEvolve.ivRatio * 100 < settings.transferIvThreshold) {
+        if (pokemonToEvolve.getIvPercentage() < settings.transferIvThreshold) {
             if (pokemonToEvolve.candiesToEvolve == 0) {
                 return null
             }
