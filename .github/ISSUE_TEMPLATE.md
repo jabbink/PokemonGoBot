@@ -23,3 +23,6 @@
 
 **Java version:**
 [Full output of `java -version`]
+
+Leave this sentence in your issue as proof that you have read and used this template.
+
