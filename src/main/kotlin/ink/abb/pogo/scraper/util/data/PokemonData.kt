@@ -1,13 +1,17 @@
+/**
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper.util.data
 
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
-
-/**
- * Created by Peyphour on 8/10/16.
- */
 
 data class PokemonData(
         var id: Long? = null,
