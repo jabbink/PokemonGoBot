@@ -180,7 +180,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Log.green("Open the map on http://ui.pogobot.club/")
         }
 
-        if (settings.wantSniping) && (settings.snipingPort > 0) {
+        if (settings.wantSniping && settings.snipingPort > 0) {
             task(sniper)
             Log.normal("Listening for snipe info on port ${settings.snipingPort}")
         }

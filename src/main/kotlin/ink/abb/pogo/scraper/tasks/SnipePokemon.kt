@@ -83,12 +83,15 @@ class SnipePokemon (val latitude: Double, val longitude: Double, val pokemonName
                     return
                 }
 
+                val isCurveBall = (Math.random() < settings.desiredCurveRate)
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         ctx.api.cachedInventories.itemBag,
                         desiredCatchProbability,
-                        settings.alwaysCurve,
+                        isCurveBall,
                         !settings.neverUseBerries,
+                        settings.randomBallThrows,
+                        settings.waitBetweenThrows,
                         -1)
 
                 if (result == null) {
