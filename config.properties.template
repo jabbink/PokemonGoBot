@@ -12,7 +12,7 @@ proxy_port=-1
 proxy_type=SOCKS
 # Proxy authentication
 proxy_username=
-proxy_password
+proxy_password=
 
 # Token to login directly
 token=
