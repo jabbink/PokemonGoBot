@@ -6,7 +6,7 @@
  * For more information, refer to the LICENSE file in this repositories root directory
  */
 
-package ink.abb.pogo.scraper.tasks
+package ink.abb.pogo.scraper.evolve
 
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass
 import com.pokegoapi.api.pokemon.Pokemon
@@ -20,8 +20,8 @@ import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 
-class EvolvePokemon : Task {
-    override fun run(bot: Bot, ctx: Context, settings: Settings) {
+class XpBatchStrategy : EvolutionStrategy {
+    override fun evolve(bot: Bot, ctx: Context, settings: Settings) {
         //count the current stack of possible evolves
         var countEvolveStack = 0
         val groupedPokemonForCount = ctx.api.inventories.pokebank.pokemons.groupBy { it.pokemonId }

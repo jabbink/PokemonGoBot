@@ -91,8 +91,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val profile = UpdateProfile()
         val catch = CatchOneNearbyPokemon()
         val release = ReleasePokemon()
-        val evolve = EvolvePokemon()
-        val myEvolve = Evolve()
+        val evolve = Evolve()
         val hatchEggs = HatchEggs()
         val export = Export()
 
@@ -139,13 +138,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             task(hatchEggs)
             if (settings.export.length > 0)
                 task(export)
-            if (settings.evolveStackLimit > 0)
-                task(evolve)
             if (settings.autoEvolve) {
                 // Pausing to not cause too much strain if a bunch or evolves happen at the same time
                 try {
                     ctx.pauseWalking.set(true)
-                    task(myEvolve)
+                    task(evolve)
                 } finally {
                     ctx.pauseWalking.set(false)
                 }
