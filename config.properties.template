@@ -198,6 +198,18 @@ wait_chance=0.0
 wait_time_min=0
 wait_time_max=0
 
+# Bot timeouts, to stop the bot after reaching certain definable limits
+# If multiple limits are set the first reached will stop the bot (however it will NOT kill the process, you must do that manually!!!)
+# Set if you want to pause the bot after a certain time (in minutes), if not leave it -1. Only full numers, eg. 300
+bot_timeout_after_minutes=-1
+
+# Set if you want the bot to wait after catching certain amount of pokemons, -1 skips it
+bot_timeout_after_catching_pokemon=-1
+
+# Set if you want the bot to wait after visiting certain amount of pokestops, -1 skips it
+bot_timeout_after_visiting_pokestops=-1
+
+
 # List of pokemon names
 #MISSINGNO
 #BULBASAUR

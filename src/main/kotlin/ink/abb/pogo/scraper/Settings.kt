@@ -129,7 +129,11 @@ class SettingsParser(val properties: Properties) {
 
                 waitTimeMin = getPropertyIfSet("Minimal time to wait", "wait_time_min", defaults.waitTimeMin, String::toInt),
 
-                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt)
+                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt),
+
+                botTimeoutAfterMinutes = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_minutes", defaults.botTimeoutAfterMinutes, String::toInt),
+                botTimeoutAfterCatchingPokemon = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_catching_pokemon", defaults.botTimeoutAfterCatchingPokemon, String::toInt),
+                botTimeoutAfterVisitingPokestops = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_visiting_pokestops", defaults.botTimeoutAfterVisitingPokestops, String::toInt)
         )
     }
 
@@ -262,7 +266,11 @@ data class Settings(
 
         val waitChance: Double = 0.0,
         val waitTimeMin: Int = 0,
-        val waitTimeMax: Int = 0
+        val waitTimeMax: Int = 0,
+
+        val botTimeoutAfterMinutes: Int = -1,
+        val botTimeoutAfterCatchingPokemon:Int = -1,
+        val botTimeoutAfterVisitingPokestops:Int = -1
 ) {
     fun withName(name: String): Settings {
         this.name = name
