@@ -28,7 +28,11 @@ desired_catch_probability_unwanted=0.0
 
 # Set if random ball throws should be enabled
 # Currently decides if the throw is nice/great/excellent/normal by using the desired_catch_probability(_unwanted), decreasing earned exp and fang rate however
+# Heavily depends on the desired catch rates now, if you have too few excellent/great throws try increasing those values
 random_ball_throws=false
+
+# Set if you want to wait a little between throws (0-3 secs)
+wait_between_throws=false
 
 # Number of nearest unused pokestops to randomly select
 # The next pokestop from (1/infinite)
