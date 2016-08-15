@@ -164,6 +164,9 @@ evolve_before_transfer=CATERPIE,RATTATA,WEEDLE,PIDGEY
 # The stack of evolves needed to pop lucky egg and evolve all
 evolve_stack_limit=100
 
+# Use lucky egg before transfer (1 = yes, anything else = no)
+use_lucky_egg=1
+
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
 

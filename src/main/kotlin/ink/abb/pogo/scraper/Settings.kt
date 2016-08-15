@@ -115,6 +115,8 @@ class SettingsParser(val properties: Properties) {
 
                 evolveStackLimit = getPropertyIfSet("The stack of evolves needed to pop lucky egg and evolve all", "evolve_stack_limit", defaults.evolveStackLimit, String::toInt),
 
+                useLuckyEgg = getPropertyIfSet("Use lucky egg before evolves", "use_lucky_egg", defaults.useLuckyEgg, String::toInt),
+
                 export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
@@ -244,6 +246,7 @@ data class Settings(
 
         val evolveBeforeTransfer: List<PokemonId> = listOf(PokemonId.CATERPIE, PokemonId.RATTATA, PokemonId.WEEDLE, PokemonId.PIDGEY),
         val evolveStackLimit: Int = 100,
+        val useLuckyEgg: Int = 1,
 
         val export: String = "",
 
