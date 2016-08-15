@@ -262,7 +262,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val timeDiff:Long = ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())
         val pokemonCatched:Int = ctx.pokemonStats.first.get()
         val pokestopsVisited:Int = ctx.itemStats.first.get()
-        Log.red("time: ${timeDiff}, pokemon: ${pokemonCatched}, pokestops: ${pokestopsVisited}")
+        //Log.red("time: ${timeDiff}, pokemon: ${pokemonCatched}, pokestops: ${pokestopsVisited}")
         if(settings.botTimeoutAfterMinutes <= timeDiff && settings.botTimeoutAfterMinutes != -1){
             Log.red("Bot timed out as declared in the settings (after ${settings.botTimeoutAfterMinutes} minutes)")
             return true
