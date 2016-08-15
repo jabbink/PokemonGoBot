@@ -67,9 +67,11 @@ class EvolvePokemon : Task {
                 if (settings.evolveBeforeTransfer.contains(it.pokemonId)) {
                     Log.yellow("Evolving ${it.pokemonId.name} before transfer")
                     val evolveResult = it.evolve()
+                    Thread.sleep(300)
                     if (evolveResult.isSuccessful()) {
                         countEvolved++
                         releasePokemon(evolveResult.getEvolvedPokemon(),"Evolved for XP only",ctx)
+                        Thread.sleep(300)
                     }
                 }
             }
