@@ -75,6 +75,8 @@ class SettingsParser(val properties: Properties) {
                 campLurePokestop = getPropertyIfSet("Camp around x lured pokestops", "camp_lure_pokestop", defaults.campLurePokestop, String::toInt),
                 desiredCatchProbability = getPropertyIfSet("Desired chance to catch a Pokemon with 1 ball", "desired_catch_probability", defaults.desiredCatchProbability, String::toDouble),
                 desiredCatchProbabilityUnwanted = getPropertyIfSet("Desired probability to catch unwanted Pokemon (obligatory_transfer; low IV; low CP)", "desired_catch_probability_unwanted", defaults.desiredCatchProbabilityUnwanted, String::toDouble),
+                randomBallThrows = getPropertyIfSet("Randomize Ball Throwing", "random_ball_throws", defaults.randomBallThrows, String::toBoolean),
+                waitBetweenThrows = getPropertyIfSet("Waiting between throws", "wait_between_throws", defaults.waitBetweenThrows, String::toBoolean),
                 autotransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.autotransfer, String::toBoolean),
                 keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", defaults.keepPokemonAmount, String::toInt),
                 maxPokemonAmount = getPropertyIfSet("maximum keep pokemon amount", "max_pokemon_amount", defaults.maxPokemonAmount, String::toInt),
@@ -91,7 +93,7 @@ class SettingsParser(val properties: Properties) {
 
                 sortByIv = getPropertyIfSet("Sort by IV first instead of CP", "sort_by_iv", defaults.sortByIv, String::toBoolean),
 
-                desiredCurveRate = getPropertyIfSet("Define curved balls probability", "always_curve", defaults.desiredCurveRate, String::toDouble),
+                desiredCurveRate = getPropertyIfSet("Define curved balls probability", "desired_curve_rate", defaults.desiredCurveRate, String::toDouble),
 
                 neverUseBerries = getPropertyIfSet("Never use berries", "never_use_berries", defaults.neverUseBerries, String::toBoolean),
 
@@ -114,6 +116,8 @@ class SettingsParser(val properties: Properties) {
                 evolveBeforeTransfer = getPropertyIfSet("list of pokemon you always want to evolve before transfer to maximize XP", "evolve_before_transfer", defaults.obligatoryTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
                 evolveStackLimit = getPropertyIfSet("The stack of evolves needed to pop lucky egg and evolve all", "evolve_stack_limit", defaults.evolveStackLimit, String::toInt),
+
+                useLuckyEgg = getPropertyIfSet("Use lucky egg before evolves", "use_lucky_egg", defaults.useLuckyEgg, String::toInt),
 
                 export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
 
@@ -216,6 +220,8 @@ data class Settings(
         val desiredCatchProbability: Double = 0.4,
         val desiredCatchProbabilityUnwanted: Double = 0.0,
         val autotransfer: Boolean = true,
+        val randomBallThrows: Boolean = false,
+        val waitBetweenThrows: Boolean = false,
         val keepPokemonAmount: Int = 1,
         val maxPokemonAmount: Int = -1,
 
@@ -244,6 +250,7 @@ data class Settings(
 
         val evolveBeforeTransfer: List<PokemonId> = listOf(PokemonId.CATERPIE, PokemonId.RATTATA, PokemonId.WEEDLE, PokemonId.PIDGEY),
         val evolveStackLimit: Int = 100,
+        val useLuckyEgg: Int = 1,
 
         val export: String = "",
 

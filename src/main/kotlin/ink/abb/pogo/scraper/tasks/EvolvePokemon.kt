@@ -54,22 +54,28 @@ class EvolvePokemon : Task {
         // use lucky egg if above evolve stack limit and evolve the whole stack
         if (countEvolveStack >= settings.evolveStackLimit) {
             val startingXP = ctx.api.playerProfile.stats.experience
-            Log.yellow("Using Lucky Egg before evolving stack of $countEvolveStack pokemons")
-            try {
-                var resultLuckyEgg = ctx.api.cachedInventories.itemBag.useLuckyEgg()
-                Log.yellow("Result of using lucky egg: ${resultLuckyEgg.result.toString()}")
+            if (settings.useLuckyEgg == 1) {
+                Log.yellow("Using Lucky Egg before evolving stack of $countEvolveStack pokemons")
+                try {
+                    var resultLuckyEgg = ctx.api.cachedInventories.itemBag.useLuckyEgg()
+                    Log.yellow("Result of using lucky egg: ${resultLuckyEgg.result.toString()}")
+                } catch (exc: Exception) {
+                    Log.red("Lucky egg usage failed! Will continue evolving stack without one.")
+                }
             }
-            catch (exc: Exception) {
-                Log.red("Lucky egg usage failed! Will continue evolving stack without one.")
+            else {
+                Log.yellow("Not using lucky egg")
             }
             var countEvolved = 0
             ctx.api.inventories.pokebank.pokemons.forEach {
                 if (settings.evolveBeforeTransfer.contains(it.pokemonId)) {
                     Log.yellow("Evolving ${it.pokemonId.name} before transfer")
                     val evolveResult = it.evolve()
+                    Thread.sleep(300)
                     if (evolveResult.isSuccessful()) {
                         countEvolved++
                         releasePokemon(evolveResult.getEvolvedPokemon(),"Evolved for XP only",ctx)
+                        Thread.sleep(300)
                     }
                 }
             }

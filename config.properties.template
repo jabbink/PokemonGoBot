@@ -12,7 +12,7 @@ proxy_port=-1
 proxy_type=SOCKS
 # Proxy authentication
 proxy_username=
-proxy_password
+proxy_password=
 
 # Token to login directly
 token=
@@ -26,6 +26,14 @@ desired_catch_probability=0.4
 # Set to -1 to not attempt catching at all
 desired_catch_probability_unwanted=0.0
 
+# Set if random ball throws should be enabled
+# Currently decides if the throw is nice/great/excellent/normal by using the desired_catch_probability(_unwanted), decreasing earned exp and fang rate however
+# Heavily depends on the desired catch rates now, if you have too few excellent/great throws try increasing those values
+random_ball_throws=false
+
+# Set if you want to wait a little between throws (0-3 secs)
+wait_between_throws=false
+
 # Number of nearest unused pokestops to randomly select
 # The next pokestop from (1/infinite)
 random_next_pokestop_selection=5
@@ -38,6 +46,7 @@ camp_lure_pokestop=-1
 speed=2.8
 
 # Random speed range around the original speed value in Meters per Second
+# Example: If speed is 2.8, and the range 0.5, the speed will be between 2.3 and 3.3
 random_speed_range=0.0
 
 # Should the bot follow the streets (true) or just go directly to pokestops/waypoints
@@ -117,7 +126,7 @@ max_pokemon_amount=-1
 sort_by_iv=false
 
 # Rate for bot to throw a curveball, between 0 (never) and 1 (always)
-desired_curve_rate = 0.0
+desired_curve_rate=0.0
 
 # Never use berries
 never_use_berries=true
@@ -163,6 +172,9 @@ evolve_before_transfer=CATERPIE,RATTATA,WEEDLE,PIDGEY
 
 # The stack of evolves needed to pop lucky egg and evolve all
 evolve_stack_limit=100
+
+# Use lucky egg before transfer (1 = yes, anything else = no)
+use_lucky_egg=1
 
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001

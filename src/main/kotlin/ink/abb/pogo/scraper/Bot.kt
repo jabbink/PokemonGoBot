@@ -175,7 +175,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             if (settings.guiPortSocket != 8001) {
                 needPort = "#localhost:${settings.guiPortSocket}"
             }*/
-            Log.green("Open the map on http://pogo.abb.ink/RocketTheme/")
+            Log.green("Open the map on http://ui.pogobot.club/")
         }
 
 

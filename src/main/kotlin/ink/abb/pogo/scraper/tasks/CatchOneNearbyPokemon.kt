@@ -74,12 +74,15 @@ class CatchOneNearbyPokemon : Task {
                     return
                 }
                 val isBallCurved = (Math.random() < settings.desiredCurveRate)
+                //TODO: Give settings object to the catch function instead of the seperate values
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
                         itemBag,
                         desiredCatchProbability,
                         isBallCurved,
                         !settings.neverUseBerries,
+                        settings.randomBallThrows,
+                        settings.waitBetweenThrows,
                         -1)
 
                 if (result == null) {
