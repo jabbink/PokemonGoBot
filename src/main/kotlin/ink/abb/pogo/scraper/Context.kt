@@ -36,6 +36,7 @@ data class Context(
 
         val walking: AtomicBoolean = AtomicBoolean(false),
 
-        val pauseWalking: AtomicBoolean = AtomicBoolean(false)
+        val pauseWalking: AtomicBoolean = AtomicBoolean(false),
+        val pauseForSniping: AtomicBoolean = AtomicBoolean(false)
 
 )

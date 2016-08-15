@@ -86,7 +86,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV% \r\n ${it.getStatsFormatted()}"
         }.forEach { Log.normal(it) }
 
-        val keepalive = GetMapRandomDirection()
+        val keepalive = GetMapRandomDirection(isForSniping=false)
         val drop = DropUselessItems()
         val profile = UpdateProfile()
         val catch = CatchOneNearbyPokemon()
@@ -94,6 +94,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val evolve = EvolvePokemon()
         val hatchEggs = HatchEggs()
         val export = Export()
+        val sniper = SnipeListener()
 
         if (settings.export.length > 0)
             task(export)
@@ -156,7 +157,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(drop)
             if (settings.autotransfer)
                 task(release)
-
         }
 
         runLoop(500, "PokestopLoop") {
@@ -165,6 +165,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             else if (!ctx.walking.get())
                 task(WalkToStartPokestop(process.startPokestop as Pokestop))
         }
+
+        
 
         Log.setContext(ctx)
 
@@ -178,6 +180,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Log.green("Open the map on http://ui.pogobot.club/")
         }
 
+        if (settings.wantSniping) && (settings.snipingPort > 0) {
+            task(sniper)
+            Log.normal("Listening for snipe info on port ${settings.snipingPort}")
+        }
 
         if (settings.timerWalkToStartPokestop > 0)
             runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), "BotWalkBackLoop") {

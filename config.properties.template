@@ -179,6 +179,12 @@ use_lucky_egg=1
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
 
+# Allow sniping (Recommended value: false)
+want_sniping = false
+
+# Port where the sniping information is sent to
+sniping_port = 16969
+
 # Export player/pokemondata on Profile Update. Options are:
 #   *empty*  Don't export (default)
 #   CSV      Correct USA/UK CSV format ("," as delimiter and "." as decimal separator)

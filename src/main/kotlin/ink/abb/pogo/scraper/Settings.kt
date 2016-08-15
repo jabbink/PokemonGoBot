@@ -123,6 +123,10 @@ class SettingsParser(val properties: Properties) {
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
+                wantSniping = getPropertyIfSet("Enable or disable the sniping feature", "want_sniping", defaults.wantSniping, String::toBoolean),
+                
+                snipingPort = getPropertyIfSet("Port where the sniping information will be sent to", "sniping_port", defaults.snipingPort, String::toInt),
+
                 initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt),
 
                 waitChance = getPropertyIfSet("Chance to wait on a pokestop", "wait_chance", defaults.waitChance, String::toDouble),
@@ -255,6 +259,9 @@ data class Settings(
         val export: String = "",
 
         val guiPortSocket: Int = 8001,
+
+        val wantSniping: Boolean = false,
+        val snipingPort: Int = 16969,
 
         var initialMapSize: Int = 9,
 

@@ -14,9 +14,14 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 
-class GetMapRandomDirection : Task {
+class GetMapRandomDirection(val isForSniping: Boolean) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // query a small area to keep alive
+
+        if (ctx.pauseForSniping.get() && !isForSniping) {
+            return
+        }
+
         val lat = ctx.lat.get() + randomLatLng()
         val lng = ctx.lng.get() + randomLatLng()
 

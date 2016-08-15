@@ -25,37 +25,37 @@ import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 
-class CatchOneNearbyPokemon : Task {
+class SnipePokemon (val latitude: Double, val longitude: Double, val pokemonName: String): Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        // STOP WALKING
-        if (ctx.pauseForSniping.get()) {
-            return
-        }
         ctx.pauseWalking.set(true)
-        val pokemon = ctx.api.map.getCatchablePokemon(ctx.blacklistedEncounters)
-
-        val itemBag = ctx.api.cachedInventories.itemBag
-        val hasPokeballs = itemBag.hasPokeballs()
-
-        /*Pokeball.values().forEach {
-            Log.yellow("${it.ballType}: ${ctx.api.cachedInventories.itemBag.getItem(it.ballType).count}")
-        }*/
-
+        ctx.pauseForSniping.set(true)
+        val hasPokeballs = ctx.api.cachedInventories.itemBag.hasPokeballs()
         if (!hasPokeballs) {
             ctx.pauseWalking.set(false)
             return
         }
 
-        if (pokemon.isNotEmpty()) {
-            val catchablePokemon = pokemon.first()
+        var oldLatitude = ctx.lat.get()
+        var oldLongitude = ctx.lng.get()
+
+        ctx.lat.set(latitude); ctx.lng.set(longitude)
+        ctx.api.setLocation(latitude, longitude, 0.0)
+        bot.task(GetMapRandomDirection(isForSniping=true))
+
+        val pokemon = ctx.api.map.getCatchablePokemon(ctx.blacklistedEncounters)
+
+        Log.cyan("Sniper Found $pokemon at long/lat ${ctx.lng.get()}/${ctx.lat.get()}")
+        val catchablePokemon = pokemon.find { it.pokemonId.toString().toLowerCase().equals(pokemonName.toLowerCase()) }
+
+        Log.cyan(text="$catchablePokemon")
+        if (null != catchablePokemon) {
             if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId) && settings.desiredCatchProbabilityUnwanted == -1.0) {
                 ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
-                Log.normal("Found pokemon ${catchablePokemon.pokemonId}; blacklisting because it's unwanted")
+                Log.normal("Found pokemon ${catchablePokemon.pokemonId}; blacklisting it because it's unwanted")
                 ctx.pauseWalking.set(false)
                 return
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
-            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
 
             val encounterResult = catchablePokemon.encounterPokemon()
             val wasFromLure = encounterResult is DiskEncounterResult
@@ -63,6 +63,12 @@ class CatchOneNearbyPokemon : Task {
                 val pokemonData = encounterResult.pokemonData
                 Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
                         "with CP ${pokemonData.cp} and IV ${pokemonData.getIvPercentage()}%")
+
+                ctx.lat.set(oldLatitude); ctx.lng.set(oldLongitude)
+                ctx.api.setLocation(oldLatitude, oldLongitude, 0.0)
+
+                bot.task(GetMapRandomDirection(isForSniping=true))
+
                 val (shouldRelease, reason) = pokemonData.shouldTransfer(settings)
                 val desiredCatchProbability = if (shouldRelease) {
                     Log.yellow("Using desired_catch_probability_unwanted because $reason")
@@ -72,31 +78,26 @@ class CatchOneNearbyPokemon : Task {
                 }
                 if (desiredCatchProbability == -1.0) {
                     ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
-                    Log.normal("CP/IV of encountered pokemon ${catchablePokemon.pokemonId} turns out to be too low; blacklisting encounter")
+                    Log.normal("CP/IV of encountered pokemon ${catchablePokemon.pokemonId} is too low; blacklisting encounter")
                     ctx.pauseWalking.set(false)
                     return
                 }
-                val isBallCurved = (Math.random() < settings.desiredCurveRate)
-                //TODO: Give settings object to the catch function instead of the seperate values
+
                 val result = catchablePokemon.catch(
                         encounterResult.captureProbability,
-                        itemBag,
+                        ctx.api.cachedInventories.itemBag,
                         desiredCatchProbability,
-                        isBallCurved,
+                        settings.alwaysCurve,
                         !settings.neverUseBerries,
-                        settings.randomBallThrows,
-                        settings.waitBetweenThrows,
                         -1)
 
                 if (result == null) {
-                    // prevent trying it in the next iteration
                     ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                     Log.red("No Pokeballs in your inventory; blacklisting Pokemon")
                     ctx.pauseWalking.set(false)
                     return
                 }
 
-                // TODO: temp fix for server timing issues regarding GetMapObjects
                 ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                 if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
                     ctx.pokemonStats.first.andIncrement
@@ -127,6 +128,10 @@ class CatchOneNearbyPokemon : Task {
                     }
                 }
             } else {
+                // We need to set this back to the old value.
+                ctx.lat.set(oldLatitude); ctx.lng.set(oldLongitude)
+                ctx.api.setLocation(oldLatitude, oldLongitude, 0.0)
+
                 Log.red("Encounter failed with result: ${encounterResult.status}")
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
                     Log.red("Disabling catching of Pokemon")
@@ -138,5 +143,8 @@ class CatchOneNearbyPokemon : Task {
             }
         }
         ctx.pauseWalking.set(false)
+        bot.task(GetMapRandomDirection(isForSniping=false))
+        ctx.pauseForSniping.set(false)
+
     }
 }

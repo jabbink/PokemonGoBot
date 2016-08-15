@@ -67,6 +67,7 @@
   "useLuckyEgg" : 1,
   "export" : "",
   "guiPortSocket" : 8001,
+  "snipingPort": 16969,
   "initialMapSize" : 9,
   "waitChance" : 0.0,
   "waitTimeMin" : 0,

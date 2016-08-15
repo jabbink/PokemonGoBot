@@ -23,6 +23,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
+        if (ctx.pauseForSniping.get()) {
+            return
+        }
         if (settings.followStreets) walkRoute(bot, ctx, settings)
         else walk(bot, ctx, settings)
 
