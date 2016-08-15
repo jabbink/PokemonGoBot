@@ -121,7 +121,7 @@ display_pokestop_name=false
 autotransfer=true
 
 # Should the bot wait between each transfer and how long? -1 to disable, time to wait in MILIseconds (it will be randomized alittle around the given value)
-autotranser_time_delay=-1
+autotransfer_time_delay=-1
 
 # Minimum amount of pokemon type to keep
 keep_pokemon_amount=1
