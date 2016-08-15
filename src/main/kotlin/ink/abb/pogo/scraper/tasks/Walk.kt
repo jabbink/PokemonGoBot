@@ -31,6 +31,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (ctx.coordinatesToGoTo.size > 0) {
             val coordinates = ctx.coordinatesToGoTo.first()
             ctx.coordinatesToGoTo.removeAt(0)
+            Log.normal("Using supplied coordinate, number of remaining points : " + ctx.coordinatesToGoTo.size)
             Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
 
             walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
