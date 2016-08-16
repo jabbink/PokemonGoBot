@@ -31,14 +31,16 @@ open class ApiAuthProvider : HandlerInterceptorAdapter() {
     override fun preHandle(request: HttpServletRequest,
                   response: HttpServletResponse, handler: Any): Boolean {
 
+        if(request.method.equals("OPTIONS"))
+            return true // Allow preflight calls
+
         val pattern = Pattern.compile("\\/api/bot/([A-Za-z0-9\\-_]*)")
         val matcher = pattern.matcher(request.requestURI)
         if(matcher.find()) {
             val token = service.getBotContext(matcher.group(1)).restApiToken
 
             // If the token is invalid or isn't in the request, nothing will be done
-            request.getHeader("X-PGB-ACCESS-TOKEN") ?: return request.getParameter("token").equals(token)
-            return request.getHeader("X-PGB-ACCESS-TOKEN").equals(token)
+            return request.getHeader("X-PGB-ACCESS-TOKEN")!!.equals(token)
         }
 
         return false
