@@ -20,6 +20,7 @@ import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
+import java.text.DecimalFormat
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
@@ -107,7 +108,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
 
         val randomSpeed = randomizeSpeed(speed, settings.randomSpeedRange)
-        Log.green("Your character now moves with: ${randomSpeed} Meters per second")
+        Log.green("Your character now moves at ${DecimalFormat("#0.0").format(randomSpeed)} m/s")
 
         val timeout = 200L
 
