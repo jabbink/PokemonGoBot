@@ -37,7 +37,7 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
 
 fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
     //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1"
-    return "$routeProvider?loc=$olat,$olng&loc=$dlat,$dlng&compression=false"
+    return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1&layer=mapnik"
 }
 
 fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
