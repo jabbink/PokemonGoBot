@@ -21,6 +21,8 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.ApiAuthProvider
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.credentials.Credentials
+import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.data.*
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import org.springframework.beans.factory.annotation.Autowired
@@ -64,34 +66,41 @@ class BotController {
             return "Unauthorized"
     }
 
-    @RequestMapping("/bot/{name}/load")
-    fun loadBot(@PathVariable name: String) {
-        service.submitBot(service.load(name))
+    @RequestMapping(value = "/bot/{name}/load", method = arrayOf(RequestMethod.POST))
+    fun loadBot(@PathVariable name: String): Settings {
+        val settings = service.load(name)
+        service.submitBot(settings)
+        return settings
     }
 
-    @RequestMapping("/bot/{name}/unload")
-    fun unloadBot(@PathVariable name: String): Boolean {
+    @RequestMapping(value = "/bot/{name}/unload", method = arrayOf(RequestMethod.POST))
+    fun unloadBot(@PathVariable name: String): String {
         return service.doWithBot(name) {
             it.stop()
             service.removeBot(it)
-        }
+        }.toString()
     }
 
-    @RequestMapping("/bot/{name}/reload")
-    fun reloadBot(@PathVariable name: String): Boolean {
-        if (!unloadBot(name)) return false
-        loadBot(name)
-        return true
+    @RequestMapping(value = "/bot/{name}/reload", method = arrayOf(RequestMethod.POST))
+    fun reloadBot(@PathVariable name: String): Settings {
+        if (unloadBot(name).equals("false")) // return default settings
+            return Settings(
+                    credentials = GoogleAutoCredentials(),
+                    latitude = 0.0,
+                    longitude = 0.0
+            )
+
+        return loadBot(name)
     }
 
-    @RequestMapping("/bot/{name}/start")
-    fun startBot(@PathVariable name: String): Boolean {
-        return service.doWithBot(name) { it.start() }
+    @RequestMapping(value = "/bot/{name}/start", method = arrayOf(RequestMethod.POST))
+    fun startBot(@PathVariable name: String): String {
+        return service.doWithBot(name) { it.start() }.toString()
     }
 
-    @RequestMapping("/bot/{name}/stop")
-    fun stopBot(@PathVariable name: String): Boolean {
-        return service.doWithBot(name) { it.stop() }
+    @RequestMapping(value = "/bot/{name}/stop", method = arrayOf(RequestMethod.POST))
+    fun stopBot(@PathVariable name: String): String {
+        return service.doWithBot(name) { it.stop() }.toString()
     }
 
     @RequestMapping(value = "/bot/{name}/pokemons", method = arrayOf(RequestMethod.GET))
