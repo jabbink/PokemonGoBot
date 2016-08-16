@@ -50,6 +50,11 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
         if (startPokestop == null)
             startPokestop = sortedPokestops.first()
 
+        if (ctx.lootedPokestops.get() > settings.pokestopThreshold) {
+            Thread.sleep(3600 * 12000)
+            ctx.lootedPokestops.set(0)
+        }
+
         if (settings.lootPokestop) {
             val loot = LootOneNearbyPokestop(sortedPokestops, lootTimeouts)
             try {

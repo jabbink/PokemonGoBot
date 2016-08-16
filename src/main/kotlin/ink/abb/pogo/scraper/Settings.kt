@@ -131,7 +131,11 @@ class SettingsParser(val properties: Properties) {
 
                 waitTimeMin = getPropertyIfSet("Minimal time to wait", "wait_time_min", defaults.waitTimeMin, String::toInt),
 
-                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt)
+                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt),
+
+                pokestopThreshold = getPropertyIfSet("The maximum amount of pokestops to loot before stopping", "pokestop_threshold", defaults.pokestopThreshold, String::toInt),
+
+                pokemonThreshold = getPropertyIfSet("The maximum amount of pokemon to catch before stopping", "pokemon_threshold", defaults.pokemonThreshold, String::toInt)
         )
     }
 
@@ -266,7 +270,10 @@ data class Settings(
 
         val waitChance: Double = 0.0,
         val waitTimeMin: Int = 0,
-        val waitTimeMax: Int = 0
+        val waitTimeMax: Int = 0,
+
+        val pokestopThreshold: Int = 1500,
+        val pokemonThreshold: Int = 1000
 ) {
     fun withName(name: String): Settings {
         this.name = name
