@@ -65,7 +65,7 @@ auto_fill_incubator=true
 # Should the bot EVER drop items (true/false)
 drop_items=true
 
-# Should the bot wait between each item/group dropped? Time in miliseconds, will be randomized a little, to skip use -1
+# Should the bot wait between each item/group dropped? Time in milliseconds, will be randomized a little, to skip use -1
 item_drop_delay=-1
 
 
@@ -120,7 +120,7 @@ display_pokestop_name=false
 # Should the bot auto transfer duplicate pokemon
 autotransfer=true
 
-# Should the bot wait between each transfer and how long? -1 to disable, time to wait in MILIseconds (it will be randomized alittle around the given value)
+# Should the bot wait between each transfer and how long? -1 to disable, time to wait in milliseconds (it will be randomized alittle around the given value)
 autotransfer_time_delay=-1
 
 # Minimum amount of pokemon type to keep
@@ -183,9 +183,9 @@ evolve_stack_limit=100
 # Use lucky egg before transfer (1 = yes, anything else = no)
 use_lucky_egg=1
 
-# Should the bot wait between each evolution and how long? -1 to disable, time to wait in MILIseconds (it will be randomized alittle around the given value)
+# Should the bot wait between each evolution and how long? -1 to disable, time to wait in milliseconds (it will be randomized alittle around the given value)
 # Default and minimum is 300, and even if you decrease it it wont change as with a lower value evolution doesnt work.
-evolve_time_delay= 300
+evolve_time_delay=300
 
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
