@@ -49,7 +49,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                 ctx.pauseWalking.set(false)
                 return
             }
-
+            ctx.pokestops.getAndAdd(1)
             if (result.itemsAwarded != null) {
                 ctx.itemStats.first.getAndAdd(result.itemsAwarded.size)
             }

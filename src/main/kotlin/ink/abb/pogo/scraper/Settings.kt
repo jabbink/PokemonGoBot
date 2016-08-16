@@ -135,7 +135,7 @@ class SettingsParser(val properties: Properties) {
 
                 waitTimeMin = getPropertyIfSet("Minimal time to wait", "wait_time_min", defaults.waitTimeMin, String::toInt),
 
-                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt),
+                waitTimeMax = getPropertyIfSet("Maximum time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt),
 
                 botTimeoutAfterMinutes = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_minutes", defaults.botTimeoutAfterMinutes, String::toInt),
                 botTimeoutAfterCatchingPokemon = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_catching_pokemon", defaults.botTimeoutAfterCatchingPokemon, String::toInt),

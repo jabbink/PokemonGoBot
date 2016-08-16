@@ -27,6 +27,7 @@ data class Context(
         val startTime: LocalDateTime,
         val pokemonStats: Pair<AtomicInteger, AtomicInteger>,
         val luredPokemonStats: AtomicInteger,
+        val pokestops: AtomicInteger,
         val itemStats: Pair<AtomicInteger, AtomicInteger>,
 
         val blacklistedEncounters: MutableSet<Long>,
