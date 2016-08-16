@@ -96,9 +96,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val evolve = EvolvePokemon()
         val hatchEggs = HatchEggs()
         val export = Export()
+        val readGpx = ReadGpx()
 
         if (settings.export.length > 0)
             task(export)
+
+        task(readGpx)
 
         task(keepalive)
         Log.normal("Getting initial pokestops...")

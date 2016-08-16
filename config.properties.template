@@ -193,6 +193,11 @@ export=
 # Initial map size (S2 tiles) to fetch (max. 9: ~3*3km area)
 initial_map_size=9
 
+# GPX file to be added on the bot's start
+gpx_file=
+# Number of times the bot must repeat this GPX file
+gpx_repeat=-1
+
 # For artificial pauses/rests
 # Chance to wait randomly at a pokestop in %, recommended about 10 or less, default disabled
 wait_chance=0.0

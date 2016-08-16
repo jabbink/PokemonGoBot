@@ -11,6 +11,7 @@ package ink.abb.pogo.scraper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
+import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.gui.SocketServer
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
@@ -39,6 +40,8 @@ data class Context(
 
         val walking: AtomicBoolean = AtomicBoolean(false),
 
-        val pauseWalking: AtomicBoolean = AtomicBoolean(false)
+        val pauseWalking: AtomicBoolean = AtomicBoolean(false),
+
+        val coordinatesToGoTo: MutableList<S2LatLng> = mutableListOf<S2LatLng>()
 
 )
