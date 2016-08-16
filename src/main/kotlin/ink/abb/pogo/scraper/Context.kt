@@ -29,9 +29,6 @@ data class Context(
         val luredPokemonStats: AtomicInteger,
         val itemStats: Pair<AtomicInteger, AtomicInteger>,
 
-        val lootedPokestops: AtomicInteger,
-        val caughtPokemon: AtomicInteger,
-
         val blacklistedEncounters: MutableSet<Long>,
         val server: SocketServer,
 
@@ -42,6 +39,9 @@ data class Context(
 
         val walking: AtomicBoolean = AtomicBoolean(false),
 
-        val pauseWalking: AtomicBoolean = AtomicBoolean(false)
+        val pauseWalking: AtomicBoolean = AtomicBoolean(false),
+
+        val lootedPokestops: AtomicInteger = AtomicInteger(0),
+        val caughtPokemon: AtomicInteger = AtomicInteger(0)
 
 )
