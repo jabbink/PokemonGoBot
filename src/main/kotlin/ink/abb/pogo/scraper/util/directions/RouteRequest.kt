@@ -20,7 +20,7 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
     connection.setRequestProperty("Cache-Control", "max=0")
     connection.setRequestProperty("Connection", "keep-alive")
     connection.setRequestProperty("DNT", "1")
-    connection.setRequestProperty("Host", "router.project-osrm.org")
+    connection.setRequestProperty("Host", "mobrouting.com")
     connection.setRequestProperty("Upgrade-Insecure-Requests", "1")
     connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36")
     var routeFile = String()
