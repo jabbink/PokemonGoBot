@@ -14,7 +14,7 @@ import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
-import ink.abb.pogo.scraper.controllers.ProgrammController
+import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
@@ -281,7 +281,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
     fun terminateApplication(){
         phaser.forceTermination()
-        ProgrammController.stopAllAplications()
+        ProgramController.stopAllApplications()
     }
 
 }

@@ -22,7 +22,7 @@ import com.pokegoapi.exceptions.LoginFailedException
 import com.pokegoapi.exceptions.RemoteServerException
 import com.pokegoapi.main.ServerRequest
 import com.pokegoapi.util.SystemTimeImpl
-import ink.abb.pogo.scraper.controllers.ProgrammController
+import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
@@ -90,7 +90,7 @@ fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit
 fun main(args: Array<String>) {
     com.pokegoapi.util.Log.setLevel(com.pokegoapi.util.Log.Level.NONE)
     val pokemonGoBotApplication: ConfigurableApplicationContext = SpringApplication.run(PokemonGoBotApplication::class.java, *args)
-    ProgrammController.addApplication(pokemonGoBotApplication)
+    ProgramController.addApplication(pokemonGoBotApplication)
 }
 
 fun loadProperties(filename: String): Properties {

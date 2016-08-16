@@ -6,14 +6,14 @@ import org.springframework.context.ConfigurableApplicationContext
 /**
  * Created by alex_b on 16.08.16.
  */
-class ProgrammController(){
+class ProgramController(){
     companion object {
         var applicationList = arrayListOf<ConfigurableApplicationContext>()
 
         fun addApplication (configurableApplicationContext: ConfigurableApplicationContext){
             applicationList.add(configurableApplicationContext)
         }
-        fun stopAllAplications (){
+        fun stopAllApplications (){
             applicationList.forEach {
                 it.close()
             }
