@@ -22,6 +22,7 @@ import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import java.io.File
 import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -52,7 +53,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Pair(AtomicInteger(0), AtomicInteger(0)),
             mutableSetOf(),
             SocketServer(),
-            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false))
+            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
+            settings.restApiPassword
     )
 
     @Synchronized
