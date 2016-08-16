@@ -53,6 +53,7 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
         if (ctx.lootedPokestops.get() > settings.pokestopThreshold) {
             Thread.sleep(3600 * 12000)
             ctx.lootedPokestops.set(0)
+            return
         }
 
         if (settings.lootPokestop) {
