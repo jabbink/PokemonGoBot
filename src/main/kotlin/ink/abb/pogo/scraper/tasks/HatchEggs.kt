@@ -38,7 +38,7 @@ class HatchEggs : Task {
         val incubators = ctx.api.cachedInventories.incubators
         val eggs = ctx.api.cachedInventories.hatchery.eggs
 
-        val freeIncubators = incubators.filter { !it.isInUse }
+        val freeIncubators = incubators.filter { !it.isInUse } .sortedByDescending { it.usesRemaining }
         val filteredEggs = eggs
                 .filter { !it.isIncubate }
                 .sortedByDescending { it.eggKmWalkedTarget }
