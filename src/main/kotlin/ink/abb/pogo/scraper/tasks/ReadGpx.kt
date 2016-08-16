@@ -32,6 +32,8 @@ class ReadGpx : Task {
 
         var i: Int = settings.gpxRepeat
 
+        Log.green("GPX plugin : reading file " + settings.gpxFile + " with $i repeats")
+
         // gpxRepeat == 0 or -1 : No coordinates will be added
         while(i > 0) {
             for (element in coords.children)
