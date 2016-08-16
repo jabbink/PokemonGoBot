@@ -147,7 +147,7 @@ class SettingsParser(val properties: Properties) {
             System.exit(1)
         }
 
-        var result: T?
+        val result: T?
         try {
             result = conversion(properties.getProperty(property))
         } catch (e: Exception) {
@@ -274,6 +274,8 @@ data class Settings(
     }
 
     fun writeProperty(propertyFile: String, key: String, value: Any) {
+        if(propertyFile == "")
+            return
         // TODO: This function does not work with lists, like obligatory_transfer
         val file = BufferedReader(FileReader(propertyFile))
         var propertiesText = String()
