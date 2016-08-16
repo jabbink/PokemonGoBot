@@ -121,7 +121,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     if (needCurve) {
         logMessage += "; Using curve"
     }
-    logMessage += "; achieved catch probability: ${catchProbability}, desired: ${desiredCatchProbability}"
+    logMessage += "; achieved catch probability: ${Math.round(catchProbability*100.0)}%, desired: ${Math.round(desiredCatchProbability*100.0)}%"
     Log.yellow(logMessage)
     //excellent throw value
     var recticleSize = 1.7 + Math.random()*0.3
