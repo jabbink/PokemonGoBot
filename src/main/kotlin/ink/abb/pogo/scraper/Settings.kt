@@ -123,6 +123,8 @@ class SettingsParser(val properties: Properties) {
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
+                restApiPassword = getPropertyIfSet("REST API password for the bot", "rest_api_password", defaults.restApiPassword, String::toString),
+
                 initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt),
 
                 waitChance = getPropertyIfSet("Chance to wait on a pokestop", "wait_chance", defaults.waitChance, String::toDouble),
@@ -174,7 +176,7 @@ class SettingsParser(val properties: Properties) {
     }
 }
 
-@JsonIgnoreProperties("startingLocation", "name", ignoreUnknown = true)
+@JsonIgnoreProperties("startingLocation", ignoreUnknown = true)
 data class Settings(
         var name: String = "",
 
@@ -255,6 +257,8 @@ data class Settings(
         val export: String = "",
 
         val guiPortSocket: Int = 8001,
+
+        var restApiPassword: String = "",
 
         var initialMapSize: Int = 9,
 

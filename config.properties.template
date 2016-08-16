@@ -179,6 +179,9 @@ use_lucky_egg=1
 # Port where the socketserver should listen, 0 = do not listen
 gui_port_socket=8001
 
+# REST API password, CHANGE THIS
+rest_api_password=
+
 # Export player/pokemondata on Profile Update. Options are:
 #   *empty*  Don't export (default)
 #   CSV      Correct USA/UK CSV format ("," as delimiter and "." as decimal separator)
