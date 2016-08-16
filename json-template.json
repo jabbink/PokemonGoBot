@@ -11,6 +11,7 @@
   "proxyType" : "",
   "proxyUsername" : "",
   "proxyPassword" : "",
+  "restApiPassword": "",
   "speed" : 2.8,
   "randomSpeedRange" : 0.0,
   "followStreets" : false,
