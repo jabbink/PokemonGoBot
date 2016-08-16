@@ -100,16 +100,15 @@ class CatchOneNearbyPokemon : Task {
                     if (wasFromLure) {
                         ctx.luredPokemonStats.andIncrement
                     }
-                    val iv = (pokemonData.individualAttack + pokemonData.individualDefense + pokemonData.individualStamina) * 100 / 45
-                    var message = "Caught a ${catchablePokemon.pokemonId} " +
-                            "with CP ${pokemonData.cp} and IV $iv%"
-                    message += "\r\n ${pokemonData.getStatsFormatted()}"
+                    var message = "Caught a "
                     if (settings.displayIfPokemonFromLure) {
                         if (encounterResult is DiskEncounterResult)
-                            message += " (lured pokemon) "
+                            message += "lured "
                         else
-                            message += " (wild pokemon) "
+                            message += "wild "
                     }
+					message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp} and IV" +
+							" (${pokemonData.individualAttack}-${pokemonData.individualDefense}-${pokemonData.individualStamina}) ${pokemonData.getIvPercentage()}%"
                     if (settings.displayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
                                 "Candy, ${result.stardustList.sum()}x Stardust]"
