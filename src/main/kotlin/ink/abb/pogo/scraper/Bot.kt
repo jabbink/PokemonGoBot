@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
 
-class Bot(val api: PokemonGo, val settings: Settings) {
+class Bot(val api: PokemonGo, val settings: Settings, val propFile: String) {
 
     private var runningLatch = CountDownLatch(0)
     var prepareWalkBack = AtomicBoolean(false)
@@ -228,6 +228,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
+            settings.writeProperty(propFile,"longitude", ctx.lng.toString())
+            settings.writeProperty(propFile,"latitude", ctx.lat.toString())
             ctx.server.stop()
             Log.red("Stopped SocketServer.")
             socketServerStopLatch.countDown()
@@ -237,7 +239,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         runningLatch.countDown()
         phaser.arriveAndAwaitAdvance()
         Log.red("All bot loops stopped.")
-
         socketServerStopLatch.await()
     }
 
