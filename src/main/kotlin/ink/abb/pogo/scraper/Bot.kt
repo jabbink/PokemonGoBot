@@ -14,6 +14,7 @@ import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
+import ink.abb.pogo.scraper.controllers.ProgrammController
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
@@ -168,9 +169,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             else if (!ctx.walking.get())
                 task(WalkToStartPokestop(process.startPokestop as Pokestop))
             if(checkForPlannedStop()){
-                stop()
+                terminateApplication()
             }
-
         }
 
         Log.setContext(ctx)
@@ -277,6 +277,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             return true
         }
         return false
+    }
+
+    fun terminateApplication(){
+        phaser.forceTermination()
+        ProgrammController.stopAllAplications()
     }
 
 }
