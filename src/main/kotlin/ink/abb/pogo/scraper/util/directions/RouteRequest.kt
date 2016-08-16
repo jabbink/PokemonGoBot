@@ -9,7 +9,8 @@ import java.util.*
 import java.util.regex.Pattern
 
 //var routeProvider = "http://yournavigation.org/api/dev/route.php"
-var routeProvider = "http://router.project-osrm.org/viaroute"
+//var routeProvider = "http://router.project-osrm.org/viaroute"
+var routeProvider = "http://mobrouting.com/api/dev/gosmore.php"
 
 
 fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
@@ -39,8 +40,7 @@ fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): Str
     return "$routeProvider?loc=$olat,$olng&loc=$dlat,$dlng&compression=false"
 }
 
-
-/*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
+fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     var routeParsed = getRoutefile(olat, olng, dlat, dlng)
     if (routeParsed.length > 0 && !routeParsed.contains("<distance>0</distance>")) {
         routeParsed = routeParsed.split("<coordinates>")[1]
@@ -58,11 +58,10 @@ fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): Str
         return ArrayList()
     }
 
-}*/
-
+}
 
 //Keep this in case yournavigation.org goes down
-fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
+/*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     var route = getRoutefile(olat, olng, dlat, dlng)
     if (route.length > 0 && route.contains("\"status\":200")) {
         route = route.split("route_geometry")[1]
@@ -79,8 +78,7 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
     } else {
         return ArrayList()
     }
-
-}
+}*/
 
 fun getRouteCoordinates(start: S2LatLng, end: S2LatLng): ArrayList<S2LatLng> {
     return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees())
