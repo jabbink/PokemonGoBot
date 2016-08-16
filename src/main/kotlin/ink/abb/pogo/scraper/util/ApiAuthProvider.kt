@@ -37,7 +37,8 @@ open class ApiAuthProvider : HandlerInterceptorAdapter() {
             val token = service.getBotContext(matcher.group(1)).restApiToken
 
             // If the token is invalid or isn't in the request, nothing will be done
-            return request.getHeader("X-PGB-ACCESS-TOKEN")!!.equals(token)
+            request.getHeader("X-PGB-ACCESS-TOKEN") ?: return request.getParameter("token").equals(token)
+            return request.getHeader("X-PGB-ACCESS-TOKEN").equals(token)
         }
 
         return false

@@ -1,7 +1,7 @@
 REST API Documentation :
 
 * Secure your API with the `rest_api_password` setting. This password is shared across all bots. If the setting isn't set, it will be generated and saved in the config file.
-* Request an access token with a `POST` to `/api/bot/{name}/auth`, the request body must be `rest_api_password`. This token must be placed in the X-PGB-ACCESS-TOKEN header for further use of the API.
+* Request an access token with a `POST` to `/api/bot/{name}/auth`, the request body must be `rest_api_password`. This token must be placed in the `X-PGB-ACCESS-TOKEN` header or in a `token` parameter in each request URL for further use of the API.
 * Pokemon end-point :
   - GET `/bot/{name}/pokemons` => List all pokemons
   - POST `/bot/{name}/pokemon/{id}/transfer` => Transfer pokemon
