@@ -189,12 +189,6 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
     }
 
-    // TODO not used anymore? remove?
-    private fun walkAndComeBack(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
-        walkPath(bot, ctx, settings, mutableListOf(end, start), speed, sendDone)
-    }
-
     private fun selectRandom(pokestops: List<Pokestop>, ctx: Context): Pokestop {
         // Select random pokestop while taking the distance into account
         // E.g. pokestop is closer to the user -> higher probabilty to be chosen

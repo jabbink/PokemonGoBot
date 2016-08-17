@@ -18,6 +18,7 @@ proxy_password=
 token=
 latitude=
 longitude=
+save_location_on_shutdown=true
 
 # Desired probability to catch Pokemon with 1 throw
 desired_catch_probability=0.4
