@@ -14,7 +14,9 @@ This is a known issue with the currently used Pokemon GO API. The bot sends too 
 
 ## After login I see `Accepting ToS` and get a `RemoteServerException: Your account may be banned! please try from the official client.`
 
-If you login in the official client and you see "Error fetching game data": RIP items/eggs/pokemons, your account got permabanned. You knew this was possible since you did read and violate the ToS of the official game.
+If you CAN login to the official client, complete the tutorial (catch your first pokemon, touch your first pokestop) and try again.
+
+If you CAN'T login in the official client but see "Error fetching game data": RIP items/eggs/pokemons, your account got permabanned. You knew this was possible since you did read and violate the ToS of the official game.
 
 ## The bot doesn't find/catch Pokemon
 

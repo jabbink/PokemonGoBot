@@ -1,12 +1,14 @@
 REST API Documentation :
 
-* Secure your API by putting a secure and random password in the `rest_api_password` setting in your config.properties file. This password is shared across all bots. If the configuration key is not set, it will be generated and saved in the config file.
+* Secure your API by putting a secure and random password in the `rest_api_password` setting in your config.properties file or the `restApiPassword` setting in your JSON file(s). Each bot has its own password, so use the correct one in the next step (or if you are lazy, use the same value everywhere). If the configuration key is not set, it will be generated and saved in the config file.
 
 * Request an access token with a `POST` to `http://localhost:8080/api/bot/{name}/auth` where `{name}` is the name of your bot (= `default` by default) and the raw body must be the value from the `rest_api_password` setting from the first step. Mind the default server port, which is 8080 (to change this, run the bot as `java -jar PokemonGoBot.jar --server-port=XXXX`) and do NOT use the socket port defined in your bot configuration (which is by default 8001).
 You will get a response from the server with a random session token which must be placed in the `X-PGB-ACCESS-TOKEN` header for further use of the API.
 
+* General end-point :
+  - GET `/api/bots` => List all bots (this does not need the `X-PGB-ACCESS-TOKEN` header)
+
 * Bot end-point :
-  - GET `/api/bots` => List all bots
   - POST `/api/bot{name}/load` => Load bot
   - POST `/api/bot{name}/unload` => Unload bot
   - POST `/api/bot{name}/reload` => Reload bot
