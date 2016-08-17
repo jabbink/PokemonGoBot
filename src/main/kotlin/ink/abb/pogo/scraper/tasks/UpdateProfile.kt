@@ -80,14 +80,14 @@ class UpdateProfile : Task {
                 0
             }
             val nextLevel: String = if (xpPerHour != 0L) {
-                DecimalFormat("#0.00").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())
+				"${DecimalFormat("#0").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())}h${Math.round(((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())%1*60)}m"
             } else {
-                "0"
+                "Unknown"
             }
 
             Log.magenta("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
             Log.magenta("XP gain: ${NumberFormat.getInstance().format(player.stats.experience - ctx.startXp.get())} XP in ${ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())} mins; " +
-                    "XP rate: ${NumberFormat.getInstance().format(xpPerHour)}/hr; Next level in: ${nextLevel} hr")
+                    "XP rate: ${NumberFormat.getInstance().format(xpPerHour)}/hr; Next level in: ${nextLevel}")
             Log.magenta("Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
                     "Pokemon caught from lures: ${ctx.luredPokemonStats.get()}; " +
                     "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};")

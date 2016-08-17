@@ -230,6 +230,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun stop() {
         if (!isRunning()) return
 
+        if(settings.saveLocationOnShutdown) {
+            Log.normal("Saving last location ...")
+            settings.longitude = ctx.lng.get()
+            settings.latitude = ctx.lat.get()
+        }
+
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
