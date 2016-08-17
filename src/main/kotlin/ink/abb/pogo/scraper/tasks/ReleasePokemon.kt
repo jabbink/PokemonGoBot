@@ -9,6 +9,7 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result
+import com.pokegoapi.exceptions.AsyncPokemonGoException
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -45,7 +46,14 @@ class ReleasePokemon : Task {
                         if (shouldRelease) {
                             Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
                                     "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
-                            val result = pokemon.transferPokemon()
+                            val result : Result
+                            try {
+                                result = pokemon.transferPokemon()
+                            } catch(e: AsyncPokemonGoException) {
+                                Log.red("Failed to transfer ${pokemon.pokemonId.name} with " +
+                                        "CP ${pokemon.cp} and IV $ivPercentage% due to ${e.cause?.message}")
+                                continue
+                            }
                             
                             if(ctx.pokemonInventoryFullStatus.second.get() && !settings.catchPokemon) {
                               // Just released a pokemon so the inventory is not full anymore

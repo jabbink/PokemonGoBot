@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.pokegoapi.google.common.geometry.S2LatLng
+import ink.abb.pogo.scraper.evolve.EvolutionStrategy
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.*
 import java.io.BufferedReader
@@ -132,7 +133,10 @@ class SettingsParser(val properties: Properties) {
 
                 waitTimeMin = getPropertyIfSet("Minimal time to wait", "wait_time_min", defaults.waitTimeMin, String::toInt),
 
-                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt)
+                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt),
+
+                autoEvolve = getPropertyIfSet("Should auto evolve", "auto_evolve", defaults.autoEvolve, String::toBoolean),
+                evolutionStrategy = getPropertyIfSet("Evolution strategy to use", "evolution_strategy", defaults.evolutionStrategy, String::toString)
         )
     }
 
@@ -257,6 +261,9 @@ data class Settings(
         val useLuckyEgg: Int = 1,
 
         val export: String = "",
+
+        val autoEvolve: Boolean = false,
+        val evolutionStrategy: String = "",
 
         val guiPortSocket: Int = 8001,
 
