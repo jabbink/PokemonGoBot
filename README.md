@@ -34,3 +34,7 @@ As the name says, the `develop` branch is for developing where we'll add new fea
 # Donations
 
 If you really like this bot and would like to donate, you can send Bitcoin donations to **1PoGoboTzD9jS43qrQYogMFW6nmNfK1BGi**
+
+If you rather use PayPal, please click here:
+
+[![Donate via PayPal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B2ZM2WREK7B32)
