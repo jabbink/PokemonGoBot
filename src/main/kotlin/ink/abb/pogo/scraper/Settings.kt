@@ -33,6 +33,7 @@ class SettingsParser(val properties: Properties) {
                 timerWalkToStartPokestop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timer_walk_to_start_pokestop", defaults.timerWalkToStartPokestop, String::toLong),
                 latitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
                 longitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
+                saveLocationOnShutdown = getPropertyIfSet("Save last location when the bot stop", "save_location_on_shutdown", defaults.saveLocationOnShutdown, String::toBoolean),
 
                 credentials = if (properties.getProperty("username", "").isEmpty()) {
                     GoogleCredentials(properties.getProperty("token", ""))
@@ -180,8 +181,9 @@ class SettingsParser(val properties: Properties) {
 data class Settings(
         var name: String = "",
 
-        val latitude: Double,
-        val longitude: Double,
+        var latitude: Double,
+        var longitude: Double,
+        val saveLocationOnShutdown: Boolean = true,
 
         val startingLocation: S2LatLng = S2LatLng.fromDegrees(latitude, longitude),
         val credentials: Credentials,
