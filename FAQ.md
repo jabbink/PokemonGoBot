@@ -10,7 +10,7 @@ Only that is not enough, check the whole stacktrace for the correct error.
 
 ## I get an `InvalidProtocolBufferException: Contents of buffer are null`
 
-This is a known issue with the currently used Pokemon GO API. The bot sends too much requests in a too short time to the servers, which return with a null value. We hope to get that fixed shortly, but is not something you can simply fix with some configuration settings or by putting extra Thread.sleep() in the code.
+This is a known issue with the currently used Pokemon GO API. The bot sends too many requests in a too short time to the servers, which return with a null value. We hope to get that fixed shortly, but is not something you can simply fix with some configuration settings or by putting extra Thread.sleep() in the code.
 
 ## After login I see `Accepting ToS` and get a `RemoteServerException: Your account may be banned! please try from the official client.`
 
@@ -26,7 +26,8 @@ Some possible issues:
  * Make sure the mobile app is not on (kill the process if need be)
  * Make sure the account you're botting on did do the initial tutorial (mainly catching a starter Pokemon)
  * Make sure your item bank is empty
- * You catched too many pokemons in a short time and are softbanned (don't catch more than 1000 Pokemon in 23 hours, [source](https://www.reddit.com/r/pokemongodev/comments/4xkqmq/new_ban_types_and_their_causes/)).
+ * Make sure you have enough pokeballs and your pokebank is not full
+ * You caught too many pokemons in a short time and are softbanned (don't catch more than 1000 Pokemon in 23 hours, [source](https://www.reddit.com/r/pokemongodev/comments/4xkqmq/new_ban_types_and_their_causes/)).
 
 ## The bot doesn't find/loot Pokestops
 
