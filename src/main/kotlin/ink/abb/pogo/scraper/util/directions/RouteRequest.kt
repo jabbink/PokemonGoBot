@@ -3,8 +3,8 @@ package ink.abb.pogo.scraper.util.directions
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.util.*
 
 //var routeProvider = "http://yournavigation.org/api/dev/route.php"
@@ -12,28 +12,15 @@ import java.util.*
 //var routeProvider = "http://mobrouting.com/api/dev/gosmore.php"
 val routeProvider = "http://valhalla.mapzen.com/route?json="
 
-
 fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
-    val connection = URL(createURLString(olat, olng, dlat, dlng)).openConnection() as HttpURLConnection
-    connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-    connection.setRequestProperty("Accept-Language", "en")
-    connection.setRequestProperty("Cache-Control", "max=0")
-    connection.setRequestProperty("Connection", "keep-alive")
-    connection.setRequestProperty("DNT", "1")
-    connection.setRequestProperty("Host", "valhalla.mapzen.com")
-    connection.setRequestProperty("Upgrade-Insecure-Requests", "1")
-    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36")
-    var routeFile = String()
     try {
-        connection.inputStream.bufferedReader().lines().forEach {
-            routeFile += "$it\n"
-        }
+        val response = OkHttpClient().newCall(Request.Builder().url(createURLString(olat, olng, dlat, dlng)).build()).execute()
+        return response.body().string()
     } catch (e: Exception) {
         Log.red("Error fetching route from provider: " + e.message)
     }
-    return routeFile
+    return String()
 }
-
 
 fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
     //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1"
@@ -41,31 +28,8 @@ fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): Str
     return routeProvider + "{\"locations\":[{\"lat\":$olat,\"lon\":$olng},{\"lat\":$dlat,\"lon\":$dlng}],\"costing\":\"pedestrian\",\"directions_options\":{\"narrative\":\"false\"}}"
 }
 
-
-//Keep this, used for mobrouting.com
-/*
 fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
-    var routeParsed = getRoutefile(olat, olng, dlat, dlng)
-    if (routeParsed.length > 0 && !routeParsed.contains("<distance>0</distance>")) {
-        routeParsed = routeParsed.split("<coordinates>")[1]
-        val matcher = Pattern.compile("(|-)\\d+.\\d+,(|-)\\d+.\\d+").matcher(routeParsed)
-        val coordinatesList = ArrayList<String>()
-        while (matcher.find()) {
-            coordinatesList.add(matcher.group())
-        }
-        val latlngList = ArrayList<S2LatLng>()
-        coordinatesList.forEach {
-            latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[1].toDouble()), S1Angle.degrees(it.toString().split(",")[0].toDouble())))
-        }
-        return latlngList
-    } else {
-        return ArrayList()
-    }
-}
-*/
-
-fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
-    var routeParsed = getRoutefile(olat, olng, dlat, dlng)
+    val routeParsed = getRoutefile(olat, olng, dlat, dlng)
 
     if (routeParsed.length > 0) {
 
@@ -113,6 +77,31 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
     return ArrayList()
 }
 
+fun getRouteCoordinates(start: S2LatLng, end: S2LatLng): ArrayList<S2LatLng> {
+    return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees())
+}
+
+//Keep this, used for mobrouting.com
+/*
+fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
+    var routeParsed = getRoutefile(olat, olng, dlat, dlng)
+    if (routeParsed.length > 0 && !routeParsed.contains("<distance>0</distance>")) {
+        routeParsed = routeParsed.split("<coordinates>")[1]
+        val matcher = Pattern.compile("(|-)\\d+.\\d+,(|-)\\d+.\\d+").matcher(routeParsed)
+        val coordinatesList = ArrayList<String>()
+        while (matcher.find()) {
+            coordinatesList.add(matcher.group())
+        }
+        val latlngList = ArrayList<S2LatLng>()
+        coordinatesList.forEach {
+            latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[1].toDouble()), S1Angle.degrees(it.toString().split(",")[0].toDouble())))
+        }
+        return latlngList
+    } else {
+        return ArrayList()
+    }
+}
+*/
 
 //Keep this in case yournavigation.org goes down
 /*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
@@ -133,8 +122,3 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
         return ArrayList()
     }
 }*/
-
-
-fun getRouteCoordinates(start: S2LatLng, end: S2LatLng): ArrayList<S2LatLng> {
-    return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees())
-}
