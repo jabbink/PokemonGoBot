@@ -29,9 +29,17 @@ class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // STOP WALKING
 
-        if (ctx.caughtPokemon.get() > settings.pokemonThreshold) {
-            Thread.sleep(3600 * 12000)
+        if (ctx.pokemonLockTime != 0L && bot.api.currentTimeMillis() > ctx.pokemonLockTime)
+        {
+            settings.catchPokemon = true
             ctx.caughtPokemon.set(0)
+        }
+
+        if (ctx.caughtPokemon.get() > settings.pokemonThreshold) {
+            if (settings.catchPokemon) {
+                settings.catchPokemon = false
+                ctx.pokemonLockTime = bot.api.currentTimeMillis() + (3600 * settings.thresholdWaitTime.toLong())
+            }
             return
         }
 

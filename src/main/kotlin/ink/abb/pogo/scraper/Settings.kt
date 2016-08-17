@@ -135,7 +135,9 @@ class SettingsParser(val properties: Properties) {
 
                 pokestopThreshold = getPropertyIfSet("The maximum amount of pokestops to loot before stopping", "pokestop_threshold", defaults.pokestopThreshold, String::toInt),
 
-                pokemonThreshold = getPropertyIfSet("The maximum amount of pokemon to catch before stopping", "pokemon_threshold", defaults.pokemonThreshold, String::toInt)
+                pokemonThreshold = getPropertyIfSet("The maximum amount of pokemon to catch before stopping", "pokemon_threshold", defaults.pokemonThreshold, String::toInt),
+
+                thresholdWaitTime = getPropertyIfSet("Threshold delay time in hours", "threshold_wait_time", defaults.thresholdWaitTime, String::toInt)
         )
     }
 
@@ -237,7 +239,7 @@ data class Settings(
         val displayPokemonCatchRewards: Boolean = true,
         val displayIfPokemonFromLure: Boolean = true,
 
-        val lootPokestop: Boolean = true,
+        var lootPokestop: Boolean = true,
         var catchPokemon: Boolean = true,
         val autoFillIncubator: Boolean = true,
 
@@ -272,6 +274,7 @@ data class Settings(
         val waitTimeMin: Int = 0,
         val waitTimeMax: Int = 0,
 
+        val thresholdWaitTime: Int = 12,
         val pokestopThreshold: Int = 1500,
         val pokemonThreshold: Int = 1000
 ) {

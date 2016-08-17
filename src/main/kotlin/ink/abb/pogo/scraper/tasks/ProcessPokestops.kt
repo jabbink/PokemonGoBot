@@ -50,9 +50,17 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
         if (startPokestop == null)
             startPokestop = sortedPokestops.first()
 
-        if (ctx.lootedPokestops.get() > settings.pokestopThreshold) {
-            Thread.sleep(3600 * 12000)
+        if (ctx.pokestopLockTime != 0L && bot.api.currentTimeMillis() > ctx.pokestopLockTime)
+        {
+            settings.lootPokestop = true
             ctx.lootedPokestops.set(0)
+        }
+
+        if (ctx.lootedPokestops.get() > settings.pokestopThreshold) {
+            if (settings.lootPokestop) {
+                settings.lootPokestop = false
+                ctx.pokestopLockTime = bot.api.currentTimeMillis() + (3600 * settings.thresholdWaitTime.toLong())
+            }
             return
         }
 

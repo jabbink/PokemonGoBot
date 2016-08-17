@@ -42,6 +42,9 @@ data class Context(
         val pauseWalking: AtomicBoolean = AtomicBoolean(false),
 
         val lootedPokestops: AtomicInteger = AtomicInteger(0),
-        val caughtPokemon: AtomicInteger = AtomicInteger(0)
+        val caughtPokemon: AtomicInteger = AtomicInteger(0),
+
+        var pokemonLockTime: Long = 0L,
+        var pokestopLockTime: Long = 0L
 
 )

@@ -207,6 +207,9 @@ wait_time_max=0
 pokestop_threshold=1500
 pokemon_threshold=1000
 
+# Threshold delay time in hours:
+threshold_wait_time=12
+
 # List of pokemon names
 #MISSINGNO
 #BULBASAUR
