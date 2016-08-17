@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
@@ -107,9 +108,9 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
         }
 
-        val randomSpeed = randomizeSpeed(speed, settings.randomSpeedRange)
+        val randomSpeed = randomizeSpeed(speed, settings.randomSpeedRange, ctx)
         Log.green("Your character now moves at ${DecimalFormat("#0.0").format(randomSpeed)} m/s")
-
+        ctx.walkingSpeed = AtomicDouble(randomSpeed)
         val timeout = 200L
 
         var remainingSteps = 0.0
@@ -222,10 +223,23 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         return pokestops.first()
     }
 
-    private fun randomizeSpeed(speed : Double, randomSpeedRange: Double): Double {
-        if(randomSpeedRange > speed){
+    // The speed changes always in the desired range, meaning if you already have a low speed and it goes lower, it will change less
+    private fun randomizeSpeed(speed : Double, speedRange: Double, ctx: Context): Double {
+        if(speedRange > speed){
             return speed
         }
-        return speed - randomSpeedRange + (Math.random()*randomSpeedRange*2)
+        var speedDiff: Double = 0.0
+        val minSpeed = speed - speedRange
+        val maxSpeed = speed + speedRange
+        // random value between -1 and  +1. There is always a 50:50 chance it will be slower or faster
+        // The speedChange is now twice math.random so that it prefers small/slow acceleration, but has still a low chance of abruptly changing (like a human)
+        val speedChangeNormalized = (Math.random()*2 -1)*Math.random()
+        if(speedChangeNormalized > 0){
+            speedDiff = maxSpeed - ctx.walkingSpeed.toDouble()
+        } else if(speedChangeNormalized < 0){
+            speedDiff = ctx.walkingSpeed.toDouble() - minSpeed
+        }
+        return ctx.walkingSpeed.toDouble() + speedChangeNormalized*speedDiff
+
     }
 }

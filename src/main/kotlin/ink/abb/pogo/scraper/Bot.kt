@@ -54,6 +54,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             AtomicInteger(0),
             AtomicInteger(0),
             Pair(AtomicInteger(0), AtomicInteger(0)),
+            AtomicDouble(settings.speed),
             mutableSetOf(),
             SocketServer(),
             Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
