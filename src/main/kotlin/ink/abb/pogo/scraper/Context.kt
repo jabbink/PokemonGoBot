@@ -8,10 +8,14 @@
 
 package ink.abb.pogo.scraper
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.gui.SocketServer
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -41,4 +45,17 @@ data class Context(
 
         val pauseWalking: AtomicBoolean = AtomicBoolean(false)
 
-)
+) {
+    fun getAltitude(latitude: Double?, longitude: Double?): Double {
+        val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":" + latitude.toString() + ",\"lon\":" + longitude.toString() + "}]}").newBuilder().build()
+        val request = okhttp3.Request.Builder().url(url).build()
+        var elevation = 10.0
+        try {
+            val result: Map<*,*>
+            result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
+            elevation = java.lang.Double.parseDouble(result["height"].toString().replace("[^\\d\\-]".toRegex(), ""))
+        } catch (ex: Exception) {
+        }
+        return elevation
+    }
+}
