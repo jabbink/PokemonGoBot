@@ -6,6 +6,7 @@ REST API Documentation :
 You will get a response from the server with a random session token which must be placed in the `X-PGB-ACCESS-TOKEN` header for further use of the API.
 
 * Bot end-point :
+  - GET `/api/bots` => List all bots
   - POST `/api/bot{name}/load` => Load bot
   - POST `/api/bot{name}/unload` => Unload bot
   - POST `/api/bot{name}/reload` => Reload bot

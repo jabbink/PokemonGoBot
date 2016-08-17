@@ -4,15 +4,19 @@
 
 There is a lot of output with the reason WHY the build fails, please read it through carefully and fix any errors mentionned in the output.
 
-## I get a `AsyncPokemonGoException: Unknown exception occurred` / `Error running loop ProfileLoop!` / `Error running loop BotLoop!`
+## I get an `AsyncPokemonGoException: Unknown exception occurred` / `Error running loop ProfileLoop!` / `Error running loop BotLoop!`
 
 Only that is not enough, check the whole stacktrace for the correct error.
 
-## I get a `InvalidProtocolBufferException: Contents of buffer are null`
+## I get an `InvalidProtocolBufferException: Contents of buffer are null`
 
 This is a known issue with the currently used Pokemon GO API. The bot sends too much requests in a too short time to the servers, which return with a null value. We hope to get that fixed shortly, but is not something you can simply fix with some configuration settings or by putting extra Thread.sleep() in the code.
 
-## The bot doesn't catch Pokemon
+## After login I see `Accepting ToS` and get a `RemoteServerException: Your account may be banned! please try from the official client.`
+
+If you login in the official client and you see "Error fetching game data": RIP items/eggs/pokemons, your account got permabanned. You knew this was possible since you did read and violate the ToS of the official game.
+
+## The bot doesn't find/catch Pokemon
 
 Currently not reproducible so can't be reliably fixed. Look here for some people that managed to get it fixed: https://github.com/jabbink/PokemonGoBot/issues/21
 
@@ -22,6 +26,21 @@ Some possible issues:
  * Make sure the mobile app is not on (kill the process if need be)
  * Make sure the account you're botting on did do the initial tutorial (mainly catching a starter Pokemon)
  * Make sure your item bank is empty
+ * You catched too many pokemons in a short time and are softbanned (don't catch more than 1000 Pokemon in 23 hours, [source](https://www.reddit.com/r/pokemongodev/comments/4xkqmq/new_ban_types_and_their_causes/)).
+
+## The bot doesn't find/loot Pokestops
+
+Some possible issues:
+
+ * Your startlocation is wrong and/or there are no pokestops nearby.
+ * You looted too many pokestops in a short time and are softbanned (don't loot more than 2000 Pokestops in 23 hours, [source](https://www.reddit.com/r/pokemongodev/comments/4xkqmq/new_ban_types_and_their_causes/))
+
+## The bot doesn't walk
+
+Some possible issues:
+
+ * You're camping a Pokestop with a lure (should be visible in log)
+ * You're resting (should be visible in log)
 
 ## Immediately after starting I get a LoginFailedException
 
