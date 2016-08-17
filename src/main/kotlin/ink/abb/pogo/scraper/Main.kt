@@ -42,7 +42,7 @@ import javax.swing.text.rtf.RTFEditorKit
 
 val time = SystemTimeImpl()
 
-fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit): CredentialProvider {
+fun getAuth(settings: Settings, http: OkHttpClient, propFile: String): CredentialProvider {
     val credentials = settings.credentials
     val auth = if (credentials is GoogleCredentials) {
         if (credentials.token.isBlank()) {
@@ -58,7 +58,7 @@ fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit
             println("Refresh token:" + provider.refreshToken)
             Log.normal("Setting Google refresh token in your config")
             credentials.token = provider.refreshToken
-            writeToken(credentials.token)
+            settings.writeProperty(propFile, "token", credentials.token)
 
             provider
         } else {
@@ -125,7 +125,7 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
 
     val dir = File(System.getProperty("java.class.path")).absoluteFile.parentFile
 
-    var filename = "";
+    var filename = ""
 
     fileLoop@ for (path in arrayOf(Paths.get("").toAbsolutePath(), dir)) {
         for (attemptFilename in attemptFilenames) {
@@ -141,18 +141,16 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
 
     if (properties == null) {
         Log.red("No config files found. Exiting.")
-        System.exit(1);
+        System.exit(1)
         return
     } else {
         val settings = SettingsParser(properties).createSettingsFromProperties()
-        service.addBot(startBot(settings, http, {
-            settings.writeProperty(filename, "token", it)
-        }))
+        service.addBot(startBot(settings, http, filename))
     }
 }
 
 
-fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit = {}): Bot {
+fun startBot(settings: Settings, http: OkHttpClient, propFile: String): Bot {
 
     var proxyHttp: OkHttpClient? = null
 
@@ -189,9 +187,9 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     do {
         try {
             if(proxyHttp == null)
-                auth = getAuth(settings, http, writeToken)
+                auth = getAuth(settings, http, propFile)
             else
-                auth = getAuth(settings, proxyHttp, writeToken)
+                auth = getAuth(settings, proxyHttp, propFile)
         } catch (e: LoginFailedException) {
             throw IllegalStateException("Server refused your login credentials. Are they correct?")
         } catch (e: RemoteServerException) {
@@ -325,7 +323,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
 
     api.setDeviceInfo(deviceInfo)
 
-    val bot = Bot(api, settings)
+    val bot = Bot(api, settings, propFile)
 
     bot.start()
 

@@ -39,7 +39,7 @@ class BotService {
     }
 
     fun submitBot(settings: Settings) {
-        addBot(startBot(settings, http))
+        addBot(startBot(settings, http, ""))
         save(settings)
     }
 
@@ -74,7 +74,7 @@ class BotService {
     }
     
     fun getBotContext(name: String): Context {
-        var bot = bots.find {it.settings.name == name}
+        val bot = bots.find {it.settings.name == name}
 
         bot ?: throw IllegalArgumentException("Bot $name doesn't exists !")
 
