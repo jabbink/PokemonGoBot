@@ -23,7 +23,7 @@ fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String
 }
 
 fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
-    //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1"
+    //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1" // used for router.project-osrm.org
     //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1&layer=mapnik" // used for mobrouting.com
     return routeProvider + "{\"locations\":[{\"lat\":$olat,\"lon\":$olng},{\"lat\":$dlat,\"lon\":$dlng}],\"costing\":\"pedestrian\",\"directions_options\":{\"narrative\":\"false\"}}"
 }
@@ -39,6 +39,8 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
         // status 0 == no problem
         if (status == 0) {
             val shape = jsonRoot.path("trip").findValue("shape").textValue()
+
+            // Decode the route shape, look at https://mapzen.com/documentation/turn-by-turn/decoding/
 
             val precision: Double = 1E6
             val latlngList = ArrayList<S2LatLng>()
@@ -82,8 +84,7 @@ fun getRouteCoordinates(start: S2LatLng, end: S2LatLng): ArrayList<S2LatLng> {
 }
 
 //Keep this, used for mobrouting.com
-/*
-fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
+/*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     var routeParsed = getRoutefile(olat, olng, dlat, dlng)
     if (routeParsed.length > 0 && !routeParsed.contains("<distance>0</distance>")) {
         routeParsed = routeParsed.split("<coordinates>")[1]
@@ -103,7 +104,7 @@ fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double):
 }
 */
 
-//Keep this in case yournavigation.org goes down
+//Keep this, used for router.project-osrm.org
 /*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
     var route = getRoutefile(olat, olng, dlat, dlng)
     if (route.length > 0 && route.contains("\"status\":200")) {
