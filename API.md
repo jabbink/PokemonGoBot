@@ -1,13 +1,17 @@
 REST API Documentation :
 
-* Secure your API with the `rest_api_password` setting. This password is shared across all bots. If the setting isn't set, it will be generated and saved in the config file.
-* Request an access token with a `POST` to `/api/bot/{name}/auth`, the request body must be `rest_api_password`. This token must be placed in the `X-PGB-ACCESS-TOKEN` header for further use of the API.
-* Bot end-point : 
+* Secure your API by putting a secure and random password in the `rest_api_password` setting in your config.properties file. This password is shared across all bots. If the configuration key is not set, it will be generated and saved in the config file.
+
+* Request an access token with a `POST` to `http://localhost:8080/api/bot/{name}/auth` where `{name}` is the name of your bot (= `default` by default) and the raw body must be the value from the `rest_api_password` setting from the first step. Mind the default server port, which is 8080 (to change this, run the bot as `java -jar PokemonGoBot.jar --server-port=XXXX`) and do NOT use the socket port defined in your bot configuration (which is by default 8001).
+You will get a response from the server with a random session token which must be placed in the `X-PGB-ACCESS-TOKEN` header for further use of the API.
+
+* Bot end-point :
   - POST `/api/bot{name}/load` => Load bot
   - POST `/api/bot{name}/unload` => Unload bot
   - POST `/api/bot{name}/reload` => Reload bot
   - POST `/api/bot{name}/stop` => Stop bot
   - POST `/api/bot{name}/start` => Start bot
+
 * Pokemon end-point :
   - GET `/api/bot{name}/pokemons` => List all pokemons
   - POST `/api/bot{name}/pokemon/{id}/transfer` => Transfer pokemon
@@ -28,3 +32,5 @@ REST API Documentation :
   - GET `/api/bot{name}/profile` => Get account profile
   - GET `/api/bot{name}/pokedex` => Get account pokedex
   - GET `/api/bot{name}/eggs` => Get eggs
+
+A very simple [proof of concept with javascript](https://gist.github.com/Sieberkev/0f96f190615cebf15a07ca2a8a2a61ca) can be found here.

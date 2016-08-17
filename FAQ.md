@@ -1,11 +1,16 @@
 # Frequently Asked Questions
 
 ## I got `BUILD FAILED`
-Most of the time it's because the you didn't execute step 2 of the README.
 
-After that, just try `gradlew clean build`.
+There is a lot of output with the reason WHY the build fails, please read it through carefully and fix any errors mentionned in the output.
 
-If there's still a problem, open an issue.
+## I get a `AsyncPokemonGoException: Unknown exception occurred` / `Error running loop ProfileLoop!` / `Error running loop BotLoop!`
+
+Only that is not enough, check the whole stacktrace for the correct error.
+
+## I get a `InvalidProtocolBufferException: Contents of buffer are null`
+
+This is a known issue with the currently used Pokemon GO API. The bot sends too much requests in a too short time to the servers, which return with a null value. We hope to get that fixed shortly, but is not something you can simply fix with some configuration settings or by putting extra Thread.sleep() in the code.
 
 ## The bot doesn't catch Pokemon
 
@@ -16,6 +21,7 @@ Some possible issues:
  * Make sure your system time is (semi-)correct (let it autosync with an online server)
  * Make sure the mobile app is not on (kill the process if need be)
  * Make sure the account you're botting on did do the initial tutorial (mainly catching a starter Pokemon)
+ * Make sure your item bank is empty
 
 ## Immediately after starting I get a LoginFailedException
 
@@ -23,9 +29,9 @@ Some possible issues:
 - If you're using PTC, your credentials are correct and your password is longer than 15 characters, only enter the first 15 characters of your account and the login should work.
 - If there is a token present, remove it and retry.
 
-## After 1.5 hours I get a errors with Google login
+## After 1.5 hours I get a errors with PTC/Google login `LoginFailedException: Invalid Auth status code recieved, token not refreshed?`
 
-Known issue with the Java API handling login for Google.
+Known issue with the Java API handling login for PTC/Google.
 
 ## I get a RemoteServerException or something about "502"
 
@@ -49,11 +55,11 @@ If your bot runs the GUI socket on port `8001`, everything should work automatic
 
 ## The bot refuses to login to my Google account
 
-Make sure you enter the full email address (including `@`) in the `username=` property.
+Make sure you enter the full email address (including `@`) in the `username=` property. If you use a JSON configuration, make sure the credential type is set as `google-auto`.
 
 ## Error: unable to access jarfile xxxxx
 
-Make sure you are working in the directory where the JAR file is located
+Make sure you are working in the directory where the JAR file is located. If you JAR file is located in `C:\Users\userprofilename\Desktop\pogobot\` you can change your directory in the console with the command `cd C:\Users\userprofilename\Desktop\pogobot\` (do not simply copy/paste this command but alter it to your location first).
 
 ## I want to use multiple bots
 
@@ -61,11 +67,15 @@ Define the bot configurations in multiple JSON files in the `bot-settings` direc
 
 Refer to the file named [`json-template.json`](./json-template.json) for an example.
 
+If you use a PTC account, set credential type to "PTC", if you use a Google account, set credential type to `google-auto`!
+
 Make sure all JSON files have a different `guiPortSocket` or set that port to `0`!
 
 ## I get "Address already in use"
 
-You are either trying to run multiple bots by running Java multiple times, multiple bot configurations use the same `guiPortSocket` or the port is simply in use by another application.
+It is possible you did not close the bot correctly (do not close the console window, but do `CTRL+C` first to close the process) and it is still running in the background. Kill all running JAVA processes and restart the bot.
+
+If that is not the case, you are either trying to run multiple bots by running Java multiple times, multiple bot configurations use the same `guiPortSocket` or the port is simply in use by another application.
 
 To change the socket ports, change `guiPortSocket` (`gui_port_socket` in `config.properties`) to another port, or disable the GUI by setting this to `0`.
 
