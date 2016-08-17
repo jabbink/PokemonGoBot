@@ -116,7 +116,9 @@ class SettingsParser(val properties: Properties) {
 
                 obligatoryTransfer = getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", defaults.obligatoryTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
-                evolveBeforeTransfer = getPropertyIfSet("list of pokemon you always want to evolve before transfer to maximize XP", "evolve_before_transfer", defaults.obligatoryTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
+                evolveBeforeTransfer = getPropertyIfSet("list of pokemon you always want to evolve before transfer to maximize XP", "evolve_before_transfer", defaults.evolveBeforeTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
+
+                neverCatchPokemon = getPropertyIfSet("list of pokemon you NEVER want to catch", "never_catch_pokemon", defaults.neverCatchPokemon.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
                 evolveStackLimit = getPropertyIfSet("The stack of evolves needed to pop lucky egg and evolve all", "evolve_stack_limit", defaults.evolveStackLimit, String::toInt),
 
@@ -263,6 +265,7 @@ data class Settings(
         val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
 
         val evolveBeforeTransfer: List<PokemonId> = listOf(PokemonId.CATERPIE, PokemonId.RATTATA, PokemonId.WEEDLE, PokemonId.PIDGEY),
+        val neverCatchPokemon: List<PokemonId> = listOf(),
         val evolveStackLimit: Int = 100,
         val useLuckyEgg: Int = 1,
         val evolveTimeDelay: Long = 300,

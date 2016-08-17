@@ -178,6 +178,9 @@ obligatory_transfer=DODUO,RATTATA,CATERPIE,PIDGEY
 # list of pokemon you always want to evolve before transfer to maximize XP
 evolve_before_transfer=CATERPIE,RATTATA,WEEDLE,PIDGEY
 
+# list of pokemon you NEVER want to catch, regardless of cp/iv
+never_catch_pokemon=
+
 # The stack of evolves needed to pop lucky egg and evolve all
 evolve_stack_limit=100
 

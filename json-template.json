@@ -67,6 +67,7 @@
   "ignoredPokemon" : [ "EEVEE", "MEWTWO", "CHARMANDER" ],
   "obligatoryTransfer" : [ "DODUO", "RATTATA", "CATERPIE", "PIDGEY" ],
   "evolveBeforeTransfer" : [ "CATERPIE", "RATTATA", "WEEDLE", "PIDGEY" ],
+  "neverCatchPokemon" : [],
   "evolveStackLimit" : 100,
   "useLuckyEgg" : 1,
   "evolveTimeDelay" : 300,

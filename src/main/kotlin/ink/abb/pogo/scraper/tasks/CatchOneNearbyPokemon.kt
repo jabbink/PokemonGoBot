@@ -45,7 +45,7 @@ class CatchOneNearbyPokemon : Task {
 
         if (pokemon.isNotEmpty()) {
             val catchablePokemon = pokemon.first()
-            if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId) && settings.desiredCatchProbabilityUnwanted == -1.0) {
+            if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId) && settings.desiredCatchProbabilityUnwanted == -1.0 || settings.neverCatchPokemon.contains(catchablePokemon.pokemonId)) {
                 ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                 Log.normal("Found pokemon ${catchablePokemon.pokemonId}; blacklisting because it's unwanted")
                 ctx.pauseWalking.set(false)
