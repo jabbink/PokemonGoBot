@@ -87,7 +87,7 @@ Define the bot configurations in multiple JSON files in the `bot-settings` direc
 
 Refer to the file named [`json-template.json`](./json-template.json) for an example.
 
-If you use a PTC account, set credential type to "PTC", if you use a Google account, set credential type to `google-auto`!
+If you use a PTC account, set credential type to "ptc", if you use a Google account, set credential type to `google-auto`!
 
 Make sure all JSON files have a different `guiPortSocket` or set that port to `0`!
 
