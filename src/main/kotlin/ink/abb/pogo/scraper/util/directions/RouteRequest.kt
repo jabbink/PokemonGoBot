@@ -1,125 +1,32 @@
 package ink.abb.pogo.scraper.util.directions
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.pokegoapi.google.common.geometry.S2LatLng
+import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.*
 
-//var routeProvider = "http://yournavigation.org/api/dev/route.php"
-//var routeProvider = "http://router.project-osrm.org/viaroute"
-//var routeProvider = "http://mobrouting.com/api/dev/gosmore.php"
-val routeProvider = "http://valhalla.mapzen.com/route?json="
-
-fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
+fun getRouteCoordinates(startLat: Double, startLong: Double, endLat: Double, endLong: Double, settings: Settings): ArrayList<S2LatLng> {
+    val routeProvider = settings.followStreetsProvider
     try {
-        val response = OkHttpClient().newCall(Request.Builder().url(createURLString(olat, olng, dlat, dlng)).build()).execute()
-        return response.body().string()
-    } catch (e: Exception) {
-        Log.red("Error fetching route from provider: " + e.message)
-    }
-    return String()
-}
-
-fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
-    //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1" // used for router.project-osrm.org
-    //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1&layer=mapnik" // used for mobrouting.com
-    return routeProvider + "{\"locations\":[{\"lat\":$olat,\"lon\":$olng},{\"lat\":$dlat,\"lon\":$dlng}],\"costing\":\"pedestrian\",\"directions_options\":{\"narrative\":\"false\"}}"
-}
-
-fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
-    val routeParsed = getRoutefile(olat, olng, dlat, dlng)
-
-    if (routeParsed.length > 0) {
-
-        val jsonRoot = ObjectMapper().readTree(routeParsed)
-        val status = jsonRoot.path("trip").path("status").asInt()
-
-        // status 0 == no problem
-        if (status == 0) {
-            val shape = jsonRoot.path("trip").findValue("shape").textValue()
-
-            // Decode the route shape, look at https://mapzen.com/documentation/turn-by-turn/decoding/
-
-            val precision: Double = 1E6
-            val latlngList = ArrayList<S2LatLng>()
-            var index: Int = 0
-            var lat: Int = 0
-            var lng: Int = 0
-            while (index < shape.length) {
-                var b: Int
-                var shift = 0
-                var result = 0
-                do {
-                    b = shape[index++].toInt() - 63
-                    result = result or (b and 0x1f shl shift)
-                    shift += 5
-                } while (b >= 0x20)
-                val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-                lat += dlat
-
-                shift = 0
-                result = 0
-                do {
-                    b = shape[index++].toInt() - 63
-                    result = result or (b and 0x1f shl shift)
-                    shift += 5
-                } while (b >= 0x20)
-                val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-                lng += dlng
-
-                latlngList.add(S2LatLng.fromDegrees(lat / precision, lng / precision))
+        val url = routeProvider.createURLString(startLat, startLong, endLat, endLong)
+        val request = Request.Builder().url(url).build()
+        val response = OkHttpClient().newCall(request).execute()
+        val responseBody = response.body().string()
+        if (responseBody.length > 0) {
+            val coordinates = routeProvider.parseRouteResponse(responseBody)
+            if (coordinates.isNotEmpty()) {
+                return coordinates
             }
-            // everything is ok
-            return latlngList
         }
+        Log.red("Error fetching route from $routeProvider: response is empty")
+    } catch (e: Exception) {
+        Log.red("Error fetching route from $routeProvider: ${e.message}")
     }
-    // can't parse
     return ArrayList()
 }
 
-fun getRouteCoordinates(start: S2LatLng, end: S2LatLng): ArrayList<S2LatLng> {
-    return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees())
+fun getRouteCoordinates(start: S2LatLng, end: S2LatLng, settings: Settings): ArrayList<S2LatLng> {
+    return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees(), settings)
 }
-
-//Keep this, used for mobrouting.com
-/*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
-    var routeParsed = getRoutefile(olat, olng, dlat, dlng)
-    if (routeParsed.length > 0 && !routeParsed.contains("<distance>0</distance>")) {
-        routeParsed = routeParsed.split("<coordinates>")[1]
-        val matcher = Pattern.compile("(|-)\\d+.\\d+,(|-)\\d+.\\d+").matcher(routeParsed)
-        val coordinatesList = ArrayList<String>()
-        while (matcher.find()) {
-            coordinatesList.add(matcher.group())
-        }
-        val latlngList = ArrayList<S2LatLng>()
-        coordinatesList.forEach {
-            latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[1].toDouble()), S1Angle.degrees(it.toString().split(",")[0].toDouble())))
-        }
-        return latlngList
-    } else {
-        return ArrayList()
-    }
-}
-*/
-
-//Keep this, used for router.project-osrm.org
-/*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
-    var route = getRoutefile(olat, olng, dlat, dlng)
-    if (route.length > 0 && route.contains("\"status\":200")) {
-        route = route.split("route_geometry")[1]
-        val matcher = Pattern.compile("(|-)\\d+.\\d+,(|-)\\d+.\\d+").matcher(route)
-        val coordinatesList = ArrayList<String>()
-        while (matcher.find()) {
-            coordinatesList.add(matcher.group())
-        }
-        val latlngList = ArrayList<S2LatLng>()
-        coordinatesList.forEach {
-            latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[0].toDouble()), S1Angle.degrees(it.toString().split(",")[1].toDouble())))
-        }
-        return latlngList
-    } else {
-        return ArrayList()
-    }
-}*/

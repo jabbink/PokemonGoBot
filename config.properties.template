@@ -57,6 +57,11 @@ random_speed_range=0.0
 # Should the bot follow the streets (true) or just go directly to pokestops/waypoints
 follow_streets=false
 
+# Which route provider the bot should use to follow the streets (if follow_streets=true)
+# Supported UP: MAPZEN, MOBROUTING
+# Supported but DOWN: PROJECTOSM, YOURNAVIGATION
+follow_streets_provider=MAPZEN
+
 # Should the bot loot the pokestops (true/false)
 loot_pokestop=true
 

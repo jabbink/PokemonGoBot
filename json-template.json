@@ -16,6 +16,7 @@
   "speed" : 2.8,
   "randomSpeedRange" : 0.0,
   "followStreets" : false,
+  "followStreetsProvider" : "MAPZEN",
   "groupItemsByType" : false,
   "dropItems" : true,
   "uselessItems" : {

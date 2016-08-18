@@ -8,16 +8,19 @@
 
 package ink.abb.pogo.scraper
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.credentials.*
+import ink.abb.pogo.scraper.util.credentials.Credentials
+import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
+import ink.abb.pogo.scraper.util.credentials.GoogleCredentials
+import ink.abb.pogo.scraper.util.credentials.PtcCredentials
+import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
-import java.net.Proxy
 import java.util.*
 
 
@@ -52,6 +55,7 @@ class SettingsParser(val properties: Properties) {
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
                 randomSpeedRange = getPropertyIfSet("Define random speed range around the original speed", "random_speed_range", defaults.randomSpeedRange, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
+                followStreetsProvider = getPropertyIfSet("Which route provider the bot should use to follow the streets (if follow_streets=true)", "follow_streets_provider", defaults.followStreetsProvider, RouteProviderEnum::valueOf),
                 dropItems = dropItems,
                 groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
 
@@ -148,7 +152,7 @@ class SettingsParser(val properties: Properties) {
             System.exit(1)
         }
 
-        var result: T?
+        val result: T?
         try {
             result = conversion(properties.getProperty(property))
         } catch (e: Exception) {
@@ -197,7 +201,8 @@ data class Settings(
         val speed: Double = 2.8,
         val randomSpeedRange: Double = 0.0,
         val followStreets: Boolean = false,
-        val groupItemsByType : Boolean = false,
+        val followStreetsProvider: RouteProviderEnum = RouteProviderEnum.MAPZEN,
+        val groupItemsByType: Boolean = false,
         val dropItems: Boolean = true,
         val uselessItems: Map<ItemId, Int> = mapOf(
                 Pair(ItemId.ITEM_REVIVE, 20),

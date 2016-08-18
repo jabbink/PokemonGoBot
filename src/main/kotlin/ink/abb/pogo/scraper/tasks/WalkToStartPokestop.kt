@@ -104,7 +104,7 @@ class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
             return
         }
         val timeout = 200L
-        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), S2LatLng.fromDegrees(startPokeStop.latitude, startPokeStop.longitude))
+        val coordinatesList = getRouteCoordinates(ctx.lat.get(), ctx.lng.get(), startPokeStop.latitude, startPokeStop.longitude, settings)
         if (coordinatesList.size <= 0) {
             walk(bot, ctx, settings)
         } else {
