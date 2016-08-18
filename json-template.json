@@ -3,7 +3,7 @@
   "longitude" : 0,
   "saveLocationOnShutdown" : true,
   "credentials" : {
-    "type" : "google",
+    "type" : "ptc",
     "username" : "",
     "password" : ""
   },

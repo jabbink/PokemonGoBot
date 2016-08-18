@@ -35,9 +35,10 @@ class TestSettings {
         val settingsFromTemplate = SettingsParser(properties).createSettingsFromProperties()
         val settingsFromJsonTemplate = ObjectMapper().registerKotlinModule().readValue(File("json-template.json"), Settings::class.java).withName("default")
         val settingsFromCode = Settings(name = "default", latitude = 0.0, longitude = 0.0, credentials = GoogleCredentials())
+        val settingsFromCodeForJson = Settings(name = "default", latitude = 0.0, longitude = 0.0, credentials = PtcCredentials())
 
         Assert.assertEquals(settingsFromCode.toString().split(",").joinToString("\n"), settingsFromTemplate.toString().split(",").joinToString("\n"))
-        Assert.assertEquals(settingsFromCode.toString().split(",").joinToString("\n"), settingsFromJsonTemplate.toString().split(",").joinToString("\n"))
+        Assert.assertEquals(settingsFromCodeForJson.toString().split(",").joinToString("\n"), settingsFromJsonTemplate.toString().split(",").joinToString("\n"))
     }
 
     @Test
