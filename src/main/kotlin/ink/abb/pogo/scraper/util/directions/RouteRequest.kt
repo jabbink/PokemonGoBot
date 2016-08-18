@@ -7,11 +7,13 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.*
 
+val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
+
 fun getRouteCoordinates(startLat: Double, startLong: Double, endLat: Double, endLong: Double, settings: Settings): ArrayList<S2LatLng> {
     val routeProvider = settings.followStreetsProvider
     try {
         val url = routeProvider.createURLString(startLat, startLong, endLat, endLong)
-        val request = Request.Builder().url(url).build()
+        val request = Request.Builder().url(url).header("User-Agent", userAgent).build()
         val response = OkHttpClient().newCall(request).execute()
         val responseBody = response.body().string()
         if (responseBody.length > 0) {
