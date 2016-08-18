@@ -29,7 +29,12 @@ class EvolvePokemon : Task {
             if (settings.evolveBeforeTransfer.contains(it.key)){
                 // Get pokemonFamily meta information
                 val pokemonMeta = PokemonMetaRegistry.getMeta(it.key)
-                var maxPossibleEvolves = bot.api.inventories.candyjar.getCandies(pokemonMeta.family) / pokemonMeta.candyToEvolve
+                var maxPossibleEvolves: Int = 0
+
+                if (pokemonMeta.candyToEvolve > 0) {
+                    maxPossibleEvolves = bot.api.inventories.candyjar.getCandies(pokemonMeta.family) / pokemonMeta.candyToEvolve
+                }
+                
                 // Add the minimum value, depending on which is the bottleneck, amount of candy, or pokemon of this type in pokebank:
                 countEvolveStack +=  Math.min(maxPossibleEvolves,it.value.count())
 
