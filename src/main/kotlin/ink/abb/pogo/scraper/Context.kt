@@ -55,7 +55,7 @@ data class Context(
             return this.s2Cache[cellId]!! + rand
         }
         var elevation = 10.0
-        val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":" + latitude.toString() + ",\"lon\":" + longitude.toString() + "}]}").newBuilder().build()
+        val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
         val request = okhttp3.Request.Builder().url(url).build()
         try {
             val result: Map<*,*>
