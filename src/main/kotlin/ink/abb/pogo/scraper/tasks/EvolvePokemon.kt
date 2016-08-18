@@ -36,7 +36,7 @@ class EvolvePokemon : Task {
                 } else {
                     Log.red("${it.key} is in evolve list but is unevolvable")
                 }
-                
+
                 // Add the minimum value, depending on which is the bottleneck, amount of candy, or pokemon of this type in pokebank:
                 countEvolveStack +=  Math.min(maxPossibleEvolves,it.value.count())
             }
@@ -66,7 +66,14 @@ class EvolvePokemon : Task {
                     Thread.sleep(300)
                     if (evolveResult.isSuccessful()) {
                         countEvolved++
+                        val evolvedpokemon = evolveResult.getEvolvedPokemon()
+                        Log.yellow("Successfully evolved in ${evolvedpokemon.pokemonId.name} CP ${evolvedpokemon.cp} IV ${evolvedpokemon.getIvPercentage()}%")
+                        ctx.server.releasePokemon(it.id)
+                        //TODO: comunicate to the sockserver the new got pokemon
+                        //ctx.server.newPokemon(0.0, 0.0, PokemonDataOuterClass.PokemonData.buildFromPokemon(evolvedpokemon))
                         Thread.sleep(300)
+                    } else {
+                        Log.red("Evolve of ${it.pokemonId.name} CP ${it.cp} IV ${it.getIvPercentage()}% failed: ${evolveResult.result.toString()}")
                     }
                 }
             }
