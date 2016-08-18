@@ -14,7 +14,7 @@ having to answer the same question can really clog up the pipes for people who a
 
 ## Prebuilt
 
-1. Make sure you have Oracle Java 1.8 or higher installed (`java -version` in a command line)
+1. Make sure you have Oracle Java 1.8 JRE (JDK works too) installed (`java -version` in a command line)
     - If not, go [here](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html).
 2. Download the latest release from [here](https://github.com/jabbink/PokemonGoBot/releases).
 3. Download [config.properties.template](https://raw.githubusercontent.com/jabbink/PokemonGoBot/master/config.properties.template) and save it in the same directory
@@ -26,9 +26,15 @@ having to answer the same question can really clog up the pipes for people who a
 
 ## From source
 
-1. Clone this repo: `git clone https://github.com/jabbink/PokemonGoBot.git && cd PokemonGoBot` or download the zip
-2. Run from terminal/cmd: `gradlew build`
-3. Rename `./config.properties.template` to `./config.properties`
-4. Modify `config.properties` as you please
-5. To run the bot directly from console run `gradlew run`
-6. :exclamation: If you use JetBrains IntelliJ, install the Lombok plugin and enable Settings -> Compiler -> Annotation Processors -> Enable annotation processing :exclamation:
+1. Make sure you have Oracle Java JDK 1.8 installed (`java -version` in a command line)
+    - If not, go [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
+2. Clone this repo: `git clone https://github.com/jabbink/PokemonGoBot.git && cd PokemonGoBot` or download the zip
+3. Run from terminal/cmd: `gradlew build`
+4. Copy `./config.properties.template` to `./config.properties`
+5. Modify `config.properties` as you please
+6. To run the bot directly from console run `gradlew run`
+7. :exclamation: If you use JetBrains IntelliJ, install the Lombok plugin and enable Settings -> Compiler -> Annotation Processors -> Enable annotation processing :exclamation:
+
+## Stopping the bot
+
+Do not simply close the console window, but press `CTRL+C` first to terminate the bot gracefully. Otherwise there's a chance the process will still run in the background and give an `address in use` error when you want to restart it.

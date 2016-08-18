@@ -14,10 +14,14 @@ proxy_type=SOCKS
 proxy_username=
 proxy_password=
 
-# Token to login directly
+# Token to login directly (leave this empty, the bot will fill this in automatically)
 token=
+
+# Fill in the start GPS location (latitude/longitude) where you want the bot to start
 latitude=
 longitude=
+
+# Do you want the bot so start from the location when you shut it down?
 save_location_on_shutdown=true
 
 # Desired probability to catch Pokemon with 1 throw
