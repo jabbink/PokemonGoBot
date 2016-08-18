@@ -15,11 +15,12 @@ import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.gui.SocketServer
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
+import com.pokegoapi.google.common.geometry.S2LatLng
+import com.pokegoapi.google.common.geometry.S2CellId
 
 data class Context(
         val api: PokemonGo,
@@ -39,6 +40,7 @@ data class Context(
         val pokemonInventoryFullStatus: Pair<AtomicBoolean, AtomicBoolean>,
 
         var restApiPassword: String,
+        var s2Cache: MutableMap<String, Double>,
         var restApiToken: String = "",
 
         val walking: AtomicBoolean = AtomicBoolean(false),
@@ -46,16 +48,22 @@ data class Context(
         val pauseWalking: AtomicBoolean = AtomicBoolean(false)
 
 ) {
-    fun getAltitude(latitude: Double?, longitude: Double?): Double {
+    fun getAltitude(latitude: Double, longitude: Double): Double {
+        val rand = (Math.random() * 3) + 1
+        val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
+        if (this.s2Cache.containsKey(cellId) && this.s2Cache[cellId] != null){
+            return this.s2Cache[cellId]!! + rand
+        }
+        var elevation = 10.0
         val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":" + latitude.toString() + ",\"lon\":" + longitude.toString() + "}]}").newBuilder().build()
         val request = okhttp3.Request.Builder().url(url).build()
-        var elevation = 10.0
         try {
             val result: Map<*,*>
             result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
-            elevation = java.lang.Double.parseDouble(result["height"].toString().replace("[^\\d\\-]".toRegex(), ""))
+            elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
+            this.s2Cache[cellId] = elevation
         } catch (ex: Exception) {
         }
-        return elevation
+        return elevation + rand
     }
 }
