@@ -32,35 +32,21 @@ class EvolvePokemon : Task {
                 var maxPossibleEvolves: Int = 0
 
                 if (pokemonMeta.candyToEvolve > 0) {
+                    Log.red("${it.key} is in evolve list but is unevolvable")
                     maxPossibleEvolves = bot.api.inventories.candyjar.getCandies(pokemonMeta.family) / pokemonMeta.candyToEvolve
                 }
                 
                 // Add the minimum value, depending on which is the bottleneck, amount of candy, or pokemon of this type in pokebank:
                 countEvolveStack +=  Math.min(maxPossibleEvolves,it.value.count())
-
-                // Use Iv sorting if this is configured:
-                val sorted = if (settings.sortByIv) {
-                    it.value.sortedByDescending { it.getIv() }
-                } else {
-                    it.value.sortedByDescending { it.cp }
-                }
-                // Release pokemon we wont be able to evolve anyway, because of lack of candy:
-                sorted.forEach {
-                    maxPossibleEvolves--
-                    if (maxPossibleEvolves < 0) {
-                        releasePokemon(it,"Not enough candy to save for evolve",ctx)
-                    }
-                }
-
             }
         }
-        Log.yellow("Stack of pokemon ready to evolve: $countEvolveStack pokemons")
+        Log.yellow("Stack of pokemon ready to evolve: $countEvolveStack/${settings.evolveStackLimit}")
 
         // use lucky egg if above evolve stack limit and evolve the whole stack
         if (countEvolveStack >= settings.evolveStackLimit) {
             val startingXP = ctx.api.playerProfile.stats.experience
             if (settings.useLuckyEgg == 1) {
-                Log.yellow("Using Lucky Egg before evolving stack of $countEvolveStack pokemons")
+                Log.yellow("Starting stack evolve of $countEvolveStack pokemons using lucky egg")
                 try {
                     var resultLuckyEgg = ctx.api.cachedInventories.itemBag.useLuckyEgg()
                     Log.yellow("Result of using lucky egg: ${resultLuckyEgg.result.toString()}")
@@ -69,37 +55,22 @@ class EvolvePokemon : Task {
                 }
             }
             else {
-                Log.yellow("Not using lucky egg")
+                Log.yellow("Starting stack evolve of $countEvolveStack pokemons witouth lucky egg")
             }
             var countEvolved = 0
             ctx.api.inventories.pokebank.pokemons.forEach {
                 if (settings.evolveBeforeTransfer.contains(it.pokemonId)) {
-                    Log.yellow("Evolving ${it.pokemonId.name} before transfer")
+                    Log.yellow("Evolving ${it.pokemonId.name} CP ${it.cp} IV ${it.getIvPercentage()}%")
                     val evolveResult = it.evolve()
                     Thread.sleep(300)
                     if (evolveResult.isSuccessful()) {
                         countEvolved++
-                        releasePokemon(evolveResult.getEvolvedPokemon(),"Evolved for XP only",ctx)
                         Thread.sleep(300)
                     }
                 }
             }
             val endXP = ctx.api.playerProfile.stats.experience
             Log.yellow("Finished evolving $countEvolved pokemon; ${endXP-startingXP} xp gained")
-        }
-        //
-    }
-
-    fun releasePokemon(pokemon: Pokemon, reason: String, ctx: Context) {
-        Log.yellow("Going to transfer ${pokemon.pokemonId.name} with " +
-                "CP ${pokemon.cp} and IV ${pokemon.getIvPercentage()}%; reason: $reason")
-        val result = pokemon.transferPokemon()
-        if (result == ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result.SUCCESS) {
-            ctx.pokemonStats.second.andIncrement
-            ctx.server.releasePokemon(pokemon.id)
-            ctx.server.sendProfile()
-        } else {
-            Log.red("Failed to transfer ${pokemon.pokemonId.name}: ${result.name}")
         }
     }
 }
