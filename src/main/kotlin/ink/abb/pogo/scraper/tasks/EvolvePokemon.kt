@@ -32,8 +32,9 @@ class EvolvePokemon : Task {
                 var maxPossibleEvolves: Int = 0
 
                 if (pokemonMeta.candyToEvolve > 0) {
-                    Log.red("${it.key} is in evolve list but is unevolvable")
                     maxPossibleEvolves = bot.api.inventories.candyjar.getCandies(pokemonMeta.family) / pokemonMeta.candyToEvolve
+                } else {
+                    Log.red("${it.key} is in evolve list but is unevolvable")
                 }
                 
                 // Add the minimum value, depending on which is the bottleneck, amount of candy, or pokemon of this type in pokebank:
