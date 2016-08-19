@@ -16,7 +16,7 @@
   "speed" : 2.8,
   "randomSpeedRange" : 0.0,
   "followStreets" : [],
-  "mapzen_api_key" : "",
+  "mapzenApiKey" : "",
   "groupItemsByType" : false,
   "dropItems" : true,
   "uselessItems" : {
