@@ -52,8 +52,7 @@ class SocketServer {
         server?.addEventListener("goto", EventGoto::class.java) { client, data, ackRequest ->
             run {
                 if (data.lat != null && data.lng != null) {
-                    val coord = S2LatLng.fromRadians(data.lat!!, data.lng!!)
-                    coordinatesToGoTo.add(coord)
+                    coordinatesToGoTo.add(S2LatLng.fromDegrees(data.lat!!, data.lng!!))
                 }
             }
         }
