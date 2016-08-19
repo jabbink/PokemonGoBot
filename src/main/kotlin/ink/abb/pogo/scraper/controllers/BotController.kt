@@ -16,6 +16,7 @@ import com.pokegoapi.api.inventory.Item
 import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.map.pokemon.EvolutionResult
 import com.pokegoapi.api.pokemon.Pokemon
+import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
