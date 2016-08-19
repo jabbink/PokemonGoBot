@@ -54,8 +54,15 @@ speed=2.8
 # Example: If speed is 2.8, and the range 0.5, the speed will be between 2.3 and 3.3
 random_speed_range=0.0
 
-# Should the bot follow the streets (true) or just go directly to pokestops/waypoints
+# Should the bot follow the streets? If false, go directly to pokestops/waypoints
+# If so, separate route providers by a comma, ordered by preference
+# Example: MAPZEN,MOBROUTING,PROJECTOSM,YOURNAVIGATION
 follow_streets=false
+
+# If you use MAPZEN as route provider, you can use a Mapzen "Turn by Turn" API key (if not you are limited to 6 calls per minute)
+# How to: https://github.com/mapzen/mapzen-docs-generator/blob/master/docs/index.md
+# Template: valhalla-XXXXXXX
+mapzen_api_key=
 
 # Should the bot loot the pokestops (true/false)
 loot_pokestop=true

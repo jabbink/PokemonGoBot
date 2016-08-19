@@ -1,85 +1,63 @@
+/**
+ * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions.
+ *
+ * For more information, refer to the LICENSE file in this repositories root directory
+ */
+
 package ink.abb.pogo.scraper.util.directions
 
-import com.pokegoapi.google.common.geometry.S1Angle
 import com.pokegoapi.google.common.geometry.S2LatLng
+import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.Log
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.util.*
-import java.util.regex.Pattern
 
-//var routeProvider = "http://yournavigation.org/api/dev/route.php"
-//var routeProvider = "http://router.project-osrm.org/viaroute"
-var routeProvider = "http://mobrouting.com/api/dev/gosmore.php"
+val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
 
+fun getRouteCoordinates(startLat: Double, startLong: Double, endLat: Double, endLong: Double, settings: Settings): ArrayList<S2LatLng> {
+    for (routeProvider in settings.followStreets) {
+        if (routeProvider.isBanned()) {
+            continue
+        }
+        var error: String?
+        try {
+            val url = routeProvider.createURLString(startLat, startLong, endLat, endLong, routeProvider.getApiKey(settings))
+            val request = Request.Builder().url(url).header("User-Agent", userAgent).build()
+            val response = OkHttpClient().newCall(request).execute()
+            val responseBody = response.body().string()
+            if (responseBody.length > 0) {
+                val coordinates = routeProvider.parseRouteResponse(responseBody)
+                if (coordinates.isNotEmpty()) {
+                    routeProvider.banTime = 0 // everything is ok, reset the bantime
+                    Log.red("[Route] Got route coordinates from $routeProvider (API KEY: ${routeProvider.usingApiKey(settings)})")
+                    return coordinates
+                }
+            }
+            error = "response is not valid or empty"
+        } catch (e: Exception) {
+            error = e.message
+        } finally {
+            routeProvider.lastTry = Calendar.getInstance()
+        }
+        routeProvider.banMe()
+        Log.red("[Route] Error from $routeProvider: $error (banned for ${routeProvider.banTime} min) (API KEY: ${routeProvider.usingApiKey(settings)})")
+    }
+    Log.red("[Route] No more route providers, go directly to pokestops/waypoints")
+    return ArrayList()
+}
 
-fun getRoutefile(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
-    val connection = URL(createURLString(olat, olng, dlat, dlng)).openConnection() as HttpURLConnection
-    connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-    connection.setRequestProperty("Accept-Language", "en")
-    connection.setRequestProperty("Cache-Control", "max=0")
-    connection.setRequestProperty("Connection", "keep-alive")
-    connection.setRequestProperty("DNT", "1")
-    connection.setRequestProperty("Host", "mobrouting.com")
-    connection.setRequestProperty("Upgrade-Insecure-Requests", "1")
-    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36")
-    var routeFile = String()
+fun getRouteCoordinates(start: S2LatLng, end: S2LatLng, settings: Settings): ArrayList<S2LatLng> {
+    return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees(), settings)
+}
+
+fun isValidRouteProvider(routeName: String): Boolean {
     try {
-        connection.inputStream.bufferedReader().lines().forEach {
-            routeFile += "$it\n"
-        }
-    } catch (e: Exception) {
-        Log.red("Error fetching route from provider: " + e.message)
+        RouteProviderEnum.valueOf(routeName)
+        return true
+    } catch (e: IllegalArgumentException) {
+        return false
     }
-    return routeFile
-}
-
-
-fun createURLString(olat: Double, olng: Double, dlat: Double, dlng: Double): String {
-    //return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1"
-    return "$routeProvider?flat=$olat&flon=$olng&tlat=$dlat&tlon=$dlng&v=foot&fast=1&layer=mapnik"
-}
-
-fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
-    var routeParsed = getRoutefile(olat, olng, dlat, dlng)
-    if (routeParsed.length > 0 && !routeParsed.contains("<distance>0</distance>")) {
-        routeParsed = routeParsed.split("<coordinates>")[1]
-        val matcher = Pattern.compile("(|-)\\d+.\\d+,(|-)\\d+.\\d+").matcher(routeParsed)
-        val coordinatesList = ArrayList<String>()
-        while (matcher.find()) {
-            coordinatesList.add(matcher.group())
-        }
-        val latlngList = ArrayList<S2LatLng>()
-        coordinatesList.forEach {
-            latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[1].toDouble()), S1Angle.degrees(it.toString().split(",")[0].toDouble())))
-        }
-        return latlngList
-    } else {
-        return ArrayList()
-    }
-
-}
-
-//Keep this in case yournavigation.org goes down
-/*fun getRouteCoordinates(olat: Double, olng: Double, dlat: Double, dlng: Double): ArrayList<S2LatLng> {
-    var route = getRoutefile(olat, olng, dlat, dlng)
-    if (route.length > 0 && route.contains("\"status\":200")) {
-        route = route.split("route_geometry")[1]
-        val matcher = Pattern.compile("(|-)\\d+.\\d+,(|-)\\d+.\\d+").matcher(route)
-        val coordinatesList = ArrayList<String>()
-        while (matcher.find()) {
-            coordinatesList.add(matcher.group())
-        }
-        val latlngList = ArrayList<S2LatLng>()
-        coordinatesList.forEach {
-            latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[0].toDouble()), S1Angle.degrees(it.toString().split(",")[1].toDouble())))
-        }
-        return latlngList
-    } else {
-        return ArrayList()
-    }
-}*/
-
-fun getRouteCoordinates(start: S2LatLng, end: S2LatLng): ArrayList<S2LatLng> {
-    return getRouteCoordinates(start.latDegrees(), start.lngDegrees(), end.latDegrees(), end.lngDegrees())
 }

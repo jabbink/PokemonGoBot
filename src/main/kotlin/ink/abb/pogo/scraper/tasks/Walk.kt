@@ -66,7 +66,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
     }
 
     private fun walk(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        if (settings.followStreets) {
+        if (settings.followStreets.isNotEmpty()) {
             walkRoute(bot, ctx, settings, end, speed, sendDone)
         } else {
             walkDirectly(bot, ctx, settings, end, speed, sendDone)
@@ -78,7 +78,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
     }
 
     private fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end)
+        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end, settings)
         if (coordinatesList.size > 0) {
             walkPath(bot, ctx, settings, coordinatesList, speed, sendDone)
         } else {
@@ -96,10 +96,10 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
 
         //random waiting
-        if(Math.random() * 100 < settings.waitChance){
+        if (Math.random() * 100 < settings.waitChance) {
             val waitTimeMin = settings.waitTimeMin
             val waitTimeMax = settings.waitTimeMax
-            if(waitTimeMax > waitTimeMin){
+            if (waitTimeMax > waitTimeMin) {
                 val sleepTime: Long = (Math.random() * (waitTimeMax - waitTimeMin) + waitTimeMin).toLong()
                 Log.yellow("Trainer grew tired, needs to rest a little (for ${sleepTime} seconds)")
                 Thread.sleep(sleepTime * 1000)
@@ -222,10 +222,10 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         return pokestops.first()
     }
 
-    private fun randomizeSpeed(speed : Double, randomSpeedRange: Double): Double {
-        if(randomSpeedRange > speed){
+    private fun randomizeSpeed(speed: Double, randomSpeedRange: Double): Double {
+        if (randomSpeedRange > speed) {
             return speed
         }
-        return speed - randomSpeedRange + (Math.random()*randomSpeedRange*2)
+        return speed - randomSpeedRange + (Math.random() * randomSpeedRange * 2)
     }
 }
