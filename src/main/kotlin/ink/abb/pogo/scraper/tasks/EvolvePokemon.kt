@@ -56,7 +56,7 @@ class EvolvePokemon : Task {
                 }
             }
             else {
-                Log.yellow("Starting stack evolve of $countEvolveStack pokemon withouth lucky egg")
+                Log.yellow("Starting stack evolve of $countEvolveStack pokemon without lucky egg")
             }
             var countEvolved = 0
             ctx.api.inventories.pokebank.pokemons.forEach {
