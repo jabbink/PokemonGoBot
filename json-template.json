@@ -1,18 +1,18 @@
 {
   "latitude" : 0,
   "longitude" : 0,
-  "saveLocationOnShutdown": true,
+  "saveLocationOnShutdown" : true,
   "credentials" : {
     "type" : "ptc",
     "username" : "",
     "password" : ""
   },
   "proxyServer" : "",
-  "proxyPort" : "",
-  "proxyType" : "",
+  "proxyPort" : "-1",
+  "proxyType" : "SOCKS",
   "proxyUsername" : "",
   "proxyPassword" : "",
-  "restApiPassword": "",
+  "restApiPassword" : "",
   "speed" : 2.8,
   "randomSpeedRange" : 0.0,
   "followStreets" : false,
@@ -81,3 +81,4 @@
   "botTimeoutAfterCatchingPokemon" : -1,
   "botTimeoutAfterVisitingPokestops" : -1
 }
+
