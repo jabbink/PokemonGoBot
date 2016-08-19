@@ -74,7 +74,7 @@ data class Context(
                 elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
                 this.s2Cache[cellId] = elevation
             } catch (exi: Exception) {
-                Log.red("Failed to fetch elevation. Using default...")
+                Log.red("Can't get elevation, using ${elevation + rand}...")
             }
         }
         return elevation + rand
