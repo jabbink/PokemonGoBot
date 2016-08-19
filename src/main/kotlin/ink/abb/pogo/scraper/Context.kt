@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import com.pokegoapi.google.common.geometry.S2LatLng
 import com.pokegoapi.google.common.geometry.S2CellId
+import java.util.*
 
 data class Context(
         val api: PokemonGo,
@@ -51,18 +52,29 @@ data class Context(
     fun getAltitude(latitude: Double, longitude: Double): Double {
         val rand = (Math.random() * 3) + 1
         val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
-        if (this.s2Cache.containsKey(cellId) && this.s2Cache[cellId] != null){
+        if (this.s2Cache.containsKey(cellId) && this.s2Cache[cellId] != null) {
             return this.s2Cache[cellId]!! + rand
         }
         var elevation = 10.0
-        val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
-        val request = okhttp3.Request.Builder().url(url).build()
+        var url = HttpUrl.parse("https://maps.googleapis.com/maps/api/elevation/json?locations=$latitude,$longitude&sensor=true").newBuilder().build()
+        var request = okhttp3.Request.Builder().url(url).build()
         try {
-            val result: Map<*,*>
+            val result: Map<*, *>
             result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
-            elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
+            val results = result["results"] as List<*>
+            val firstResult = results[0] as Map<*, *>
+            elevation = firstResult["elevation"].toString().toDouble()
             this.s2Cache[cellId] = elevation
-        } catch (ex: Exception) {
+        } catch(ex: Exception) {
+            url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
+            request = okhttp3.Request.Builder().url(url).build()
+            try {
+                val result: Map<*, *>
+                result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
+                elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
+                this.s2Cache[cellId] = elevation
+            } catch (exi: Exception) {
+            }
         }
         return elevation + rand
     }
