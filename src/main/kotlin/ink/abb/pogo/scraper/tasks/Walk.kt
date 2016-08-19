@@ -66,7 +66,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
     }
 
     private fun walk(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        if (settings.followStreets) {
+        if (settings.followStreets.isNotEmpty()) {
             walkRoute(bot, ctx, settings, end, speed, sendDone)
         } else {
             walkDirectly(bot, ctx, settings, end, speed, sendDone)

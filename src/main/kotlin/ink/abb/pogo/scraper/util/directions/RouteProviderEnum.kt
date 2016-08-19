@@ -11,15 +11,19 @@ package ink.abb.pogo.scraper.util.directions
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pokegoapi.google.common.geometry.S1Angle
 import com.pokegoapi.google.common.geometry.S2LatLng
+import ink.abb.pogo.scraper.Settings
 import java.util.*
 import java.util.regex.Pattern
-
 
 enum class RouteProviderEnum {
 
     MAPZEN {
-        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double): String {
-            return "http://valhalla.mapzen.com/route?json={\"locations\":[{\"lat\":$startLat,\"lon\":$startLong},{\"lat\":$endLat,\"lon\":$endLong}],\"costing\":\"pedestrian\",\"directions_options\":{\"narrative\":\"false\"}}"
+        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
+            var url = "http://valhalla.mapzen.com/route?json={\"locations\":[{\"lat\":$startLat,\"lon\":$startLong},{\"lat\":$endLat,\"lon\":$endLong}],\"costing\":\"pedestrian\",\"directions_options\":{\"narrative\":\"false\"}}"
+            if (apiKey.isNotBlank()) {
+                url += "&api_key=$apiKey"
+            }
+            return url
         }
 
         override fun parseRouteResponse(routeParsed: String): ArrayList<S2LatLng> {
@@ -65,10 +69,14 @@ enum class RouteProviderEnum {
             }
             return ArrayList() // can't parse
         }
+
+        override fun getApiKey(settings: Settings): String {
+            return settings.mapzenApiKey
+        }
     },
 
     MOBROUTING {
-        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double): String {
+        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
             return "http://mobrouting.com/api/dev/gosmore.php?flat=$startLat&flon=$startLong&tlat=$endLat&tlon=$endLong&v=foot&fast=1&layer=mapnik"
         }
 
@@ -87,10 +95,14 @@ enum class RouteProviderEnum {
             }
             return ArrayList() // can't parse
         }
+
+        override fun getApiKey(settings: Settings): String {
+            return ""
+        }
     },
 
     PROJECTOSM {
-        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double): String {
+        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
             return "http://router.project-osrm.org/viaroute?flat=$startLat&flon=$startLong&tlat=$endLat&tlon=$endLong&v=foot&fast=1"
         }
 
@@ -110,10 +122,14 @@ enum class RouteProviderEnum {
                 return ArrayList() // can't parse
             }
         }
+
+        override fun getApiKey(settings: Settings): String {
+            return ""
+        }
     },
 
     YOURNAVIGATION {
-        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double): String {
+        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
             return "http://yournavigation.org/api/dev/route.php?flat=$startLat&flon=$startLong&tlat=$endLat&tlon=$endLong&v=foot&fast=1"
         }
 
@@ -133,10 +149,42 @@ enum class RouteProviderEnum {
                 return ArrayList() // can't parse
             }
         }
+
+        override fun getApiKey(settings: Settings): String {
+            return ""
+        }
     };
 
-    abstract fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double): String
+    abstract fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String
 
     abstract fun parseRouteResponse(routeParsed: String): ArrayList<S2LatLng>
+
+    abstract fun getApiKey(settings: Settings): String
+
+    fun usingApiKey(settings: Settings): Boolean {
+        return getApiKey(settings).isNotBlank()
+    }
+
+    /**
+     * We ban a service provider for 1 minute
+     * If it's still doesn't work, we double the time for every fail (1,2,4,8,16...)
+     */
+    fun banMe() {
+        if (banTime == 0) {
+            banTime = 1
+        } else {
+            banTime *= 2
+        }
+        banDate = Calendar.getInstance()
+        banDate.add(Calendar.MINUTE, banTime)
+    }
+
+    fun isBanned(): Boolean {
+        return Calendar.getInstance().before(banDate)
+    }
+
+    var lastTry: Calendar = Calendar.getInstance() // when we try to call this route provider last time?
+    var banDate: Calendar = Calendar.getInstance() // when we can unban this route provider?
+    var banTime: Int = 0 // how many time this route provider is banned (in minute)
 
 }
