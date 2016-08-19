@@ -16,7 +16,6 @@ import com.pokegoapi.api.inventory.Item
 import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.map.pokemon.EvolutionResult
 import com.pokegoapi.api.pokemon.Pokemon
-import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
@@ -303,13 +302,13 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/pokedex", method = arrayOf(RequestMethod.GET))
     fun getPokedex(@PathVariable name: String): List<PokedexEntry> {
 
-        var pokedex = mutableListOf<PokedexEntry>()
+        val pokedex = mutableListOf<PokedexEntry>()
         val api = service.getBotContext(name).api
         var i: Int = 1
 
         while (i < 151) {
             i++
-            var entry: PokedexEntryOuterClass.PokedexEntry? = api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.forNumber(i))
+            val entry: PokedexEntryOuterClass.PokedexEntry? = api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.forNumber(i))
             entry ?: continue
 
             pokedex.add(PokedexEntry().buildFromEntry(entry))

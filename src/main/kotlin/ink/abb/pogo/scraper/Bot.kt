@@ -32,15 +32,20 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
+import com.fasterxml.jackson.databind.ObjectMapper
 
 class Bot(val api: PokemonGo, val settings: Settings) {
 
     private var runningLatch = CountDownLatch(0)
     var prepareWalkBack = AtomicBoolean(false)
     var walkBackLock = AtomicBoolean(true)
-
+    var altitudeCache: MutableMap<String, Double> =
+            try {
+                ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
+            } catch (ex: Exception){
+                mutableMapOf()
+            }
     lateinit private var phaser: Phaser
-
     var ctx = Context(
             api,
             api.playerProfile,
@@ -54,7 +59,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             mutableSetOf(),
             SocketServer(),
             Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
-            settings.restApiPassword
+            settings.restApiPassword,
+            altitudeCache
     )
 
     @Synchronized
@@ -226,11 +232,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         if (!isRunning()) return
 
         if(settings.saveLocationOnShutdown) {
-            Log.normal("Saving last location ...")
+            Log.normal("Saving last location...")
             settings.longitude = ctx.lng.get()
             settings.latitude = ctx.lat.get()
         }
-
+        Log.normal("Saving cache file...")
+        ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
