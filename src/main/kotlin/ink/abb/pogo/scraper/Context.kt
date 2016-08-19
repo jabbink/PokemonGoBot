@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import com.pokegoapi.google.common.geometry.S2LatLng
 import com.pokegoapi.google.common.geometry.S2CellId
-import java.util.*
+import ink.abb.pogo.scraper.util.Log
 
 data class Context(
         val api: PokemonGo,
@@ -74,6 +74,7 @@ data class Context(
                 elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
                 this.s2Cache[cellId] = elevation
             } catch (exi: Exception) {
+                Log.red("Failed to fetch elevation. Using default...")
             }
         }
         return elevation + rand
