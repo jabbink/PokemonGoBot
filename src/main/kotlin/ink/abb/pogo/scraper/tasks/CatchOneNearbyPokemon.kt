@@ -52,7 +52,7 @@ class CatchOneNearbyPokemon : Task {
                 return
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
-            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
+            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), ctx.getAltitude(ctx.lat.get(), ctx.lng.get()))
 
             val encounterResult = catchablePokemon.encounterPokemon()
             val wasFromLure = encounterResult is DiskEncounterResult
