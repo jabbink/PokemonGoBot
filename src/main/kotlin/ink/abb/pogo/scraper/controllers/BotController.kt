@@ -287,7 +287,7 @@ class BotController {
         val ctx: Context = service.getBotContext(name)
 
         if (!latitude.isNaN() && !longitude.isNaN()) {
-            ctx.server.coordinatesToGoTo.add(S2LatLng.fromRadians(latitude, longitude))
+            ctx.server.coordinatesToGoTo.add(S2LatLng.fromDegrees(latitude, longitude))
             return "SUCCESS"
         } else {
             return "FAIL"
