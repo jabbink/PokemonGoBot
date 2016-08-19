@@ -56,9 +56,9 @@ data class Context(
             return this.s2Cache[cellId]!! + rand
         }
         var elevation = 10.0
-        var url = HttpUrl.parse("https://maps.googleapis.com/maps/api/elevation/json?locations=$latitude,$longitude&sensor=true").newBuilder().build()
-        var request = okhttp3.Request.Builder().url(url).build()
         try {
+            val url = HttpUrl.parse("https://maps.googleapis.com/maps/api/elevation/json?locations=$latitude,$longitude&sensor=true").newBuilder().build()
+            val request = okhttp3.Request.Builder().url(url).build()
             val result: Map<*, *>
             result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
             val results = result["results"] as List<*>
@@ -66,8 +66,8 @@ data class Context(
             elevation = firstResult["elevation"].toString().toDouble()
             this.s2Cache[cellId] = elevation
         } catch(ex: Exception) {
-            url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
-            request = okhttp3.Request.Builder().url(url).build()
+            val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
+            val request = okhttp3.Request.Builder().url(url).build()
             try {
                 val result: Map<*, *>
                 result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
