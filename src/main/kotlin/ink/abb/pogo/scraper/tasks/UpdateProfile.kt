@@ -60,7 +60,11 @@ class UpdateProfile : Task {
         }
 
         // No messages to show? Booo!
-        ctx.api.playerProfile.checkAndEquipBadges()
+        try {
+            ctx.api.playerProfile.checkAndEquipBadges()
+        } catch (e: Exception) {
+            Log.red("Failed to check and equip badges")
+        }
 
         try {
             // update km walked, mainly
