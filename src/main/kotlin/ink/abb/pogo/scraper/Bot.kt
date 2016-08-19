@@ -91,7 +91,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         api.cachedInventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
             val pnickname = if (!it.nickname.isEmpty()) " (${it.nickname})" else ""
-            "Have ${it.pokemonId.name}${pnickname} with ${it.cp} CP and IV (${it.individualAttack}-${it.individualDefense}-${it.individualStamina}) ${it.getIvPercentage()}%"
+            "Have ${it.pokemonId.name}${pnickname} with ${it.cp}/${it.maxCpForPlayer} ${it.cpInPercentageActualPlayerLevel}% CP and IV (${it.individualAttack}-${it.individualDefense}-${it.individualStamina}) ${it.getIvPercentage()}% "
         }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
