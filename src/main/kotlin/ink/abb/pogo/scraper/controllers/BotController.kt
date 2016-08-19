@@ -16,6 +16,7 @@ import com.pokegoapi.api.inventory.Item
 import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.map.pokemon.EvolutionResult
 import com.pokegoapi.api.pokemon.Pokemon
+import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
@@ -283,23 +284,15 @@ class BotController {
             @PathVariable longitude: Double
     ): String {
 
-        return "UNSUPPORTED"
-
         val ctx: Context = service.getBotContext(name)
 
-        // Stop walking
-        ctx.pauseWalking.set(true)
+        if (!latitude.isNaN() && !longitude.isNaN()) {
+            ctx.server.coordinatesToGoTo.add(S2LatLng.fromRadians(latitude, longitude))
+            return "SUCCESS"
+        } else {
+            return "FAIL"
+        }
 
-        ctx.lat.set(latitude)
-        ctx.lng.set(longitude)
-
-        ctx.api.setLocation(latitude, longitude, ctx.getAltitude(latitude, longitude))
-
-        ctx.pauseWalking.set(false)
-
-        ctx.server.setLocation(latitude, longitude)
-
-        return "SUCCESS"
     }
 
     @RequestMapping(value = "/bot/{name}/profile", method = arrayOf(RequestMethod.GET))
