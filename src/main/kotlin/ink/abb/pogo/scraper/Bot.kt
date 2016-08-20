@@ -10,6 +10,7 @@ package ink.abb.pogo.scraper
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.util.concurrent.AtomicDouble
+import com.google.maps.GeoApiContext
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
@@ -19,10 +20,10 @@ import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
+import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
 import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
-import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import java.io.File
 import java.time.LocalDateTime
 import java.util.*
@@ -45,6 +46,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             } catch (ex: Exception) {
                 mutableMapOf()
             }
+
     lateinit private var phaser: Phaser
     var ctx = Context(
             api,
@@ -60,7 +62,12 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             SocketServer(),
             Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
             settings.restApiPassword,
-            altitudeCache
+            altitudeCache,
+            geoApiContext = if (settings.followStreets.contains(RouteProviderEnum.GOOGLE) && settings.googleApiKey.startsWith("AIza")) {
+                GeoApiContext().setApiKey(settings.googleApiKey)
+            } else {
+                null
+            }
     )
 
     @Synchronized
@@ -76,7 +83,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
         Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
         Log.normal("Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
-        //Log.normal("Inventory bag ${ctx.api.bag}")
 
         val compareName = Comparator<Pokemon> { a, b ->
             a.pokemonId.name.compareTo(b.pokemonId.name)
@@ -91,7 +97,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         api.cachedInventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
             val pnickname = if (!it.nickname.isEmpty()) " (${it.nickname})" else ""
-            "Have ${it.pokemonId.name}${pnickname} with ${it.cp}/${it.maxCpForPlayer} ${it.cpInPercentageActualPlayerLevel}% CP and IV (${it.individualAttack}-${it.individualDefense}-${it.individualStamina}) ${it.getIvPercentage()}% "
+            "Have ${it.pokemonId.name}$pnickname with ${it.cp}/${it.maxCpForPlayer} ${it.cpInPercentageActualPlayerLevel}% CP and IV (${it.individualAttack}-${it.individualDefense}-${it.individualStamina}) ${it.getIvPercentage()}% "
         }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
@@ -133,7 +139,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             }
         } while (reply == null || reply.pokestops.size == 0)
         if (originalInitialMapSize != settings.initialMapSize) {
-            Log.red("Too high initialMapSize (${originalInitialMapSize}) found, " +
+            Log.red("Too high initialMapSize ($originalInitialMapSize) found, " +
                     "please change the setting in your config to ${settings.initialMapSize}")
         }
         val process = ProcessPokestops(reply.pokestops)

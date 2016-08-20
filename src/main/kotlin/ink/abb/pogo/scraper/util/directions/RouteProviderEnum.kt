@@ -9,6 +9,9 @@
 package ink.abb.pogo.scraper.util.directions
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.maps.DirectionsApi
+import com.google.maps.GeoApiContext
+import com.google.maps.model.TravelMode
 import com.pokegoapi.google.common.geometry.S1Angle
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Settings
@@ -18,6 +21,10 @@ import java.util.regex.Pattern
 enum class RouteProviderEnum {
 
     MAPZEN {
+        override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
+            throw UnsupportedOperationException("not implemented")
+        }
+
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
             var url = "http://valhalla.mapzen.com/route?json={\"locations\":[{\"lat\":$startLat,\"lon\":$startLong},{\"lat\":$endLat,\"lon\":$endLong}],\"costing\":\"pedestrian\",\"directions_options\":{\"narrative\":\"false\"}}"
             if (apiKey.isNotBlank()) {
@@ -76,6 +83,10 @@ enum class RouteProviderEnum {
     },
 
     MOBROUTING {
+        override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
+            throw UnsupportedOperationException("not implemented")
+        }
+
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
             return "http://mobrouting.com/api/dev/gosmore.php?flat=$startLat&flon=$startLong&tlat=$endLat&tlon=$endLong&v=foot&fast=1&layer=mapnik"
         }
@@ -102,6 +113,10 @@ enum class RouteProviderEnum {
     },
 
     PROJECTOSM {
+        override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
+            throw UnsupportedOperationException("not implemented")
+        }
+
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
             return "http://router.project-osrm.org/viaroute?loc=$startLat,$startLong&loc=$endLat,$endLong&compression=false"
         }
@@ -128,6 +143,10 @@ enum class RouteProviderEnum {
     },
 
     YOURNAVIGATION {
+        override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
+            throw UnsupportedOperationException("not implemented")
+        }
+
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
             // change v=foot to v=bicycle, foot doesn't work atm, remove fast=1 (default value)
             return "http://yournavigation.org/api/dev/route.php?flat=$startLat&flon=$startLong&tlat=$endLat&tlon=$endLong&v=bicycle"
@@ -135,7 +154,7 @@ enum class RouteProviderEnum {
 
         override fun parseRouteResponse(routeParsed: String): ArrayList<S2LatLng> {
             if (!routeParsed.contains("<distance>0</distance>") && !routeParsed.contains("Please try again later")) {
-                val matcher = Pattern.compile("(|-)\\d+.(|-)\\d+,(|-)\\d+.(|-)\\d+").matcher(routeParsed.split("<coordinates>")[1])
+                val matcher = Pattern.compile("(|-)\\d+.\\d+,(|-)\\d+.\\d+").matcher(routeParsed.split("<coordinates>")[1])
                 val coordinatesList = ArrayList<String>()
                 while (matcher.find()) {
                     coordinatesList.add(matcher.group())
@@ -152,6 +171,42 @@ enum class RouteProviderEnum {
         override fun getApiKey(settings: Settings): String {
             return ""
         }
+    },
+
+    GOOGLE {
+        override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
+            try {
+                val directionsRequest = DirectionsApi.getDirections(geoApiContext, "$startLat,$startLong", "$endLat,$endLong")
+                directionsRequest.mode(TravelMode.WALKING)
+                val directions = directionsRequest.await()
+                val latlngList = ArrayList<S2LatLng>()
+                directions.routes.forEach {
+                    it.legs.forEach {
+                        it.steps.forEach {
+                            it.polyline.decodePath().forEach {
+                                latlngList.add(S2LatLng(S1Angle.degrees(it.lat), S1Angle.degrees(it.lng)))
+                            }
+                        }
+                    }
+                }
+                return latlngList
+            } catch (e: Exception) {
+                return ArrayList()
+            }
+        }
+
+        override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
+            throw UnsupportedOperationException("not implemented")
+        }
+
+        override fun getApiKey(settings: Settings): String {
+            return settings.googleApiKey
+        }
+
+        override fun parseRouteResponse(routeParsed: String): ArrayList<S2LatLng> {
+            throw UnsupportedOperationException("not implemented")
+        }
+
     };
 
     abstract fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String
@@ -159,6 +214,8 @@ enum class RouteProviderEnum {
     abstract fun parseRouteResponse(routeParsed: String): ArrayList<S2LatLng>
 
     abstract fun getApiKey(settings: Settings): String
+
+    abstract fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng>
 
     fun usingApiKey(settings: Settings): Boolean {
         return getApiKey(settings).isNotBlank()

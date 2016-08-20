@@ -18,6 +18,7 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
+import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 import ink.abb.pogo.scraper.util.pokemon.catch
@@ -52,7 +53,7 @@ class CatchOneNearbyPokemon : Task {
                 return
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
-            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), ctx.getAltitude(ctx.lat.get(), ctx.lng.get()))
+            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), getAltitude(ctx.lat.get(), ctx.lng.get(), ctx))
 
             val encounterResult = catchablePokemon.encounterPokemon()
             val wasFromLure = encounterResult is DiskEncounterResult

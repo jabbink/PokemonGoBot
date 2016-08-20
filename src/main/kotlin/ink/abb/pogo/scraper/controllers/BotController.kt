@@ -22,7 +22,6 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.ApiAuthProvider
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.credentials.Credentials
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.data.*
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
@@ -270,7 +269,7 @@ class BotController {
     }
 
     @RequestMapping(value = "/bot/{name}/location", method = arrayOf(RequestMethod.GET))
-    fun getLocation(@PathVariable name: String) : LocationData {
+    fun getLocation(@PathVariable name: String): LocationData {
         return LocationData(
                 service.getBotContext(name).api.latitude,
                 service.getBotContext(name).api.longitude

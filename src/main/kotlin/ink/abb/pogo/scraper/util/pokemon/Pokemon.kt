@@ -9,6 +9,7 @@
 package ink.abb.pogo.scraper.util.pokemon
 
 import com.pokegoapi.api.pokemon.Pokemon
+import com.pokegoapi.api.pokemon.PokemonMetaRegistry
 import ink.abb.pogo.scraper.Settings
 
 fun Pokemon.getIv(): Int {
@@ -32,17 +33,6 @@ fun Pokemon.getStatsFormatted(): String {
     return details + " | IV: ${getIv()} (${(getIvPercentage())}%) | $maxCpDetails "
 }
 
-fun isTooMany(settings: Settings, pokemonCounts: MutableMap<String, Int>, pokemon: Pokemon): Boolean {
-    val max = settings.maxPokemonAmount
-    if (max == -1) {
-        return false
-    }
-    val name = pokemon.pokemonId.name
-    val count = pokemonCounts.getOrElse(name, { 0 }) + 1
-    pokemonCounts.put(name, count)
-    return (count > max)
-}
-
 fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String, Int>): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
     val ignoredPokemon = settings.ignoredPokemon
@@ -50,9 +40,6 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
     val minIVPercentage = settings.transferIvThreshold
     val minCP = settings.transferCpThreshold
     val minCpPercentage = settings.transferCpMinThreshold
-
-    // add 1 to the map
-    val isTooMany = isTooMany(settings, pokemonCounts, this)
 
     var shouldRelease = obligatoryTransfer.contains(this.pokemonId)
     var reason: String = "Obligatory transfer"
@@ -79,14 +66,27 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
             }
             shouldRelease = ivTooLow && cpTooLow && (maxCpInRange || minCpPercentage == -1)
         }
+
         // still shouldn't release? Check if we have too many
-        if (!shouldRelease && isTooMany) {
+        val max = settings.maxPokemonAmount
+        val name = this.pokemonId.name
+        val count = pokemonCounts.getOrElse(name, { 0 }) + 1
+        pokemonCounts.put(name, count)
+
+        if (!shouldRelease && max!=-1 && count > max) {
             shouldRelease = true
             reason = "Too many"
         }
         // Save pokemon for evolve stacking
-        if (settings.evolveBeforeTransfer.contains(this.pokemonId) && settings.evolveStackLimit > 0){
-            shouldRelease = false
+        val ctoevolve = PokemonMetaRegistry.getMeta(this.pokemonId).candyToEvolve
+        if (shouldRelease && settings.evolveBeforeTransfer.contains(this.pokemonId) && settings.evolveStackLimit > 0){
+            val maxtomantain = this.candy/ctoevolve;
+            if(ctoevolve > 0 && count > maxtomantain){
+                shouldRelease = true
+                reason = "Not enough candy ${this.candy}/$ctoevolve: max $maxtomantain"
+            } else {
+                shouldRelease = false
+            }
         }
     }
     return Pair(shouldRelease, reason)
