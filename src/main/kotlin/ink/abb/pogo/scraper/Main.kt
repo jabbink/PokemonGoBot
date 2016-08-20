@@ -38,6 +38,7 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.nio.file.Paths
 import java.util.*
+import java.util.logging.LogManager
 import javax.swing.text.rtf.RTFEditorKit
 
 val time = SystemTimeImpl()
@@ -85,6 +86,7 @@ fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit
 }
 
 fun main(args: Array<String>) {
+    LogManager.getLogManager().reset()
     com.pokegoapi.util.Log.setLevel(com.pokegoapi.util.Log.Level.NONE)
     SpringApplication.run(PokemonGoBotApplication::class.java, *args)
 }
@@ -134,7 +136,7 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
                 properties = loadProperties("${path.toString()}/$filename")
                 break@fileLoop
             } catch (e: FileNotFoundException) {
-                Log.red("${filename} file not found")
+                Log.red("$filename file not found")
             }
         }
     }
