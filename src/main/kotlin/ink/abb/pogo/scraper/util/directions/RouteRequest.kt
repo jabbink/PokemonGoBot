@@ -74,38 +74,45 @@ fun isValidRouteProvider(routeName: String): Boolean {
 }
 
 fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
-    var elevation = 10.0
     if (ctx.geoApiContext != null) {
-        val elevationRequest = ElevationApi.getByPoint(ctx.geoApiContext, LatLng(latitude, longitude))
-        elevation = elevationRequest.await().elevation
-        return elevation
-    } else {
-        val rand = (Math.random() * 3) + 1
-        val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
-        if (ctx.s2Cache.containsKey(cellId) && ctx.s2Cache[cellId] != null) {
-            return ctx.s2Cache[cellId]!! + rand
-        }
         try {
-            val url = HttpUrl.parse("https://maps.googleapis.com/maps/api/elevation/json?locations=$latitude,$longitude&sensor=true").newBuilder().build()
-            val request = okhttp3.Request.Builder().url(url).build()
+            val elevationRequest = ElevationApi.getByPoint(ctx.geoApiContext, LatLng(latitude, longitude))
+            return elevationRequest.await().elevation
+        } catch (e: Exception) {
+            return getAltitude(ctx, latitude, longitude)
+        }
+    } else {
+        return getAltitude(ctx, latitude, longitude)
+    }
+}
+
+fun getAltitude(ctx: Context, latitude: Double, longitude: Double): Double {
+    val rand = (Math.random() * 3) + 1
+    val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
+    var elevation = 10.0
+    if (ctx.s2Cache.containsKey(cellId) && ctx.s2Cache[cellId] != null) {
+        return ctx.s2Cache[cellId]!! + rand
+    }
+    try {
+        val url = HttpUrl.parse("https://maps.googleapis.com/maps/api/elevation/json?locations=$latitude,$longitude&sensor=true").newBuilder().build()
+        val request = okhttp3.Request.Builder().url(url).build()
+        val result: Map<*, *>
+        result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
+        val results = result["results"] as List<*>
+        val firstResult = results[0] as Map<*, *>
+        elevation = firstResult["elevation"].toString().toDouble()
+        ctx.s2Cache[cellId] = elevation
+    } catch(ex: Exception) {
+        val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
+        val request = okhttp3.Request.Builder().url(url).build()
+        try {
             val result: Map<*, *>
             result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
-            val results = result["results"] as List<*>
-            val firstResult = results[0] as Map<*, *>
-            elevation = firstResult["elevation"].toString().toDouble()
+            elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
             ctx.s2Cache[cellId] = elevation
-        } catch(ex: Exception) {
-            val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
-            val request = okhttp3.Request.Builder().url(url).build()
-            try {
-                val result: Map<*, *>
-                result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
-                elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
-                ctx.s2Cache[cellId] = elevation
-            } catch (exi: Exception) {
-                Log.red("Can't get elevation, using ${elevation + rand}...")
-            }
+        } catch (exi: Exception) {
+            Log.red("Can't get elevation, using ${elevation + rand}...")
         }
-        return elevation + rand
     }
+    return elevation + rand
 }
