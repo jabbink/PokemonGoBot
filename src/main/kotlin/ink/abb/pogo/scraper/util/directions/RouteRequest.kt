@@ -32,7 +32,7 @@ fun getRouteCoordinates(startLat: Double, startLong: Double, endLat: Double, end
                 val coordinates = routeProvider.parseRouteResponse(responseBody)
                 if (coordinates.isNotEmpty()) {
                     routeProvider.banTime = 0 // everything is ok, reset the bantime
-                    Log.red("[Route] Got route coordinates from $routeProvider (API KEY: ${routeProvider.usingApiKey(settings)})")
+                    Log.normal("[Route] Got route coordinates from $routeProvider (API KEY: ${routeProvider.usingApiKey(settings)})")
                     return coordinates
                 }
             }
