@@ -84,7 +84,7 @@ class UpdateProfile : Task {
                 0
             }
             val nextLevel: String = if (xpPerHour != 0L) {
-				"${DecimalFormat("#0").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())}h${Math.round(((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())%1*60)}m"
+                "${DecimalFormat("#0").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())}h${Math.round(((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())%1*60)}m"
             } else {
                 "Unknown"
             }

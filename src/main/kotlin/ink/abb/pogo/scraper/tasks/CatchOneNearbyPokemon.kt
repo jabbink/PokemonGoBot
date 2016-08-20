@@ -107,8 +107,8 @@ class CatchOneNearbyPokemon : Task {
                         else
                             message += "wild "
                     }
-					message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp} and IV" +
-							" (${pokemonData.individualAttack}-${pokemonData.individualDefense}-${pokemonData.individualStamina}) ${pokemonData.getIvPercentage()}%"
+                    message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp} and IV" +
+                            " (${pokemonData.individualAttack}-${pokemonData.individualDefense}-${pokemonData.individualStamina}) ${pokemonData.getIvPercentage()}%"
                     if (settings.displayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
                                 "Candy, ${result.stardustList.sum()}x Stardust]"
@@ -126,9 +126,9 @@ class CatchOneNearbyPokemon : Task {
                 Log.red("Encounter failed with result: ${encounterResult.status}")
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
                     Log.red("Disabling catching of Pokemon")
-                    
+
                     ctx.pokemonInventoryFullStatus.second.set(true)
-                    
+
                     settings.catchPokemon = false
                 }
             }

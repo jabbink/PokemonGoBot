@@ -53,7 +53,7 @@ class BotController {
 
         val ctx = service.getBotContext(name)
 
-        if(ctx.restApiPassword.equals("")) {
+        if (ctx.restApiPassword.equals("")) {
             Log.red("WARNING : REST API password isn't set. Generating one.")
             authProvider.generateRestPassword(name)
             return "Password generated. See in your console output"
@@ -61,7 +61,7 @@ class BotController {
 
         authProvider.generateAuthToken(name)
 
-        if(pass.equals(ctx.restApiPassword))
+        if (pass.equals(ctx.restApiPassword))
             return ctx.restApiToken
         else
             return "Unauthorized"

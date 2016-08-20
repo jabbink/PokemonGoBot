@@ -22,6 +22,7 @@ apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'application'
 apply plugin: 'spring-boot'
+apply plugin: 'checkstyle'
 
 mainClassName = 'ink.abb.pogo.scraper.MainKt'
 
@@ -46,6 +47,13 @@ sourceSets {
         }
         resources.srcDirs sourceResourcesFolder
     }
+}
+
+checkstyle {
+    configFile = new File(rootDir, "checkstyle.xml")
+    checkstyleMain.source = "src/main/kotlin"
+    checkstyleMain.ignoreFailures = false
+    checkstyleMain.showViolations = true
 }
 
 configurations {
