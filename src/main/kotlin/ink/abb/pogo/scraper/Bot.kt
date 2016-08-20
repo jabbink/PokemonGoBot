@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.util.concurrent.AtomicDouble
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
@@ -40,9 +41,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     private var runningLatch = CountDownLatch(0)
     var prepareWalkBack = AtomicBoolean(false)
     var walkBackLock = AtomicBoolean(true)
-
+    var altitudeCache: MutableMap<String, Double> =
+            try {
+                ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
+            } catch (ex: Exception) {
+                mutableMapOf()
+            }
     lateinit private var phaser: Phaser
-
     var ctx = Context(
             api,
             api.playerProfile,
@@ -58,7 +63,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             mutableSetOf(),
             SocketServer(),
             Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
-            settings.restApiPassword
+            settings.restApiPassword,
+            altitudeCache
     )
 
     @Synchronized
@@ -69,8 +75,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         Log.normal()
         Log.normal("Name: ${ctx.profile.playerData.username}")
         Log.normal("Team: ${ctx.profile.playerData.team.name}")
-        Log.normal("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        Log.normal("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
+        Log.normal("Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}")
+        Log.normal("Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
         Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
         Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
         Log.normal("Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
@@ -88,8 +94,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             }
         }
         api.cachedInventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
-            val IV = it.getIvPercentage()
-            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV% \r\n ${it.getStatsFormatted()}"
+            val pnickname = if (!it.nickname.isEmpty()) " (${it.nickname})" else ""
+            "Have ${it.pokemonId.name}${pnickname} with ${it.cp}/${it.maxCpForPlayer} ${it.cpInPercentageActualPlayerLevel}% CP and IV (${it.individualAttack}-${it.individualDefense}-${it.individualStamina}) ${it.getIvPercentage()}% "
         }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
@@ -231,12 +237,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun stop() {
         if (!isRunning()) return
 
-        if(settings.saveLocationOnShutdown) {
-            Log.normal("Saving last location ...")
+        if (settings.saveLocationOnShutdown) {
+            Log.normal("Saving last location...")
             settings.longitude = ctx.lng.get()
             settings.latitude = ctx.lat.get()
         }
-
+        Log.normal("Saving cache file...")
+        ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")

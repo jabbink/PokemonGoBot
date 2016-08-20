@@ -49,7 +49,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         }
         if(waitBetweenThrows){
             val waitTime = (Math.random()*2900 + 100)
-            Log.blue("Damn, the Pokemon got out of the ball. Waiting for ${DecimalFormat("#0.0").format(waitTime/1000)} seconds while aiming the next ball")
+            Log.blue("Pokemon got out of the ball. Waiting for ${Math.round(waitTime/1000)} until next throw")
             Thread.sleep(waitTime.toLong())
         }
         numThrows++

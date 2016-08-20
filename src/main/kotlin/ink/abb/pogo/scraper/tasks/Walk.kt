@@ -33,9 +33,9 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (ctx.server.coordinatesToGoTo.size > 0) {
             val coordinates = ctx.server.coordinatesToGoTo.first()
             ctx.server.coordinatesToGoTo.removeAt(0)
-            Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
+            Log.normal("Walking to ${coordinates.latDegrees()}, ${coordinates.lngDegrees()}")
 
-            walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            walk(bot, ctx, settings, coordinates, settings.speed, true)
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
                 val canLoot = it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
@@ -67,7 +67,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
     }
 
     private fun walk(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        if (settings.followStreets) {
+        if (settings.followStreets.isNotEmpty()) {
             walkRoute(bot, ctx, settings, end, speed, sendDone)
         } else {
             walkDirectly(bot, ctx, settings, end, speed, sendDone)
@@ -79,7 +79,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
     }
 
     private fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end)
+        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end, settings)
         if (coordinatesList.size > 0) {
             walkPath(bot, ctx, settings, coordinatesList, speed, sendDone)
         } else {
@@ -97,10 +97,10 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
 
         //random waiting
-        if(Math.random() * 100 < settings.waitChance){
+        if (Math.random() * 100 < settings.waitChance) {
             val waitTimeMin = settings.waitTimeMin
             val waitTimeMax = settings.waitTimeMax
-            if(waitTimeMax > waitTimeMin){
+            if (waitTimeMax > waitTimeMin) {
                 val sleepTime: Long = (Math.random() * (waitTimeMax - waitTimeMin) + waitTimeMin).toLong()
                 Log.yellow("Trainer grew tired, needs to rest a little (for ${sleepTime} seconds)")
                 Thread.sleep(sleepTime * 1000)
