@@ -26,6 +26,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // STOP WALKING! until loot is done
+
         ctx.pauseWalking.set(true)
         ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), ctx.getAltitude(ctx.lat.get(), ctx.lng.get()))
         val nearbyPokestops = sortedPokestops.filter {
@@ -60,6 +61,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
 
             when (result.result) {
                 Result.SUCCESS -> {
+                    ctx.lootedPokestops.andIncrement
                     ctx.server.sendPokestop(closest)
                     ctx.server.sendProfile()
                     var message = "Looted pokestop $pokestopID; +${result.experience} XP"

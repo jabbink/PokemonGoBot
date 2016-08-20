@@ -46,7 +46,13 @@ data class Context(
 
         val walking: AtomicBoolean = AtomicBoolean(false),
 
-        val pauseWalking: AtomicBoolean = AtomicBoolean(false)
+        val pauseWalking: AtomicBoolean = AtomicBoolean(false),
+
+        val lootedPokestops: AtomicInteger = AtomicInteger(0),
+        val caughtPokemon: AtomicInteger = AtomicInteger(0),
+
+        var pokemonLockTime: Long = 0L,
+        var pokestopLockTime: Long = 0L
 
 ) {
     fun getAltitude(latitude: Double, longitude: Double): Double {

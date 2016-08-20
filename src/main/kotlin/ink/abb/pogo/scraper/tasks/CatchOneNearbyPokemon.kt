@@ -28,6 +28,21 @@ import ink.abb.pogo.scraper.util.pokemon.shouldTransfer
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // STOP WALKING
+
+        if (ctx.pokemonLockTime != 0L && bot.api.currentTimeMillis() > ctx.pokemonLockTime)
+        {
+            settings.catchPokemon = true
+            ctx.caughtPokemon.set(0)
+        }
+
+        if (ctx.caughtPokemon.get() > settings.pokemonThreshold) {
+            if (settings.catchPokemon) {
+                settings.catchPokemon = false
+                ctx.pokemonLockTime = bot.api.currentTimeMillis() + (3600 * settings.thresholdWaitTime.toLong())
+            }
+            return
+        }
+
         ctx.pauseWalking.set(true)
         val pokemon = ctx.api.map.getCatchablePokemon(ctx.blacklistedEncounters)
 
@@ -96,6 +111,7 @@ class CatchOneNearbyPokemon : Task {
                 // TODO: temp fix for server timing issues regarding GetMapObjects
                 ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                 if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                    ctx.caughtPokemon.andIncrement
                     ctx.pokemonStats.first.andIncrement
                     if (wasFromLure) {
                         ctx.luredPokemonStats.andIncrement
