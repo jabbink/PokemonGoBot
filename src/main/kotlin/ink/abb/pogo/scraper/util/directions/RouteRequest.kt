@@ -74,19 +74,6 @@ fun isValidRouteProvider(routeName: String): Boolean {
 }
 
 fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
-    if (ctx.geoApiContext != null) {
-        try {
-            val elevationRequest = ElevationApi.getByPoint(ctx.geoApiContext, LatLng(latitude, longitude))
-            return elevationRequest.await().elevation
-        } catch (e: Exception) {
-            return getAltitude(ctx, latitude, longitude)
-        }
-    } else {
-        return getAltitude(ctx, latitude, longitude)
-    }
-}
-
-fun getAltitude(ctx: Context, latitude: Double, longitude: Double): Double {
     val rand = (Math.random() * 3) + 1
     val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
     var elevation = 10.0
