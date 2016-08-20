@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper.util
 
-import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.services.BotService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
