@@ -57,7 +57,7 @@ class SettingsParser(val properties: Properties) {
                 randomSpeedRange = getPropertyIfSet("Define random speed range around the original speed", "random_speed_range", defaults.randomSpeedRange, String::toDouble),
                 followStreets = getPropertyIfSet("Should the bot follow the streets", "follow_streets", defaults.followStreets.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() && isValidRouteProvider(it) }.map { RouteProviderEnum.valueOf(it) },
                 mapzenApiKey = getPropertyIfSet("If you use MAPZEN as route provider, you can use a Mapzen Turn by Turn API key", "mapzen_api_key", defaults.mapzenApiKey, String::toString),
-                googleApiKey = getPropertyIfSet("If you use MAPZEN as route provider, you can use a Mapzen Turn by Turn API key", "google_api_key", defaults.googleApiKey, String::toString),
+                googleApiKey = getPropertyIfSet("If you use GOOGLE as route provider, you must use a Google API key", "google_api_key", defaults.googleApiKey, String::toString),
                 dropItems = dropItems,
                 groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
 
