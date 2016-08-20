@@ -22,7 +22,7 @@ enum class RouteProviderEnum {
 
     MAPZEN {
         override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
-            return ArrayList()
+            throw UnsupportedOperationException("not implemented")
         }
 
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
@@ -84,7 +84,7 @@ enum class RouteProviderEnum {
 
     MOBROUTING {
         override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
-            return ArrayList()
+            throw UnsupportedOperationException("not implemented")
         }
 
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
@@ -114,7 +114,7 @@ enum class RouteProviderEnum {
 
     PROJECTOSM {
         override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
-            return ArrayList()
+            throw UnsupportedOperationException("not implemented")
         }
 
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
@@ -144,7 +144,7 @@ enum class RouteProviderEnum {
 
     YOURNAVIGATION {
         override fun getRoute(startLat: Double, startLong: Double, endLat: Double, endLong: Double, geoApiContext: GeoApiContext): ArrayList<S2LatLng> {
-            return ArrayList()
+            throw UnsupportedOperationException("not implemented")
         }
 
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
@@ -196,7 +196,7 @@ enum class RouteProviderEnum {
         }
 
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
-            throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+            throw UnsupportedOperationException("not implemented")
         }
 
         override fun getApiKey(settings: Settings): String {
@@ -204,7 +204,7 @@ enum class RouteProviderEnum {
         }
 
         override fun parseRouteResponse(routeParsed: String): ArrayList<S2LatLng> {
-            return ArrayList()
+            throw UnsupportedOperationException("not implemented")
         }
 
     };
