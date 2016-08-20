@@ -103,7 +103,7 @@ enum class RouteProviderEnum {
 
     PROJECTOSM {
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
-            return "http://router.project-osrm.org/viaroute?flat=$startLat&flon=$startLong&tlat=$endLat&tlon=$endLong&v=foot&fast=1"
+            return "http://router.project-osrm.org/viaroute?loc=$startLat,$startLong&loc=$endLat,$endLong&compression=false"
         }
 
         override fun parseRouteResponse(routeParsed: String): ArrayList<S2LatLng> {
@@ -118,9 +118,8 @@ enum class RouteProviderEnum {
                     latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[0].toDouble()), S1Angle.degrees(it.toString().split(",")[1].toDouble())))
                 }
                 return latlngList // everything is ok
-            } else {
-                return ArrayList() // can't parse
             }
+            return ArrayList() // can't parse
         }
 
         override fun getApiKey(settings: Settings): String {
@@ -130,7 +129,8 @@ enum class RouteProviderEnum {
 
     YOURNAVIGATION {
         override fun createURLString(startLat: Double, startLong: Double, endLat: Double, endLong: Double, apiKey: String): String {
-            return "http://yournavigation.org/api/dev/route.php?flat=$startLat&flon=$startLong&tlat=$endLat&tlon=$endLong&v=foot&fast=1"
+            // change v=foot to v=bicycle, foot doesn't work atm, remove fast=1 (default value)
+            return "http://yournavigation.org/api/dev/route.php?flat=$startLat&flon=$startLong&tlat=$endLat&tlon=$endLong&v=bicycle"
         }
 
         override fun parseRouteResponse(routeParsed: String): ArrayList<S2LatLng> {
@@ -145,9 +145,8 @@ enum class RouteProviderEnum {
                     latlngList.add(S2LatLng(S1Angle.degrees(it.toString().split(",")[1].toDouble()), S1Angle.degrees(it.toString().split(",")[0].toDouble())))
                 }
                 return latlngList // everything is ok
-            } else {
-                return ArrayList() // can't parse
             }
+            return ArrayList() // can't parse
         }
 
         override fun getApiKey(settings: Settings): String {
