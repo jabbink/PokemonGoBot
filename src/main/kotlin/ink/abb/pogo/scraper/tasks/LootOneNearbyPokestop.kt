@@ -107,4 +107,3 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
         }
     }
 }
-

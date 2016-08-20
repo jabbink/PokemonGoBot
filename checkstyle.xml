@@ -4,9 +4,17 @@
     "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
 <module name="Checker">
-  <!--module name="NewlineAtEndOfFile"/-->
-  <module name="FileLength"/>
+  <module name="Header">
+    <property name="header" value="/**\n * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)\n * This program comes with ABSOLUTELY NO WARRANTY;\n * This is free software, and you are welcome to redistribute it under certain conditions.\n *\n * For more information, refer to the LICENSE file in this repositories root directory\n */"/>
+  </module>
+
+  <module name="NewlineAtEndOfFile">
+    <property name="lineSeparator" value="lf" />
+  </module>
+
   <module name="FileTabCharacter"/>
+  <module name="FileLength"/>
+
 
   <!-- Trailing spaces -->
   <module name="RegexpSingleline">
@@ -59,6 +67,7 @@
     <module name="AvoidStarImport"/>
     <module name="IllegalImport"/>
     <module name="RedundantImport"/>
+    <module name="ImportOrder"/>
     <module name="UnusedImports">
       <property name="processJavadoc" value="true"/>
     </module>
@@ -75,6 +84,7 @@
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
+    <module name="EmptyLineSeparator"/>
     <module name="GenericWhitespace"/>
     <module name="EmptyForIteratorPad"/>
     <module name="MethodParamPad"/>
