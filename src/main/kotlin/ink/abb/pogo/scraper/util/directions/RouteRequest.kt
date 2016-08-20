@@ -9,9 +9,7 @@
 package ink.abb.pogo.scraper.util.directions
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.maps.ElevationApi
 import com.google.maps.GeoApiContext
-import com.google.maps.model.LatLng
 import com.pokegoapi.google.common.geometry.S2CellId
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
