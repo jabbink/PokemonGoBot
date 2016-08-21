@@ -23,6 +23,8 @@ longitude=
 
 # Do you want the bot so start from the location when you shut it down?
 save_location_on_shutdown=true
+saved_latitude=
+saved_longitude=
 
 # Desired probability to catch Pokemon with 1 throw
 desired_catch_probability=0.4

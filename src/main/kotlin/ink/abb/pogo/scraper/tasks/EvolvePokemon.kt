@@ -42,9 +42,10 @@ class EvolvePokemon : Task {
 
         // use lucky egg if above evolve stack limit and evolve the whole stack
         if (countEvolveStack >= settings.evolveStackLimit) {
+            Log.yellow("Starting stack evolve of $countEvolveStack pokemon using lucky egg")
+            ctx.pauseWalking.set(true)
             val startingXP = ctx.api.playerProfile.stats.experience
             if (settings.useLuckyEgg == 1) {
-                Log.yellow("Starting stack evolve of $countEvolveStack pokemon using lucky egg")
                 try {
                     val resultLuckyEgg = ctx.api.cachedInventories.itemBag.useLuckyEgg()
                     Log.yellow("Result of using lucky egg: ${resultLuckyEgg.result.toString()}")
@@ -80,6 +81,7 @@ class EvolvePokemon : Task {
                 }
             }
             val endXP = ctx.api.playerProfile.stats.experience
+            ctx.pauseWalking.set(false)
             Log.yellow("Finished evolving $countEvolved pokemon; ${endXP - startingXP} xp gained")
         }
     }

@@ -17,6 +17,7 @@ import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.gui.SocketServer
+import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
@@ -73,6 +74,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     @Synchronized
     fun start() {
         if (isRunning()) return
+
+        if (settings.saveLocationOnShutdown && settings.savedLatitude!=0.0 && settings.savedLongitude!=0.0) {
+            Log.normal("Loading last location...")
+            ctx.lat.set(settings.savedLatitude)
+            ctx.lng.set(settings.savedLongitude)
+        }
+
         ctx.walking.set(false)
 
         Log.normal()
@@ -236,11 +244,10 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     @Synchronized
     fun stop() {
         if (!isRunning()) return
-
         if (settings.saveLocationOnShutdown) {
             Log.normal("Saving last location...")
-            settings.longitude = ctx.lng.get()
-            settings.latitude = ctx.lat.get()
+            settings.savedLatitude = ctx.lat.get()
+            settings.savedLongitude = ctx.lng.get()
         }
         Log.normal("Saving cache file...")
         ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)

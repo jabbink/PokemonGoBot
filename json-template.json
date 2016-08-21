@@ -2,6 +2,8 @@
   "latitude" : 0,
   "longitude" : 0,
   "saveLocationOnShutdown" : true,
+  "savedLatitude" : 0,
+  "savedLongitude" : 0,
   "credentials" : {
     "type" : "ptc",
     "username" : "",
