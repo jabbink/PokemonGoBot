@@ -45,11 +45,11 @@ class HatchEggs : Task {
                 .filter { !it.isIncubate }
                 .sortedByDescending { it.eggKmWalkedTarget }
         if (freeIncubators.isNotEmpty() && filteredEggs.isNotEmpty() && settings.autoFillIncubator) {
-			var eggResult = filteredEggs.first() 
-			if(freeIncubators.first().usesRemaining == 0) {
-				eggResult = filteredEggs.last()
-			}
-			val incubateResult = eggResult.incubate(freeIncubators.first())
+            var eggResult = filteredEggs.first() 
+            if(freeIncubators.first().usesRemaining == 0) {
+                eggResult = filteredEggs.last()
+            }
+            val incubateResult = eggResult.incubate(freeIncubators.first())
             if (incubateResult == UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse.Result.SUCCESS) {
                 Log.cyan("Put egg of ${eggResult.eggKmWalkedTarget}km in unused incubator")
             } else {
