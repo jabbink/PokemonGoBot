@@ -127,7 +127,7 @@
     <module name="InnerAssignment"/>
     <!--<module name="MagicNumber"/>-->
     <module name="MissingSwitchDefault"/>
-    <module name="RedundantThrows"/>
+    <!-- module name="RedundantThrows"/ [DOES NOT EXIST IN 7.1] -->
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
 

@@ -50,7 +50,8 @@ sourceSets {
 }
 
 checkstyle {
-    configFile = new File(rootDir, "checkstyle.xml")
+    toolVersion = "7.1"
+    checkstyleMain.configFile = new File(rootDir, "checkstyle.xml")
     checkstyleMain.source = "src/main/kotlin"
     checkstyleMain.ignoreFailures = false
     checkstyleMain.showViolations = true
