@@ -52,23 +52,22 @@ class SocketServer {
         server?.addEventListener("goto", EventGoto::class.java) { client, data, ackRequest ->
             run {
                 if (data.lat != null && data.lng != null) {
-                    val coord = S2LatLng.fromRadians(data.lat!!, data.lng!!)
-                    coordinatesToGoTo.add(coord)
+                    coordinatesToGoTo.add(S2LatLng.fromDegrees(data.lat!!, data.lng!!))
                 }
             }
         }
 
         var startAttempt: Future<Void>? = null
         do {
-            Log.normal("Attempting to bind Socket Server to port ${port}")
+            Log.normal("Attempting to bind Socket Server to port $port")
             try {
                 startAttempt = server?.startAsync()?.syncUninterruptibly()
             } catch (e: Exception) {
-                Log.red("Failed to bind Socket Server to port ${port}; retrying in 5 seconds")
+                Log.red("Failed to bind Socket Server to port $port; retrying in 5 seconds")
                 Thread.sleep(5000)
             }
         } while (startAttempt == null)
-        Log.green("Bound Socket Server to port ${port}")
+        Log.green("Bound Socket Server to port $port")
     }
 
     fun stop() {

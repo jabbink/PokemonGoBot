@@ -9,6 +9,7 @@
 package ink.abb.pogo.scraper
 
 import com.google.common.util.concurrent.AtomicDouble
+import com.google.maps.GeoApiContext
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.gui.SocketServer
@@ -35,10 +36,12 @@ data class Context(
         val pokemonInventoryFullStatus: Pair<AtomicBoolean, AtomicBoolean>,
 
         var restApiPassword: String,
+        var s2Cache: MutableMap<String, Double>,
         var restApiToken: String = "",
 
         val walking: AtomicBoolean = AtomicBoolean(false),
 
-        val pauseWalking: AtomicBoolean = AtomicBoolean(false)
+        val pauseWalking: AtomicBoolean = AtomicBoolean(false),
 
+        val geoApiContext: GeoApiContext?
 )

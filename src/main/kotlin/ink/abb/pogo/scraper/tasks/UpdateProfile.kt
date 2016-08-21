@@ -60,7 +60,11 @@ class UpdateProfile : Task {
         }
 
         // No messages to show? Booo!
-        ctx.api.playerProfile.checkAndEquipBadges()
+        try {
+            ctx.api.playerProfile.checkAndEquipBadges()
+        } catch (e: Exception) {
+            Log.red("Failed to check and equip badges")
+        }
 
         try {
             // update km walked, mainly
@@ -87,7 +91,7 @@ class UpdateProfile : Task {
 
             Log.magenta("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
             Log.magenta("XP gain: ${NumberFormat.getInstance().format(player.stats.experience - ctx.startXp.get())} XP in ${ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())} mins; " +
-                    "XP rate: ${NumberFormat.getInstance().format(xpPerHour)}/hr; Next level in: ${nextLevel}")
+                    "XP rate: ${NumberFormat.getInstance().format(xpPerHour)}/hr; Next level in: $nextLevel")
             Log.magenta("Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
                     "Pokemon caught from lures: ${ctx.luredPokemonStats.get()}; " +
                     "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};")

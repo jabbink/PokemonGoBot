@@ -16,12 +16,12 @@ import com.pokegoapi.api.inventory.Item
 import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.map.pokemon.EvolutionResult
 import com.pokegoapi.api.pokemon.Pokemon
+import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.ApiAuthProvider
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.credentials.Credentials
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.data.*
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
@@ -52,7 +52,7 @@ class BotController {
 
         val ctx = service.getBotContext(name)
 
-        if(ctx.restApiPassword.equals("")) {
+        if (ctx.restApiPassword.equals("")) {
             Log.red("WARNING : REST API password isn't set. Generating one.")
             authProvider.generateRestPassword(name)
             return "Password generated. See in your console output"
@@ -60,7 +60,7 @@ class BotController {
 
         authProvider.generateAuthToken(name)
 
-        if(pass.equals(ctx.restApiPassword))
+        if (pass.equals(ctx.restApiPassword))
             return ctx.restApiToken
         else
             return "Unauthorized"
@@ -269,7 +269,7 @@ class BotController {
     }
 
     @RequestMapping(value = "/bot/{name}/location", method = arrayOf(RequestMethod.GET))
-    fun getLocation(@PathVariable name: String) : LocationData {
+    fun getLocation(@PathVariable name: String): LocationData {
         return LocationData(
                 service.getBotContext(name).api.latitude,
                 service.getBotContext(name).api.longitude
@@ -283,23 +283,15 @@ class BotController {
             @PathVariable longitude: Double
     ): String {
 
-        return "UNSUPPORTED"
-
         val ctx: Context = service.getBotContext(name)
 
-        // Stop walking
-        ctx.pauseWalking.set(true)
+        if (!latitude.isNaN() && !longitude.isNaN()) {
+            ctx.server.coordinatesToGoTo.add(S2LatLng.fromDegrees(latitude, longitude))
+            return "SUCCESS"
+        } else {
+            return "FAIL"
+        }
 
-        ctx.lat.set(latitude)
-        ctx.lng.set(longitude)
-
-        ctx.api.setLocation(latitude, longitude, 10.0)
-
-        ctx.pauseWalking.set(false)
-
-        ctx.server.setLocation(latitude, longitude)
-
-        return "SUCCESS"
     }
 
     @RequestMapping(value = "/bot/{name}/profile", method = arrayOf(RequestMethod.GET))
@@ -310,13 +302,13 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/pokedex", method = arrayOf(RequestMethod.GET))
     fun getPokedex(@PathVariable name: String): List<PokedexEntry> {
 
-        var pokedex = mutableListOf<PokedexEntry>()
+        val pokedex = mutableListOf<PokedexEntry>()
         val api = service.getBotContext(name).api
         var i: Int = 1
 
         while (i < 151) {
             i++
-            var entry: PokedexEntryOuterClass.PokedexEntry? = api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.forNumber(i))
+            val entry: PokedexEntryOuterClass.PokedexEntry? = api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.forNumber(i))
             entry ?: continue
 
             pokedex.add(PokedexEntry().buildFromEntry(entry))
