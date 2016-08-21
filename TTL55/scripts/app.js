@@ -165,6 +165,7 @@ function runSocket(){
     }
   });
   socket.on('newPokemon', function(data){
+
     if(settings.notifications.caught_pokemon){
       sendNotification("Caught '" + data.name + "' with CP " + data.cp + "", {
         icon: icons.pokemon(data.pokemonId),
@@ -184,19 +185,18 @@ function runSocket(){
       title: data.name + ' with CP ' + data.cp
     });
     caughtPokemonMarkers.push(marker);
-	
-	pokebankUpdate();
-	
+  getAllPokemon();
 	console.log("Pokemon added");
   });
   socket.on('releasePokemon', function(data){
+    getAllPokemon();
     var id = String(data.id);
     if(typeof pokebank[id] !== 'undefined'){
       pokebank[id] = undefined;
       delete pokebank[id];
       $('#pokemon-id-' + id).remove();
-	  console.log("I dont know..");
     }
+    	console.log("Pokemon removed");
   });
   socket.on('newLocation', function(data){
     if(typeof positionMarker !== 'undefined'){
@@ -341,13 +341,14 @@ $(function() {
 New methods added
 */
 function pokebankUpdate() {
-	drawPokemon();
+  getAllPokemon();
+  drawPokemon();
 }
 
 function drawPokemon() {
 	var table = "";
 
-  
+
 
 	for (i = 0; i < allPokemon.length; i ++) {
     var favoriteicon = "";
@@ -372,7 +373,7 @@ function getToken () {
     var restport = $("#REST-PORT").val();
     var restuser = $("#REST-API-User").val();
     var address = $("#server-address").val();
-    var RESTURL = ('http://' + address + ':' + restport + '/api/bot/'+ restuser); 
+    var RESTURL = ('http://' + address + ':' + restport + '/api/bot/'+ restuser);
 
 
 
@@ -395,7 +396,7 @@ function getToken () {
 
 
 function getAllPokemon() {
-	
+
 	var url = getUrl()+"pokemons";
 	console.log(url);
 	$.ajax({
@@ -406,23 +407,23 @@ function getAllPokemon() {
 			"X-PGB-ACCESS-TOKEN" : token
 		},
 		cache: false,
-		
-		success: function(response) {	
+
+		success: function(response) {
 			allPokemon = response;
-			
+
 			//Because I'm lazy and want to get sushi fuck you
 			function SortByName(a, b){
 				var aName = a.iv;
-				var bName = b.iv; 
+				var bName = b.iv;
 				return ((aName > bName) ? -1 : ((aName < bName) ? 1 : 0)); //Should I really rename this? We need an intern!
 			}
 			allPokemon.sort(SortByName);
-			
-			drawPokemon()
+      console.log(response);
+			drawPokemon();
 			},
 		error: function(e) {
 			console.log("Failed to get all pokemon");
-			
+
 		}
 
 	});
@@ -431,8 +432,8 @@ function getAllPokemon() {
 function editPokemonModal(id){
 	var pokemon = getPokemonById(id);
 	selectedPokemon = pokemon;
-	
-	
+
+
 	$("#pokemonName").text(pokemon.name);
 	$("#editIcon").attr("src","https://pokeapi.co/media/sprites/pokemon/" + pokemon.pokemonId + ".png");
 	console.log(pokemon);
@@ -447,7 +448,7 @@ function editPokemonModal(id){
 	$("#pokCP").text(pokemon.cp);
 	$("#pokIV").text(pokemon.iv);
 	$("#nicknameInput").text(pokemon.nickname);
-	
+
 	$(".pokemonListDiv").hide();
 	$(".editPokemon").show();
 	$("#close").hide();
@@ -460,9 +461,9 @@ function returnToList() {
 	$('#nicknameInput').val('');
 	$('#nicknameInput').attr('placeholder','Enter Nickname');
   $('#nicknameButton').text("Change Nickname");
-	
+
 	selectedPokemon = null;
-	
+
 	$(".pokemonListDiv").show();
 	$(".editPokemon").hide();
 	$("#close").show();
@@ -472,7 +473,11 @@ function returnToList() {
 
 
 function getUrl() {
-	return "http://localhost:8080/api/bot/default/";
+  var restaddress = $("#server-address").val();
+  var restport = $("#REST-PORT").val();
+  var restname = $("#REST-API-User").val();
+
+  return "http://" + restaddress + ":" + restport + "/api/bot/" + restname + "/";
 }
 
 function getPokemonById(id) {
@@ -506,13 +511,13 @@ var url = getUrl()+"pokemon/"+pokeID+"/rename";
 		headers: {
 			"X-PGB-ACCESS-TOKEN" : token
 		},
-		cache: false,	
-		success: function(response) {	
+		cache: false,
+		success: function(response) {
 			$('#nicknameButton').text("Nickname changed!");
 		},
 		error: function(e) {
 			$('#nicknameButton').text("Something went wrong");
-			
+
 		}
 
 	});
@@ -527,14 +532,14 @@ var url = getUrl()+"pokemon/"+selectedPokemon.id+"/evolve";
 		headers: {
 			"X-PGB-ACCESS-TOKEN" : token
 		},
-		cache: false,	
-		success: function(response) {	
+		cache: false,
+		success: function(response) {
 			console.log("geovuleerd");
 			returnToList();
 		},
 		error: function(e) {
 			console.log("SERVER DOWN!!!");
-			
+
 		}
 
 	});
@@ -549,14 +554,14 @@ var url = getUrl()+"pokemon/"+selectedPokemon.id+"/transfer";
 		headers: {
 			"X-PGB-ACCESS-TOKEN" : token
 		},
-		cache: false,	
-		success: function(response) {	
+		cache: false,
+		success: function(response) {
 			console.log("transfered");
 			returnToList();
 		},
 		error: function(e) {
 			console.log("SERVER DOWN!!!");
-			
+
 		}
 
 	});
@@ -571,14 +576,14 @@ var url = getUrl()+"pokemon/"+selectedPokemon.id+"/favorite";
     headers: {
       "X-PGB-ACCESS-TOKEN" : token
     },
-    cache: false, 
-    success: function(response) { 
+    cache: false,
+    success: function(response) {
       console.log("favorited");
       returnToList();
     },
     error: function(e) {
       console.log("SERVER DOWN!!!");
-      
+
     }
 
   });
@@ -593,26 +598,15 @@ var url = getUrl()+"pokemon/"+selectedPokemon.id+"/powerup";
     headers: {
       "X-PGB-ACCESS-TOKEN" : token
     },
-    cache: false, 
-    success: function(response) { 
+    cache: false,
+    success: function(response) {
       console.log("powerupped");
       returnToList();
     },
     error: function(e) {
       console.log(e);
-      
+
     }
 
   });
 }
-
-
-
-
-
-
-
-
-
-
-
