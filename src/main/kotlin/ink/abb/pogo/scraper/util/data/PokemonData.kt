@@ -40,12 +40,10 @@ data class PokemonData(
         var maxCpFullEvolveAndPowerup: Int? = null,
         var candyCostsForPowerup: Int? = null,
         var stardustCostsForPowerup: Int? = null,
-		var.cpAfterPowerup: Int? = null,
-        var.creationTimeMs: Int? = null,
-        var.numerOfPowerupsDone: Int? = null,
-		var.battlesAttacked: Int? = null,
-		var.battlesDefended: Int? = null
-
+        var battlesAttacked: Int? = null,
+        var battlesDefended: Int? = null,
+        var creationTimeMs: Long? = null,
+        var cpAfterPowerup: Int? = null
 ) {
     fun buildFromPokemon(pokemon: Pokemon): PokemonData {
         this.id = pokemon.id
@@ -72,14 +70,10 @@ data class PokemonData(
         this.maxCp = pokemon.maxCp
         this.absMaxCp = pokemon.absoluteMaxCp
         this.maxCpFullEvolveAndPowerup = pokemon.cpFullEvolveAndPowerup
-        this.candyCostsForPowerup = pokemon.candyCostsForPowerup
+		    this.candyCostsForPowerup = pokemon.candyCostsForPowerup
         this.stardustCostsForPowerup = pokemon.stardustCostsForPowerup
-		this.cpAfterPowerup = pokemon.cpAfterPowerup
+        this.cpAfterPowerup = pokemon.cpAfterPowerup
         this.creationTimeMs = pokemon.creationTimeMs
-        this.numerOfPowerupsDone = pokemon.numerOfPowerupsDone
-		this.battlesDefended = pokemon.battlesDefended
-		this.battlesAttacked = pokemon.battlesAttacked
         return this
     }
-
 }
