@@ -37,8 +37,9 @@ data class PokemonData(
         var maxStamina: Int? = null,
         var maxCp: Int? = null,
         var absMaxCp: Int? = null,
-        var maxCpFullEvolveAndPowerup: Int? = null
-
+        var maxCpFullEvolveAndPowerup: Int? = null,
+        var candyCostsForPowerup: Int? = null,
+        var stardustCostsForPowerup: Int? = null
 ) {
     fun buildFromPokemon(pokemon: Pokemon): PokemonData {
         this.id = pokemon.id
@@ -65,6 +66,8 @@ data class PokemonData(
         this.maxCp = pokemon.maxCp
         this.absMaxCp = pokemon.absoluteMaxCp
         this.maxCpFullEvolveAndPowerup = pokemon.cpFullEvolveAndPowerup
+		this.candyCostsForPowerup = pokemon.candyCostsForPowerup
+        this.stardustCostsForPowerup = pokemon.stardustCostsForPowerup
 
         return this
     }
