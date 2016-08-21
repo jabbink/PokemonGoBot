@@ -133,7 +133,7 @@ class SocketServer {
         server?.broadcastOperations?.sendEvent("newLocation", newLocation)
     }
 
-    fun newPokemon(lat: Double, lng: Double, pokemon: PokemonDataOuterClass.PokemonData) {
+fun newPokemon(lat: Double, lng: Double, pokemon: PokemonDataOuterClass.PokemonData) {
         val newPokemon = EventNewPokemon()
         newPokemon.lat = lat
         newPokemon.lng = lng
@@ -142,7 +142,21 @@ class SocketServer {
         newPokemon.name = pokemon.pokemonId.name
         newPokemon.cp = pokemon.cp
         newPokemon.iv = pokemon.getIvPercentage()
-        newPokemon.stats = pokemon.getStatsFormatted()
+        newPokemon.individualStamina = pokemon.individualStamina
+        newPokemon.individualAttack = pokemon.individualAttack
+        newPokemon.individualDefense = pokemon.individualDefense
+        //newPokemon.candy = pokemon.candy
+        //newPokemon.candiesToEvolve = pokemon.candiesToEvolve
+        newPokemon.creationTimeMs = pokemon.creationTimeMs
+        //newPokemon.level = pokemon.level
+        newPokemon.move1 = pokemon.move1.name
+        newPokemon.move2 = pokemon.move2.name
+        newPokemon.deployedFortId = pokemon.deployedFortId
+        newPokemon.stamina = pokemon.stamina
+        newPokemon.maxStamina = pokemon.stamina
+        //newPokemon.maxCp = pokemon.maxCp
+        //newPokemon.absMaxCp = pokemon.absoluteMaxCp
+        //newPokemon.maxCpFullEvolveAndPowerup = pokemon.cpFullEvolveAndPowerup
         server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
     }
 
@@ -218,7 +232,21 @@ class SocketServer {
         var name: String? = null
         var cp: Int? = null
         var iv: Int? = null
-        var stats: String? = null
+        var individualStamina: Int? = null
+        var individualAttack: Int? = null
+        var individualDefense: Int? = null
+        //var candy: Int? = null
+        var candiesToEvolve: Int? = null
+        var creationTimeMs: Long? = null
+        //var level: Float? = null
+        var move1: String? = null
+        var move2: String? = null
+        var deployedFortId: String? = null
+        var stamina: Int? = null
+        var maxStamina: Int? = null
+        //var maxCp: Int? = null
+        //var absMaxCp: Int? = null
+        //var maxCpFullEvolveAndPowerup: Int? = null
     }
 
     class EventReleasePokemon {
