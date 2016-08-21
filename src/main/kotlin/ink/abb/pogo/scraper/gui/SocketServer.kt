@@ -233,7 +233,21 @@ fun newPokemon(lat: Double, lng: Double, pokemon: PokemonDataOuterClass.PokemonD
         var name: String? = null
         var cp: Int? = null
         var iv: Int? = null
-        var stats: String? = null
+        var individualStamina: Int? = null
+        var individualAttack: Int? = null
+        var individualDefense: Int? = null
+        //var candy: Int? = null
+        var candiesToEvolve: Int? = null
+        var creationTimeMs: Long? = null
+        //var level: Float? = null
+        var move1: String? = null
+        var move2: String? = null
+        var deployedFortId: String? = null
+        var stamina: Int? = null
+        var maxStamina: Int? = null
+        //var maxCp: Int? = null
+        //var absMaxCp: Int? = null
+        //var maxCpFullEvolveAndPowerup: Int? = null
     }
 
     class EventReleasePokemon {
