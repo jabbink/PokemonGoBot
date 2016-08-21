@@ -9,6 +9,7 @@
 package ink.abb.pogo.scraper.tasks
 
 import com.google.common.util.concurrent.AtomicDouble
+import com.google.maps.GeoApiContext
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
@@ -79,7 +80,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
     }
 
     private fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean, pokestop: Pokestop?) {
-        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end, settings)
+        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end, settings, ctx.geoApiContext ?: GeoApiContext())
         if (coordinatesList.size > 0) {
             walkPath(bot, ctx, settings, coordinatesList, speed, sendDone, pokestop)
         } else {

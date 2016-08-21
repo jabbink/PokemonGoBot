@@ -8,20 +8,15 @@
 
 package ink.abb.pogo.scraper
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.util.concurrent.AtomicDouble
+import com.google.maps.GeoApiContext
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import ink.abb.pogo.scraper.gui.SocketServer
-import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
-import com.pokegoapi.google.common.geometry.S2LatLng
-import com.pokegoapi.google.common.geometry.S2CellId
-import ink.abb.pogo.scraper.util.Log
 
 data class Context(
         val api: PokemonGo,
@@ -48,37 +43,7 @@ data class Context(
 
         val walking: AtomicBoolean = AtomicBoolean(false),
 
-        val pauseWalking: AtomicBoolean = AtomicBoolean(false)
+        val pauseWalking: AtomicBoolean = AtomicBoolean(false),
 
-) {
-    fun getAltitude(latitude: Double, longitude: Double): Double {
-        val rand = (Math.random() * 3) + 1
-        val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
-        if (this.s2Cache.containsKey(cellId) && this.s2Cache[cellId] != null) {
-            return this.s2Cache[cellId]!! + rand
-        }
-        var elevation = 10.0
-        try {
-            val url = HttpUrl.parse("https://maps.googleapis.com/maps/api/elevation/json?locations=$latitude,$longitude&sensor=true").newBuilder().build()
-            val request = okhttp3.Request.Builder().url(url).build()
-            val result: Map<*, *>
-            result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
-            val results = result["results"] as List<*>
-            val firstResult = results[0] as Map<*, *>
-            elevation = firstResult["elevation"].toString().toDouble()
-            this.s2Cache[cellId] = elevation
-        } catch(ex: Exception) {
-            val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
-            val request = okhttp3.Request.Builder().url(url).build()
-            try {
-                val result: Map<*, *>
-                result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
-                elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
-                this.s2Cache[cellId] = elevation
-            } catch (exi: Exception) {
-                Log.red("Can't get elevation, using ${elevation + rand}...")
-            }
-        }
-        return elevation + rand
-    }
-}
+        val geoApiContext: GeoApiContext?
+)

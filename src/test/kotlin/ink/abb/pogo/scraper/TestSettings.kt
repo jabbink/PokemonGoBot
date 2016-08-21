@@ -100,12 +100,12 @@ class TestSettings {
         propertyNames.forEach {
             val templateName = it
             val settingsName = templateName.underscoreToCamel()
-            Assert.assertTrue("$templateName set in template, ${settingsName} not found in Settings", memberNames.contains(settingsName))
+            Assert.assertTrue("$templateName set in template, $settingsName not found in Settings", memberNames.contains(settingsName))
         }
         memberNames.forEach {
             val settingsName = it
             val templateName = settingsName.camelToUnderscores()
-            Assert.assertNotNull("$settingsName set in Settings, ${templateName} not found in template", properties.get(templateName))
+            Assert.assertNotNull("$settingsName set in Settings, $templateName not found in template", properties.get(templateName))
         }
 
         val jsonkeys = ArrayList<String>()

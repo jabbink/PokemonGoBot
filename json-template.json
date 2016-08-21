@@ -17,6 +17,7 @@
   "randomSpeedRange" : 0.0,
   "followStreets" : [],
   "mapzenApiKey" : "",
+  "googleApiKey" : "",
   "groupItemsByType" : false,
   "dropItems" : true,
   "itemDropDelay" : -1,

@@ -22,7 +22,6 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.ApiAuthProvider
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.credentials.Credentials
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.data.*
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
@@ -53,7 +52,7 @@ class BotController {
 
         val ctx = service.getBotContext(name)
 
-        if(ctx.restApiPassword.equals("")) {
+        if (ctx.restApiPassword.equals("")) {
             Log.red("WARNING : REST API password isn't set. Generating one.")
             authProvider.generateRestPassword(name)
             return "Password generated. See in your console output"
@@ -61,7 +60,7 @@ class BotController {
 
         authProvider.generateAuthToken(name)
 
-        if(pass.equals(ctx.restApiPassword))
+        if (pass.equals(ctx.restApiPassword))
             return ctx.restApiToken
         else
             return "Unauthorized"
@@ -106,6 +105,8 @@ class BotController {
 
     @RequestMapping(value = "/bot/{name}/pokemons", method = arrayOf(RequestMethod.GET))
     fun listPokemons(@PathVariable name: String): List<PokemonData> {
+
+        service.getBotContext(name).api.inventories.updateInventories(true)
 
         val data = service.getBotContext(name).api.inventories.pokebank.pokemons
         val pokemons = mutableListOf<PokemonData>()
@@ -217,6 +218,8 @@ class BotController {
     @RequestMapping("/bot/{name}/items")
     fun listItems(@PathVariable name: String): List<ItemData> {
 
+        service.getBotContext(name).api.inventories.updateInventories(true)
+
         val data = service.getBotContext(name).api.inventories.itemBag.items
         val items = mutableListOf<ItemData>()
 
@@ -270,7 +273,7 @@ class BotController {
     }
 
     @RequestMapping(value = "/bot/{name}/location", method = arrayOf(RequestMethod.GET))
-    fun getLocation(@PathVariable name: String) : LocationData {
+    fun getLocation(@PathVariable name: String): LocationData {
         return LocationData(
                 service.getBotContext(name).api.latitude,
                 service.getBotContext(name).api.longitude
@@ -321,8 +324,9 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/eggs", method = arrayOf(RequestMethod.GET))
     fun getEggs(@PathVariable name: String): List<EggData> {
 
-        val eggs = mutableListOf<EggData>()
+        service.getBotContext(name).api.inventories.updateInventories(true)
 
+        val eggs = mutableListOf<EggData>()
         for (egg in service.getBotContext(name).api.inventories.hatchery.eggs) {
             eggs.add(EggData().buildFromEggPokemon(egg))
         }
