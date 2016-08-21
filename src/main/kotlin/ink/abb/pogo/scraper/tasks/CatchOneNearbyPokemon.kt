@@ -18,6 +18,7 @@ import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
+import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 import ink.abb.pogo.scraper.util.pokemon.catch
@@ -52,7 +53,7 @@ class CatchOneNearbyPokemon : Task {
                 return
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
-            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), ctx.getAltitude(ctx.lat.get(), ctx.lng.get()))
+            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), getAltitude(ctx.lat.get(), ctx.lng.get(), ctx))
 
             val encounterResult = catchablePokemon.encounterPokemon()
             val wasFromLure = encounterResult is DiskEncounterResult
@@ -107,8 +108,8 @@ class CatchOneNearbyPokemon : Task {
                         else
                             message += "wild "
                     }
-					message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp} and IV" +
-							" (${pokemonData.individualAttack}-${pokemonData.individualDefense}-${pokemonData.individualStamina}) ${pokemonData.getIvPercentage()}%"
+                    message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp} and IV" +
+                            " (${pokemonData.individualAttack}-${pokemonData.individualDefense}-${pokemonData.individualStamina}) ${pokemonData.getIvPercentage()}%"
                     if (settings.displayPokemonCatchRewards)
                         message += ": [${result.xpList.sum()}x XP, ${result.candyList.sum()}x " +
                                 "Candy, ${result.stardustList.sum()}x Stardust]"
@@ -126,9 +127,9 @@ class CatchOneNearbyPokemon : Task {
                 Log.red("Encounter failed with result: ${encounterResult.status}")
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
                     Log.red("Disabling catching of Pokemon")
-                    
+
                     ctx.pokemonInventoryFullStatus.second.set(true)
-                    
+
                     settings.catchPokemon = false
                 }
             }

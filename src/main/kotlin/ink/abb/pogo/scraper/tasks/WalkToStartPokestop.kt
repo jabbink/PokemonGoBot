@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        if (settings.followStreets) walkRoute(bot, ctx, settings)
+        if (settings.followStreets.isNotEmpty()) walkRoute(bot, ctx, settings)
         else walk(bot, ctx, settings)
 
     }
@@ -104,7 +104,7 @@ class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
             return
         }
         val timeout = 200L
-        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), S2LatLng.fromDegrees(startPokeStop.latitude, startPokeStop.longitude))
+        val coordinatesList = getRouteCoordinates(ctx.lat.get(), ctx.lng.get(), startPokeStop.latitude, startPokeStop.longitude, settings, ctx.geoApiContext!!)
         if (coordinatesList.size <= 0) {
             walk(bot, ctx, settings)
         } else {
