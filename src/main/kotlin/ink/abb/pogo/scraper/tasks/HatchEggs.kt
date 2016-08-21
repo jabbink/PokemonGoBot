@@ -45,9 +45,13 @@ class HatchEggs : Task {
                 .filter { !it.isIncubate }
                 .sortedByDescending { it.eggKmWalkedTarget }
         if (freeIncubators.isNotEmpty() && filteredEggs.isNotEmpty() && settings.autoFillIncubator) {
-            val incubateResult = filteredEggs.first().incubate(freeIncubators.first())
+            var eggResult = filteredEggs.first() 
+            if(freeIncubators.first().usesRemaining == 0) {
+                eggResult = filteredEggs.last()
+            }
+            val incubateResult = eggResult.incubate(freeIncubators.first())
             if (incubateResult == UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse.Result.SUCCESS) {
-                Log.cyan("Put egg of ${filteredEggs.first().eggKmWalkedTarget}km in unused incubator")
+                Log.cyan("Put egg of ${eggResult.eggKmWalkedTarget}km in unused incubator")
             } else {
                 Log.red("Failed to put egg in incubator; error: $incubateResult")
             }
