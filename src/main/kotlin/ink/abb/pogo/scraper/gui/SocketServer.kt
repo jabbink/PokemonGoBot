@@ -143,6 +143,15 @@ class SocketServer {
         newPokemon.cp = pokemon.cp
         newPokemon.iv = pokemon.getIvPercentage()
         newPokemon.stats = pokemon.getStatsFormatted()
+        newPokemon.individualStamina = pokemon.individualStamina
+        newPokemon.individualAttack = pokemon.individualAttack
+        newPokemon.individualDefense = pokemon.individualDefense
+        newPokemon.creationTimeMs = pokemon.creationTimeMs
+        newPokemon.move1 = pokemon.move1.name
+        newPokemon.move2 = pokemon.move2.name
+        newPokemon.deployedFortId = pokemon.deployedFortId
+        newPokemon.stamina = pokemon.stamina
+        newPokemon.maxStamina = pokemon.stamina
         server?.broadcastOperations?.sendEvent("newPokemon", newPokemon)
     }
 
@@ -219,6 +228,15 @@ class SocketServer {
         var cp: Int? = null
         var iv: Int? = null
         var stats: String? = null
+        var individualStamina: Int? = null
+        var individualAttack: Int? = null
+        var individualDefense: Int? = null
+        var creationTimeMs: Long? = null
+        var move1: String? = null
+        var move2: String? = null
+        var deployedFortId: String? = null
+        var stamina: Int? = null
+        var maxStamina: Int? = null
     }
 
     class EventReleasePokemon {
