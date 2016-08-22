@@ -8,7 +8,6 @@
 
 package ink.abb.pogo.scraper.util
 
-import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.services.BotService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -30,6 +29,9 @@ open class ApiAuthProvider : HandlerInterceptorAdapter() {
     @Throws(Exception::class)
     override fun preHandle(request: HttpServletRequest,
                   response: HttpServletResponse, handler: Any): Boolean {
+
+        if(request.method.equals("OPTIONS"))
+            return true // Allow preflight calls
 
         val pattern = Pattern.compile("\\/api/bot/([A-Za-z0-9\\-_]*)")
         val matcher = pattern.matcher(request.requestURI)

@@ -11,11 +11,11 @@ package ink.abb.pogo.scraper.services
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import ink.abb.pogo.scraper.Bot
-import ink.abb.pogo.scraper.Settings
-import ink.abb.pogo.scraper.util.credentials.*
-import ink.abb.pogo.scraper.startBot
 import ink.abb.pogo.scraper.Context
+import ink.abb.pogo.scraper.Settings
+import ink.abb.pogo.scraper.startBot
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -72,9 +72,9 @@ class BotService {
     fun getSaveNames(): List<String> {
         return root.list().filter { it.endsWith(".json") }.map { it.replace(Regex("\\.json$"), "") }
     }
-    
+
     fun getBotContext(name: String): Context {
-        var bot = bots.find {it.settings.name == name}
+        val bot = bots.find { it.settings.name == name }
 
         bot ?: throw IllegalArgumentException("Bot $name doesn't exists !")
 
@@ -83,7 +83,7 @@ class BotService {
 
     @Synchronized
     fun getAllBotSettings(): List<Settings> {
-        return bots.map {it.settings.copy(credentials = GoogleAutoCredentials(), restApiPassword = "")}
+        return bots.map { it.settings.copy(credentials = GoogleAutoCredentials(), restApiPassword = "") }
     }
 
     @Synchronized

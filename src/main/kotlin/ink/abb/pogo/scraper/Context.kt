@@ -9,6 +9,7 @@
 package ink.abb.pogo.scraper
 
 import com.google.common.util.concurrent.AtomicDouble
+import com.google.maps.GeoApiContext
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.google.common.geometry.S2LatLng
@@ -36,6 +37,7 @@ data class Context(
         val pokemonInventoryFullStatus: Pair<AtomicBoolean, AtomicBoolean>,
 
         var restApiPassword: String,
+        var s2Cache: MutableMap<String, Double>,
         var restApiToken: String = "",
 
         val walking: AtomicBoolean = AtomicBoolean(false),
@@ -44,4 +46,5 @@ data class Context(
 
         val coordinatesToGoTo: MutableList<S2LatLng> = mutableListOf<S2LatLng>()
 
+        val geoApiContext: GeoApiContext?
 )

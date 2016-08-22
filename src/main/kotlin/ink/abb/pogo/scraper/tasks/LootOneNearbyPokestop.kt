@@ -11,12 +11,12 @@ package ink.abb.pogo.scraper.tasks
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.map.fort.PokestopLootResult
-import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.map.canLoot
 import java.util.*
 
@@ -27,7 +27,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // STOP WALKING! until loot is done
         ctx.pauseWalking.set(true)
-        ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), 0.0)
+        ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), getAltitude(ctx.lat.get(), ctx.lng.get(),ctx))
         val nearbyPokestops = sortedPokestops.filter {
             it.canLoot(lootTimeouts = lootTimeouts, api = ctx.api)
         }

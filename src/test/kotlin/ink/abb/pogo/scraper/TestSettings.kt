@@ -8,13 +8,17 @@
 
 package ink.abb.pogo.scraper
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import ink.abb.pogo.scraper.util.camelToUnderscores
 import ink.abb.pogo.scraper.util.underscoreToCamel
 import ink.abb.pogo.scraper.util.credentials.*
 import org.junit.Assert
 import org.junit.Test
+import java.io.File
 import java.io.FileInputStream
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.reflect.memberProperties
 
 class TestSettings {
@@ -29,9 +33,12 @@ class TestSettings {
         properties.setProperty("latitude", "0.0")
         properties.setProperty("longitude", "0.0")
         val settingsFromTemplate = SettingsParser(properties).createSettingsFromProperties()
+        val settingsFromJsonTemplate = ObjectMapper().registerKotlinModule().readValue(File("json-template.json"), Settings::class.java).withName("default")
         val settingsFromCode = Settings(name = "default", latitude = 0.0, longitude = 0.0, credentials = GoogleCredentials())
+        val settingsFromCodeForJson = Settings(name = "default", latitude = 0.0, longitude = 0.0, credentials = PtcCredentials())
 
         Assert.assertEquals(settingsFromCode.toString().split(",").joinToString("\n"), settingsFromTemplate.toString().split(",").joinToString("\n"))
+        Assert.assertEquals(settingsFromCodeForJson.toString().split(",").joinToString("\n"), settingsFromJsonTemplate.toString().split(",").joinToString("\n"))
     }
 
     @Test
@@ -66,7 +73,22 @@ class TestSettings {
                 // Bot combines this in its own property
                 "startingLocation",
                 // only in JSON config
-                "name"
+                "name",
+                "type",
+                "ITEM_REVIVE",
+                "ITEM_MAX_REVIVE",
+                "ITEM_SUPER_POTION",
+                "ITEM_HYPER_POTION",
+                "ITEM_MAX_POTION",
+                "ITEM_POKE_BALL",
+                "ITEM_GREAT_BALL",
+                "ITEM_ULTRA_BALL",
+                "ITEM_MASTER_BALL",
+                "ITEM_RAZZ_BERRY",
+                "ITEM_LUCKY_EGG",
+                "ITEM_INCENSE_ORDINARY",
+                "ITEM_TROY_DISK",
+                "ITEM_POTION"
         )
 
         val properties = Properties()
@@ -78,12 +100,29 @@ class TestSettings {
         propertyNames.forEach {
             val templateName = it
             val settingsName = templateName.underscoreToCamel()
-            Assert.assertTrue("$templateName set in template, ${settingsName} not found in Settings", memberNames.contains(settingsName))
+            Assert.assertTrue("$templateName set in template, $settingsName not found in Settings", memberNames.contains(settingsName))
         }
         memberNames.forEach {
             val settingsName = it
             val templateName = settingsName.camelToUnderscores()
-            Assert.assertNotNull("$settingsName set in Settings, ${templateName} not found in template", properties.get(templateName))
+            Assert.assertNotNull("$settingsName set in Settings, $templateName not found in template", properties.get(templateName))
+        }
+
+        val jsonkeys = ArrayList<String>()
+        val regex = "\"([\\w]*)\"\\s:\\s"
+        val pattern = Pattern.compile(regex)
+        File("json-template.json").forEachLine {
+            val matcher = pattern.matcher(it)
+            while (matcher.find()) {
+                jsonkeys.add(matcher.group(1))
+            }
+        }
+        val jsonNames = jsonkeys.filter { !propertyBlacklist.contains(it) }
+        jsonNames.forEach {
+            Assert.assertTrue("$it set in json template, $it not found in Settings", memberNames.contains(it))
+        }
+        memberNames.forEach {
+            Assert.assertTrue("$it set in Settings, $it not found in json template", jsonkeys.contains(it))
         }
     }
 

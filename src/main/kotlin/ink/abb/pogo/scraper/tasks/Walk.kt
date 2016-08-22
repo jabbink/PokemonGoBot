@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import com.google.maps.GeoApiContext
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Bot
@@ -28,14 +29,14 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (!ctx.walking.compareAndSet(false, true)) {
             return
         }
-
-        if (ctx.coordinatesToGoTo.size > 0) {
-            val coordinates = ctx.coordinatesToGoTo.first()
-            ctx.coordinatesToGoTo.removeAt(0)
+        
+        if (ctx.server.coordinatesToGoTo.size > 0) {
+            val coordinates = ctx.server.coordinatesToGoTo.first()
+            ctx.server.coordinatesToGoTo.removeAt(0)
             Log.normal("Using supplied coordinate, number of remaining points : " + ctx.coordinatesToGoTo.size)
-            Log.normal("Walking to ${coordinates.latRadians()}, ${coordinates.lngRadians()}")
-
-            walk(bot, ctx, settings, S2LatLng.fromDegrees(coordinates.latRadians(), coordinates.lngRadians()), settings.speed, true)
+            Log.normal("Walking to ${coordinates.latDegrees()}, ${coordinates.lngDegrees()}")
+            
+            walk(bot, ctx, settings, coordinates, settings.speed, true, null)
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
                 val canLoot = it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
@@ -61,34 +62,34 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     }
                 }
 
-                walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false)
+                walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false, chosenPokestop)
             }
         }
     }
 
-    private fun walk(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        if (settings.followStreets) {
-            walkRoute(bot, ctx, settings, end, speed, sendDone)
+    private fun walk(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean, pokestop: Pokestop?) {
+        if (settings.followStreets.isNotEmpty()) {
+            walkRoute(bot, ctx, settings, end, speed, sendDone, pokestop)
         } else {
             walkDirectly(bot, ctx, settings, end, speed, sendDone)
         }
     }
 
     private fun walkDirectly(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        walkPath(bot, ctx, settings, mutableListOf(end), speed, sendDone)
+        walkPath(bot, ctx, settings, mutableListOf(end), speed, sendDone, null)
     }
 
-    private fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end)
+    private fun walkRoute(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean, pokestop: Pokestop?) {
+        val coordinatesList = getRouteCoordinates(S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get()), end, settings, ctx.geoApiContext ?: GeoApiContext())
         if (coordinatesList.size > 0) {
-            walkPath(bot, ctx, settings, coordinatesList, speed, sendDone)
+            walkPath(bot, ctx, settings, coordinatesList, speed, sendDone, pokestop)
         } else {
             walkDirectly(bot, ctx, settings, end, speed, sendDone)
         }
     }
 
     //all walk functions should call this one
-    private fun walkPath(bot: Bot, ctx: Context, settings: Settings, path: MutableList<S2LatLng>, speed: Double, sendDone: Boolean) {
+    private fun walkPath(bot: Bot, ctx: Context, settings: Settings, path: MutableList<S2LatLng>, speed: Double, sendDone: Boolean, pokestop: Pokestop?) {
         if (speed.equals(0)) {
             return
         }
@@ -97,15 +98,14 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
 
         //random waiting
-        if(Math.random() * 100 < settings.waitChance){
+        if (Math.random() * 100 < settings.waitChance) {
             val waitTimeMin = settings.waitTimeMin
             val waitTimeMax = settings.waitTimeMax
-            if(waitTimeMax > waitTimeMin){
+            if (waitTimeMax > waitTimeMin) {
                 val sleepTime: Long = (Math.random() * (waitTimeMax - waitTimeMin) + waitTimeMin).toLong()
-                Log.yellow("Trainer grew tired, needs to rest a little (for ${sleepTime} seconds)")
+                Log.yellow("Trainer grew tired, needs to rest a little (for $sleepTime seconds)")
                 Thread.sleep(sleepTime * 1000)
             }
-
         }
 
         val randomSpeed = randomizeSpeed(speed, settings.randomSpeedRange)
@@ -134,7 +134,15 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     if (sendDone) {
                         ctx.server.sendGotoDone()
                     }
-                    ctx.walking.set(false)
+
+                    // Destination reached, if we follow streets, but the pokestop is not on a available from street, go directly
+                    if (pokestop != null && settings.followStreets.isNotEmpty() && pokestop.canLoot(true) && !pokestop.canLoot(false)) {
+                        Log.normal("Pokestop is too far using street, go directly!")
+                        walkDirectly(bot, ctx, settings, S2LatLng.fromDegrees(pokestop.latitude, pokestop.longitude), speed, false)
+                    } else {
+                        ctx.walking.set(false)
+                    }
+
                     cancel()
                 } else {
                     //calculate delta lat/long for next step
@@ -190,12 +198,6 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         }
     }
 
-    // TODO not used anymore? remove?
-    private fun walkAndComeBack(bot: Bot, ctx: Context, settings: Settings, end: S2LatLng, speed: Double, sendDone: Boolean) {
-        val start = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
-        walkPath(bot, ctx, settings, mutableListOf(end, start), speed, sendDone)
-    }
-
     private fun selectRandom(pokestops: List<Pokestop>, ctx: Context): Pokestop {
         // Select random pokestop while taking the distance into account
         // E.g. pokestop is closer to the user -> higher probabilty to be chosen
@@ -229,10 +231,10 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         return pokestops.first()
     }
 
-    private fun randomizeSpeed(speed : Double, randomSpeedRange: Double): Double {
-        if(randomSpeedRange > speed){
+    private fun randomizeSpeed(speed: Double, randomSpeedRange: Double): Double {
+        if (randomSpeedRange > speed) {
             return speed
         }
-        return speed - randomSpeedRange + (Math.random()*randomSpeedRange*2)
+        return speed - randomSpeedRange + (Math.random() * randomSpeedRange * 2)
     }
 }

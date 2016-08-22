@@ -28,16 +28,17 @@ import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.credentials.GoogleCredentials
 import ink.abb.pogo.scraper.util.credentials.PtcCredentials
 import ink.abb.pogo.scraper.util.toHexString
-import okhttp3.*
+import okhttp3.Credentials
+import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.nio.file.Paths
 import java.util.*
+import java.util.logging.LogManager
 import javax.swing.text.rtf.RTFEditorKit
 
 val time = SystemTimeImpl()
@@ -85,6 +86,7 @@ fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit
 }
 
 fun main(args: Array<String>) {
+    LogManager.getLogManager().reset()
     com.pokegoapi.util.Log.setLevel(com.pokegoapi.util.Log.Level.NONE)
     SpringApplication.run(PokemonGoBotApplication::class.java, *args)
 }
@@ -110,7 +112,7 @@ fun loadProperties(filename: String): Properties {
             val rtfParser = RTFEditorKit()
             val document = rtfParser.createDefaultDocument()
             rtfParser.read(it.reader(), document, 0)
-            val text = document.getText(0, document.getLength())
+            val text = document.getText(0, document.length)
             properties.load(text.byteInputStream())
             Log.red("Config file encoded as Rich Text Format (RTF)!")
         }
@@ -125,7 +127,7 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
 
     val dir = File(System.getProperty("java.class.path")).absoluteFile.parentFile
 
-    var filename = "";
+    var filename = ""
 
     fileLoop@ for (path in arrayOf(Paths.get("").toAbsolutePath(), dir)) {
         for (attemptFilename in attemptFilenames) {
@@ -134,14 +136,14 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
                 properties = loadProperties("${path.toString()}/$filename")
                 break@fileLoop
             } catch (e: FileNotFoundException) {
-                Log.red("${filename} file not found")
+                Log.red("$filename file not found")
             }
         }
     }
 
     if (properties == null) {
         Log.red("No config files found. Exiting.")
-        System.exit(1);
+        System.exit(1)
         return
     } else {
         val settings = SettingsParser(properties).createSettingsFromProperties()
@@ -156,13 +158,13 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
 
     var proxyHttp: OkHttpClient? = null
 
-    if(!settings.proxyServer.equals("") && settings.proxyPort > 0) {
+    if (!settings.proxyServer.equals("") && settings.proxyPort > 0) {
         Log.normal("Setting up proxy server for bot " + settings.name + ": " + settings.proxyServer + ":" + settings.proxyPort)
 
         val proxyType: Proxy.Type
-        if(settings.proxyType.equals("HTTP"))
+        if (settings.proxyType.equals("HTTP"))
             proxyType = Proxy.Type.HTTP
-        else if(settings.proxyType.equals("SOCKS"))
+        else if (settings.proxyType.equals("SOCKS"))
             proxyType = Proxy.Type.SOCKS
         else
             proxyType = Proxy.Type.DIRECT
@@ -188,7 +190,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     var auth: CredentialProvider? = null
     do {
         try {
-            if(proxyHttp == null)
+            if (proxyHttp == null)
                 auth = getAuth(settings, http, writeToken)
             else
                 auth = getAuth(settings, proxyHttp, writeToken)
@@ -208,7 +210,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     var api: PokemonGo? = null
     do {
         try {
-            if(proxyHttp == null)
+            if (proxyHttp == null)
                 api = PokemonGo(auth, http, time)
             else
                 api = PokemonGo(auth, proxyHttp, time)
@@ -256,7 +258,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
         val serverRequestsPlayer = ServerRequest(RequestTypeOuterClass.RequestType.GET_PLAYER, getPlayerMessageBuilder.build())
         val serverRequestsTutorial = ServerRequest(RequestTypeOuterClass.RequestType.MARK_TUTORIAL_COMPLETE, tosBuilder.build())
 
-        api.getRequestHandler().sendServerRequests(serverRequestsPlayer, serverRequestsTutorial)
+        api.requestHandler.sendServerRequests(serverRequestsPlayer, serverRequestsTutorial)
         Thread.sleep(1000)
         // set stats
         api.inventories.updateInventories(true)

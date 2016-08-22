@@ -8,16 +8,20 @@
 
 package ink.abb.pogo.scraper
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.credentials.*
+import ink.abb.pogo.scraper.util.credentials.Credentials
+import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
+import ink.abb.pogo.scraper.util.credentials.GoogleCredentials
+import ink.abb.pogo.scraper.util.credentials.PtcCredentials
+import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
+import ink.abb.pogo.scraper.util.directions.isValidRouteProvider
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
-import java.net.Proxy
 import java.util.*
 
 
@@ -33,6 +37,7 @@ class SettingsParser(val properties: Properties) {
                 timerWalkToStartPokestop = getPropertyIfSet("Set Timer to return the first Pokestop (minutes)", "timer_walk_to_start_pokestop", defaults.timerWalkToStartPokestop, String::toLong),
                 latitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
                 longitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
+                saveLocationOnShutdown = getPropertyIfSet("Save last location when the bot stop", "save_location_on_shutdown", defaults.saveLocationOnShutdown, String::toBoolean),
 
                 credentials = if (properties.getProperty("username", "").isEmpty()) {
                     GoogleCredentials(properties.getProperty("token", ""))
@@ -50,7 +55,9 @@ class SettingsParser(val properties: Properties) {
 
                 speed = getPropertyIfSet("Speed", "speed", defaults.speed, String::toDouble),
                 randomSpeedRange = getPropertyIfSet("Define random speed range around the original speed", "random_speed_range", defaults.randomSpeedRange, String::toDouble),
-                followStreets = getPropertyIfSet("Should the bot follow the streets (true) or just go directly to pokestops/waypoints", "follow_streets", defaults.followStreets, String::toBoolean),
+                followStreets = getPropertyIfSet("Should the bot follow the streets", "follow_streets", defaults.followStreets.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() && isValidRouteProvider(it) }.map { RouteProviderEnum.valueOf(it) },
+                mapzenApiKey = getPropertyIfSet("If you use MAPZEN as route provider, you can use a Mapzen Turn by Turn API key", "mapzen_api_key", defaults.mapzenApiKey, String::toString),
+                googleApiKey = getPropertyIfSet("If you use GOOGLE as route provider, you must use a Google API key", "google_api_key", defaults.googleApiKey, String::toString),
                 dropItems = dropItems,
                 groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
 
@@ -151,7 +158,7 @@ class SettingsParser(val properties: Properties) {
             System.exit(1)
         }
 
-        var result: T?
+        val result: T?
         try {
             result = conversion(properties.getProperty(property))
         } catch (e: Exception) {
@@ -184,8 +191,9 @@ class SettingsParser(val properties: Properties) {
 data class Settings(
         var name: String = "",
 
-        val latitude: Double,
-        val longitude: Double,
+        var latitude: Double,
+        var longitude: Double,
+        val saveLocationOnShutdown: Boolean = true,
 
         val startingLocation: S2LatLng = S2LatLng.fromDegrees(latitude, longitude),
         val credentials: Credentials,
@@ -198,8 +206,10 @@ data class Settings(
 
         val speed: Double = 2.8,
         val randomSpeedRange: Double = 0.0,
-        val followStreets: Boolean = false,
-        val groupItemsByType : Boolean = false,
+        val followStreets: List<RouteProviderEnum> = emptyList(),
+        val mapzenApiKey: String = "",
+        val googleApiKey: String = "",
+        val groupItemsByType: Boolean = false,
         val dropItems: Boolean = true,
         val uselessItems: Map<ItemId, Int> = mapOf(
                 Pair(ItemId.ITEM_REVIVE, 20),
