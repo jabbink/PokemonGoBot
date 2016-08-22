@@ -108,18 +108,35 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
     }
 
     if (foundEle) {
-        val altitudeReload: MutableMap<String, Double> =
-                try {
-                    ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
-                } catch (ex: Exception) {
-                    mutableMapOf()
+        val inp = java.io.RandomAccessFile("altitude_cache.json","rw")
+        try {
+            val lock = inp.channel.lock()
+            try {
+                var altitudeReloadStr = ""
+                val by = ByteArray(inp.length().toInt())
+                inp.readFully(by)
+                for (byt in by) {
+                    altitudeReloadStr += byt.toChar().toString()
                 }
-        for ((s2CellId, elevation) in altitudeReload) {
-            ctx.s2Cache[s2CellId] = elevation
+                inp.setLength(0)
+                val altitudeReload: MutableMap<String, Double> =
+                        try {
+                            ObjectMapper().readValue(altitudeReloadStr, MutableMap::class.java) as MutableMap<String, Double>
+                        } catch (ex: Exception) {
+                            mutableMapOf()
+                        }
+                for ((s2CellId, ele) in altitudeReload) {
+                    ctx.s2Cache[s2CellId] = ele
+                }
+                Log.normal("Saving altitude cache file...")
+                ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(inp, ctx.s2Cache)
+            } finally {
+                lock.release()
+            }
+        } finally {
+            inp.close()
         }
-        Log.normal("Saving altitude cache file...")
-        ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
     }
-    
+
     return elevation + rand
 }
