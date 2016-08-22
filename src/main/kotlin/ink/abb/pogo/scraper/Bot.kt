@@ -243,8 +243,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             settings.savedLatitude = ctx.lat.get()
             settings.savedLongitude = ctx.lng.get()
         }
-        Log.normal("Saving cache file...")
-        ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
