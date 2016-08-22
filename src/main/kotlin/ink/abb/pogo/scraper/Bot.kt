@@ -83,9 +83,8 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         ctx.walking.set(false)
 
         Log.normal("Name: ${ctx.profile.playerData.username} - Team: ${ctx.profile.playerData.team.name}")
-        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}; Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}; Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
-        Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
-        Log.normal("Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
+        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}; Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}")
+        Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
 
         val compareName = Comparator<Pokemon> { a, b ->
             a.pokemonId.name.compareTo(b.pokemonId.name)
