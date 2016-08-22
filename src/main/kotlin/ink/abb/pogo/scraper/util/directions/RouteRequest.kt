@@ -18,6 +18,7 @@ import ink.abb.pogo.scraper.util.Log
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.File
 import java.util.*
 
 val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
@@ -75,6 +76,7 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
     val rand = (Math.random() * 3) + 1
     val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
     var elevation = 10.0
+    var foundEle = false
     if (ctx.s2Cache.containsKey(cellId) && ctx.s2Cache[cellId] != null) {
         return ctx.s2Cache[cellId]!! + rand
     }
@@ -86,6 +88,7 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
         val results = result["results"] as List<*>
         val firstResult = results[0] as Map<*, *>
         elevation = firstResult["elevation"].toString().toDouble()
+        foundEle = true
         ctx.s2Cache[cellId] = elevation
     } catch(ex: Exception) {
         val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
@@ -94,10 +97,23 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
             val result: Map<*, *>
             result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
             elevation = result["height"].toString().replace("[^\\d\\-]".toRegex(), "").toDouble()
+            foundEle = true
             ctx.s2Cache[cellId] = elevation
         } catch (exi: Exception) {
             Log.red("Can't get elevation, using ${elevation + rand}...")
         }
+    }
+    if(foundEle) {
+        val altitudeReload: MutableMap<String, Double> =
+                try {
+                    ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
+                } catch (ex: Exception) {
+                    mutableMapOf()
+                }
+        for ((k, v) in altitudeReload) {
+            ctx.s2Cache[k] = v
+        }
+        ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
     }
     return elevation + rand
 }

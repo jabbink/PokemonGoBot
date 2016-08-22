@@ -243,6 +243,15 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             settings.latitude = ctx.lat.get()
         }
         Log.normal("Saving cache file...")
+        val altitudeReload: MutableMap<String, Double> =
+                try {
+                    ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
+                } catch (ex: Exception) {
+                    mutableMapOf()
+                }
+        for((k, v) in altitudeReload){
+            ctx.s2Cache[k] = v
+        }
         ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
         val socketServerStopLatch = CountDownLatch(1)
         thread {
