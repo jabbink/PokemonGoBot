@@ -99,9 +99,9 @@ class UpdateProfile : Task {
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
                     "Inventory ${inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}"
             )
-            if (ctx.profile.playerData.maxPokemonStorage < inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size && ctx.pokemonInventoryFullStatus.get())
+            if (inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size < ctx.profile.playerData.maxPokemonStorage && ctx.pokemonInventoryFullStatus.get())
                 ctx.pokemonInventoryFullStatus.set(false)
-            else if (ctx.profile.playerData.maxPokemonStorage >= inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size && !ctx.pokemonInventoryFullStatus.get())
+            else if (inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size >= ctx.profile.playerData.maxPokemonStorage && !ctx.pokemonInventoryFullStatus.get())
                 ctx.pokemonInventoryFullStatus.set(true)
             ctx.server.sendProfile()
         } catch (e: Exception) {
