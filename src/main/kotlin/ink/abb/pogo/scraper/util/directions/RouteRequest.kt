@@ -113,6 +113,7 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
         for ((k, v) in altitudeReload) {
             ctx.s2Cache[k] = v
         }
+        Log.normal("Saving cache file...")
         ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
     }
     return elevation + rand
