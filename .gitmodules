@@ -5,3 +5,6 @@
 [submodule "Poppo"]
 	path = Poppo
 	url = https://github.com/pureexe/Poppo
+[submodule "TTL55"]
+	path = TTL55
+	url = git://github.com/JoeyyT/PGBGUI
