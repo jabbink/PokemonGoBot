@@ -77,9 +77,11 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
     val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
     var elevation = 10.0
     var foundEle = false
+
     if (ctx.s2Cache.containsKey(cellId) && ctx.s2Cache[cellId] != null) {
         return ctx.s2Cache[cellId]!! + rand
     }
+
     try {
         val url = HttpUrl.parse("https://maps.googleapis.com/maps/api/elevation/json?locations=$latitude,$longitude&sensor=true").newBuilder().build()
         val request = okhttp3.Request.Builder().url(url).build()
@@ -93,6 +95,7 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
     } catch(ex: Exception) {
         val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
         val request = okhttp3.Request.Builder().url(url).build()
+
         try {
             val result: Map<*, *>
             result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
@@ -103,18 +106,20 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
             Log.red("Can't get elevation, using ${elevation + rand}...")
         }
     }
-    if(foundEle) {
+
+    if (foundEle) {
         val altitudeReload: MutableMap<String, Double> =
                 try {
                     ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
                 } catch (ex: Exception) {
                     mutableMapOf()
                 }
-        for ((k, v) in altitudeReload) {
-            ctx.s2Cache[k] = v
+        for ((s2CellId, elevation) in altitudeReload) {
+            ctx.s2Cache[s2CellId] = elevation
         }
-        Log.normal("Saving cache file...")
+        Log.normal("Saving altitude cache file...")
         ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
     }
+    
     return elevation + rand
 }
