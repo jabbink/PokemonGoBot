@@ -66,7 +66,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             geoApiContext = if (settings.followStreets.contains(RouteProviderEnum.GOOGLE) && settings.googleApiKey.startsWith("AIza")) {
                 GeoApiContext().setApiKey(settings.googleApiKey)
             } else {
-                null
+                GeoApiContext()
             }
     )
 
