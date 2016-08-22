@@ -98,8 +98,11 @@ class UpdateProfile : Task {
             Log.magenta("Pokebank ${inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; " +
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
                     "Inventory ${inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}"
-
             )
+            if (ctx.profile.playerData.maxPokemonStorage<inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size && ctx.pokemonInventoryFullStatus.get())
+                ctx.pokemonInventoryFullStatus.set(false)
+            else if (!ctx.pokemonInventoryFullStatus.get())
+                ctx.pokemonInventoryFullStatus.set(true)
             ctx.server.sendProfile()
         } catch (e: Exception) {
             Log.red("Failed to update profile and inventories")

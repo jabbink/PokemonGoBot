@@ -33,7 +33,7 @@ data class Context(
         val blacklistedEncounters: MutableSet<Long>,
         val server: SocketServer,
 
-        val pokemonInventoryFullStatus: Pair<AtomicBoolean, AtomicBoolean>,
+        val pokemonInventoryFullStatus: AtomicBoolean = AtomicBoolean(false),
 
         var restApiPassword: String,
         var s2Cache: MutableMap<String, Double>,

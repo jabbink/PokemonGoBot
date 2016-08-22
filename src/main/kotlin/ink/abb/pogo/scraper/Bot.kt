@@ -17,7 +17,6 @@ import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import ink.abb.pogo.scraper.gui.SocketServer
-import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
@@ -61,7 +60,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Pair(AtomicInteger(0), AtomicInteger(0)),
             mutableSetOf(),
             SocketServer(),
-            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
+            AtomicBoolean(false),
             settings.restApiPassword,
             altitudeCache,
             geoApiContext = if (settings.followStreets.contains(RouteProviderEnum.GOOGLE) && settings.googleApiKey.startsWith("AIza")) {
@@ -76,19 +75,15 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         if (isRunning()) return
 
         if (settings.saveLocationOnShutdown && settings.savedLatitude!=0.0 && settings.savedLongitude!=0.0) {
-            Log.normal("Loading last location...")
             ctx.lat.set(settings.savedLatitude)
             ctx.lng.set(settings.savedLongitude)
+            Log.normal("Loaded last saved location (${settings.savedLatitude}, ${settings.savedLatitude})")
         }
 
         ctx.walking.set(false)
 
-        Log.normal()
-        Log.normal("Name: ${ctx.profile.playerData.username}")
-        Log.normal("Team: ${ctx.profile.playerData.team.name}")
-        Log.normal("Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}")
-        Log.normal("Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
-        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
+        Log.normal("Name: ${ctx.profile.playerData.username} - Team: ${ctx.profile.playerData.team.name}")
+        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}; Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}; Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
         Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
         Log.normal("Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
 
@@ -166,7 +161,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
-            if (settings.catchPokemon) {
+            if (settings.catchPokemon && !ctx.pokemonInventoryFullStatus.get()) {
                 try {
                     task(catch)
                 } catch (e: Exception) {
@@ -245,7 +240,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun stop() {
         if (!isRunning()) return
         if (settings.saveLocationOnShutdown) {
-            Log.normal("Saving last location...")
+            Log.normal("Saving current location (${ctx.lat.get()}, ${ctx.lng.get()})")
             settings.savedLatitude = ctx.lat.get()
             settings.savedLongitude = ctx.lng.get()
         }
