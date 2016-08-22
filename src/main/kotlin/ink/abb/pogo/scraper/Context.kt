@@ -9,8 +9,7 @@
 package ink.abb.pogo.scraper
 
 import com.google.common.util.concurrent.AtomicDouble
-import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.api.player.PlayerProfile
+import ink.abb.pogo.api.PoGoApi
 import ink.abb.pogo.scraper.gui.SocketServer
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
@@ -18,8 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 data class Context(
-        val api: PokemonGo,
-        val profile: PlayerProfile,
+        val api: PoGoApi,
         val lat: AtomicDouble,
         val lng: AtomicDouble,
 

@@ -9,6 +9,7 @@
 package ink.abb.pogo.scraper.util.pokemon
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData
+import ink.abb.pogo.api.PoGoApi
 import ink.abb.pogo.scraper.Settings
 
 fun PokemonData.getIv(): Int {
@@ -32,7 +33,6 @@ fun PokemonData.getStatsFormatted(): String {
     return details + " | IV: ${getIv()} (${(getIvPercentage())}%)"
 }
 
-// TODO: Deduplicate this
 fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
     val ignoredPokemon = settings.ignoredPokemon
@@ -61,3 +61,34 @@ fun PokemonData.shouldTransfer(settings: Settings): Pair<Boolean, String> {
     }
     return Pair(shouldRelease, reason)
 }
+
+fun PokemonData.eggKmWalked(poGoApi: PoGoApi): Double {
+    if (!incubated) {
+        return 0.0
+    }
+    val incubators = poGoApi.inventory.eggIncubators.filter {
+        it.id == eggIncubatorId
+    }
+
+    if (incubators.isNotEmpty()) {
+        val incubator = incubators.first()
+        return eggKmWalkedTarget - (incubator.targetKmWalked - poGoApi.inventory.playerStats.kmWalked)
+    } else {
+        return 0.0
+    }
+}
+
+val PokemonData.incubated: Boolean
+    get() {
+        return eggIncubatorId.isNotBlank()
+    }
+
+val PokemonData.injured: Boolean
+    get() {
+        return !fainted && stamina < staminaMax
+    }
+
+val PokemonData.fainted: Boolean
+    get() {
+        return stamina == 0
+    }

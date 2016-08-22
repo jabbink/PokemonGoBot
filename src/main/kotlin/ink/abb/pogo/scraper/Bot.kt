@@ -8,17 +8,15 @@
 
 package ink.abb.pogo.scraper
 
+import POGOProtos.Data.PokemonDataOuterClass
 import com.google.common.util.concurrent.AtomicDouble
-import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.api.map.MapObjects
-import com.pokegoapi.api.map.fort.Pokestop
-import com.pokegoapi.api.player.PlayerProfile
-import com.pokegoapi.api.pokemon.Pokemon
+import ink.abb.pogo.api.PoGoApi
+import ink.abb.pogo.api.cache.BagPokemon
+import ink.abb.pogo.api.cache.Pokestop
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
-import ink.abb.pogo.scraper.util.inventory.size
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
@@ -33,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
 
-class Bot(val api: PokemonGo, val settings: Settings) {
+class Bot(val api: PoGoApi, val settings: Settings) {
 
     private var runningLatch = CountDownLatch(0)
     var prepareWalkBack = AtomicBoolean(false)
@@ -43,10 +41,9 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
     var ctx = Context(
             api,
-            api.playerProfile,
             AtomicDouble(settings.latitude),
             AtomicDouble(settings.longitude),
-            AtomicLong(api.playerProfile.stats.experience),
+            AtomicLong(api.inventory.playerStats.experience),
             LocalDateTime.now(),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             AtomicInteger(0),
@@ -63,29 +60,29 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         ctx.walking.set(false)
 
         Log.normal()
-        Log.normal("Name: ${ctx.profile.playerData.username}")
-        Log.normal("Team: ${ctx.profile.playerData.team.name}")
-        Log.normal("Pokecoin: ${ctx.profile.currencies.get(PlayerProfile.Currency.POKECOIN)}")
-        Log.normal("Stardust: ${ctx.profile.currencies.get(PlayerProfile.Currency.STARDUST)}")
-        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
-        Log.normal("Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
+        Log.normal("Name: ${api.playerData.username}")
+        Log.normal("Team: ${api.playerData.team.name}")
+        Log.normal("Pokecoin: ${api.inventory.currencies.get("POKECOIN")}")
+        Log.normal("Stardust: ${api.inventory.currencies.get("STARDUST")}")
+        Log.normal("Level ${api.inventory.playerStats.level}, Experience ${api.inventory.playerStats.level}")
+        Log.normal("Pokebank ${api.inventory.pokemon.size + api.inventory.eggs.size}/${api.playerData.maxPokemonStorage}")
+        Log.normal("Inventory ${api.inventory.items.size}/${api.playerData.maxItemStorage}")
         //Log.normal("Inventory bag ${ctx.api.bag}")
 
-        val compareName = Comparator<Pokemon> { a, b ->
-            a.pokemonId.name.compareTo(b.pokemonId.name)
+        val compareName = Comparator<BagPokemon> { a, b ->
+            a.pokemonData.pokemonId.name.compareTo(b.pokemonData.pokemonId.name)
         }
-        val compareIv = Comparator<Pokemon> { a, b ->
+        val compareIv = Comparator<BagPokemon> { a, b ->
             // compare b to a to get it descending
             if (settings.sortByIv) {
-                b.getIv().compareTo(a.getIv())
+                b.pokemonData.getIv().compareTo(a.pokemonData.getIv())
             } else {
-                b.cp.compareTo(a.cp)
+                b.pokemonData.cp.compareTo(a.pokemonData.cp)
             }
         }
-        api.cachedInventories.pokebank.pokemons.sortedWith(compareName.thenComparing(compareIv)).map {
-            val IV = it.getIvPercentage()
-            "Have ${it.pokemonId.name} (${it.nickname}) with ${it.cp} CP and IV $IV% \r\n ${it.getStatsFormatted()}"
+        api.inventory.pokemon.map { it.value }.sortedWith(compareName.thenComparing(compareIv)).map {
+            val IV = it.pokemonData.getIvPercentage()
+            "Have ${it.pokemonData.pokemonId.name} (${it.pokemonData.nickname}) with ${it.pokemonData.cp} CP and IV $IV% \r\n ${it.pokemonData.getStatsFormatted()}"
         }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
@@ -103,34 +100,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         task(keepalive)
         Log.normal("Getting initial pokestops...")
 
-        val sleepTimeout = 10L
-        val originalInitialMapSize = settings.initialMapSize
-        var retries = 0
-        var reply: MapObjects?
-        do {
-            reply = api.map.getMapObjects(settings.initialMapSize)
-            Log.normal("Got ${reply.pokestops.size} pokestops")
-            if (reply == null || reply.pokestops.size == 0) {
-                retries++
-                if (retries % 3 == 0) {
-                    if (settings.initialMapSize > 1) {
-                        settings.initialMapSize -= 2
-                        Log.red("Decreasing initialMapSize to ${settings.initialMapSize}")
-                    } else {
-                        Log.red("Cannot decrease initialMapSize even further. Are your sure your latitude/longitude is correct?")
-                        Log.yellow("This is what I am trying to fetch: " +
-                                "https://www.google.com/maps/@${settings.latitude},${settings.longitude},15z")
-                    }
-                }
-                Log.red("Retrying in $sleepTimeout seconds...")
-                Thread.sleep(sleepTimeout * 1000)
-            }
-        } while (reply == null || reply.pokestops.size == 0)
-        if (originalInitialMapSize != settings.initialMapSize) {
-            Log.red("Too high initialMapSize (${originalInitialMapSize}) found, " +
-                    "please change the setting in your config to ${settings.initialMapSize}")
+        while (api.map.getPokestops(api.latitude, api.longitude, settings.initialMapSize).size == 0) {
+            Thread.sleep(1000)
         }
-        val process = ProcessPokestops(reply.pokestops)
+
+        val process = ProcessPokestops(api.map.getPokestops(api.latitude, api.longitude, settings.initialMapSize))
 
         runningLatch = CountDownLatch(1)
         phaser = Phaser(1)
