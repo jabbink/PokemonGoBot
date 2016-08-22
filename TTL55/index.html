@@ -21,6 +21,7 @@
                 <label for="server-port">Port</label>
               </div>
                <div class="input-field">
+
                 <input id="REST-API-User" type="text" class="validate" value="default">
                 <label for="REST-API-User">Rest API Username</label>
               </div>
@@ -64,6 +65,7 @@
       <ul id='dropdown1' class='dropdown-content'>
         <li><a href="#profileDisplay" class="modal-trigger">Profile</a></li>
         <li><a href="#pokebankDisplay" class="modal-trigger">Pokebank</a></li>
+        <li><a href="#inventoryDisplay" class="modal-trigger">Inventory</a></li>
         <li id="logDisplayTrigger"><a href="#logDisplay" class="modal-trigger">Console</a></li>
         <li><a href="#settingDisplay" class="modal-trigger">Setting</a></li>
       </ul>
@@ -128,14 +130,14 @@
 
 			<table class="table" style="margin: 5% 5% 5% 5%; width: 90%;">
 				<tr><td><img id="editIcon" src=""></td><td><h4 id="pokemonName"></h4></td></tr>
-				<tr><td>Nickname</td><td><input id="nicknameInput" type="text" placeholder="Enter Nickname"></td>
+				<tr><td><b>Nickname</b></td><td><input id="nicknameInput" type="text" placeholder="Enter Nickname"></td>
 				<td><button class="btn btn-default" id="nicknameButton" onclick="changeNickname()">Change Nickname</button></td></tr>
 				<!--<tr><td><button class="btn btn-default" id="favoriteButton" onclick="favoritePokemon()">Favorite</button></td></tr> -->
-				<tr><td>CP</td><td><span id="pokCP"></td></tr>
-				<tr><td>IV</td><td><span id="pokIV"></td></tr>
-				<tr><td>Evolve</td><td><button id="evolveButton" class="btn btn-default" onclick="evolvePokemon()" disabled>Evolve</button></td></tr>
-				<tr><td>Power up!</td><td><button class="btn btn-default" onclick="powerPokemon()">power up!</button></td>
-				<tr><td>Transfer</td><td><button class="btn btn-default" onclick="transferPokemon()">Transfer</button></td>
+				<tr><td><b>CP</b></td><td><span id="pokCP"></td><td><button class="btn btn-default" onclick="fullPowerPokemon()">full power up!</button></td></tr>
+				<tr><td><b>IV</b></td><td><span id="pokIV"></td><td><button class="btn btn-default" onclick="powerPokemon()">power up!</button></td></tr>
+				<tr><td><b>Candy</b></td><td><span id="pokCandy"></td><td><button id="evolveButton" class="btn btn-default" onclick="evolvePokemon()" disabled>Evolve</button></td></tr>
+				<tr><td><b>Level</b></td><td><span id="pokLvl"></td><td><button class="btn btn-default" onclick="transferPokemon()">Transfer</button></td></tr>
+        <tr><td><b>Moveset</b></td><td><span id="pokMove"></td></tr>
 
 			</table>
 		</div>
@@ -148,6 +150,23 @@
 
         </div>
       </div>
+
+      <div id="inventoryDisplay" class="modal modal-fixed-footer">
+        <div class="invListDiv">
+        <div class="modal-content">
+          <table class="border">
+          <thead><tr><th>Picture</th><th data-sort="string">Item</th><th data-sort="int">Count</th></tr></thead>
+          <tbody id="invenList"></tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+      <div id="close"><a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">close</a></div>
+
+        </div>
+      </div>
+    </div>
+    
+
       <div id="settingDisplay" class="modal">
         <div class="modal-content">
           <form action="#">

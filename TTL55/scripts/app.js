@@ -313,6 +313,7 @@ $(function() {
   }
   $("#login").click(function(){
     getToken(); //START FUNCTION FOR GET REST API FUNCTIONS
+
     $("#login").hide();
     $("#login-preload").show();
     var address = $("#server-address").val();
@@ -340,9 +341,11 @@ $(function() {
 /**
 New methods added
 */
+
 function pokebankUpdate() {
   getAllPokemon();
   drawPokemon();
+  getItems();
 }
 
 function drawPokemon() {
@@ -360,7 +363,7 @@ function drawPokemon() {
     }
 		  var icon = 'http://pokeapi.co/media/sprites/pokemon/' + pok.pokemonId + '.png';
 		//Build GUI
-		table = table + "<tr><td><img style ='height:50px;'src='" + icon + "'></td><td><b>" + pok.name + "</b></td><td>" + " " + pok.nickname + " </td><td> "+pok.cp+"" + "</td><td>"+pok.iv+"</td><td>" + favoriteicon + "</td><td> <button onclick='editPokemonModal("+pok.id+")' class='btn btn-default' >More options</button></td></tr>";
+		table = table + "<tr><td><img style ='height:50px;'src='" + icon + "'></td><td><b>" + pok.name + "</b></td><td>" + " " + pok.nickname + " </td><td> "+pok.cp+"" + "</td><td>"+pok.iv+"%"+"</td><td>" + favoriteicon + "</td><td> <button onclick='editPokemonModal("+pok.id+")' class='btn btn-default' >More options</button></td></tr>";
 	}
 	$("#pokemonList").html(""); //Clear the table so we can redraw with no problems and old gay pokemon
 	$("#pokemonList").html(table);
@@ -385,9 +388,13 @@ function getToken () {
     xhr.addEventListener("readystatechange", function () {
 		if (this.readyState === 4) {
 			token = this.responseText;
+      getAllPokemon();
+      setTimeout(function(){
+        getItems();
+      }, 1000);
 			console.log(token); //Print token for dev purposes
-			getAllPokemon();
 		}
+
     });
 
   xhr.open("POST", RESTURL + '/auth');
@@ -438,15 +445,19 @@ function editPokemonModal(id){
 	$("#editIcon").attr("src","https://pokeapi.co/media/sprites/pokemon/" + pokemon.pokemonId + ".png");
 	console.log(pokemon);
 	if (pokemon.candy >= pokemon.candiesToEvolve && pokemon.candiesToEvolve != 0)  {
-		evolveButton = $('#evolveButton').prop("disabled",false);
+    evolveButton = $('#evolveButton').prop("disabled",false);
 	}  else {
 		evolveButton = $('#evolveButton').prop("disabled",true);
 	}
 	$(".star.glyphicon").click(function() {
   $(this).toggleClass("glyphicon-star glyphicon-star-empty");
 });
-	$("#pokCP").text(pokemon.cp);
-	$("#pokIV").text(pokemon.iv);
+  $('#evolveButton').text("Evolve ("+ pokemon.candiesToEvolve +")");
+	$("#pokCP").text(pokemon.cp + " / " + pokemon.maxCp );
+	$("#pokIV").text(pokemon.iv + "%" );
+  $("#pokCandy").text(pokemon.candy);
+  $("#pokLvl").text(pokemon.level);
+  $("#pokMove").text(pokemon.move1 + "  /  " + pokemon.move2);
 	$("#nicknameInput").text(pokemon.nickname);
 
 	$(".pokemonListDiv").hide();
@@ -470,7 +481,14 @@ function returnToList() {
 	$("#return").hide();
 }
 
+function getUrlv2(){
+  var restaddress = $("#server-address").val();
+  var restport = $("#REST-PORT").val();
+  var restname = $("#REST-API-User").val();
 
+  return "http://" + restaddress + ":" + restport + "/api/bots";
+
+}
 
 function getUrl() {
   var restaddress = $("#server-address").val();
@@ -487,7 +505,6 @@ function getPokemonById(id) {
 		}
 	}
 }
-
 
 /**
 Pokemon manipulation methods..
@@ -609,4 +626,110 @@ var url = getUrl()+"pokemon/"+selectedPokemon.id+"/powerup";
     }
 
   });
+}
+
+function getItems() {
+  var url = getUrl()+"items";
+  	$.ajax({
+  		url: url,
+  		type: 'GET',
+  		timeout: 9000,
+  		headers: {
+  			"X-PGB-ACCESS-TOKEN" : token
+  		},
+  		cache: false,
+  		success: function(response) {
+        pokeItems = response;
+  			drawInventory();
+  		},
+  		error: function(e) {
+  			console.log("SERVER DOWN!!!");
+
+  		}
+
+  	});
+
+}
+
+function drawInventory() {
+	for (i = 0; i < pokeItems.length; i ++) {
+		item = pokeItems[i];
+    var table;
+    var icon;
+    var itemName; //Drop mic?  Idc, wat is de error ik zat southpark te kijken ofzo weet ik veel fuck you
+    switch (item.itemName) {
+      case "ITEM_REVIVE":
+        itemName = "Revive";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/08/Revive-Pokemon-Go.png'>";
+        break;
+      case "ITEM_LUCKY_EGG":
+        itemName = "Lucky Egg";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/07/Lucky-Eggs.png'>";
+        break;
+      case "ITEM_RAZZ_BERRY":
+        itemName = "Razz Berry";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/08/Pokemon-Go-Razz-Berry.png'>";
+        break;
+      case "ITEM_INCUBATOR_BASIC":
+        itemName = "Basic Incubator";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/07/Pokemon-Go-Egg-Incubator.png'>";
+        break;
+      case "ITEM_GREAT_BALL":
+        itemName = "Great Ball";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/07/Great-Ball.png'>";
+        break;
+      case "ITEM_TROY_DISK":
+        itemName = "Lure Module";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/07/Lure-Modules.png'>";
+        break;
+      case "ITEM_INCUBATOR_BASIC_UNLIMITED":
+        itemName = "Unlimited Incubator";
+        icon = "<img style = height:50px; src='http://vignette3.wikia.nocookie.net/pokemongo/images/a/a4/Incubator_Unlimited.png/revision/latest?cb=20160725005706'>";
+        break;
+      case "ITEM_POKE_BALL":
+        itemName = "Poke Ball";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/07/PokeBall.png'>";
+        break;
+      case "ITEM_HYPER_POTION":
+        itemName = "Hyper Potion";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/08/Hyper_Potion-Pokemon-Go.png'>";
+        break;
+      case "ITEM_POTION":
+        itemName = "Potion";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/08/Potion-Pokemon-Go.png'>";
+        break;
+      case "ITEM_INCENSE_ORDINARY":
+        itemName = "Incense";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/07/Incense.png'>";
+        break;
+      case "ITEM_SUPER_POTION":
+        itemName = "Super Potion";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/08/Super-Potion-Pokemon-Go.png'>";
+        break;
+      case "ITEM_MAX_POTION":
+        itemName = "MAX Potion";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/08/Pokemon-Go-Potion.png'>";
+        break;
+      case "ITEM_ULTRA_BALL":
+        itemName = "Ultra Ball";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/07/Ultra-Ball.png'>";
+      break;
+      case "ITEM_MAX_REVIVE":
+        itemName = "Max Revive";
+        icon = "<img style = height:50px; src='https://rankedboost.com/wp-content/uploads/2016/08/Pokemon-Go-Revive.png'>";
+      break;
+      case "ITEM_MASTER_BALL":
+        itemName = "Master Ball";
+        icon = "<img style = height:50px; src='http://i.imgur.com/z8MrM8p.png'>";
+      break;
+      default:
+        itemName = "broken";
+        break;
+      }
+table = table + "<tr><td>" + icon + "</td><td>" + itemName + "</td><td>" + item.count + "</td><td><button onclick='' class='btn btn-default' disabled>Drop</button></td><td><button onclick='' class='btn btn-default' disabled>Use</button></td></tr>";
+console.log(itemName);
+}
+		//Build GUI
+	$("#invenList").html(""); //Clear the table so we can redraw with no problems
+	$("#invenList").html(table);
 }
