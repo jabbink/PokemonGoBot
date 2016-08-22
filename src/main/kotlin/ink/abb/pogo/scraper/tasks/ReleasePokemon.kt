@@ -48,10 +48,10 @@ class ReleasePokemon : Task {
                             val result = pokemon.transferPokemon()
                             
                             if (result == Result.SUCCESS) {
-                                if(ctx.pokemonInventoryFullStatus.get()) {
+                                if (ctx.pokemonInventoryFullStatus.get()) {
                                     // Just released a pokemon so the inventory is not full anymore
                                     ctx.pokemonInventoryFullStatus.set(false)
-                                    if(settings.catchPokemon)
+                                    if (settings.catchPokemon)
                                         Log.green("Inventory freed, enabling catching of pokemon")
                                 }
                                 ctx.pokemonStats.second.andIncrement
