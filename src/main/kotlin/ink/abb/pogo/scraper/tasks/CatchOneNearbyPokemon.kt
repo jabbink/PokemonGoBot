@@ -16,6 +16,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.pokemon.*
 import java.util.concurrent.CountDownLatch
 
@@ -45,8 +46,8 @@ class CatchOneNearbyPokemon : Task {
                 return
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
-            ctx.api.latitude = ctx.lat.get()
-            ctx.api.longitude = ctx.lng.get()
+
+            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), getAltitude(ctx.lat.get(), ctx.lng.get(), ctx))
 
             val countDown = CountDownLatch(1)
 
@@ -71,6 +72,7 @@ class CatchOneNearbyPokemon : Task {
                         countDown.countDown()
                         return@encounterSubscribe
                     }
+
                     val isBallCurved = (Math.random() < settings.desiredCurveRate)
                     //TODO: Give settings object to the catch function instead of the seperate values
                     val catch = catchablePokemon.catch(

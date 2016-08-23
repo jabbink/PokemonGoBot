@@ -13,6 +13,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.directions.getAltitude
 
 class GetMapRandomDirection : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -21,7 +22,7 @@ class GetMapRandomDirection : Task {
         val lng = ctx.lng.get() + randomLatLng()
 
         if (settings.displayKeepalive) Log.normal("Getting map of ($lat, $lng)")
-        ctx.api.setLocation(lat, lng, 0.0)
+        ctx.api.setLocation(lat, lng, getAltitude(lat, lng, ctx))
     }
 
     fun randomLatLng(): Double {

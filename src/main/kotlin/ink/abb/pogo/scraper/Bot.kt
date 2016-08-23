@@ -13,13 +13,15 @@ import com.google.common.util.concurrent.AtomicDouble
 import ink.abb.pogo.api.PoGoApi
 import ink.abb.pogo.api.cache.BagPokemon
 import ink.abb.pogo.api.cache.Pokestop
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.maps.GeoApiContext
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
+import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
-import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import java.io.File
 import java.time.LocalDateTime
 import java.util.*
@@ -36,9 +38,14 @@ class Bot(val api: PoGoApi, val settings: Settings) {
     private var runningLatch = CountDownLatch(0)
     var prepareWalkBack = AtomicBoolean(false)
     var walkBackLock = AtomicBoolean(true)
+    var altitudeCache: MutableMap<String, Double> =
+            try {
+                ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
+            } catch (ex: Exception) {
+                mutableMapOf()
+            }
 
     lateinit private var phaser: Phaser
-
     var ctx = Context(
             api,
             AtomicDouble(settings.latitude),
@@ -51,7 +58,13 @@ class Bot(val api: PoGoApi, val settings: Settings) {
             mutableSetOf(),
             SocketServer(),
             Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
-            settings.restApiPassword
+            settings.restApiPassword,
+            altitudeCache,
+            geoApiContext = if (settings.followStreets.contains(RouteProviderEnum.GOOGLE) && settings.googleApiKey.startsWith("AIza")) {
+                GeoApiContext().setApiKey(settings.googleApiKey)
+            } else {
+                null
+            }
     )
 
     @Synchronized
@@ -67,7 +80,6 @@ class Bot(val api: PoGoApi, val settings: Settings) {
         Log.normal("Level ${api.inventory.playerStats.level}, Experience ${api.inventory.playerStats.level}")
         Log.normal("Pokebank ${api.inventory.pokemon.size + api.inventory.eggs.size}/${api.playerData.maxPokemonStorage}")
         Log.normal("Inventory ${api.inventory.items.size}/${api.playerData.maxItemStorage}")
-        //Log.normal("Inventory bag ${ctx.api.bag}")
 
         val compareName = Comparator<BagPokemon> { a, b ->
             a.pokemonData.pokemonId.name.compareTo(b.pokemonData.pokemonId.name)
@@ -81,8 +93,8 @@ class Bot(val api: PoGoApi, val settings: Settings) {
             }
         }
         api.inventory.pokemon.map { it.value }.sortedWith(compareName.thenComparing(compareIv)).map {
-            val IV = it.pokemonData.getIvPercentage()
-            "Have ${it.pokemonData.pokemonId.name} (${it.pokemonData.nickname}) with ${it.pokemonData.cp} CP and IV $IV% \r\n ${it.pokemonData.getStatsFormatted()}"
+            val pnickname = if (!it.pokemonData.nickname.isEmpty()) " (${it.pokemonData.nickname})" else ""
+            "Have ${it.pokemonData.pokemonId.name}$pnickname with ${it.pokemonData.cp} CP and IV  (${it.pokemonData.individualAttack}-${it.pokemonData.individualDefense}-${it.pokemonData.individualStamina}) ${it.pokemonData.getIvPercentage()}%"
         }.forEach { Log.normal(it) }
 
         val keepalive = GetMapRandomDirection()
@@ -199,12 +211,11 @@ class Bot(val api: PoGoApi, val settings: Settings) {
     fun stop() {
         if (!isRunning()) return
 
-        if(settings.saveLocationOnShutdown) {
-            Log.normal("Saving last location ...")
+        if (settings.saveLocationOnShutdown) {
+            Log.normal("Saving last location...")
             settings.longitude = ctx.lng.get()
             settings.latitude = ctx.lat.get()
         }
-
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
