@@ -14,7 +14,7 @@ See DOCS.md for information on how to create a web-based GUI to share with other
 The original theme that comes with 0.5.0-alpha4
 
 ### [RocketTheme by @eruecco87](http://ui.pogobot.club/RocketTheme/)
-![Screenshot](http://i.imgur.com/MeAozFC.png)
+![Screenshot](img/Rocket-Theme.png)
 
 ### [Poppo by @pureexe](http://ui.pogobot.club/Poppo/)
 ![Screenshot](img/poppo-screenshot.png)
