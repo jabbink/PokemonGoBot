@@ -106,6 +106,8 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/pokemons", method = arrayOf(RequestMethod.GET))
     fun listPokemons(@PathVariable name: String): List<PokemonData> {
 
+        service.getBotContext(name).api.inventories.updateInventories(true)
+
         val data = service.getBotContext(name).api.inventories.pokebank.pokemons
         val pokemons = mutableListOf<PokemonData>()
         for (pokemon in data) {
@@ -216,6 +218,8 @@ class BotController {
     @RequestMapping("/bot/{name}/items")
     fun listItems(@PathVariable name: String): List<ItemData> {
 
+        service.getBotContext(name).api.inventories.updateInventories(true)
+
         val data = service.getBotContext(name).api.inventories.itemBag.items
         val items = mutableListOf<ItemData>()
 
@@ -320,8 +324,9 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/eggs", method = arrayOf(RequestMethod.GET))
     fun getEggs(@PathVariable name: String): List<EggData> {
 
-        val eggs = mutableListOf<EggData>()
+        service.getBotContext(name).api.inventories.updateInventories(true)
 
+        val eggs = mutableListOf<EggData>()
         for (egg in service.getBotContext(name).api.inventories.hatchery.eggs) {
             eggs.add(EggData().buildFromEggPokemon(egg))
         }
