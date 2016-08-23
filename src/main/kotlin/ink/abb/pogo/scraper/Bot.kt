@@ -8,17 +8,15 @@
 
 package ink.abb.pogo.scraper
 
-import POGOProtos.Data.PokemonDataOuterClass
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.util.concurrent.AtomicDouble
+import com.google.maps.GeoApiContext
 import ink.abb.pogo.api.PoGoApi
 import ink.abb.pogo.api.cache.BagPokemon
 import ink.abb.pogo.api.cache.Pokestop
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.maps.GeoApiContext
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
@@ -75,8 +73,8 @@ class Bot(val api: PoGoApi, val settings: Settings) {
         Log.normal()
         Log.normal("Name: ${api.playerData.username}")
         Log.normal("Team: ${api.playerData.team.name}")
-        Log.normal("Pokecoin: ${api.inventory.currencies.get("POKECOIN")}")
-        Log.normal("Stardust: ${api.inventory.currencies.get("STARDUST")}")
+        Log.normal("Pokecoin: ${api.inventory.currencies.getOrPut("POKECOIN", { AtomicInteger(0) }).get()}")
+        Log.normal("Stardust: ${api.inventory.currencies.getOrPut("STARDUST", { AtomicInteger(0) }).get()}")
         Log.normal("Level ${api.inventory.playerStats.level}, Experience ${api.inventory.playerStats.level}")
         Log.normal("Pokebank ${api.inventory.pokemon.size + api.inventory.eggs.size}/${api.playerData.maxPokemonStorage}")
         Log.normal("Inventory ${api.inventory.items.size}/${api.playerData.maxItemStorage}")

@@ -12,11 +12,7 @@ package ink.abb.pogo.scraper.controllers
 import POGOProtos.Data.PokedexEntryOuterClass
 import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Inventory.Item.ItemIdOuterClass
-import com.pokegoapi.api.inventory.Item
-import com.pokegoapi.api.inventory.ItemBag
-import com.pokegoapi.api.map.pokemon.EvolutionResult
-import com.pokegoapi.api.pokemon.Pokemon
-import com.pokegoapi.google.common.geometry.S2LatLng
+import ink.abb.pogo.api.cache.BagPokemon
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.services.BotService
@@ -106,9 +102,9 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/pokemons", method = arrayOf(RequestMethod.GET))
     fun listPokemons(@PathVariable name: String): List<PokemonData> {
 
-        service.getBotContext(name).api.inventories.updateInventories(true)
+        //service.getBotContext(name).api.inventories.updateInventories(true)
 
-        val data = service.getBotContext(name).api.inventories.pokebank.pokemons
+        val data = service.getBotContext(name).api.inventory.pokemon
         val pokemons = mutableListOf<PokemonData>()
         for (pokemon in data) {
             pokemons.add(PokemonData().buildFromPokemon(pokemon))
@@ -123,7 +119,7 @@ class BotController {
             @PathVariable id: Long
     ): String {
         val result: String
-        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
+        val pokemon: BagPokemon? = getPokemonById(service.getBotContext(name), id)
 
         result = pokemon!!.transferPokemon().toString()
         Log.magenta("REST API :transferring pokemon " + pokemon.pokemonId.name + " with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ")")
@@ -335,10 +331,8 @@ class BotController {
     }
 
     // FIXME! currently, the IDs returned by the API are not unique. It seems that only the last 6 digits change so we remove them
-    fun getPokemonById(ctx: Context, id: Long): Pokemon? {
-        return ctx.api.inventories.pokebank.pokemons.find {
-            (("" + id).substring(0, ("" + id).length - 6)).equals(("" + it.id).substring(0, ("" + it.id).length - 6))
-        }
+    fun getPokemonById(ctx: Context, id: Long): BagPokemon? {
+        return ctx.api.inventory.pokemon[id]
     }
 
 }

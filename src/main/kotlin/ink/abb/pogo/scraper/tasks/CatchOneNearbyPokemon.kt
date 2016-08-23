@@ -19,6 +19,7 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.pokemon.*
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicInteger
 
 class CatchOneNearbyPokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -59,7 +60,8 @@ class CatchOneNearbyPokemon : Task {
                     val pokemonData = encounterResult.wildPokemon.pokemonData
                     Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
                             "with CP ${pokemonData.cp} and IV ${pokemonData.getIvPercentage()}%")
-                    val (shouldRelease, reason) = pokemonData.shouldTransfer(settings)
+                    // TODO wrong parameters
+                    val (shouldRelease, reason) = pokemonData.shouldTransfer(settings, hashMapOf<String, Int>(), AtomicInteger(0))
                     val desiredCatchProbability = if (shouldRelease) {
                         Log.yellow("Using desired_catch_probability_unwanted because $reason")
                         settings.desiredCatchProbabilityUnwanted
@@ -74,7 +76,7 @@ class CatchOneNearbyPokemon : Task {
                     }
 
                     val isBallCurved = (Math.random() < settings.desiredCurveRate)
-                    //TODO: Give settings object to the catch function instead of the seperate values
+                    // TODO: Give settings object to the catch function instead of the seperate values
                     val catch = catchablePokemon.catch(
                             encounterResult.captureProbability,
                             ctx.api.inventory,

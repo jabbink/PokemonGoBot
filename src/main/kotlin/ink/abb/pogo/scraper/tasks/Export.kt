@@ -46,8 +46,8 @@ class Export : Task {
             val profile: Map<String, String> = mapOf(
                     Pair("Name", ctx.api.playerData.username),
                     Pair("Team", ctx.api.playerData.team.name),
-                    Pair("Pokecoin", "${ctx.api.inventory.currencies.get("POKECOIN")}"),
-                    Pair("Stardust", "${ctx.api.inventory.currencies.get("STARDUST")}"),
+                    Pair("Pokecoin", "${ctx.api.inventory.currencies.getOrPut("POKECOIN", { AtomicInteger(0) }).get()}"),
+                    Pair("Stardust", "${ctx.api.inventory.currencies.getOrPut("STARDUST", { AtomicInteger(0) }).get()}"),
                     Pair("Level", "${ctx.api.inventory.playerStats.level}"),
                     Pair("Experience", "${ctx.api.inventory.playerStats.experience}"),
                     Pair("Previous Level Experience", "${ctx.api.inventory.playerStats.prevLevelXp}"),
