@@ -182,7 +182,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             else if (!ctx.walking.get())
                 task(WalkToStartPokestop(process.startPokestop as Pokestop))
             if(checkForPlannedStop()){
-                terminateApplication()
+                stop()
             }
         }
 
