@@ -136,7 +136,7 @@ class BotController {
             @PathVariable id: Long
     ): String {
         val result: String
-        val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
+        val pokemon: BagPokemon? = getPokemonById(service.getBotContext(name), id)
 
         if (pokemon!!.candiesToEvolve > pokemon.candy) {
             result = "Not enough candies" + pokemon.candiesToEvolve + " " + pokemon.candy

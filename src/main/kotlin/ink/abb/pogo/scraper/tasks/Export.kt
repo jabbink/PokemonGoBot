@@ -9,10 +9,12 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Enums.PokemonIdOuterClass
+import POGOProtos.Enums.PokemonMoveOuterClass
 import com.google.common.geometry.S2CellId
 import com.google.common.geometry.S2LatLng
 import ink.abb.pogo.api.cache.BagPokemon
 import ink.abb.pogo.api.util.PokemonMetaRegistry
+import ink.abb.pogo.api.util.PokemonMoveMetaRegistry
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -109,8 +111,8 @@ class Export : Task {
 
                 val pmeta = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.forNumber(it.pokemonData.pokemonId.number))
                 // TODO: Copy the move meta
-                /*val pmmeta1 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.move1.number))
-                val pmmeta2 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.move2.number))*/
+                val pmmeta1 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.pokemonData.move1.number))
+                val pmmeta2 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.pokemonData.move2.number))
 
                 mapOf(
                         Pair("Number", "${it.pokemonData.pokemonId.number}"),
@@ -124,19 +126,19 @@ class Export : Task {
                         Pair("Class", pmeta.pokemonClass.name),
                         Pair("Type", formatType(pmeta.type1.name, pmeta.type2.name)),
                         Pair("Move 1", it.pokemonData.move1.name),
-                        /*Pair("Move 1 Type", pmmeta1.type.name),
+                        Pair("Move 1 Type", pmmeta1.type.name),
                         Pair("Move 1 Power", "${pmmeta1.power}"),
                         Pair("Move 1 Accuracy", "${pmmeta1.accuracy}"),
                         Pair("Move 1 Crit Chance", ds("${pmmeta1.critChance}", settings)),
                         Pair("Move 1 Time", "${pmmeta1.time}"),
-                        Pair("Move 1 Energy", "${pmmeta1.energy}"),*/
+                        Pair("Move 1 Energy", "${pmmeta1.energy}"),
                         Pair("Move 2", it.pokemonData.move2.name),
-                        /*Pair("Move 2 Type", pmmeta2.type.name),
+                        Pair("Move 2 Type", pmmeta2.type.name),
                         Pair("Move 2 Power", "${pmmeta2.power}"),
                         Pair("Move 2 Accuracy", "${pmmeta2.accuracy}"),
                         Pair("Move 2 Crit Chance", ds("${pmmeta2.critChance}", settings)),
                         Pair("Move 2 Time", "${pmmeta2.time}"),
-                        Pair("Move 2 Energy", "${pmmeta2.energy}"),*/
+                        Pair("Move 2 Energy", "${pmmeta2.energy}"),
                         Pair("iStamina", "${it.pokemonData.individualStamina}"),
                         Pair("iAttack", "${it.pokemonData.individualAttack}"),
                         Pair("iDefense", "${it.pokemonData.individualDefense}"),
@@ -150,8 +152,8 @@ class Export : Task {
                         Pair("Found", dateFormatter.format(Date(it.pokemonData.creationTimeMs))),
                         Pair("Found Latitude", ds("${latLng.latDegrees()}", settings)),
                         Pair("Found Longitude", ds("${latLng.lngDegrees()}", settings)),
-                        //Pair("Base Capture Rate", ds("${it.pokemonData.baseCaptureRate}", settings)),
-                        //Pair("Base Flee Rate", ds("${it.pokemonData.baseFleeRate}", settings)),
+                        Pair("Base Capture Rate", ds("${pmeta.baseCaptureRate}", settings)),
+                        Pair("Base Flee Rate", ds("${pmeta.baseFleeRate}", settings)),
                         Pair("Battles Attacked", "${it.pokemonData.battlesAttacked}"),
                         Pair("Battles Defended", "${it.pokemonData.battlesDefended}"),
                         Pair("Injured?", "${it.pokemonData.injured}"),

@@ -9,7 +9,10 @@
 package ink.abb.pogo.scraper.util.pokemon
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData
+import POGOProtos.Enums.PokemonIdOuterClass
 import ink.abb.pogo.api.PoGoApi
+import ink.abb.pogo.api.util.PokemonCpUtils
+import ink.abb.pogo.api.util.PokemonMeta
 import ink.abb.pogo.api.util.PokemonMetaRegistry
 import ink.abb.pogo.scraper.Settings
 import java.util.concurrent.atomic.AtomicInteger
@@ -132,3 +135,103 @@ val PokemonData.fainted: Boolean
     get() {
         return stamina == 0
     }
+
+val PokemonData.meta: PokemonMeta
+    get() = PokemonMetaRegistry.getMeta(this.getPokemonId())
+
+val PokemonData.maxCp: Int
+    get() {
+        val pokemonMeta = meta
+        val attack = getIndividualAttack() + pokemonMeta.baseAttack
+        val defense = getIndividualDefense() + pokemonMeta.baseDefense
+        val stamina = getIndividualStamina() + pokemonMeta.baseStamina
+        return PokemonCpUtils.getMaxCp(attack, defense, stamina)
+    }
+
+fun PokemonData.getMaxCpForLevel(level: Int): Int {
+    val pokemonMeta = meta
+    val attack = getIndividualAttack() + pokemonMeta.baseAttack
+    val defense = getIndividualDefense() + pokemonMeta.baseDefense
+    val stamina = getIndividualStamina() + pokemonMeta.baseStamina
+    val playerLevel = level
+    return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel)
+}
+
+val PokemonData.absoluteMaxCp: Int
+    get() = PokemonCpUtils.getAbsoluteMaxCp(pokemonId)
+
+val PokemonData.cpFullEvolveAndPowerup: Int
+    get() = getMaxCpFullEvolveAndPowerup(40)
+
+fun PokemonData.getMaxCpFullEvolveAndPowerupForLevel(level: Int): Int {
+    return getMaxCpFullEvolveAndPowerup(level)
+}
+
+private fun PokemonData.getMaxCpFullEvolveAndPowerup(playerLevel: Int): Int {
+    val highestUpgradedFamily: PokemonIdOuterClass.PokemonId
+    if (arrayListOf(PokemonIdOuterClass.PokemonId.VAPOREON, PokemonIdOuterClass.PokemonId.JOLTEON, PokemonIdOuterClass.PokemonId.FLAREON).contains(pokemonId)) {
+        highestUpgradedFamily = pokemonId
+    } else if (pokemonId === PokemonIdOuterClass.PokemonId.EEVEE) {
+        highestUpgradedFamily = PokemonIdOuterClass.PokemonId.FLAREON
+    } else {
+        highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(meta.family)
+    }
+    val pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily)
+    val attack = individualAttack + pokemonMeta.baseAttack
+    val defense = individualDefense + pokemonMeta.baseDefense
+    val stamina = individualStamina + pokemonMeta.baseStamina
+    return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel)
+}
+
+val PokemonData.combinedCpMultiplier: Float
+    get() = cpMultiplier + additionalCpMultiplier
+
+val PokemonData.cpAfterEvolve: Int
+    get() {
+        if (arrayListOf(PokemonIdOuterClass.PokemonId.VAPOREON, PokemonIdOuterClass.PokemonId.JOLTEON, PokemonIdOuterClass.PokemonId.FLAREON).contains(pokemonId)) {
+            return cp
+        }
+        val highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(meta.family)
+        if (pokemonId === highestUpgradedFamily) {
+            return cp
+        }
+        var pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily)
+        val secondHighest = pokemonMeta.parentId
+        if (getPokemonId() === secondHighest) {
+            val attack = individualAttack + pokemonMeta.baseAttack
+            val defense = individualDefense + pokemonMeta.baseDefense
+            val stamina = individualStamina + pokemonMeta.baseStamina
+            return PokemonCpUtils.getCp(attack, defense, stamina, combinedCpMultiplier)
+        }
+        pokemonMeta = PokemonMetaRegistry.getMeta(secondHighest)
+        val attack = individualAttack + pokemonMeta.baseAttack
+        val defense = individualDefense + pokemonMeta.baseDefense
+        val stamina = individualStamina + pokemonMeta.baseStamina
+        return PokemonCpUtils.getCp(attack, defense, stamina, combinedCpMultiplier)
+    }
+
+val PokemonData.cpAfterFullEvolve: Int
+    get() {
+        if (arrayListOf(PokemonIdOuterClass.PokemonId.VAPOREON, PokemonIdOuterClass.PokemonId.JOLTEON, PokemonIdOuterClass.PokemonId.FLAREON).contains(pokemonId)) {
+            return cp
+        }
+        val highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(meta.family)
+        if (pokemonId === highestUpgradedFamily) {
+            return cp
+        }
+
+        val pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily)
+        val attack = individualAttack + pokemonMeta.baseAttack
+        val defense = individualDefense + pokemonMeta.baseDefense
+        val stamina = individualStamina + pokemonMeta.baseStamina
+        return PokemonCpUtils.getCp(attack, defense, stamina, combinedCpMultiplier)
+    }
+
+val PokemonData.cpAfterPowerup: Int
+    get() = PokemonCpUtils.getCpAfterPowerup(cp, combinedCpMultiplier)
+
+val PokemonData.candyCostsForPowerup: Int
+    get() = PokemonCpUtils.getCandyCostsForPowerup(combinedCpMultiplier, numUpgrades)
+
+val PokemonData.stardustCostsForPowerup: Int
+    get() = PokemonCpUtils.getStartdustCostsForPowerup(combinedCpMultiplier, numUpgrades)
