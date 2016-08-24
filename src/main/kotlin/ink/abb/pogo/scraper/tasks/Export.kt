@@ -110,7 +110,6 @@ class Export : Task {
                 val latLng = S2LatLng(S2CellId(it.pokemonData.capturedCellId).toPoint())
 
                 val pmeta = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.forNumber(it.pokemonData.pokemonId.number))
-                // TODO: Copy the move meta
                 val pmmeta1 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.pokemonData.move1.number))
                 val pmmeta2 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(it.pokemonData.move2.number))
 
@@ -147,8 +146,8 @@ class Export : Task {
                         Pair("Weight [kg]", ds("${it.pokemonData.weightKg}", settings)),
                         Pair("Candy", "${ctx.api.inventory.candies.getOrPut(pmeta.family, { AtomicInteger(0) }).get()}"),
                         Pair("Candies to evolve", "${pmeta.candyToEvolve}"),
-                        //Pair("Candy costs for powerup", "${it.pokemonData.candyCostsForPowerup}"),
-                        //Pair("Stardust costs for powerup", "${it.pokemonData.stardustCostsForPowerup}"),
+                        Pair("Candy costs for powerup", "${it.pokemonData.candyCostsForPowerup}"),
+                        Pair("Stardust costs for powerup", "${it.pokemonData.stardustCostsForPowerup}"),
                         Pair("Found", dateFormatter.format(Date(it.pokemonData.creationTimeMs))),
                         Pair("Found Latitude", ds("${latLng.latDegrees()}", settings)),
                         Pair("Found Longitude", ds("${latLng.lngDegrees()}", settings)),
@@ -158,9 +157,9 @@ class Export : Task {
                         Pair("Battles Defended", "${it.pokemonData.battlesDefended}"),
                         Pair("Injured?", "${it.pokemonData.injured}"),
                         Pair("Fainted?", "${it.pokemonData.fainted}"),
-                        //Pair("Level", ds("${it.pokemonData.level}", settings)),
-                        //Pair("CP after powerup", "${it.pokemonData.cpAfterPowerup}"),
-                        //Pair("Max CP", "${it.pokemonData.maxCp}"),
+                        Pair("Level", ds("${it.pokemonData.level}", settings)),
+                        Pair("CP after powerup", "${it.pokemonData.cpAfterPowerup}"),
+                        Pair("Max CP", "${it.pokemonData.maxCp}"),
                         Pair("ID", "${it.pokemonData.id}")
                 )
             }.forEach { pokemons.add(it) }

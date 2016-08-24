@@ -235,3 +235,6 @@ val PokemonData.candyCostsForPowerup: Int
 
 val PokemonData.stardustCostsForPowerup: Int
     get() = PokemonCpUtils.getStartdustCostsForPowerup(combinedCpMultiplier, numUpgrades)
+
+val PokemonData.level: Float
+    get() = PokemonCpUtils.getLevelFromCpMultiplier(combinedCpMultiplier)
