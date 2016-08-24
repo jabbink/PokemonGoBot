@@ -38,6 +38,8 @@ class SettingsParser(val properties: Properties) {
                 latitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
                 longitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
                 saveLocationOnShutdown = getPropertyIfSet("Save last location when the bot stop", "save_location_on_shutdown", defaults.saveLocationOnShutdown, String::toBoolean),
+                savedLatitude = getPropertyIfSet("Saved start Latitude", "saved_latitude", defaults.savedLatitude, String::toDouble),
+                savedLongitude = getPropertyIfSet("Saved start Longitude", "saved_longitude",  defaults.savedLongitude, String::toDouble),
 
                 credentials = if (properties.getProperty("username", "").isEmpty()) {
                     GoogleCredentials(properties.getProperty("token", ""))
@@ -199,6 +201,8 @@ data class Settings(
 
         var latitude: Double,
         var longitude: Double,
+        var savedLatitude: Double = 0.0,
+        var savedLongitude: Double = 0.0,
         val saveLocationOnShutdown: Boolean = true,
 
         val startingLocation: S2LatLng = S2LatLng.fromDegrees(latitude, longitude),

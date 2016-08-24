@@ -126,11 +126,9 @@ class CatchOneNearbyPokemon : Task {
             } else {
                 Log.red("Encounter failed with result: ${encounterResult.status}")
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
-                    Log.red("Disabling catching of Pokemon")
-
-                    ctx.pokemonInventoryFullStatus.second.set(true)
-
-                    settings.catchPokemon = false
+                    if (settings.catchPokemon)
+                        Log.red("Inventory fillup, disabling catching of pokemon")
+                    ctx.pokemonInventoryFullStatus.set(true)
                 }
             }
         }
