@@ -8,17 +8,15 @@
 
 package ink.abb.pogo.scraper.util.data
 
-import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Enums.PokemonMoveOuterClass
-import com.pokegoapi.api.pokemon.Pokemon
-import com.pokegoapi.api.pokemon.PokemonMetaRegistry
-import com.pokegoapi.api.pokemon.PokemonMoveMetaRegistry
-import com.pokegoapi.google.common.geometry.S2CellId
-import com.pokegoapi.google.common.geometry.S2LatLng
-import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
-import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import com.google.common.geometry.S2CellId
+import com.google.common.geometry.S2LatLng
+import ink.abb.pogo.api.cache.BagPokemon
+import ink.abb.pogo.api.util.PokemonMoveMetaRegistry
+import ink.abb.pogo.scraper.util.pokemon.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 data class PokemonData(
         var id: Long? = null,
@@ -81,11 +79,12 @@ data class PokemonData(
         var cpAfterPowerup: Int? = null
 
 ) {
-    fun buildFromPokemon(pokemon: Pokemon): PokemonData {
-        val latLng = S2LatLng(S2CellId(pokemon.capturedS2CellId).toPoint())
+    fun buildFromPokemon(bagPokemon: BagPokemon): PokemonData {
+        val pokemon = bagPokemon.pokemonData
+        val latLng = S2LatLng(S2CellId(pokemon.capturedCellId).toPoint())
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
-        val pmeta = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.forNumber(pokemon.pokemonId.number))
+        val pmeta = pokemon.meta
         val pmmeta1 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(pokemon.move1.number))
         val pmmeta2 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(pokemon.move2.number))
 
@@ -99,7 +98,7 @@ data class PokemonData(
         this.cp = pokemon.cp
         this.iv = pokemon.getIvPercentage()
         this.stats = pokemon.getStatsFormatted()
-        this.favorite = pokemon.isFavorite
+        this.favorite = pokemon.favorite > 0
         this.cpMultiplier = pokemon.cpMultiplier
         this.heightM = pokemon.heightM
         this.weightKg = pokemon.weightKg
@@ -107,8 +106,8 @@ data class PokemonData(
         this.individualStamina = pokemon.individualStamina
         this.individualAttack = pokemon.individualAttack
         this.individualDefense = pokemon.individualDefense
-        this.candy = pokemon.candy
-        this.candiesToEvolve = pokemon.candiesToEvolve
+        this.candy = bagPokemon.poGoApi.inventory.candies.getOrPut(pmeta.family, { AtomicInteger(0) }).get()
+        this.candiesToEvolve = pmeta.candyToEvolve
         this.level = pokemon.level
 
         this.move1 = pokemon.move1.name
@@ -129,7 +128,7 @@ data class PokemonData(
 
         this.deployedFortId = pokemon.deployedFortId
         this.stamina = pokemon.stamina
-        this.maxStamina = pokemon.maxStamina
+        this.maxStamina = pokemon.staminaMax
         this.maxCp = pokemon.maxCp
         this.absMaxCp = pokemon.absoluteMaxCp
         this.maxCpFullEvolveAndPowerup = pokemon.cpFullEvolveAndPowerup
@@ -140,12 +139,12 @@ data class PokemonData(
         this.creationTimeMs = pokemon.creationTimeMs
         this.creationLatDegrees = latLng.latDegrees()
         this.creationLngDegrees = latLng.lngDegrees()
-        this.baseCaptureRate = pokemon.baseCaptureRate
-        this.baseFleeRate = pokemon.baseFleeRate
+        this.baseCaptureRate = pmeta.baseCaptureRate
+        this.baseFleeRate = pmeta.baseFleeRate
         this.battlesAttacked = pokemon.battlesAttacked
         this.battlesDefended = pokemon.battlesDefended
-        this.isInjured = pokemon.isInjured
-        this.isFainted = pokemon.isFainted
+        this.isInjured = pokemon.injured
+        this.isFainted = pokemon.fainted
         this.cpAfterPowerup = pokemon.cpAfterPowerup
 
         return this

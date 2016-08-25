@@ -61,6 +61,8 @@ dependencies {
     //compile 'com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'
     compile 'io.reactivex:rxkotlin:0.60.0'
 
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
 

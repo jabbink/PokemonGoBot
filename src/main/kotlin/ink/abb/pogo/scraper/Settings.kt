@@ -11,7 +11,7 @@ package ink.abb.pogo.scraper
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.pokegoapi.google.common.geometry.S2LatLng
+import com.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.Credentials
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
