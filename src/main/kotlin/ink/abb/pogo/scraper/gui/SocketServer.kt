@@ -17,7 +17,6 @@ import ink.abb.pogo.api.cache.Pokestop
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.requiredXp
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.data.PokemonData
 import ink.abb.pogo.scraper.util.pokemon.eggKmWalked
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
@@ -108,7 +107,7 @@ class SocketServer {
             val pokebank = EventPokebank()
 
             for (pokemon in ctx!!.api.inventory.pokemon) {
-                pokebank.pokemon.add(PokemonData().buildFromPokemon(pokemon))
+                pokebank.pokemon.add(PokemonData().buildFromPokemon(pokemon.value))
             }
             server?.broadcastOperations?.sendEvent("pokebank", pokebank)
         }

@@ -60,6 +60,7 @@ dependencies {
     // TODO: Wait for jitpack to fix itself...
     //compile 'com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'
     compile 'io.reactivex:rxkotlin:0.60.0'
+    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
 
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
 

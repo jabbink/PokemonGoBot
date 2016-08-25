@@ -15,9 +15,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
-import ink.abb.pogo.scraper.util.map.getCatchablePokemon
 import ink.abb.pogo.scraper.util.pokemon.inRange
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -61,7 +59,7 @@ class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
                 if (!(ctx.api.inventory.hasPokeballs && bot.api.map.getPokemon(bot.api.latitude, bot.api.longitude, 3).filter {
                     !ctx.blacklistedEncounters.contains(it.encounterId) && it.inRange
                 }.size > 0 && settings.catchPokemon)) {
-                // api break free
+                    // api break free
                     pauseWalk.set(false)
                     pauseCounter = 0
                 }

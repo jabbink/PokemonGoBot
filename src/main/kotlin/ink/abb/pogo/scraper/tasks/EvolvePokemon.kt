@@ -8,12 +8,9 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import POGOProtos.Data.PokemonDataOuterClass
 import POGOProtos.Inventory.Item.ItemIdOuterClass
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass
-import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass
 import ink.abb.pogo.api.request.EvolvePokemon
-import ink.abb.pogo.api.request.ReleasePokemon
 import ink.abb.pogo.api.request.UseItemXpBoost
 import ink.abb.pogo.api.util.PokemonMetaRegistry
 import ink.abb.pogo.scraper.Bot
@@ -21,8 +18,6 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.pokemon.getIv
-import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
