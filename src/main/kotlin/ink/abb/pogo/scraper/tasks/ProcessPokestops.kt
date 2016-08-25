@@ -14,6 +14,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.map.distance
 import ink.abb.pogo.scraper.util.pokemon.distance
 import ink.abb.pogo.scraper.util.map.inRangeForLuredPokemon
 import java.util.*
@@ -60,7 +61,7 @@ class ProcessPokestops(var pokestops: List<Pokestop>) : Task {
                 ctx.pauseWalking.set(false)
             }
         }
-        if (settings.campLurePokestop > 0 && settings.catchPokemon) {
+        if (settings.campLurePokestop > 0 && !ctx.pokemonInventoryFullStatus.get() && settings.catchPokemon) {
             val luresInRange = sortedPokestops.filter {
                 it.inRangeForLuredPokemon() && it.fortData.hasLureInfo()
             }.size

@@ -49,18 +49,14 @@ class ReleasePokemon : Task {
                                     "CP ${pokemon.pokemonData.cp} and IV $ivPercentage%; reason: $reason")
                             bot.api.queueRequest(ink.abb.pogo.api.request.ReleasePokemon().withPokemonId(pokemon.pokemonData.id)).subscribe {
                                 val result = it.response
-                                if (ctx.pokemonInventoryFullStatus.second.get() && !settings.catchPokemon) {
-                                    // Just released a pokemon so the inventory is not full anymore
-
-                                    // Restore previous value
-                                    settings.catchPokemon = ctx.pokemonInventoryFullStatus.first.get()
-                                    ctx.pokemonInventoryFullStatus.second.set(false)
-
-                                    if (settings.catchPokemon)
-                                        Log.green("Enabling catching of Pokemon")
-                                }
 
                                 if (result.result == Result.SUCCESS) {
+                                    if (ctx.pokemonInventoryFullStatus.get()) {
+                                        // Just released a pokemon so the inventory is not full anymore
+                                        ctx.pokemonInventoryFullStatus.set(false)
+                                        if (settings.catchPokemon)
+                                            Log.green("Inventory freed, enabling catching of pokemon")
+                                    }
                                     ctx.pokemonStats.second.andIncrement
                                     ctx.server.releasePokemon(pokemon.pokemonData.id)
                                     ctx.server.sendProfile()

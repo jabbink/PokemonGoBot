@@ -23,13 +23,13 @@ class DropUselessItems : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // ignores the items that have -1
         val itemsToDrop = settings.uselessItems.filter { it.value != -1 }
-        if (settings.groupItemsByType) dropGroupedItems(ctx, itemsToDrop) else dropItems(ctx, itemsToDrop)
+        if (settings.groupItemsByType) dropGroupedItems(ctx, itemsToDrop, settings) else dropItems(ctx, itemsToDrop, settings)
     }
 
     /**
      * Drops the excess items by group
      */
-    fun dropGroupedItems(ctx: Context, items: Map<ItemId, Int>) {
+    fun dropGroupedItems(ctx: Context, items: Map<ItemId, Int>, settings: Settings) {
         // map with what items to keep in what amounts
         val itemsToDrop = mutableMapOf<ItemId, Int>()
         // adds not groupable items on map
@@ -55,7 +55,7 @@ class DropUselessItems : Task {
                 }
         }
         // drops excess items
-        dropItems(ctx, itemsToDrop)
+        dropItems(ctx, itemsToDrop, settings)
     }
 
     /**
@@ -85,7 +85,7 @@ class DropUselessItems : Task {
     /**
      * Drops the excess items by item
      */
-    fun dropItems(ctx: Context, items: Map<ItemId, Int>) {
+    fun dropItems(ctx: Context, items: Map<ItemId, Int>, settings: Settings) {
         val countDown = CountDownLatch(items.size)
         val itemBag = ctx.api.inventory.items
         items.forEach {
@@ -105,6 +105,10 @@ class DropUselessItems : Task {
                     } else {
                         Log.red("Failed to drop ${count}x ${dropItem.name}: $result")
                     }
+                }
+                if(settings.itemDropDelay != (-1).toLong()){
+                    val itemDropDelay = settings.itemDropDelay/2 + (Math.random()*settings.itemDropDelay).toLong()
+                    Thread.sleep(itemDropDelay)
                 }
             }
         }

@@ -18,6 +18,7 @@ import ink.abb.pogo.api.request.UseItemCapture
 import ink.abb.pogo.scraper.util.Log
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
+import java.text.DecimalFormat
 
 /**
  * Extension function to make the code more readable in the CatchOneNearbyPokemon task
@@ -45,7 +46,7 @@ fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventor
 
                 if (waitBetweenThrows) {
                     val waitTime = (Math.random() * 2900 + 100)
-                    Log.blue("Missed, waiting for ${waitTime / 1000} seconds")
+                    Log.blue("Pokemon got out of the ball. Waiting for ca. ${Math.round(waitTime/1000)} second(s) until next throw")
                     Thread.sleep(waitTime.toLong())
                 }
                 numThrows++

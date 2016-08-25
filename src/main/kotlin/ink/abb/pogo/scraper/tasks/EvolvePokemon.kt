@@ -53,8 +53,9 @@ class EvolvePokemon : Task {
         // use lucky egg if above evolve stack limit and evolve the whole stack
         if (countEvolveStack >= settings.evolveStackLimit) {
             val startingXP = ctx.api.inventory.playerStats.experience
+            Log.yellow("Starting stack evolve of $countEvolveStack pokemon using lucky egg")
+            ctx.pauseWalking.set(true)
             if (settings.useLuckyEgg == 1) {
-                Log.yellow("Starting stack evolve of $countEvolveStack pokemon using lucky egg")
                 try {
                     val countDown = CountDownLatch(1)
                     val luckyEgg = UseItemXpBoost().withItemId(ItemIdOuterClass.ItemId.ITEM_LUCKY_EGG)
@@ -84,14 +85,15 @@ class EvolvePokemon : Task {
                             val evolveResult = it.response
                             if (evolveResult.result == EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result.SUCCESS) {
                                 countEvolved++
-                                val evolvedpokemon = evolveResult.evolvedPokemonData
-                                Log.yellow("Successfully evolved in ${evolvedpokemon.pokemonId.name} CP ${evolvedpokemon.cp} IV ${evolvedpokemon.getIvPercentage()}%")
+                                val evolvedPokemon = evolveResult.evolvedPokemonData
+                                Log.yellow("Successfully evolved in ${evolvedPokemon.pokemonId.name} CP ${evolvedPokemon.cp} IV ${evolvedPokemon.getIvPercentage()}%")
                                 ctx.server.releasePokemon(pokemonData.id)
                                 countDown.countDown()
                             } else {
                                 countDown.countDown()
                                 Log.red("Evolve of ${pokemonData.pokemonId.name} CP ${pokemonData.cp} IV ${pokemonData.getIvPercentage()}% failed: ${evolveResult.result.toString()}")
                             }
+
                         }
                         countDown.await()
                     } else {
@@ -100,6 +102,7 @@ class EvolvePokemon : Task {
                 }
             }
             val endXP = ctx.api.inventory.playerStats.experience
+            ctx.pauseWalking.set(false)
             Log.yellow("Finished evolving $countEvolved pokemon; ${endXP - startingXP} xp gained")
         }
     }

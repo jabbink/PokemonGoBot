@@ -12,25 +12,19 @@ import POGOProtos.Enums.TutorialStateOuterClass
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass
 import POGOProtos.Networking.Requests.RequestTypeOuterClass
-import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.api.device.DeviceInfo
-import com.pokegoapi.auth.CredentialProvider
-import com.pokegoapi.auth.GoogleAutoCredentialProvider
-import com.pokegoapi.auth.GoogleUserCredentialProvider
-import com.pokegoapi.auth.PtcCredentialProvider
-import com.pokegoapi.exceptions.LoginFailedException
-import com.pokegoapi.exceptions.RemoteServerException
-import com.pokegoapi.main.ServerRequest
-import com.pokegoapi.util.SystemTimeImpl
+import ink.abb.pogo.api.auth.CredentialProvider
+import ink.abb.pogo.api.auth.GoogleAutoCredentialProvider
+import ink.abb.pogo.api.auth.PtcCredentialProvider
+import ink.abb.pogo.api.util.SystemTimeImpl
+import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.credentials.GoogleCredentials
 import ink.abb.pogo.scraper.util.credentials.PtcCredentials
 import ink.abb.pogo.scraper.util.toHexString
-import okhttp3.Credentials
-import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
+import org.springframework.context.ConfigurableApplicationContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -46,49 +40,25 @@ val time = SystemTimeImpl()
 fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit): CredentialProvider {
     val credentials = settings.credentials
     val auth = if (credentials is GoogleCredentials) {
-        if (credentials.token.isBlank()) {
-            val provider = GoogleUserCredentialProvider(http, time)
-
-            println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL)
-            println("Enter authorisation code:")
-
-            val access = readLine()
-
-            // we should be able to login with this token
-            provider.login(access)
-            println("Refresh token:" + provider.refreshToken)
-            Log.normal("Setting Google refresh token in your config")
-            credentials.token = provider.refreshToken
-            writeToken(credentials.token)
-
-            provider
-        } else {
-            GoogleUserCredentialProvider(http, credentials.token, time)
-        }
+        Log.red("Google User Credential Provider is deprecated; Use google-auto")
+        System.exit(1)
+        null
     } else if (credentials is GoogleAutoCredentials) {
         GoogleAutoCredentialProvider(http, credentials.username, credentials.password, time)
     } else if (credentials is PtcCredentials) {
-        try {
-            PtcCredentialProvider(http, credentials.username, credentials.password, time)
-        } catch (e: LoginFailedException) {
-            throw e
-        } catch (e: RemoteServerException) {
-            throw e
-        } catch (e: Exception) {
-            // sometimes throws ArrayIndexOutOfBoundsException or other RTE's
-            throw RemoteServerException(e)
-        }
+        PtcCredentialProvider(http, credentials.username, credentials.password, time)
     } else {
         throw IllegalStateException("Unknown credentials: ${credentials.javaClass}")
     }
 
-    return auth
+    return auth!!
 }
 
 fun main(args: Array<String>) {
     LogManager.getLogManager().reset()
-    com.pokegoapi.util.Log.setLevel(com.pokegoapi.util.Log.Level.NONE)
-    SpringApplication.run(PokemonGoBotApplication::class.java, *args)
+    //com.pokegoapi.util.Log.setLevel(com.pokegoapi.util.Log.Level.NONE)
+    val pokemonGoBotApplication: ConfigurableApplicationContext = SpringApplication.run(PokemonGoBotApplication::class.java, *args)
+    ProgramController.addApplication(pokemonGoBotApplication)
 }
 
 fun loadProperties(filename: String): Properties {

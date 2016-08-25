@@ -56,8 +56,15 @@ class UpdateProfile : Task {
             Log.magenta("Pokebank ${bot.api.inventory.pokemon.size + bot.api.inventory.eggs.size}/${bot.api.playerData.maxPokemonStorage}; " +
                     "Stardust ${bot.api.inventory.currencies.getOrPut("STARDUST", { AtomicInteger(0) }).get()}; " +
                     "Inventory ${bot.api.inventory.items.size}/${bot.api.playerData.maxItemStorage}"
-
             )
+            if (bot.api.inventory.pokemon.size + bot.api.inventory.eggs.size < bot.api.playerData.maxPokemonStorage && ctx.pokemonInventoryFullStatus.get())
+                ctx.pokemonInventoryFullStatus.set(false)
+            else if (bot.api.inventory.pokemon.size + bot.api.inventory.eggs.size >= bot.api.playerData.maxPokemonStorage && !ctx.pokemonInventoryFullStatus.get())
+                ctx.pokemonInventoryFullStatus.set(true)
+
+            if (settings.catchPokemon && ctx.pokemonInventoryFullStatus.get())
+                Log.red("Pokemon inventory is full, not catching!")
+
             ctx.server.sendProfile()
         }
 

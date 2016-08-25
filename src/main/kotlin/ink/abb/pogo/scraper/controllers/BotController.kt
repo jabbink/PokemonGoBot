@@ -12,6 +12,7 @@ package ink.abb.pogo.scraper.controllers
 import POGOProtos.Data.PokedexEntryOuterClass
 import POGOProtos.Enums.PokemonIdOuterClass
 import POGOProtos.Inventory.Item.ItemIdOuterClass
+import com.google.common.geometry.S2LatLng
 import ink.abb.pogo.api.cache.BagPokemon
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
@@ -21,8 +22,10 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.data.*
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
+import ink.abb.pogo.scraper.util.pokemon.meta
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
+import java.util.concurrent.atomic.AtomicInteger
 
 @RestController
 @CrossOrigin
@@ -138,8 +141,11 @@ class BotController {
         val result: String
         val pokemon: BagPokemon? = getPokemonById(service.getBotContext(name), id)
 
-        if (pokemon!!.candiesToEvolve > pokemon.candy) {
-            result = "Not enough candies" + pokemon.candiesToEvolve + " " + pokemon.candy
+        val requiredCandy = pokemon!!.pokemonData.meta.candyToEvolve
+        val candy = service.getBotContext(name).api.inventory.candies.getOrPut(pokemon.pokemonData.meta.family, { AtomicInteger(0) }).get()
+
+        if (requiredCandy > candy) {
+            result = "Not enough candies" + requiredCandy + " " + candy
         } else {
             val evolutionResult: EvolutionResult
             val evolved: Pokemon
@@ -214,7 +220,7 @@ class BotController {
     @RequestMapping("/bot/{name}/items")
     fun listItems(@PathVariable name: String): List<ItemData> {
 
-        service.getBotContext(name).api.inventories.updateInventories(true)
+        //service.getBotContext(name).api.inventories.updateInventories(true)
 
         val data = service.getBotContext(name).api.inventories.itemBag.items
         val items = mutableListOf<ItemData>()
@@ -318,16 +324,8 @@ class BotController {
     }
 
     @RequestMapping(value = "/bot/{name}/eggs", method = arrayOf(RequestMethod.GET))
-    fun getEggs(@PathVariable name: String): List<EggData> {
-
-        service.getBotContext(name).api.inventories.updateInventories(true)
-
-        val eggs = mutableListOf<EggData>()
-        for (egg in service.getBotContext(name).api.inventories.hatchery.eggs) {
-            eggs.add(EggData().buildFromEggPokemon(egg))
-        }
-
-        return eggs
+    fun getEggs(@PathVariable name: String): List<BagPokemon> {
+        return service.getBotContext(name).api.inventory.eggs.map { it.value }
     }
 
     // FIXME! currently, the IDs returned by the API are not unique. It seems that only the last 6 digits change so we remove them
