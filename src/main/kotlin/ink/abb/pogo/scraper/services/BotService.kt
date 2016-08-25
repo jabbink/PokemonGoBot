@@ -100,8 +100,8 @@ class BotService {
         val latch = CountDownLatch(bots.size)
         bots.forEach {
             thread {
-                save(it.settings)
                 it.stop()
+                save(it.settings)
                 latch.countDown()
             }
         }

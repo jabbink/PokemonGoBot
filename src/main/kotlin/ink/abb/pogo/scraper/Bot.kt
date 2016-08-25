@@ -16,6 +16,7 @@ import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
+import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
@@ -26,6 +27,7 @@ import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.io.File
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Phaser
@@ -57,32 +59,36 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             LocalDateTime.now(),
             Pair(AtomicInteger(0), AtomicInteger(0)),
             AtomicInteger(0),
+            AtomicInteger(0),
             Pair(AtomicInteger(0), AtomicInteger(0)),
+            AtomicDouble(settings.speed),
             mutableSetOf(),
             SocketServer(),
-            Pair(AtomicBoolean(settings.catchPokemon), AtomicBoolean(false)),
+            AtomicBoolean(false),
             settings.restApiPassword,
             altitudeCache,
             geoApiContext = if (settings.followStreets.contains(RouteProviderEnum.GOOGLE) && settings.googleApiKey.startsWith("AIza")) {
                 GeoApiContext().setApiKey(settings.googleApiKey)
             } else {
-                null
+                GeoApiContext()
             }
     )
 
     @Synchronized
     fun start() {
         if (isRunning()) return
+
+        if (settings.saveLocationOnShutdown && settings.savedLatitude!=0.0 && settings.savedLongitude!=0.0) {
+            ctx.lat.set(settings.savedLatitude)
+            ctx.lng.set(settings.savedLongitude)
+            Log.normal("Loaded last saved location (${settings.savedLatitude}, ${settings.savedLatitude})")
+        }
+
         ctx.walking.set(false)
 
-        Log.normal()
-        Log.normal("Name: ${ctx.profile.playerData.username}")
-        Log.normal("Team: ${ctx.profile.playerData.team.name}")
-        Log.normal("Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}")
-        Log.normal("Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}")
-        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}")
-        Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}")
-        Log.normal("Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
+        Log.normal("Name: ${ctx.profile.playerData.username} - Team: ${ctx.profile.playerData.team.name}")
+        Log.normal("Level ${ctx.profile.stats.level}, Experience ${ctx.profile.stats.experience}; Pokecoin: ${ctx.profile.currencies[PlayerProfile.Currency.POKECOIN]}")
+        Log.normal("Pokebank ${ctx.api.cachedInventories.pokebank.pokemons.size + ctx.api.inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; Stardust: ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; Inventory ${ctx.api.cachedInventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}")
 
         val compareName = Comparator<Pokemon> { a, b ->
             a.pokemonId.name.compareTo(b.pokemonId.name)
@@ -158,7 +164,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
             task(keepalive)
-            if (settings.catchPokemon) {
+            if (settings.catchPokemon && !ctx.pokemonInventoryFullStatus.get()) {
                 try {
                     task(catch)
                 } catch (e: Exception) {
@@ -170,7 +176,6 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(drop)
             if (settings.autotransfer)
                 task(release)
-
         }
 
         runLoop(500, "PokestopLoop") {
@@ -178,6 +183,9 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(process)
             else if (!ctx.walking.get())
                 task(WalkToStartPokestop(process.startPokestop as Pokestop))
+            if(checkForPlannedStop()){
+                stop()
+            }
         }
 
         Log.setContext(ctx)
@@ -236,14 +244,11 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     @Synchronized
     fun stop() {
         if (!isRunning()) return
-
         if (settings.saveLocationOnShutdown) {
-            Log.normal("Saving last location...")
-            settings.longitude = ctx.lng.get()
-            settings.latitude = ctx.lat.get()
+            Log.normal("Saving current location (${ctx.lat.get()}, ${ctx.lng.get()})")
+            settings.savedLatitude = ctx.lat.get()
+            settings.savedLongitude = ctx.lng.get()
         }
-        Log.normal("Saving cache file...")
-        ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(File("altitude_cache.json"), ctx.s2Cache)
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
@@ -274,4 +279,28 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     fun task(task: Task) {
         task.run(this, ctx, settings)
     }
+
+    fun checkForPlannedStop():Boolean {
+        val timeDiff:Long = ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())
+        val pokemonCatched:Int = ctx.pokemonStats.first.get()
+        val pokestopsVisited:Int = ctx.pokestops.get()
+        //Log.red("time: ${timeDiff}, pokemon: ${pokemonCatched}, pokestops: ${pokestopsVisited}")
+        if(settings.botTimeoutAfterMinutes <= timeDiff && settings.botTimeoutAfterMinutes != -1){
+            Log.red("Bot timed out as declared in the settings (after ${settings.botTimeoutAfterMinutes} minutes)")
+            return true
+        } else if(settings.botTimeoutAfterCatchingPokemon <= pokemonCatched && settings.botTimeoutAfterCatchingPokemon != -1){
+            Log.red("Bot timed out as declared in the settings (after catching ${settings.botTimeoutAfterCatchingPokemon} pokemon)")
+            return true
+        } else if(settings.botTimeoutAfterVisitingPokestops <= pokestopsVisited && settings.botTimeoutAfterVisitingPokestops != -1){
+            Log.red("Bot timed out as declared in the settings (after visiting ${settings.botTimeoutAfterVisitingPokestops} pokestops)")
+            return true
+        }
+        return false
+    }
+
+    fun terminateApplication(){
+        phaser.forceTermination()
+        ProgramController.stopAllApplications()
+    }
+
 }
