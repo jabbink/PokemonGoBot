@@ -46,7 +46,7 @@ class CatchOneNearbyPokemon : Task {
 
         if (pokemon.isNotEmpty()) {
             val catchablePokemon = pokemon.first()
-            if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId) && settings.desiredCatchProbabilityUnwanted == -1.0) {
+            if (settings.obligatoryTransfer.contains(catchablePokemon.pokemonId) && settings.desiredCatchProbabilityUnwanted == -1.0 || settings.neverCatchPokemon.contains(catchablePokemon.pokemonId)) {
                 ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
                 Log.normal("Found pokemon ${catchablePokemon.pokemonId}; blacklisting because it's unwanted")
                 ctx.pauseWalking.set(false)
@@ -126,11 +126,9 @@ class CatchOneNearbyPokemon : Task {
             } else {
                 Log.red("Encounter failed with result: ${encounterResult.status}")
                 if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
-                    Log.red("Disabling catching of Pokemon")
-
-                    ctx.pokemonInventoryFullStatus.second.set(true)
-
-                    settings.catchPokemon = false
+                    if (settings.catchPokemon)
+                        Log.red("Inventory fillup, disabling catching of pokemon")
+                    ctx.pokemonInventoryFullStatus.set(true)
                 }
             }
         }

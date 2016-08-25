@@ -28,12 +28,14 @@ data class Context(
         val startTime: LocalDateTime,
         val pokemonStats: Pair<AtomicInteger, AtomicInteger>,
         val luredPokemonStats: AtomicInteger,
+        val pokestops: AtomicInteger,
         val itemStats: Pair<AtomicInteger, AtomicInteger>,
+        var walkingSpeed: AtomicDouble,
 
         val blacklistedEncounters: MutableSet<Long>,
         val server: SocketServer,
 
-        val pokemonInventoryFullStatus: Pair<AtomicBoolean, AtomicBoolean>,
+        val pokemonInventoryFullStatus: AtomicBoolean = AtomicBoolean(false),
 
         var restApiPassword: String,
         var s2Cache: MutableMap<String, Double>,
