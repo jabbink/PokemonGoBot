@@ -8,17 +8,23 @@
 
 package ink.abb.pogo.scraper.util.pokemon
 
-import POGOProtos.Data.Capture.CaptureProbabilityOuterClass
-import POGOProtos.Inventory.Item.ItemIdOuterClass
 import com.google.common.geometry.S2LatLng
 import ink.abb.pogo.api.cache.MapPokemon
+import ink.abb.pogo.api.network.ServerRequest
+import ink.abb.pogo.api.request.DiskEncounter
 import ink.abb.pogo.api.request.Encounter
 import rx.Observable
-import java.util.concurrent.atomic.AtomicInteger
 
-fun MapPokemon.encounter(): Observable<Encounter> {
-    val encounter = Encounter().withEncounterId(encounterId).withSpawnPointId(spawnPointId)
-    return poGoApi.queueRequest(encounter)
+fun MapPokemon.encounter(): Observable<ServerRequest> {
+    val encounter: ServerRequest? =
+            if (encounterKind == MapPokemon.EncounterKind.NORMAL) {
+                Encounter().withEncounterId(encounterId).withSpawnPointId(spawnPointId)
+            } else if (encounterKind == MapPokemon.EncounterKind.DISK) {
+                DiskEncounter().withEncounterId(encounterId).withFortId(spawnPointId)
+            } else {
+                null
+            }
+    return poGoApi.queueRequest(encounter!!)
 }
 
 val MapPokemon.inRange: Boolean

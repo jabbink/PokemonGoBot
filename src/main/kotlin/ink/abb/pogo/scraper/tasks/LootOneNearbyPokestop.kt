@@ -30,7 +30,6 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // STOP WALKING! until loot is done
         ctx.pauseWalking.set(true)
-        val countdown = CountDownLatch(1)
         ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), getAltitude(ctx.lat.get(), ctx.lng.get(), ctx))
         val nearbyPokestops = sortedPokestops.filter {
             it.canLoot(lootTimeouts = lootTimeouts)
@@ -49,61 +48,58 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
             }
             Log.normal("Looting nearby pokestop $pokestopID")
 
-            closest.loot().subscribe {
-                val result = it.response
+            val result = closest.loot().toBlocking().first().response
 
-                if (result === null) {
-                    // unlock walk block
-                    countdown.countDown()
-                    return@subscribe
-                }
+            if (result === null) {
+                // unlock walk block
+                ctx.pauseWalking.set(false)
+                return
+            }
 
-                if (result.itemsAwardedCount != 0) {
-                    ctx.itemStats.first.getAndAdd(result.itemsAwardedCount)
-                }
+            if (result.itemsAwardedCount != 0) {
+                ctx.itemStats.first.getAndAdd(result.itemsAwardedCount)
+            }
 
-                if (result.experienceAwarded > 0) {
+            if (result.experienceAwarded > 0) {
+                ctx.server.sendProfile()
+            }
+
+            when (result.result) {
+                Result.SUCCESS -> {
+                    ctx.server.sendPokestop(closest)
                     ctx.server.sendProfile()
+                    var message = "Looted pokestop $pokestopID; +${result.experienceAwarded} XP"
+                    if (settings.displayPokestopRewards)
+                        message += ": ${result.itemsAwardedList.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
+                    Log.green(message)
+                    lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
+                    checkForBan(result, closest, bot, settings)
                 }
+                Result.INVENTORY_FULL -> {
+                    ctx.server.sendPokestop(closest)
+                    ctx.server.sendProfile()
+                    var message = "Looted pokestop $pokestopID; +${result.experienceAwarded} XP, but inventory is full"
+                    if (settings.displayPokestopRewards)
+                        message += ": ${result.itemsAwardedList.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
 
-                when (result.result) {
-                    Result.SUCCESS -> {
-                        ctx.server.sendPokestop(closest)
-                        ctx.server.sendProfile()
-                        var message = "Looted pokestop $pokestopID; +${result.experienceAwarded} XP"
-                        if (settings.displayPokestopRewards)
-                            message += ": ${result.itemsAwardedList.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
-                        Log.green(message)
-                        lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
-                        checkForBan(result, closest, bot, settings)
-                    }
-                    Result.INVENTORY_FULL -> {
-                        ctx.server.sendPokestop(closest)
-                        ctx.server.sendProfile()
-                        var message = "Looted pokestop $pokestopID; +${result.experienceAwarded} XP, but inventory is full"
-                        if (settings.displayPokestopRewards)
-                            message += ": ${result.itemsAwardedList.groupBy { it.itemId.name }.map { "${it.value.size}x${it.key}" }}"
-
-                        Log.red(message)
-                        lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
-                    }
-                    Result.OUT_OF_RANGE -> {
-                        Log.red("Pokestop out of range; distance: ${closest.distance}")
-                    }
-                    Result.IN_COOLDOWN_PERIOD -> {
-                        lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
-                        Log.red("Pokestop still in cooldown mode; blacklisting for $cooldownPeriod minutes")
-                    }
-                    Result.NO_RESULT_SET -> {
-                        lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
-                        Log.red("Server refuses to loot this Pokestop (usually temporary issue); blacklisting for $cooldownPeriod minutes")
-                    }
-                    else -> Log.yellow(result.result.toString())
+                    Log.red(message)
+                    lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                 }
+                Result.OUT_OF_RANGE -> {
+                    Log.red("Pokestop out of range; distance: ${closest.distance}")
+                }
+                Result.IN_COOLDOWN_PERIOD -> {
+                    lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
+                    Log.red("Pokestop still in cooldown mode; blacklisting for $cooldownPeriod minutes")
+                }
+                Result.NO_RESULT_SET -> {
+                    lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
+                    Log.red("Server refuses to loot this Pokestop (usually temporary issue); blacklisting for $cooldownPeriod minutes")
+                }
+                else -> Log.yellow(result.result.toString())
             }
         }
         // unlock walk block
-        countdown.await()
         ctx.pauseWalking.set(false)
     }
 

@@ -16,9 +16,7 @@ import ink.abb.pogo.api.cache.MapPokemon
 import ink.abb.pogo.api.request.CatchPokemon
 import ink.abb.pogo.api.request.UseItemCapture
 import ink.abb.pogo.scraper.util.Log
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
-import java.text.DecimalFormat
 
 /**
  * Extension function to make the code more readable in the CatchOneNearbyPokemon task
@@ -26,39 +24,42 @@ import java.text.DecimalFormat
 fun MapPokemon.catch(normalizedHitPosition: Double = 1.0,
                      normalizedReticleSize: Double = 1.95 + Math.random() * 0.05,
                      spinModifier: Double = 0.85 + Math.random() * 0.15,
-                     ballType: ItemId = ItemId.ITEM_POKE_BALL, amount: Int = -1, razzBerryAmount: Int = -1): rx.Observable<CatchPokemon?> {
-    return this.catch(normalizedHitPosition, normalizedReticleSize, spinModifier, ballType, amount, razzBerryAmount)
+                     ballType: ItemId = ItemId.ITEM_POKE_BALL, amount: Int = -1, razzBerryAmount: Int = -1): rx.Observable<CatchPokemon> {
+    return poGoApi.queueRequest(CatchPokemon()
+            .withEncounterId(encounterId)
+            .withHitPokemon(true)
+            .withNormalizedHitPosition(normalizedHitPosition)
+            .withNormalizedReticleSize(normalizedReticleSize)
+            .withPokeball(ballType)
+            .withSpinModifier(spinModifier)
+            .withSpawnPointId(spawnPointId))
 }
 
-fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventory, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false, waitBetweenThrows: Boolean = false, amount: Int): rx.Observable<CatchPokemon?> {
-    var catch: rx.Observable<CatchPokemon?>
+fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventory, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false, waitBetweenThrows: Boolean = false, amount: Int): rx.Observable<CatchPokemon> {
+    var catch: rx.Observable<CatchPokemon>
     var numThrows = 0
     do {
-        val countDown = CountDownLatch(1)
         catch = catch(captureProbability, inventory, desiredCatchProbability, alwaysCurve, allowBerries, randomBallThrows)
-        catch.subscribe {
-            countDown.countDown()
-            if (it != null) {
-                val result = it?.response
-                if (result.status != CatchStatus.CATCH_ESCAPE && result.status != CatchStatus.CATCH_MISSED) {
-                    return@subscribe
-                }
-
-                if (waitBetweenThrows) {
-                    val waitTime = (Math.random() * 2900 + 100)
-                    Log.blue("Pokemon got out of the ball. Waiting for ca. ${Math.round(waitTime/1000)} second(s) until next throw")
-                    Thread.sleep(waitTime.toLong())
-                }
-                numThrows++
+        val first = catch.toBlocking().first()
+        if (first != null) {
+            val result = first.response
+            if (result.status != CatchStatus.CATCH_ESCAPE && result.status != CatchStatus.CATCH_MISSED) {
+                break
             }
+
+            if (waitBetweenThrows) {
+                val waitTime = (Math.random() * 2900 + 100)
+                Log.blue("Pokemon got out of the ball. Waiting for ca. ${Math.round(waitTime / 1000)} second(s) until next throw")
+                Thread.sleep(waitTime.toLong())
+            }
+            numThrows++
         }
-        countDown.await()
     } while (amount < 0 || numThrows < amount)
 
     return catch
 }
 
-fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventory, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false): rx.Observable<CatchPokemon?> {
+fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventory, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false): rx.Observable<CatchPokemon> {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     //Log.yellow(probabilities.toString())
@@ -115,11 +116,7 @@ fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventor
     val razzBerryCount = inventory.items.getOrPut(ItemId.ITEM_RAZZ_BERRY, { AtomicInteger(0) }).get()
     if (allowBerries && razzBerryCount > 0 && needRazzBerry) {
         logMessage += "; Using Razz Berry"
-        val countDown = CountDownLatch(1)
-        poGoApi.queueRequest(UseItemCapture().withEncounterId(encounterId).withItemId(ItemId.ITEM_RAZZ_BERRY).withSpawnPointId(spawnPointId)).subscribe {
-            countDown.countDown()
-        }
-        countDown.await()
+        poGoApi.queueRequest(UseItemCapture().withEncounterId(encounterId).withItemId(ItemId.ITEM_RAZZ_BERRY).withSpawnPointId(spawnPointId)).toBlocking()
     }
     if (needCurve) {
         logMessage += "; Using curve"

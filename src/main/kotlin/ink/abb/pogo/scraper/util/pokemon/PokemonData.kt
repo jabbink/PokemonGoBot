@@ -109,7 +109,7 @@ fun PokemonData.eggKmWalked(poGoApi: PoGoApi): Double {
     if (!incubated) {
         return 0.0
     }
-    val incubators = poGoApi.inventory.eggIncubators.filter {
+    val incubators = poGoApi.inventory.eggIncubators.map { it.value }.filter {
         it.id == eggIncubatorId
     }
 

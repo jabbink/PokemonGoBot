@@ -55,7 +55,7 @@ class UpdateProfile : Task {
                     "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};")
             Log.magenta("Pokebank ${bot.api.inventory.pokemon.size + bot.api.inventory.eggs.size}/${bot.api.playerData.maxPokemonStorage}; " +
                     "Stardust ${bot.api.inventory.currencies.getOrPut("STARDUST", { AtomicInteger(0) }).get()}; " +
-                    "Inventory ${bot.api.inventory.items.size}/${bot.api.playerData.maxItemStorage}"
+                    "Inventory ${bot.api.inventory.size}/${bot.api.playerData.maxItemStorage}"
             )
             if (bot.api.inventory.pokemon.size + bot.api.inventory.eggs.size < bot.api.playerData.maxPokemonStorage && ctx.pokemonInventoryFullStatus.get())
                 ctx.pokemonInventoryFullStatus.set(false)

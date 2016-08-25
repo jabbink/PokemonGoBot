@@ -87,7 +87,7 @@ class Bot(val api: PoGoApi, val settings: Settings) {
                 "Pokecoin: ${api.inventory.currencies.getOrPut("POKECOIN", { AtomicInteger(0) }).get()}")
         Log.normal("Pokebank ${api.inventory.pokemon.size + api.inventory.eggs.size}/${api.playerData.maxPokemonStorage}; " +
                 "Stardust: ${api.inventory.currencies.getOrPut("STARDUST", { AtomicInteger(0) }).get()}; " +
-                "Inventory ${api.inventory.items.size}/${api.playerData.maxItemStorage}")
+                "Inventory ${api.inventory.size}/${api.playerData.maxItemStorage}")
 
         val compareName = Comparator<BagPokemon> { a, b ->
             a.pokemonData.pokemonId.name.compareTo(b.pokemonData.pokemonId.name)

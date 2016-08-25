@@ -9,6 +9,8 @@
 package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse
+import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse.Status
 import ink.abb.pogo.api.cache.MapPokemon
 import ink.abb.pogo.scraper.Bot
@@ -18,7 +20,6 @@ import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.pokemon.*
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 
 class CatchOneNearbyPokemon : Task {
@@ -50,93 +51,108 @@ class CatchOneNearbyPokemon : Task {
 
             ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), getAltitude(ctx.lat.get(), ctx.lng.get(), ctx))
 
-            val countDown = CountDownLatch(1)
-
             val encounter = catchablePokemon.encounter()
-            encounter.subscribe encounterSubscribe@{
-                val encounterResult = it.response
-                val wasFromLure = catchablePokemon.encounterKind == MapPokemon.EncounterKind.DISK
-                if (encounterResult.status == Status.ENCOUNTER_SUCCESS) {
-                    val pokemonData = encounterResult.wildPokemon.pokemonData
-                    Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
-                            "with CP ${pokemonData.cp} and IV ${pokemonData.getIvPercentage()}%")
-                    // TODO wrong parameters
-                    val (shouldRelease, reason) = pokemonData.shouldTransfer(settings, hashMapOf<String, Int>(), AtomicInteger(0))
-                    val desiredCatchProbability = if (shouldRelease) {
-                        Log.yellow("Using desired_catch_probability_unwanted because $reason")
-                        settings.desiredCatchProbabilityUnwanted
-                    } else {
-                        settings.desiredCatchProbability
-                    }
-                    if (desiredCatchProbability == -1.0) {
-                        ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
-                        Log.normal("CP/IV of encountered pokemon ${catchablePokemon.pokemonId} turns out to be too low; blacklisting encounter")
-                        countDown.countDown()
-                        return@encounterSubscribe
-                    }
-
-                    val isBallCurved = (Math.random() < settings.desiredCurveRate)
-                    // TODO: Give settings object to the catch function instead of the seperate values
-                    val catch = catchablePokemon.catch(
-                            encounterResult.captureProbability,
-                            ctx.api.inventory,
-                            desiredCatchProbability,
-                            isBallCurved,
-                            !settings.neverUseBerries,
-                            settings.randomBallThrows,
-                            settings.waitBetweenThrows,
-                            -1)
-                    catch.subscribe catchSubscribe@{
-                        if (it == null) {
-                            // prevent trying it in the next iteration
-                            ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
-                            Log.red("No Pokeballs in your inventory; blacklisting Pokemon")
-                            countDown.countDown()
-                            return@catchSubscribe
-                        }
-                        val result = it.response
-
-                        // TODO: temp fix for server timing issues regarding GetMapObjects
-                        ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
-                        if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
-                            ctx.pokemonStats.first.andIncrement
-                            if (wasFromLure) {
-                                ctx.luredPokemonStats.andIncrement
-                            }
-                            var message = "Caught a "
-                            if (settings.displayIfPokemonFromLure) {
-                                if (wasFromLure)
-                                    message += "lured "
-                                else
-                                    message += "wild "
-                            }
-                            message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp} and IV" +
-                                    " (${pokemonData.individualAttack}-${pokemonData.individualDefense}-${pokemonData.individualStamina}) ${pokemonData.getIvPercentage()}%"
-                            if (settings.displayPokemonCatchRewards) {
-                                message += ": [${result.captureAward.xpList.sum()}x XP, ${result.captureAward.candyList.sum()}x " +
-                                        "Candy, ${result.captureAward.stardustList.sum()}x Stardust]"
-                            }
-                            Log.cyan(message)
-
-                            ctx.server.newPokemon(catchablePokemon.latitude, catchablePokemon.longitude, pokemonData)
-                            ctx.server.sendProfile()
-                        } else {
-                            Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
-                            if (result.status == CatchPokemonResponse.CatchStatus.CATCH_ERROR) {
-                                Log.red("Blacklisting pokemon to prevent infinite loop")
-                            }
-                        }
-                    }
+            val encounterResult = encounter.toBlocking().first().response
+            val wasFromLure = catchablePokemon.encounterKind == MapPokemon.EncounterKind.DISK
+            if ((encounterResult is DiskEncounterResponseOuterClass.DiskEncounterResponse && encounterResult.result == DiskEncounterResponseOuterClass.DiskEncounterResponse.Result.SUCCESS) ||
+                    (encounterResult is EncounterResponseOuterClass.EncounterResponse && encounterResult.status == Status.ENCOUNTER_SUCCESS)) {
+                val pokemonData = if (encounterResult is DiskEncounterResponseOuterClass.DiskEncounterResponse) {
+                    encounterResult.pokemonData
+                } else if (encounterResult is EncounterResponseOuterClass.EncounterResponse) {
+                    encounterResult.wildPokemon.pokemonData
                 } else {
-                    Log.red("Encounter failed with result: ${encounterResult.status}")
-                    if (encounterResult.status == Status.POKEMON_INVENTORY_FULL) {
-                        Log.red("Inventory fillup, disabling catching of pokemon")
+                    // TODO ugly
+                    null
+                }!!
+                Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
+                        "with CP ${pokemonData.cp} and IV ${pokemonData.getIvPercentage()}%")
+                // TODO wrong parameters
+                val (shouldRelease, reason) = pokemonData.shouldTransfer(settings, hashMapOf<String, Int>(), AtomicInteger(0))
+                val desiredCatchProbability = if (shouldRelease) {
+                    Log.yellow("Using desired_catch_probability_unwanted because $reason")
+                    settings.desiredCatchProbabilityUnwanted
+                } else {
+                    settings.desiredCatchProbability
+                }
+                if (desiredCatchProbability == -1.0) {
+                    ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    Log.normal("CP/IV of encountered pokemon ${catchablePokemon.pokemonId} turns out to be too low; blacklisting encounter")
+                    ctx.pauseWalking.set(false)
+                    return
+                }
 
-                        ctx.pokemonInventoryFullStatus.set(true)
+                val isBallCurved = (Math.random() < settings.desiredCurveRate)
+                val captureProbability = if (encounterResult is DiskEncounterResponseOuterClass.DiskEncounterResponse) {
+                    encounterResult.captureProbability
+                } else if (encounterResult is EncounterResponseOuterClass.EncounterResponse) {
+                    encounterResult.captureProbability
+                } else {
+                    // TODO ugly
+                    null
+                }!!
+                // TODO: Give settings object to the catch function instead of the seperate values
+                val catch = catchablePokemon.catch(
+                        captureProbability,
+                        ctx.api.inventory,
+                        desiredCatchProbability,
+                        isBallCurved,
+                        !settings.neverUseBerries,
+                        settings.randomBallThrows,
+                        settings.waitBetweenThrows,
+                        -1)
+                val catchResult = catch.toBlocking().first()
+                if (catchResult == null) {
+                    // prevent trying it in the next iteration
+                    ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    Log.red("No Pokeballs in your inventory; blacklisting Pokemon")
+                    ctx.pauseWalking.set(false)
+                    return
+                }
+                val result = catchResult.response
+
+                // TODO: temp fix for server timing issues regarding GetMapObjects
+                ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                if (result.status == CatchPokemonResponse.CatchStatus.CATCH_SUCCESS) {
+                    ctx.pokemonStats.first.andIncrement
+                    if (wasFromLure) {
+                        ctx.luredPokemonStats.andIncrement
+                    }
+                    var message = "Caught a "
+                    if (settings.displayIfPokemonFromLure) {
+                        if (wasFromLure)
+                            message += "lured "
+                        else
+                            message += "wild "
+                    }
+                    message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp} and IV" +
+                            " (${pokemonData.individualAttack}-${pokemonData.individualDefense}-${pokemonData.individualStamina}) ${pokemonData.getIvPercentage()}%"
+                    if (settings.displayPokemonCatchRewards) {
+                        message += ": [${result.captureAward.xpList.sum()}x XP, ${result.captureAward.candyList.sum()}x " +
+                                "Candy, ${result.captureAward.stardustList.sum()}x Stardust]"
+                    }
+                    Log.cyan(message)
+
+                    ctx.server.newPokemon(catchablePokemon.latitude, catchablePokemon.longitude, pokemonData)
+                    ctx.server.sendProfile()
+                } else {
+                    Log.red("Capture of ${catchablePokemon.pokemonId} failed with status : ${result.status}")
+                    if (result.status == CatchPokemonResponse.CatchStatus.CATCH_ERROR) {
+                        Log.red("Blacklisting pokemon to prevent infinite loop")
                     }
                 }
+            } else {
+                if (encounterResult is DiskEncounterResponseOuterClass.DiskEncounterResponse) {
+                    Log.red("Encounter failed with result: ${encounterResult.result}")
+                } else if (encounterResult is EncounterResponseOuterClass.EncounterResponse) {
+                    Log.red("Encounter failed with result: ${encounterResult.status}")
+                }
+                if ((encounterResult is DiskEncounterResponseOuterClass.DiskEncounterResponse && encounterResult.result == DiskEncounterResponseOuterClass.DiskEncounterResponse.Result.POKEMON_INVENTORY_FULL) ||
+                        (encounterResult is EncounterResponseOuterClass.EncounterResponse && encounterResult.status == Status.POKEMON_INVENTORY_FULL)) {
+                    Log.red("Inventory fillup, disabling catching of pokemon")
+
+                    ctx.pokemonInventoryFullStatus.set(true)
+                }
             }
-            countDown.await()
             ctx.pauseWalking.set(false)
         }
     }

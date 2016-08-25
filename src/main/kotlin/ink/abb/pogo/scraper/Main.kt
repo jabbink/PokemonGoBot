@@ -12,6 +12,7 @@ import ink.abb.pogo.api.PoGoApiImpl
 import ink.abb.pogo.api.auth.CredentialProvider
 import ink.abb.pogo.api.auth.GoogleAutoCredentialProvider
 import ink.abb.pogo.api.auth.PtcCredentialProvider
+import ink.abb.pogo.api.request.GetPlayerProfile
 import ink.abb.pogo.api.util.SystemTimeImpl
 import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.services.BotService
@@ -30,6 +31,7 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.nio.file.Paths
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import java.util.logging.LogManager
 import javax.swing.text.rtf.RTFEditorKit
 
@@ -165,9 +167,16 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
             else
                 PoGoApiImpl(proxyHttp, auth, time)
 
+    api.start()
+
     Log.normal("Logged in successfully")
 
     print("Getting profile data from pogo server")
+    val countdown = CountDownLatch(1)
+    api.queueRequest(GetPlayerProfile()).subscribe {
+        countdown.countDown()
+    }
+    countdown.await()
     while (api.playerProfile === null) {
         print(".")
         Thread.sleep(1000)

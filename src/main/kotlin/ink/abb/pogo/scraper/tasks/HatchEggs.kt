@@ -44,7 +44,7 @@ class HatchEggs : Task {
         val incubators = ctx.api.inventory.eggIncubators
         val eggs = ctx.api.inventory.eggs
 
-        val freeIncubators = incubators
+        val freeIncubators = incubators.map { it.value }
                 .filter { it.targetKmWalked < bot.api.inventory.playerStats.kmWalked }
                 .sortedByDescending { it.usesRemaining }
         val filteredEggs = eggs.map { it.value }

@@ -16,7 +16,6 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 
 class DropUselessItems : Task {
@@ -86,7 +85,6 @@ class DropUselessItems : Task {
      * Drops the excess items by item
      */
     fun dropItems(ctx: Context, items: Map<ItemId, Int>, settings: Settings) {
-        val countDown = CountDownLatch(items.size)
         val itemBag = ctx.api.inventory.items
         items.forEach {
             val item = itemBag.getOrPut(it.key, { AtomicInteger(0) })
@@ -95,23 +93,19 @@ class DropUselessItems : Task {
                 val dropItem = it.key
                 val drop = RecycleInventoryItem().withCount(count).withItemId(dropItem)
 
-                ctx.api.queueRequest(drop).subscribe {
-                    countDown.countDown()
-                    val result = it.response
-                    if (result.result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
-                        ctx.itemStats.second.getAndAdd(count)
-                        Log.yellow("Dropped ${count}x ${dropItem.name}")
-                        ctx.server.sendProfile()
-                    } else {
-                        Log.red("Failed to drop ${count}x ${dropItem.name}: $result")
-                    }
-                }
-                if(settings.itemDropDelay != (-1).toLong()){
-                    val itemDropDelay = settings.itemDropDelay/2 + (Math.random()*settings.itemDropDelay).toLong()
-                    Thread.sleep(itemDropDelay)
+                val result = ctx.api.queueRequest(drop).toBlocking().first().response
+                if (result.result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
+                    ctx.itemStats.second.getAndAdd(count)
+                    Log.yellow("Dropped ${count}x ${dropItem.name}")
+                    ctx.server.sendProfile()
+                } else {
+                    Log.red("Failed to drop ${count}x ${dropItem.name}: $result")
                 }
             }
+            if (settings.itemDropDelay != (-1).toLong()) {
+                val itemDropDelay = settings.itemDropDelay / 2 + (Math.random() * settings.itemDropDelay).toLong()
+                Thread.sleep(itemDropDelay)
+            }
         }
-        countDown.await()
     }
 }
