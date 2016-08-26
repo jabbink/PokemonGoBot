@@ -8,20 +8,15 @@ See DOCS.md for information on how to create a web-based GUI to share with other
 
 ## User-created GUIs
 
-### [Theme from 0.5.0-alpha4 by @shilch](http://ui.pogobot.club/0.5.0-alpha4/map.html)
-![Screenshot](img/0.5.0-alpha4-screenshot.png
-)
+### [Theme from 0.5.0-alpha4 by @shilch ![Screenshot](img/0.5.0-alpha4-screenshot.png)](http://ui.pogobot.club/0.5.0-alpha4/map.html)
 The original theme that comes with 0.5.0-alpha4
 
-### [RocketTheme by @eruecco87](http://ui.pogobot.club/RocketTheme/)
-![Screenshot](img/Rocket-Theme.png)
+### [RocketTheme by @eruecco87 ![Screenshot](img/Rocket-Theme.png)](http://ui.pogobot.club/RocketTheme/)
 
-### [Poppo by @pureexe](http://ui.pogobot.club/Poppo/)
-![Screenshot](img/poppo-screenshot.png)
+### [Poppo by @pureexe ![Screenshot](img/poppo-screenshot.png)](http://ui.pogobot.club/Poppo/)
 More maps less data
 
-### [TTL55 (Poppo improved) by @JoeyyT && Source from @pureexe](http://ui.pogobot.club/TTL55/)
-![Screenshot](img/0.1.0-TTL55.png)
+### [TTL55 (Poppo improved) by @JoeyyT && Source from @pureexe ![Screenshot](img/0.1.0-TTL55.png)](http://ui.pogobot.club/TTL55/)
 More REST API and more FEATURES
 
 
