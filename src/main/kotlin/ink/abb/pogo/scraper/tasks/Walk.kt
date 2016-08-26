@@ -52,9 +52,6 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 ctx.server.sendPokestop(chosenPokestop)
 
                 if (settings.displayPokestopName) {
-                    if (!chosenPokestop.fetchedDetails) {
-                        bot.api.queueRequest(chosenPokestop.getFortDetails()).toBlocking()
-                    }
                     Log.normal("Walking to pokestop \"${chosenPokestop.name}\"")
                 }
 

@@ -116,13 +116,7 @@ class SocketServer {
     fun sendPokestop(pokestop: Pokestop) {
         val pokestopObj = EventPokestop()
         pokestopObj.id = pokestop.id
-        pokestopObj.name =
-                if (!pokestop.fetchedDetails) {
-                    ctx!!.api.queueRequest(pokestop.getFortDetails()).toBlocking()
-                    pokestop.name
-                } else {
-                    ""
-                }
+        pokestopObj.name = pokestop.name
         pokestopObj.lat = pokestop.fortData.latitude
         pokestopObj.lng = pokestop.fortData.longitude
         server?.broadcastOperations?.sendEvent("pokestop", pokestopObj)
