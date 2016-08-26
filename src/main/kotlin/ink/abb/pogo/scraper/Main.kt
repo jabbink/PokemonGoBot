@@ -31,7 +31,6 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.nio.file.Paths
 import java.util.*
-import java.util.concurrent.CountDownLatch
 import java.util.logging.LogManager
 import javax.swing.text.rtf.RTFEditorKit
 
@@ -168,7 +167,11 @@ fun startBot(settings: Settings, http: OkHttpClient): Bot {
     Log.normal("Logged in successfully")
 
     print("Getting profile data from pogo server")
-    api.queueRequest(GetPlayerProfile()).toBlocking()
+    while (!api.initialized) {
+        print(".")
+        Thread.sleep(1000)
+    }
+    println(".")
     Thread.sleep(1000)
 
     val bot = Bot(api, settings)
