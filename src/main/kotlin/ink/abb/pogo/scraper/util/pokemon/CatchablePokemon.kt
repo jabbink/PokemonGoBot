@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger
 fun MapPokemon.catch(normalizedHitPosition: Double = 1.0,
                      normalizedReticleSize: Double = 1.95 + Math.random() * 0.05,
                      spinModifier: Double = 0.85 + Math.random() * 0.15,
-                     ballType: ItemId = ItemId.ITEM_POKE_BALL, amount: Int = -1, razzBerryAmount: Int = -1): rx.Observable<CatchPokemon> {
+                     ballType: ItemId = ItemId.ITEM_POKE_BALL): rx.Observable<CatchPokemon> {
     return poGoApi.queueRequest(CatchPokemon()
             .withEncounterId(encounterId)
             .withHitPokemon(true)
@@ -158,8 +158,6 @@ fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventor
             normalizedHitPosition = 1.0,
             normalizedReticleSize = recticleSize,
             spinModifier = if (needCurve) 0.85 + Math.random() * 0.15 else Math.random() * 0.10,
-            ballType = ball,
-            amount = 0,
-            razzBerryAmount = 0
+            ballType = ball
     )
 }

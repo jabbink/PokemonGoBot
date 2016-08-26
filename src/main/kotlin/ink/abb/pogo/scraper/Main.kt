@@ -37,7 +37,7 @@ import javax.swing.text.rtf.RTFEditorKit
 
 val time = SystemTimeImpl()
 
-fun getAuth(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit): CredentialProvider {
+fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
     val credentials = settings.credentials
     val auth = if (credentials is GoogleCredentials) {
         Log.red("Google User Credential Provider is deprecated; Use google-auto")
@@ -117,14 +117,12 @@ fun startDefaultBot(http: OkHttpClient, service: BotService) {
         return
     } else {
         val settings = SettingsParser(properties).createSettingsFromProperties()
-        service.addBot(startBot(settings, http, {
-            settings.writeProperty(filename, "token", it)
-        }))
+        service.addBot(startBot(settings, http))
     }
 }
 
 
-fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Unit = {}): Bot {
+fun startBot(settings: Settings, http: OkHttpClient): Bot {
 
     var proxyHttp: OkHttpClient? = null
 
@@ -152,13 +150,11 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
 
     Log.normal("Logging in to game server...")
 
-    val retryCount = 3
-
     val auth =
             if (proxyHttp == null) {
-                getAuth(settings, http, writeToken)
+                getAuth(settings, http)
             } else {
-                getAuth(settings, proxyHttp, writeToken)
+                getAuth(settings, proxyHttp)
             }
 
     val api =
@@ -173,11 +169,6 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
 
     print("Getting profile data from pogo server")
     api.queueRequest(GetPlayerProfile()).toBlocking()
-    while (api.playerProfile === null) {
-        print(".")
-        Thread.sleep(1000)
-    }
-    println(".")
     Thread.sleep(1000)
 
     val bot = Bot(api, settings)

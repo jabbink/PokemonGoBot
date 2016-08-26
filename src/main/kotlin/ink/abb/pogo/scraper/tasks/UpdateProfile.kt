@@ -27,7 +27,6 @@ class UpdateProfile : Task {
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         bot.api.queueRequest(GetInventory().withLastTimestampMs(0)).subscribe {
-            val result = it.response
             val curLevelXP = bot.api.inventory.playerStats.experience - requiredXp[bot.api.inventory.playerStats.level - 1]
             val nextXP = if (bot.api.inventory.playerStats.level == requiredXp.size) {
                 curLevelXP

@@ -131,7 +131,7 @@ class BotController {
         // Update GUI
         service.getBotContext(name).server.sendPokebank()
 
-        return result!!.result.toString()
+        return result.result.toString()
     }
 
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/evolve", method = arrayOf(RequestMethod.POST))
@@ -150,12 +150,12 @@ class BotController {
         } else {
             val evolve = EvolvePokemon().withPokemonId(pokemon.pokemonData.id)
             val evolutionResult = service.getBotContext(name).api.queueRequest(evolve).toBlocking().first().response
-            val evolved = evolutionResult!!.evolvedPokemonData
+            val evolved = evolutionResult.evolvedPokemonData
 
             Log.magenta("REST API : evolved pokemon " + pokemon.pokemonData.pokemonId.name + " with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ")"
                     + "To pokemon " + evolved.pokemonId.name + "with stats (" + evolved.getStatsFormatted() + " CP : " + evolved.cp + ")")
 
-            result = evolutionResult!!.result.toString()
+            result = evolutionResult.result.toString()
         }
 
         // Update GUI
@@ -170,18 +170,17 @@ class BotController {
             @PathVariable id: Long
     ): String {
 
-        var result: String = ""
         val pokemon = getPokemonById(service.getBotContext(name), id)
 
         val candy = service.getBotContext(name).api.inventory.candies.getOrPut(pokemon!!.pokemonData.meta.family, { AtomicInteger(0) }).get()
-        if (pokemon!!.pokemonData.candyCostsForPowerup > candy) {
-            result = "Not enough candies" + pokemon.pokemonData.candyCostsForPowerup + " " + candy
+        val result = if (pokemon.pokemonData.candyCostsForPowerup > candy) {
+            "Not enough candies" + pokemon.pokemonData.candyCostsForPowerup + " " + candy
         } else {
             Log.magenta("REST API : powering up pokemon " + pokemon.pokemonData.pokemonId.name + "with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ")")
-            val upgrade = UpgradePokemon().withPokemonId(pokemon!!.pokemonData.id)
-            result = service.getBotContext(name).api.queueRequest(upgrade).toBlocking().first().response.result.toString()
+            val upgrade = UpgradePokemon().withPokemonId(pokemon.pokemonData.id)
 
             Log.magenta("REST API : pokemon new CP " + pokemon.pokemonData.cp)
+            service.getBotContext(name).api.queueRequest(upgrade).toBlocking().first().response.result.toString()
         }
 
         // Update GUI
@@ -197,10 +196,10 @@ class BotController {
     ): String {
         val pokemon = getPokemonById(service.getBotContext(name), id)
 
-        val setFav = SetFavoritePokemon().withIsFavorite(!(pokemon!!.pokemonData.favorite > 0)).withPokemonId(pokemon!!.pokemonData.id)
+        val setFav = SetFavoritePokemon().withIsFavorite(pokemon!!.pokemonData.favorite == 0).withPokemonId(pokemon.pokemonData.id)
         val result = service.getBotContext(name).api.queueRequest(setFav).toBlocking().first().response.result
         if (result == SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse.Result.SUCCESS) {
-            when (pokemon!!.pokemonData.favorite > 0) {
+            when (pokemon.pokemonData.favorite > 0) {
                 false -> Log.magenta("REST API : pokemon " + pokemon.pokemonData.pokemonId.name + "with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ") is favorited")
                 true -> Log.magenta("REST API : pokemon " + pokemon.pokemonData.pokemonId.name + "with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ") is now unfavorited")
             }

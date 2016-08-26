@@ -47,12 +47,6 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
 
             val result = closest.loot().toBlocking().first().response
 
-            if (result === null) {
-                // unlock walk block
-                ctx.pauseWalking.set(false)
-                return
-            }
-
             if (result.itemsAwardedCount != 0) {
                 ctx.itemStats.first.getAndAdd(result.itemsAwardedCount)
             }

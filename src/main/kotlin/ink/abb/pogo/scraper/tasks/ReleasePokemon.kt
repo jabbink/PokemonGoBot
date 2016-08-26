@@ -22,9 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class ReleasePokemon : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val pokemon = ctx.api.inventory.pokemon ?: return
+        val pokemonMap = ctx.api.inventory.pokemon
         // prevent concurrent modification exception
-        val groupedPokemon = pokemon.map { it.value }.groupBy { it.pokemonData.pokemonId }
+        val groupedPokemon = pokemonMap.map { it.value }.groupBy { it.pokemonData.pokemonId }
         val sortByIV = settings.sortByIv
         val pokemonCounts = hashMapOf<String, Int>()
 
