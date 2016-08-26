@@ -113,7 +113,7 @@ class BotController {
 
         //service.getBotContext(name).api.inventories.updateInventories(true)
 
-        return service.getBotContext(name).api.inventory.eggs.map { PokemonData().buildFromPokemon(it.value) }
+        return service.getBotContext(name).api.inventory.pokemon.map { PokemonData().buildFromPokemon(it.value) }
     }
 
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/transfer", method = arrayOf(RequestMethod.POST))
