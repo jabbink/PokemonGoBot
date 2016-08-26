@@ -124,14 +124,9 @@ class BotController {
         val pokemon: BagPokemon? = getPokemonById(service.getBotContext(name), id)
 
         val release = ReleasePokemon().withPokemonId(pokemon!!.pokemonData.id)
-        val countdown = CountDownLatch(1)
         Log.magenta("REST API :transferring pokemon " + pokemon.pokemonData.pokemonId.name + " with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ")")
-        var result: ReleasePokemonResponseOuterClass.ReleasePokemonResponse? = null
-        service.getBotContext(name).api.queueRequest(release).subscribe {
-            result = it.response
-            countdown.countDown()
-        }
-        countdown.await()
+
+        val result = service.getBotContext(name).api.queueRequest(release).toBlocking().first().response
 
         // Update GUI
         service.getBotContext(name).server.sendPokebank()
@@ -153,14 +148,8 @@ class BotController {
         if (requiredCandy > candy) {
             result = "Not enough candies $requiredCandy > $candy"
         } else {
-            var evolutionResult: EvolvePokemonResponseOuterClass.EvolvePokemonResponse? = null
             val evolve = EvolvePokemon().withPokemonId(pokemon.pokemonData.id)
-            val countdown = CountDownLatch(1)
-            service.getBotContext(name).api.queueRequest(evolve).subscribe {
-                evolutionResult = it.response
-                countdown.countDown()
-            }
-            countdown.await()
+            val evolutionResult = service.getBotContext(name).api.queueRequest(evolve).toBlocking().first().response
             val evolved = evolutionResult!!.evolvedPokemonData
 
             Log.magenta("REST API : evolved pokemon " + pokemon.pokemonData.pokemonId.name + " with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ")"
@@ -190,12 +179,8 @@ class BotController {
         } else {
             Log.magenta("REST API : powering up pokemon " + pokemon.pokemonData.pokemonId.name + "with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ")")
             val upgrade = UpgradePokemon().withPokemonId(pokemon!!.pokemonData.id)
-            val countdown = CountDownLatch(1)
-            service.getBotContext(name).api.queueRequest(upgrade).subscribe {
-                result = it.response.result.toString()
-                countdown.countDown()
-            }
-            countdown.await()
+            result = service.getBotContext(name).api.queueRequest(upgrade).toBlocking().first().response.result.toString()
+
             Log.magenta("REST API : pokemon new CP " + pokemon.pokemonData.cp)
         }
 
@@ -210,16 +195,10 @@ class BotController {
             @PathVariable name: String,
             @PathVariable id: Long
     ): String {
-        var result: SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse.Result? = null
         val pokemon = getPokemonById(service.getBotContext(name), id)
 
         val setFav = SetFavoritePokemon().withIsFavorite(!(pokemon!!.pokemonData.favorite > 0)).withPokemonId(pokemon!!.pokemonData.id)
-        val countdown = CountDownLatch(1)
-        service.getBotContext(name).api.queueRequest(setFav).subscribe {
-            result = it.response.result
-            countdown.countDown()
-        }
-        countdown.await()
+        val result = service.getBotContext(name).api.queueRequest(setFav).toBlocking().first().response.result
         if (result == SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse.Result.SUCCESS) {
             when (pokemon!!.pokemonData.favorite > 0) {
                 false -> Log.magenta("REST API : pokemon " + pokemon.pokemonData.pokemonId.name + "with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ") is favorited")
@@ -241,13 +220,8 @@ class BotController {
     ): String {
         val pokemon = getPokemonById(service.getBotContext(name), id)
         val rename = NicknamePokemon().withNickname(newName).withPokemonId(pokemon!!.pokemonData.id)
-        val countdown = CountDownLatch(1)
-        var result = ""
-        service.getBotContext(name).api.queueRequest(rename).subscribe {
-            result = it.response.result.toString()
-            countdown.countDown()
-        }
-        countdown.await()
+        val result = service.getBotContext(name).api.queueRequest(rename).toBlocking().first().response.result.toString()
+
         return result
     }
 
@@ -272,14 +246,9 @@ class BotController {
             return "Not enough items to drop " + item.get()
         } else {
             Log.magenta("REST API : dropping " + quantity + " " + itemId.name)
-            val countdown = CountDownLatch(1)
             val recycle = RecycleInventoryItem().withCount(quantity).withItemId(itemId)
-            var result = ""
-            service.getBotContext(name).api.queueRequest(recycle).subscribe {
-                result = it.response.result.toString()
-                countdown.countDown()
-            }
-            countdown.await()
+            val result = service.getBotContext(name).api.queueRequest(recycle).toBlocking().first().response.result.toString()
+
             return result
         }
     }
@@ -292,13 +261,8 @@ class BotController {
             return "Not enough incense"
         } else {
             val useIncense = UseIncense().withIncenseType(ItemIdOuterClass.ItemId.ITEM_INCENSE_ORDINARY)
-            var result = ""
-            val countdown = CountDownLatch(1)
-            service.getBotContext(name).api.queueRequest(useIncense).subscribe {
-                result = it.response.result.toString()
-                countdown.countDown()
-            }
-            countdown.await()
+            val result = service.getBotContext(name).api.queueRequest(useIncense).toBlocking().first().response.result.toString()
+
             return result
         }
     }
@@ -311,13 +275,8 @@ class BotController {
             return "Not enough lucky eggs"
         } else {
             val useEgg = UseItemXpBoost().withItemId(ItemIdOuterClass.ItemId.ITEM_LUCKY_EGG)
-            var result = ""
-            val countdown = CountDownLatch(1)
-            service.getBotContext(name).api.queueRequest(useEgg).subscribe {
-                result = it.response.result.toString()
-                countdown.countDown()
-            }
-            countdown.await()
+            val result = service.getBotContext(name).api.queueRequest(useEgg).toBlocking().first().response.result.toString()
+
             return result
         }
     }

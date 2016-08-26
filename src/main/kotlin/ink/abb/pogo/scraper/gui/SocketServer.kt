@@ -118,9 +118,7 @@ class SocketServer {
         pokestopObj.id = pokestop.id
         pokestopObj.name =
                 if (!pokestop.fetchedDetails) {
-                    val countdownFetch = CountDownLatch(1)
-                    ctx!!.api.queueRequest(pokestop.getFortDetails()).subscribe { countdownFetch.countDown() }
-                    countdownFetch.await()
+                    ctx!!.api.queueRequest(pokestop.getFortDetails()).toBlocking()
                     pokestop.name
                 } else {
                     ""

@@ -20,7 +20,6 @@ import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
 import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.pokemon.inRange
 import java.text.DecimalFormat
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Long>) : Task {
@@ -54,9 +53,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
                 if (settings.displayPokestopName) {
                     if (!chosenPokestop.fetchedDetails) {
-                        val countdownFetch = CountDownLatch(1)
-                        bot.api.queueRequest(chosenPokestop.getFortDetails()).subscribe { countdownFetch.countDown() }
-                        countdownFetch.await()
+                        bot.api.queueRequest(chosenPokestop.getFortDetails()).toBlocking()
                     }
                     Log.normal("Walking to pokestop \"${chosenPokestop.name}\"")
                 }

@@ -172,11 +172,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     Log.normal("Logged in successfully")
 
     print("Getting profile data from pogo server")
-    val countdown = CountDownLatch(1)
-    api.queueRequest(GetPlayerProfile()).subscribe {
-        countdown.countDown()
-    }
-    countdown.await()
+    api.queueRequest(GetPlayerProfile()).toBlocking()
     while (api.playerProfile === null) {
         print(".")
         Thread.sleep(1000)

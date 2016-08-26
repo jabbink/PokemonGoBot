@@ -16,12 +16,10 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.map.distance
 import ink.abb.pogo.scraper.util.map.loot
 import java.util.*
-import java.util.concurrent.CountDownLatch
 
 class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: HashMap<String, Long>) : Task {
 
@@ -30,7 +28,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         // STOP WALKING! until loot is done
         ctx.pauseWalking.set(true)
-        ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), getAltitude(ctx.lat.get(), ctx.lng.get(), ctx))
+        ctx.api.setLocation(ctx.lat.get(), ctx.lng.get())
         val nearbyPokestops = sortedPokestops.filter {
             it.canLoot(lootTimeouts = lootTimeouts)
         }
@@ -40,9 +38,8 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
             var pokestopID = closest.id
             if (settings.displayPokestopName) {
                 if (!closest.fetchedDetails) {
-                    val countdownFetch = CountDownLatch(1)
-                    bot.api.queueRequest(closest.getFortDetails()).subscribe { countdownFetch.countDown() }
-                    countdownFetch.await()
+                    bot.api.queueRequest(closest.getFortDetails()).toBlocking()
+
                 }
                 pokestopID = "\"${closest.name}\""
             }
