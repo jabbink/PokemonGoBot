@@ -76,7 +76,7 @@ class Bot(val api: PoGoApi, val settings: Settings) {
         if (settings.saveLocationOnShutdown && settings.savedLatitude != 0.0 && settings.savedLongitude != 0.0) {
             ctx.lat.set(settings.savedLatitude)
             ctx.lng.set(settings.savedLongitude)
-            Log.normal("Loaded last saved location (${settings.savedLatitude}, ${settings.savedLatitude})")
+            Log.normal("Loaded last saved location (${settings.savedLatitude}, ${settings.savedLongitude})")
         }
 
         ctx.walking.set(false)
