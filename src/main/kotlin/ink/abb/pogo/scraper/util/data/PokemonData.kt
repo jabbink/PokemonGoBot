@@ -19,7 +19,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 data class PokemonData(
-        var id: Long? = null,
+        var id: String? = null,
         var pokemonId: Int? = null,
         var name: String? = null,
         var nickname: String? = null,
@@ -88,7 +88,7 @@ data class PokemonData(
         val pmmeta1 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(pokemon.move1.number))
         val pmmeta2 = PokemonMoveMetaRegistry.getMeta(PokemonMoveOuterClass.PokemonMove.forNumber(pokemon.move2.number))
 
-        this.id = pokemon.id
+        this.id = pokemon.id.toString()
         this.pokemonId = pokemon.pokemonId.number
         this.name = pokemon.pokemonId.name
         this.nickname = pokemon.nickname

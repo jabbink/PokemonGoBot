@@ -98,11 +98,13 @@ class UpdateProfile : Task {
             }
         }
 
-
         bot.api.queueRequest(CheckAwardedBadges()).subscribe {
             val result = it.response
             result.awardedBadgesList.forEach {
-                bot.api.queueRequest(EquipBadge().withBadgeType(it))
+                // TODO: Does not work?!
+                bot.api.queueRequest(EquipBadge().withBadgeType(it)).subscribe {
+                    println(it.response.toString())
+                }
             }
         }
     }

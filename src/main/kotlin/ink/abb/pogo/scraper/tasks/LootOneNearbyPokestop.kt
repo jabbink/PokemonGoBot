@@ -37,10 +37,6 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
             val closest = nearbyPokestops.first()
             var pokestopID = closest.id
             if (settings.displayPokestopName) {
-                if (!closest.fetchedDetails) {
-                    bot.api.queueRequest(closest.getFortDetails()).toBlocking()
-
-                }
                 pokestopID = "\"${closest.name}\""
             }
             Log.normal("Looting nearby pokestop $pokestopID")
