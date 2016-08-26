@@ -10,12 +10,13 @@ package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass
+import ink.abb.pogo.api.request.RecycleInventoryItem
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.cachedInventories
+import java.util.concurrent.atomic.AtomicInteger
 
 class DropUselessItems : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
@@ -35,19 +36,19 @@ class DropUselessItems : Task {
         // groups items
         val groupedItems = groupItems(items)
         // adds new items to the map
-        val itemBag = ctx.api.cachedInventories.itemBag
+        val itemBag = ctx.api.inventory.items
         groupedItems.forEach groupedItems@ {
             var groupCount = 0
-            it.key.forEach { groupCount += itemBag.getItem(it).count }
+            it.key.forEach { groupCount += itemBag.getOrPut(it, { AtomicInteger(0) }).get() }
             var neededToDrop = groupCount - it.value
             if (neededToDrop > 0)
                 it.key.forEach {
-                    val item = itemBag.getItem(it)
-                    if (neededToDrop <= item.count) {
-                        itemsToDrop.put(it, item.count - neededToDrop)
+                    val item = itemBag.getOrPut(it, { AtomicInteger(0) })
+                    if (neededToDrop <= item.get()) {
+                        itemsToDrop.put(it, item.get() - neededToDrop)
                         return@groupedItems
                     } else {
-                        neededToDrop -= item.count
+                        neededToDrop -= item.get()
                         itemsToDrop.put(it, 0)
                     }
                 }
@@ -84,23 +85,26 @@ class DropUselessItems : Task {
      * Drops the excess items by item
      */
     fun dropItems(ctx: Context, items: Map<ItemId, Int>, settings: Settings) {
-        val itemBag = ctx.api.cachedInventories.itemBag
+        val itemBag = ctx.api.inventory.items
         items.forEach {
-            val item = itemBag.getItem(it.key)
-            val count = item.count - it.value
+            val item = itemBag.getOrPut(it.key, { AtomicInteger(0) })
+            val count = item.get() - it.value
             if (count > 0) {
-                val result = itemBag.removeItem(it.key, count)
-                if (result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
+                val dropItem = it.key
+                val drop = RecycleInventoryItem().withCount(count).withItemId(dropItem)
+
+                val result = ctx.api.queueRequest(drop).toBlocking().first().response
+                if (result.result == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
                     ctx.itemStats.second.getAndAdd(count)
-                    Log.yellow("Dropped ${count}x ${it.key.name}")
+                    Log.yellow("Dropped ${count}x ${dropItem.name}")
                     ctx.server.sendProfile()
                 } else {
-                    Log.red("Failed to drop ${count}x ${it.key.name}: $result")
+                    Log.red("Failed to drop ${count}x ${dropItem.name}: $result")
                 }
-                if(settings.itemDropDelay != (-1).toLong()){
-                    val itemDropDelay = settings.itemDropDelay/2 + (Math.random()*settings.itemDropDelay).toLong()
-                    Thread.sleep(itemDropDelay)
-                }
+            }
+            if (settings.itemDropDelay != (-1).toLong()) {
+                val itemDropDelay = settings.itemDropDelay / 2 + (Math.random() * settings.itemDropDelay).toLong()
+                Thread.sleep(itemDropDelay)
             }
         }
     }

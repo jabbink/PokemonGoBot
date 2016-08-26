@@ -9,16 +9,15 @@
 package ink.abb.pogo.scraper.util.directions
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.geometry.S2CellId
+import com.google.common.geometry.S2LatLng
 import com.google.maps.GeoApiContext
-import com.pokegoapi.google.common.geometry.S2CellId
-import com.pokegoapi.google.common.geometry.S2LatLng
+import com.squareup.okhttp.HttpUrl
+import com.squareup.okhttp.OkHttpClient
+import com.squareup.okhttp.Request
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.util.Log
-import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import java.io.File
 import java.util.*
 
 val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36"
@@ -72,7 +71,7 @@ fun isValidRouteProvider(routeName: String): Boolean {
     }
 }
 
-fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
+/*fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
     val rand = (Math.random() * 3) + 1
     val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
     var elevation = 10.0
@@ -84,7 +83,7 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
 
     try {
         val url = HttpUrl.parse("https://maps.googleapis.com/maps/api/elevation/json?locations=$latitude,$longitude&sensor=true").newBuilder().build()
-        val request = okhttp3.Request.Builder().url(url).build()
+        val request = Request.Builder().url(url).build()
         val result: Map<*, *>
         result = ObjectMapper().readValue(OkHttpClient().newCall(request).execute().body().string(), Map::class.java)
         val results = result["results"] as List<*>
@@ -94,7 +93,7 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
         ctx.s2Cache[cellId] = elevation
     } catch(ex: Exception) {
         val url = HttpUrl.parse("https://elevation.mapzen.com/height?json={\"shape\":[{\"lat\":$latitude,\"lon\":$longitude}]}").newBuilder().build()
-        val request = okhttp3.Request.Builder().url(url).build()
+        val request = Request.Builder().url(url).build()
 
         try {
             val result: Map<*, *>
@@ -108,7 +107,7 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
     }
 
     if (foundEle) {
-        val inp = java.io.RandomAccessFile("altitude_cache.json","rw")
+        val inp = java.io.RandomAccessFile("altitude_cache.json", "rw")
         try {
             val lock = inp.channel.lock()
             try {
@@ -139,4 +138,4 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
     }
 
     return elevation + rand
-}
+}*/
