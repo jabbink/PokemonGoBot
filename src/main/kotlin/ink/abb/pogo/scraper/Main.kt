@@ -172,6 +172,7 @@ fun startBot(settings: Settings, http: OkHttpClient): Bot {
         Thread.sleep(1000)
     }
     println(".")
+    Thread.sleep(1000)
 
     val bot = Bot(api, settings)
 
