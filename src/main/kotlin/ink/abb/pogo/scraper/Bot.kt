@@ -36,6 +36,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import POGOProtos.Inventory.Item.ItemIdOuterClass
+import POGOProtos.Enums.PokemonFamilyIdOuterClass
+import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass
+import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass
+import POGOProtos.Enums.PokemonIdOuterClass
 
 class Bot(val api: PokemonGo, val settings: Settings) {
 
@@ -200,6 +207,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
             Log.green("Open the map on http://ui.pogobot.club/")
         }
 
+        val t = Thread() {
+            while(isRunning()) {
+	            val reader = BufferedReader(InputStreamReader(System.`in`))
+	            callCommand(reader.readLine());
+            }
+        }
+        t.start()
 
         if (settings.timerWalkToStartPokestop > 0)
             runLoop(TimeUnit.SECONDS.toMillis(settings.timerWalkToStartPokestop), "BotWalkBackLoop") {
@@ -303,4 +317,242 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         ProgramController.stopAllApplications()
     }
 
+    fun callCommand(command: String) {
+        try {
+	        val list = command.split(" ")
+	        val cmd = list.get(0)
+	        if (cmd.startsWith("/")) {
+	            cmd.replaceFirst("/", "")
+	        }
+	        val args = list.toMutableList();
+	        args.removeAt(0)
+	        if (cmd.equals("use", true)) {
+	            if (args.size == 1) {
+	            	if(args.get(0).equals("incense_ordinary", true)) {
+	                    val item = api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_INCENSE_ORDINARY)
+	                    if(item.count>0) {
+	                        api.getInventories().getItemBag().useIncense(ItemIdOuterClass.ItemId.ITEM_INCENSE_ORDINARY)
+	                        Log.cmdSucess("Ordinary incense succefully used! You now have ${api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_INCENSE_ORDINARY).count} ordinary incenses")
+	                    }
+	                    else {
+	                        Log.cmdError("You don't have ordinary incense anymore")
+	                    }
+	                }
+	                else if(args.get(0).equals("incense_cool", true)) {
+	                    val item = api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_INCENSE_COOL)
+	                    if(item.count>0) {
+	                        api.getInventories().getItemBag().useIncense(ItemIdOuterClass.ItemId.ITEM_INCENSE_COOL)
+	                        Log.cmdSucess("Cool incense succefully used! You now have ${api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_INCENSE_COOL).count} cool incenses")
+	                    }
+	                    else {
+	                        Log.cmdError("You don't have cool incense anymore")
+	                    }
+	                }
+	                else if(args.get(0).equals("incense_floral", true)) {
+	                    val item = api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_INCENSE_FLORAL)
+	                    if(item.count>0) {
+	                        api.getInventories().getItemBag().useIncense(ItemIdOuterClass.ItemId.ITEM_INCENSE_FLORAL)
+	                        Log.cmdSucess("Floral incense succefully used! You now have ${api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_INCENSE_FLORAL).count} floral incenses")
+	                    }
+	                    else {
+	                        Log.cmdError("You don't have floral incense anymore")
+	                    }
+	                }
+	                else if(args.get(0).equals("incense_spicy", true)) {
+	                    val item = api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_INCENSE_SPICY)
+	                    if(item.count>0) {
+	                        api.getInventories().getItemBag().useIncense(ItemIdOuterClass.ItemId.ITEM_INCENSE_SPICY)
+	                        Log.cmdSucess("Spicy incense succefully used! You now have ${api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_INCENSE_SPICY).count} spicy incenses")
+	                    }
+	                    else {
+	                        Log.cmdError("You don't have spicy incense anymore")
+	                    }
+	                }
+	                else if(args.get(0).equals("lucky_egg", true)) {
+	                    val item = api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_LUCKY_EGG)
+	                    if(item.count>0) {
+	                        api.getInventories().getItemBag().useLuckyEgg()
+	                        Log.cmdSucess("Lucky egg succefully used! You now have ${api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_LUCKY_EGG).count} lucky eggs")
+	                    }
+	                    else {
+	                        Log.cmdError("You don't have lucky egg anymore")
+	                    }
+	                }
+	                else {
+	                    Log.cmdError("Correct usage: /use <incense_ordinary/incense_cool/incense_floral/incense_spicy/lucky_egg>")
+	                }
+	            }
+	            else {
+	            	Log.cmdError("Correct usage: /use <incense_ordinary/incense_cool/incense_floral/incense_spicy/lucky_egg>")
+	            }
+	        }
+	        else if (cmd.equals("candies", true) || cmd.equals("candy", true)) {
+	            if (args.size == 1) {
+	                try {
+	                	val count = api.getInventories().getCandyjar().getCandies(PokemonFamilyIdOuterClass.PokemonFamilyId.valueOf("FAMILY_${args.get(0).toUpperCase()}"))
+	                	Log.cmdSucess("You have $count candies for this Pokemon's family")
+	                }
+	                catch (e: IllegalArgumentException) {
+	                    Log.cmdError("Pokemon not found!")
+	                }
+	            }
+	            else {
+	                Log.cmdError("Correct usage: /candies <pokemon (base evolution)>")
+	            }
+	        }
+	        else if (cmd.equals("stop", true)) {
+	            if (args.size == 0) {
+	            	stop()
+	            }
+	            else {
+	                Log.cmdError("Correct usage: /stop")
+	            }
+	        }
+	        else if (cmd.equals("radar", true) || cmd.equals("nearby", true)) {
+	            if (args.size == 0) {
+	                val listp = api.map.getNearbyPokemon()
+	                val radar : MutableList<String> = mutableListOf()
+	                for(pkmn in listp) {
+	                	radar.add(pkmn.pokemonId.name)
+	                }
+	                if(radar.size>0) {
+	                    Log.cmdSucess(radar.joinToString(", "))
+	                }
+	                else {
+	                    Log.cmdError("No Pokemon found!")
+	                }
+	            }
+	            else {
+	                Log.cmdError("Correct usage: /radar")
+	            }
+	        }
+	        else if (cmd.equals("evolve", true)) {
+	        	if (args.size == 1) {
+	                try {
+		        		val poke = api.getInventories().pokebank.getPokemonById(args.get(0).toLong())
+		                val result = poke.evolve()
+		                if(result.isSuccessful) {
+		                    Log.cmdSucess("Evolution succeed, new CP: ${result.evolvedPokemon.cp}")
+		                }
+		                else if (result.equals(EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result.FAILED_INSUFFICIENT_RESOURCES)) {
+		                    Log.cmdError("Evolution failed: Insufficient resources!")
+		                }
+		                else if (result.equals(EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result.FAILED_POKEMON_CANNOT_EVOLVE)) {
+		                    Log.cmdError("Evolution failed: That Pokemon cannot evolve!")
+		                }
+		                else {
+		                    Log.cmdError("Evolution failed!")
+		                }
+	                }
+	                catch (e : NullPointerException) {
+	                    Log.cmdError("Pokemon not found!")
+	                }
+	        	}
+	            else {
+	                Log.cmdError("Correct usage: /evolve <id>")
+	            }
+	        }
+	        else if (cmd.equals("powerup", true)) {
+	            if (args.size == 1) {
+	                try {
+		                val poke = api.getInventories().pokebank.getPokemonById(args.get(0).toLong())
+		                val cp = poke.cp - poke.cpAfterPowerup
+		                val result = poke.powerUp()
+		                if(result.equals(UpgradePokemonResponseOuterClass.UpgradePokemonResponse.Result.SUCCESS)) {
+		                    Log.cmdSucess("Power up succeed: + $cp CP")
+		                }
+		                else if (result.equals(UpgradePokemonResponseOuterClass.UpgradePokemonResponse.Result.ERROR_INSUFFICIENT_RESOURCES)) {
+		                    Log.cmdError("Power up failed: Insufficient resources!")
+		                }
+		                else {
+		                    Log.cmdError("Power up failed!")
+		                }
+	               }
+	               catch (e : NullPointerException) {
+	                   Log.cmdError("Pokemon not found!")
+	               }
+	            }
+	            else {
+	                Log.cmdError("Correct usage: /powerup <id>")
+	            }
+	        }
+	        else if (cmd.equals("max", true)) {
+	            if (args.size == 1) {
+	                try {
+	                	val poke = api.getInventories().pokebank.getPokemonById(args.get(0).toLong())
+	                	Log.cmdSucess("CP after full powerup and evolve: ${poke.cpFullEvolveAndPowerup}")
+	                }
+	                catch (e : NullPointerException) {
+	                    Log.cmdError("Pokemon not found!")
+	                }
+	            }
+	            else {
+	                Log.cmdError("Correct usage: /max <id>")
+	            }
+	        }
+	        else if (cmd.equals("search", true)) {
+	            if (args.size == 1) {
+	                try {
+	                    PokemonIdOuterClass.PokemonId.valueOf(args.get(0).toUpperCase())
+	                }
+	                catch (e: IllegalArgumentException) {
+	                    Log.cmdError("Pokemon not found!")
+	                }
+	            	val listp : MutableList<Pokemon> = mutableListOf()
+	                for(pkmn in api.getInventories().pokebank.pokemons) {
+	                    if(pkmn.pokemonId.equals(PokemonIdOuterClass.PokemonId.valueOf(args.get(0).toUpperCase()))) {
+	                        listp.add(pkmn)
+	                    }
+	                }
+	                if(listp.size>0) {
+	                    Log.blue("********************* Command *********************")
+	                    Log.blue("")
+	                    Log.green("${listp.size} pokemons found:")
+	                    for(pkmn in listp) {
+	                    	Log.green("${pkmn.pokemonId.toString()}, CP: ${pkmn.cp}, IV: ${pkmn.getIv()} (${pkmn.getIvPercentage()}%) ==> Id: ${pkmn.id}")
+	                    }
+	                    Log.blue("")
+	                    Log.blue("***************************************************")
+	                }
+	                else {
+	                    Log.cmdError("You don't have that Pokemon!")
+	                }
+	            }
+	            else {
+	                Log.cmdError("Correct usage: /search <pokemon>")
+	            }
+	        }
+	        else if (cmd.equals("best", true)) {
+	            var poke = api.getInventories().pokebank.pokemons.first()
+	            for(pkmn in api.getInventories().pokebank.pokemons) {
+	                if(pkmn.cpFullEvolveAndPowerup>poke.cpFullEvolveAndPowerup) {
+	                    poke = pkmn
+	                }
+	            }
+	            Log.cmdSucess("Best Pokemon: ${poke.pokemonId.toString()}, actual CP: ${poke.cp}, IV: ${poke.getIv()} (${poke.getIvPercentage()}%, Max CP: ${poke.cpFullEvolveAndPowerup}), Id: ${poke.id}}")
+	        }
+            else if (cmd.equals("help", true)) {
+            	Log.blue("********************* Command *********************")
+            	Log.blue("")
+            	Log.green("/best")
+                Log.green("/search <pokemon>")
+                Log.green("/max <pokemon id>")
+                Log.green("/powerup <pokemon id>")
+                Log.green("/evolve <pokemon id>")
+                Log.green("/radar")
+                Log.green("/stop")
+                Log.green("/best")
+                Log.green("/candies <pokemon (base evolution)>")
+                Log.green("/use <incense_ordinary/incense_cool/incense_floral/incense_spicy/lucky_egg>")
+            	Log.blue("")
+            	Log.blue("***************************************************")
+            }
+	        else {
+	            Log.cmdError("Unknown command, type /help for help")
+	        }
+	    }
+        catch (e: Exception) {
+        	Log.cmdError("An error occurred")
+        }
+    }
 }
