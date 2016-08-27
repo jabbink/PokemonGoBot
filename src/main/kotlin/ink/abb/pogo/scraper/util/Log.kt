@@ -94,6 +94,22 @@ class Log {
             info(text, Color.WHITE)
             ctx?.server?.sendLog("white", text)
         }
+        
+        fun cmdSucess(text: String = "") {
+            info("********************* Command *********************", Color.BLUE)
+            info("", Color.BLUE)
+            info(text, Color.GREEN)
+            info("", Color.BLUE)
+            info("***************************************************", Color.BLUE)
+        }
+        
+        fun cmdError(text: String = "") {
+            info("********************* Command *********************", Color.BLUE)
+            info("", Color.BLUE)
+            info(text, Color.RED)
+            info("", Color.BLUE)
+            info("***************************************************", Color.BLUE)
+        }
 
         fun setContext(ctx: Context) {
             this.ctx = ctx
