@@ -19,6 +19,7 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.map.canLoot
 import ink.abb.pogo.scraper.util.map.distance
 import ink.abb.pogo.scraper.util.map.loot
+import java.text.DecimalFormat
 import java.util.*
 
 class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeouts: HashMap<String, Long>) : Task {
@@ -73,7 +74,7 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                     lootTimeouts.put(closest.id, closest.cooldownCompleteTimestampMs)
                 }
                 Result.OUT_OF_RANGE -> {
-                    Log.red("Pokestop out of range; distance: ${closest.distance}")
+                    Log.red("Pokestop out of range; our calculated distance: ${DecimalFormat("#0.00").format(closest.distance)}m")
                     if (closest.distance < 40) {
                         Log.red("Server is lying to us; blacklisting for $cooldownPeriod minutes")
                         lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
