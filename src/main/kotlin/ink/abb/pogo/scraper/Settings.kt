@@ -150,7 +150,7 @@ class SettingsParser(val properties: Properties) {
 
                 botTimeoutAfterMinutes = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_minutes", defaults.botTimeoutAfterMinutes, String::toInt),
                 botTimeoutAfterCatchingPokemon = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_catching_pokemon", defaults.botTimeoutAfterCatchingPokemon, String::toInt),
-                botTimeoutAfterVisitingPokestops = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_visiting_pokestops", defaults.botTimeoutAfterVisitingPokestops, String::toInt)
+                botTimeoutAfterVisitingPokestops = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_visiting_pokestops", defaults.botTimeoutAfterVisitingPokestops, String::toInt),
                 
                 autoTeam = getPropertyIfSet("Auto team", "auto_team", defaults.autoTeam, String::toString)
         )
@@ -300,7 +300,7 @@ data class Settings(
 
         val botTimeoutAfterMinutes: Int = -1,
         val botTimeoutAfterCatchingPokemon:Int = -1,
-        val botTimeoutAfterVisitingPokestops:Int = -1
+        val botTimeoutAfterVisitingPokestops:Int = -1,
         
         val autoTeam: String = "NEUTRAL"
 ) {
