@@ -19,6 +19,12 @@ import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.reflect.jvm.internal.impl.protobuf.InvalidProtocolBufferException
+import POGOProtos.Enums.TeamColorOuterClass.TeamColor
+import POGOProtos.Networking.Requests.Messages.SetPlayerTeamMessageOuterClass.SetPlayerTeamMessage
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType
+import com.pokegoapi.main.ServerRequest
+import POGOProtos.Networking.Responses.SetPlayerTeamResponseOuterClass
 
 class UpdateProfile : Task {
     var lastLevelCheck: Int = 1
