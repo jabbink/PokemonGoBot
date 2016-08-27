@@ -83,6 +83,7 @@
   "waitTimeMax" : 0,
   "botTimeoutAfterMinutes" : -1,
   "botTimeoutAfterCatchingPokemon" : -1,
-  "botTimeoutAfterVisitingPokestops" : -1
+  "botTimeoutAfterVisitingPokestops" : -1,
+  "autoTeam" : "NEUTRAL"
 }
 
