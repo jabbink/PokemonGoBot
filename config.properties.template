@@ -249,6 +249,8 @@ bot_timeout_after_catching_pokemon=-1
 # Set if you want the bot to stop after visiting certain amount of pokestops, -1 skips it
 bot_timeout_after_visiting_pokestops=-1
 
+# Auto join team at level 5 or more. Can be NEUTRAL, RED, BLUE or YELLOW
+auto_team=NEUTRAL
 
 # List of pokemon names
 #MISSINGNO
