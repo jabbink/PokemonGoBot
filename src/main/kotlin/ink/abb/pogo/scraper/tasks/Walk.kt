@@ -244,7 +244,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         val speedChangeNormalized = (Math.random()*2 -1)*Math.random()
         if (speedChangeNormalized > 0) {
             speedDiff = maxSpeed - ctx.walkingSpeed.toDouble()
-        } else if (speedChangeNormalized < 0){
+        } else if (speedChangeNormalized < 0) {
             speedDiff = ctx.walkingSpeed.toDouble() - minSpeed
         }
         return ctx.walkingSpeed.toDouble() + speedChangeNormalized*speedDiff

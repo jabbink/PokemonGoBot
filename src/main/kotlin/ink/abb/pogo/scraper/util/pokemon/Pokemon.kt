@@ -79,7 +79,7 @@ fun Pokemon.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String,
         }
         // Save pokemon for evolve stacking
         val ctoevolve = PokemonMetaRegistry.getMeta(this.pokemonId).candyToEvolve
-        if (shouldRelease && settings.evolveBeforeTransfer.contains(this.pokemonId) && settings.evolveStackLimit > 0){
+        if (shouldRelease && settings.evolveBeforeTransfer.contains(this.pokemonId) && settings.evolveStackLimit > 0) {
             val maxtomantain = this.candy/ctoevolve
             if (ctoevolve > 0 && count > maxtomantain) {
                 shouldRelease = true

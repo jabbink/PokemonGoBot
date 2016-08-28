@@ -137,8 +137,8 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
             // we substract the difference from the recticle size, the lower this size, the worse the ball
             recticleSize = 1 + Math.random() - (catchProbability - desiredCatchProbability)*0.5
 
-            if (recticleSize > 2){ recticleSize = 2.0 }
-            else if(recticleSize < 0){ recticleSize = 0.01 }
+            if (recticleSize > 2) { recticleSize = 2.0 }
+            else if (recticleSize < 0) { recticleSize = 0.01 }
 
             if (recticleSize < 1) {
                 Log.blue("Your trainer threw a normal ball, no xp/catching bonus, good for pretending to be not a bot however")

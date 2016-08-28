@@ -26,10 +26,16 @@
         <property name="message" value="Line has trailing spaces."/>
     </module>
 
-    <!-- Space after 'for' and 'if' -->
+    <!-- Space after 'for', 'if', 'while' -->
     <module name="RegexpSingleline">
-        <property name="format" value="^\s*(for|if)[^ ]"/>
+        <property name="format" value="^\s*(for|if|while)[^ ]"/>
         <property name="message" value="Space needed before opening parenthesis."/>
+    </module>
+
+    <!-- Space between ')' and '{' -->
+    <module name="RegexpSingleline">
+        <property name="format" value="\)\{"/>
+        <property name="message" value="Space needed between condition and block opening"/>
     </module>
 
     <!-- For each spacing -->

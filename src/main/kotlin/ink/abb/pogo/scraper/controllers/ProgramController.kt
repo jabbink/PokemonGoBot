@@ -11,14 +11,14 @@ package ink.abb.pogo.scraper.controllers
 import org.springframework.boot.SpringApplication
 import org.springframework.context.ConfigurableApplicationContext
 
-class ProgramController(){
+class ProgramController() {
     companion object {
         var applicationList = arrayListOf<ConfigurableApplicationContext>()
 
-        fun addApplication (configurableApplicationContext: ConfigurableApplicationContext){
+        fun addApplication (configurableApplicationContext: ConfigurableApplicationContext) {
             applicationList.add(configurableApplicationContext)
         }
-        fun stopAllApplications (){
+        fun stopAllApplications () {
             applicationList.forEach {
                 it.close()
             }
