@@ -47,7 +47,7 @@ class ReleasePokemon : Task {
                                     "CP ${pokemon.cp} and IV $ivPercentage%; reason: $reason")
                             val result = pokemon.transferPokemon()
 
-                            if(settings.autotransferTimeDelay != (-1).toLong()){
+                            if (settings.autotransferTimeDelay != (-1).toLong()) {
                                 val transferWaitTime = settings.autotransferTimeDelay/2 + (Math.random()*settings.autotransferTimeDelay).toLong()
                                 Thread.sleep(transferWaitTime)
                             }

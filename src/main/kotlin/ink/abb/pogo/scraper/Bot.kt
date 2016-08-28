@@ -183,7 +183,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(process)
             else if (!ctx.walking.get())
                 task(WalkToStartPokestop(process.startPokestop as Pokestop))
-            if(checkForPlannedStop()){
+            if (checkForPlannedStop()){
                 stop()
             }
         }
@@ -285,13 +285,13 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val pokemonCatched:Int = ctx.pokemonStats.first.get()
         val pokestopsVisited:Int = ctx.pokestops.get()
         //Log.red("time: ${timeDiff}, pokemon: ${pokemonCatched}, pokestops: ${pokestopsVisited}")
-        if(settings.botTimeoutAfterMinutes <= timeDiff && settings.botTimeoutAfterMinutes != -1){
+        if (settings.botTimeoutAfterMinutes <= timeDiff && settings.botTimeoutAfterMinutes != -1) {
             Log.red("Bot timed out as declared in the settings (after ${settings.botTimeoutAfterMinutes} minutes)")
             return true
-        } else if(settings.botTimeoutAfterCatchingPokemon <= pokemonCatched && settings.botTimeoutAfterCatchingPokemon != -1){
+        } else if (settings.botTimeoutAfterCatchingPokemon <= pokemonCatched && settings.botTimeoutAfterCatchingPokemon != -1){
             Log.red("Bot timed out as declared in the settings (after catching ${settings.botTimeoutAfterCatchingPokemon} pokemon)")
             return true
-        } else if(settings.botTimeoutAfterVisitingPokestops <= pokestopsVisited && settings.botTimeoutAfterVisitingPokestops != -1){
+        } else if (settings.botTimeoutAfterVisitingPokestops <= pokestopsVisited && settings.botTimeoutAfterVisitingPokestops != -1){
             Log.red("Bot timed out as declared in the settings (after visiting ${settings.botTimeoutAfterVisitingPokestops} pokestops)")
             return true
         }

@@ -45,8 +45,8 @@ class HatchEggs : Task {
                 .filter { !it.isIncubate }
                 .sortedByDescending { it.eggKmWalkedTarget }
         if (freeIncubators.isNotEmpty() && filteredEggs.isNotEmpty() && settings.autoFillIncubator) {
-            var eggResult = filteredEggs.first() 
-            if(freeIncubators.first().usesRemaining == 0) {
+            var eggResult = filteredEggs.first()
+            if (freeIncubators.first().usesRemaining == 0) {
                 eggResult = filteredEggs.last()
             }
             val incubateResult = eggResult.incubate(freeIncubators.first())

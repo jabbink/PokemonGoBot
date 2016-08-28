@@ -47,7 +47,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
                 (result.status != CatchStatus.CATCH_ESCAPE && result.status != CatchStatus.CATCH_MISSED)) {
             break
         }
-        if(waitBetweenThrows){
+        if (waitBetweenThrows) {
             val waitTime = (Math.random()*2900 + 100)
             Log.blue("Pokemon got out of the ball. Waiting for ca. ${Math.round(waitTime/1000)} second(s) until next throw")
             Thread.sleep(waitTime.toLong())
@@ -127,26 +127,26 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     //excellent throw value
     var recticleSize = 1.7 + Math.random()*0.3
 
-    if(randomBallThrows){
+    if (randomBallThrows) {
         //excellent throw if capture probability is still less then desired
-        if( catchProbability <= desiredCatchProbability){
+        if (catchProbability <= desiredCatchProbability) {
             // the recticle size is already set for an excelent throw
         }
         //if catch probability is too high...
-        else{
+        else {
             // we substract the difference from the recticle size, the lower this size, the worse the ball
             recticleSize = 1 + Math.random() - (catchProbability - desiredCatchProbability)*0.5
 
             if (recticleSize > 2){ recticleSize = 2.0 }
             else if(recticleSize < 0){ recticleSize = 0.01 }
 
-            if( recticleSize < 1){
+            if (recticleSize < 1) {
                 Log.blue("Your trainer threw a normal ball, no xp/catching bonus, good for pretending to be not a bot however")
-            } else if ( recticleSize >= 1 && recticleSize < 1.3){
+            } else if (recticleSize >= 1 && recticleSize < 1.3) {
                 Log.blue("Your trainer got a 'Nice throw' - nice")
-            } else if ( recticleSize >= 1.3 && recticleSize < 1.7){
+            } else if (recticleSize >= 1.3 && recticleSize < 1.7) {
                 Log.blue("Your trainer got a 'Great throw!'")
-            } else if ( recticleSize > 1.7){
+            } else if (recticleSize > 1.7) {
                 Log.blue("Your trainer got an 'Excellent throw!' - that's suspicious, might he be a bot?")
             }
         }
