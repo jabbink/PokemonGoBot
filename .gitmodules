@@ -10,5 +10,5 @@
 	url = https://github.com/JoeyyT/PGBGUI
 [submodule "pogobot-builder"]
 	path = pogobot-builder
-	url = http://github.com/shilch/pogobot-builder.git
+	url = https://github.com/shilch/pogobot-builder.git
 	branch = develop
