@@ -19,7 +19,7 @@ More maps less data
 ### [TTL55 (Poppo improved) by @JoeyyT && Source from @pureexe ![Screenshot](img/0.1.0-TTL55.png)](http://ui.pogobot.club/TTL55/)
 More REST API and more FEATURES
 
-### [Pogobot-Builder by @shilch ![Screenshot](img/pogobot-builder.png)](http://ui.pogobot.club/pogobot-builder)
+### [Pogobot-Builder by @shilch ![Screenshot](img/pogobot-builder.png)](https://pogo.bot-builder.xyz/)
 Pokemon Go Bot Builder generates a package (zip) that includes all necessary files to run PokemonGo-Bot. Just fill in the fields and click Generate package. Your bot is ready now :)
 
 
