@@ -8,3 +8,7 @@
 [submodule "TTL55"]
 	path = TTL55
 	url = https://github.com/JoeyyT/PGBGUI
+[submodule "pogobot-builder"]
+	path = pogobot-builder
+	url = http://github.com/shilch/pogobot-builder.git
+	branch = develop
