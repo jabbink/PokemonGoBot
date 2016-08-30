@@ -75,8 +75,8 @@ class LootOneNearbyPokestop(val sortedPokestops: List<Pokestop>, val lootTimeout
                 }
                 Result.OUT_OF_RANGE -> {
                     Log.red("Pokestop out of range; our calculated distance: ${DecimalFormat("#0.00").format(closest.distance)}m")
-                    if (closest.distance < 40) {
-                        Log.red("Server is lying to us; blacklisting for $cooldownPeriod minutes")
+                    if (closest.distance < ctx.api.fortSettings.interactionRangeMeters) {
+                        Log.red("Server is lying to us (${closest.distance} < ${ctx.api.fortSettings.interactionRangeMeters}!); blacklisting for $cooldownPeriod minutes")
                         lootTimeouts.put(closest.id, ctx.api.currentTimeMillis() + cooldownPeriod * 60 * 1000)
                     }
                 }
