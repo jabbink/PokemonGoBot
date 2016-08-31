@@ -9,31 +9,31 @@ You will get a response from the server with a random session token which must b
   - GET `/api/bots` => List all bots (this does not need the `X-PGB-ACCESS-TOKEN` header)
 
 * Bot end-point :
-  - POST `/api/bot{name}/load` => Load bot
-  - POST `/api/bot{name}/unload` => Unload bot
-  - POST `/api/bot{name}/reload` => Reload bot
-  - POST `/api/bot{name}/stop` => Stop bot
-  - POST `/api/bot{name}/start` => Start bot
+  - POST `/api/bot/{name}/load` => Load bot
+  - POST `/api/bot/{name}/unload` => Unload bot
+  - POST `/api/bot/{name}/reload` => Reload bot
+  - POST `/api/bot/{name}/stop` => Stop bot
+  - POST `/api/bot/{name}/start` => Start bot
 
 * Pokemon end-point :
-  - GET `/api/bot{name}/pokemons` => List all pokemons
-  - POST `/api/bot{name}/pokemon/{id}/transfer` => Transfer pokemon
-  - POST `/api/bot{name}/pokemon/{id}/evolve` => Evolve pokemon
-  - POST `/api/bot{name}/pokemon/{id}/powerup` => Power-up pokemon
-  - POST `/api/bot{name}/pokemon/{id}/favorite` => Toggle favorite for this pokemon
-  - POST `/api/bot{name}/pokemon/{id}/rename` => Rename pokemon, request body MUST be the new name of the pokemon
+  - GET `/api/bot/{name}/pokemons` => List all pokemons
+  - POST `/api/bot/{name}/pokemon/{id}/transfer` => Transfer pokemon
+  - POST `/api/bot/{name}/pokemon/{id}/evolve` => Evolve pokemon
+  - POST `/api/bot/{name}/pokemon/{id}/powerup` => Power-up pokemon
+  - POST `/api/bot/{name}/pokemon/{id}/favorite` => Toggle favorite for this pokemon
+  - POST `/api/bot/{name}/pokemon/{id}/rename` => Rename pokemon, request body MUST be the new name of the pokemon
 
 * Item end-point :
-  - GET `/api/bot{name}/items` => List all items
-  - DELETE `/api/bot{name}/item/{id}/drop/{quantity}` => Drop `quantity` of this item
-  - POST `/api/bot{name}/useIncense` => Use an incense
-  - POST `/api/bot{name}/useLuckyEgg` => Use a lucky egg
+  - GET `/api/bot/{name}/items` => List all items
+  - DELETE `/api/bot/{name}/item/{id}/drop/{quantity}` => Drop `quantity` of this item
+  - POST `/api/bot/{name}/useIncense` => Use an incense
+  - POST `/api/bot/{name}/useLuckyEgg` => Use a lucky egg
 
 * Misc end-points :
-  - GET `/api/bot{name}/location` => Get bot current location
-  - POST `/api/bot{name}/location/{latitude}/{longitude}` => Change bot location
-  - GET `/api/bot{name}/profile` => Get account profile
-  - GET `/api/bot{name}/pokedex` => Get account pokedex
-  - GET `/api/bot{name}/eggs` => Get eggs
+  - GET `/api/bot/{name}/location` => Get bot current location
+  - POST `/api/bot/{name}/location/{latitude}/{longitude}` => Change bot location
+  - GET `/api/bot/{name}/profile` => Get account profile
+  - GET `/api/bot/{name}/pokedex` => Get account pokedex
+  - GET `/api/bot/{name}/eggs` => Get eggs
 
 A very simple [proof of concept with javascript](https://gist.github.com/Sieberkev/0f96f190615cebf15a07ca2a8a2a61ca) can be found here.
