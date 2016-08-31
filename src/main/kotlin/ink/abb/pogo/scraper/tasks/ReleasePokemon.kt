@@ -47,10 +47,12 @@ class ReleasePokemon : Task {
                         if (shouldRelease) {
                             Log.yellow("Going to transfer ${pokemon.pokemonData.pokemonId.name} with " +
                                     "CP ${pokemon.pokemonData.cp} and IV $ivPercentage%; reason: $reason")
-                            bot.api.queueRequest(ink.abb.pogo.api.request.ReleasePokemon().withPokemonId(pokemon.pokemonData.id)).subscribe {
+                            bot.api.queueRequest(ink.abb.pogo.api.request.ReleasePokemon().withPokemonId(pokemon.pokemonData.id)).toBlocking().subscribe {
                                 val result = it.response
 
                                 if (result.result == Result.SUCCESS) {
+                                    Log.green("Successfully transfered ${pokemon.pokemonData.pokemonId.name} with " +
+                                            "CP ${pokemon.pokemonData.cp} and IV $ivPercentage%")
                                     if (ctx.pokemonInventoryFullStatus.get()) {
                                         // Just released a pokemon so the inventory is not full anymore
                                         ctx.pokemonInventoryFullStatus.set(false)
