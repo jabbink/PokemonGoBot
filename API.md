@@ -36,7 +36,7 @@ If the authentication fails, you will get a HTTP status code 401 (Unauthorized).
   - GET `/api/bot/{name}/pokemons` => List all pokemons
   - POST `/api/bot/{name}/pokemon/{id}/transfer` => Transfer pokemon
   - POST `/api/bot/{name}/pokemon/{id}/evolve` => Evolve pokemon (HTTP status code 400 (Bad Request) when not enough candy)
-  - POST `/api/bot/{name}/pokemon/{id}/powerup` => Power-up pokemon (HTTP status code 400 (Bad Request) when not enough candy)
+  - POST `/api/bot/{name}/pokemon/{id}/powerup` => Power-up pokemon (HTTP status code 400 (Bad Request) when not enough candy or stardust)
   - POST `/api/bot/{name}/pokemon/{id}/favorite` => Toggle favorite for this pokemon
   - POST `/api/bot/{name}/pokemon/{id}/rename` => Rename pokemon, request body MUST be the new name of the pokemon
 
