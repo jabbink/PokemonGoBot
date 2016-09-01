@@ -97,7 +97,7 @@ class DropUselessItems : Task {
                 } else {
                     Log.red("Failed to drop ${count}x ${it.key.name}: $result")
                 }
-                if(settings.itemDropDelay != (-1).toLong()){
+                if (settings.itemDropDelay != (-1).toLong()) {
                     val itemDropDelay = settings.itemDropDelay/2 + (Math.random()*settings.itemDropDelay).toLong()
                     Thread.sleep(itemDropDelay)
                 }

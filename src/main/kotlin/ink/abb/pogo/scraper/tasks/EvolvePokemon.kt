@@ -62,7 +62,7 @@ class EvolvePokemon : Task {
                     if (bot.api.inventories.candyjar.getCandies(pokemonMeta.family) >= pokemonMeta.candyToEvolve) {
                         Log.yellow("Evolving ${it.pokemonId.name} CP ${it.cp} IV ${it.getIvPercentage()}%")
                         val evolveResult = it.evolve()
-                        if( settings.evolveTimeDelay > 300){
+                        if ( settings.evolveTimeDelay > 300) {
                             Thread.sleep(settings.evolveTimeDelay/2 + (Math.random()*settings.evolveTimeDelay).toLong())
                         } else {
                             Thread.sleep(300)
