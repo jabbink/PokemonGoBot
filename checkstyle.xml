@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+    <!-- Each file should have this header -->
+    <module name="Header">
+        <property name="header" value="/**\n * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)\n * This program comes with ABSOLUTELY NO WARRANTY;\n * This is free software, and you are welcome to redistribute it under certain conditions.\n *\n * For more information, refer to the LICENSE file in this repositories root directory\n */"/>
+    </module>
+
+    <!-- Each file should end with a newline to avoid messy diff's when appending code to end of file -->
+    <module name="NewlineAtEndOfFile">
+        <property name="lineSeparator" value="lf" />
+    </module>
+
+    <!-- Checks to see if a file contains a tab character. -->
+    <module name="FileTabCharacter"/>
+
+    <!-- Checks for long source files. -->
+    <module name="FileLength"/>
+
+    <!-- Trailing spaces -->
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="message" value="Line has trailing spaces."/>
+    </module>
+
+    <!-- Space after 'for', 'if', 'while' -->
+    <module name="RegexpSingleline">
+        <property name="format" value="^\s*(for|if|while)[^ ]"/>
+        <property name="message" value="Space needed before opening parenthesis."/>
+    </module>
+
+    <!-- Space between ')' and '{' -->
+    <module name="RegexpSingleline">
+        <property name="format" value="\)\{"/>
+        <property name="message" value="Space needed between condition and block opening"/>
+    </module>
+
+    <!-- For each spacing -->
+    <module name="RegexpSingleline">
+        <property name="format" value="^\s*for \(.*?([^ ]:|:[^ ])"/>
+        <property name="message" value="Space needed around ':' character."/>
+    </module>
+
+    <!-- TreeWalker realy doesn't like Kotlin syntax, don't even bother trying to get this working -->
+    <!--module name="TreeWalker">
+        <property name="fileExtensions" value="java,kt"/>
+        <property name="tabWidth" value="4"/>
+    </module-->
+</module>
