@@ -16,7 +16,7 @@ The original theme that comes with 0.5.0-alpha4
 ### [Poppo by @pureexe ![Screenshot](img/poppo-screenshot.png)](http://ui.pogobot.club/Poppo/)
 More maps less data
 
-### [TTL55 (Poppo improved) by @JoeyyT && Source from @pureexe ![Screenshot](img/0.1.0-TTL55.png)](http://ui.pogobot.club/TTL55/)
+### [TTL55 (Poppo improved) by @JoeyyT && Source from @pureexe ![Screenshot](img/0.1.0-TTL55.png)](http://ttl55.ui.pogobot.club/)
 More REST API and more FEATURES
 
 ### [Pogobot-Builder by @shilch ![Screenshot](img/pogobot-builder.png)](https://pogo.bot-builder.xyz/)
