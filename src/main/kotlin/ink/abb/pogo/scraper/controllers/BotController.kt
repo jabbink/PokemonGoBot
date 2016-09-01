@@ -14,6 +14,7 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass
 import com.pokegoapi.api.inventory.Item
 import com.pokegoapi.api.inventory.ItemBag
 import com.pokegoapi.api.map.pokemon.EvolutionResult
+import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
 import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Context
@@ -53,19 +54,20 @@ class BotController {
         val ctx = service.getBotContext(name)
 
         if (ctx.restApiPassword.equals("")) {
-            Log.red("WARNING : REST API password isn't set. Generating one.")
+            Log.red("REST API: There is no REST API password set in the configuration for bot $name, generating one now...")
             authProvider.generateRestPassword(name)
-            return "Password generated. See in your console output"
+            return "REST API password generated for bot $name, check your console output!"
         }
 
         authProvider.generateAuthToken(name)
 
-        if (pass.equals(ctx.restApiPassword))
-            return ctx.restApiToken
-        else {
+        if (!pass.equals(ctx.restApiPassword))
+        {
             httpResponse.status = HttpServletResponse.SC_UNAUTHORIZED
-            return "Unauthorized"
+            return "Your authentication request ($pass) does not match the REST API password from the bot $name configuration!"
         }
+
+        return ctx.restApiToken
     }
 
     @RequestMapping(value = "/bot/{name}/load", method = arrayOf(RequestMethod.POST))
@@ -127,7 +129,7 @@ class BotController {
         val pokemon: Pokemon? = getPokemonById(service.getBotContext(name), id)
 
         result = pokemon!!.transferPokemon().toString()
-        Log.magenta("REST API :transferring pokemon " + pokemon.pokemonId.name + " with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ")")
+        Log.magenta("REST API: Transferring pokemon ${pokemon.pokemonId.name} with stats (${pokemon.getStatsFormatted()} CP: ${pokemon.cp})")
 
         // Update GUI
         service.getBotContext(name).server.sendPokebank()
@@ -146,15 +148,15 @@ class BotController {
 
         if (pokemon!!.candiesToEvolve > pokemon.candy) {
             httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-            result = "Not enough candies, need " + pokemon.candiesToEvolve + " but have " + pokemon.candy
+            result = "Not enough candies to evolve: ${pokemon.candy}/${pokemon.candiesToEvolve}"
         } else {
             val evolutionResult: EvolutionResult
             val evolved: Pokemon
             evolutionResult = pokemon.evolve()
             evolved = evolutionResult.evolvedPokemon
 
-            Log.magenta("REST API : evolved pokemon " + pokemon.pokemonId.name + " with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ")"
-                    + "To pokemon " + evolved.pokemonId.name + "with stats (" + evolved.getStatsFormatted() + " CP : " + evolved.cp + ")")
+            Log.magenta("REST API: Evolved pokemon ${pokemon.pokemonId.name} with stats (${pokemon.getStatsFormatted()} CP: ${pokemon.cp})"
+                    + " to pokemon ${evolved.pokemonId.name} with stats (${evolved.getStatsFormatted()} CP: ${evolved.cp})")
 
             result = evolutionResult.result.toString()
         }
@@ -176,11 +178,14 @@ class BotController {
 
         if (pokemon!!.candyCostsForPowerup > pokemon.candy) {
             httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-            result = "Not enough candies" + pokemon.candyCostsForPowerup + " " + pokemon.candy
+            result = "Not enough candies to powerup: ${pokemon.candy}/${pokemon.candyCostsForPowerup}"
+        } else if (pokemon.stardustCostsForPowerup > service.getBotContext(name).api.playerProfile.currencies.get(PlayerProfile.Currency.STARDUST)!!.toInt()) {
+            httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
+            result = "Not enough stardust to powerup: ${service.getBotContext(name).api.playerProfile.currencies.get(PlayerProfile.Currency.STARDUST)}/${pokemon.stardustCostsForPowerup}"
         } else {
-            Log.magenta("REST API : powering up pokemon " + pokemon.pokemonId.name + "with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ")")
+            Log.magenta("REST API: Powering up pokemon ${pokemon.pokemonId.name} with stats (${pokemon.getStatsFormatted()} CP: ${pokemon.cp})")
             result = pokemon.powerUp().toString()
-            Log.magenta("REST API : pokemon new CP " + pokemon.cp)
+            Log.magenta("REST API: Pokemon new CP ${pokemon.cp}")
         }
 
         // Update GUI
@@ -199,8 +204,8 @@ class BotController {
 
         result = pokemon!!.setFavoritePokemon(!pokemon.isFavorite).toString()
         when (pokemon.isFavorite) {
-            true -> Log.magenta("REST API : pokemon " + pokemon.pokemonId.name + "with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ") is favorited")
-            false -> Log.magenta("REST API : pokemon " + pokemon.pokemonId.name + "with stats (" + pokemon.getStatsFormatted() + " CP : " + pokemon.cp + ") is now unfavorited")
+            true -> Log.magenta("REST API: pokemon ${pokemon.pokemonId.name} with stats (${pokemon.getStatsFormatted()} CP: ${pokemon.cp}) is favorited")
+            false -> Log.magenta("REST API: pokemon ${pokemon.pokemonId.name} with stats (${pokemon.getStatsFormatted()} CP: ${pokemon.cp}) is now unfavorited")
         }
 
         // Update GUI
@@ -245,9 +250,9 @@ class BotController {
 
         if (quantity > item!!.count) {
             httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-            return "Not enough items to drop " + item.count
+            return "Not enough items to drop ${item.count}"
         } else {
-            Log.magenta("REST API : dropping " + quantity + " " + item.itemId.name)
+            Log.magenta("REST API: Dropping ${quantity} ${item.itemId.name}")
             return itemBag.removeItem(item.itemId, quantity).toString()
         }
     }
