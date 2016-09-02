@@ -36,7 +36,7 @@ data class Context(
         val pokemonInventoryFullStatus: AtomicBoolean = AtomicBoolean(false),
 
         var restApiPassword: String,
-        //var s2Cache: MutableMap<String, Double>,
+        var s2Cache: MutableMap<String, Double>,
         var restApiToken: String = "",
 
         val walking: AtomicBoolean = AtomicBoolean(false),

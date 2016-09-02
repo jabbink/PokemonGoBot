@@ -10,7 +10,6 @@ package ink.abb.pogo.scraper.tasks
 
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass
 import ink.abb.pogo.api.request.CheckAwardedBadges
-import ink.abb.pogo.api.request.EquipBadge
 import ink.abb.pogo.api.request.GetInventory
 import ink.abb.pogo.api.request.LevelUpRewards
 import ink.abb.pogo.scraper.*
@@ -23,7 +22,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 class UpdateProfile : Task {
-    var lastLevelCheck: Int = 1
+    var lastLevelCheck: Int = 0
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         bot.api.queueRequest(GetInventory().withLastTimestampMs(0)).subscribe {
@@ -67,10 +66,15 @@ class UpdateProfile : Task {
             ctx.server.sendProfile()
         }
 
-        for (i in lastLevelCheck..bot.api.inventory.playerStats.level) {
+        for (i in (lastLevelCheck + 1)..bot.api.inventory.playerStats.level) {
+            Log.magenta("Accepting rewards for level $i...")
             bot.api.queueRequest(LevelUpRewards().withLevel(i)).subscribe {
                 val result = it.response
                 if (result.result == LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.Result.AWARDED_ALREADY) {
+                    Log.magenta("Already accepted awards for level ${i}, updating $lastLevelCheck = $i")
+                    if (i > lastLevelCheck) {
+                        lastLevelCheck = i
+                    }
                     return@subscribe
                 }
 
@@ -102,9 +106,9 @@ class UpdateProfile : Task {
             val result = it.response
             result.awardedBadgesList.forEach {
                 // TODO: Does not work?!
-                bot.api.queueRequest(EquipBadge().withBadgeType(it)).subscribe {
+                /*bot.api.queueRequest(EquipBadge().withBadgeType(it)).subscribe {
                     println(it.response.toString())
-                }
+                }*/
             }
         }
     }

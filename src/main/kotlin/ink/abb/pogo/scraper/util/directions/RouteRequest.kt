@@ -71,7 +71,7 @@ fun isValidRouteProvider(routeName: String): Boolean {
     }
 }
 
-/*fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
+fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
     val rand = (Math.random() * 3) + 1
     val cellId = S2CellId.fromLatLng(S2LatLng.fromDegrees(latitude, longitude)).parent(15).id().toString()
     var elevation = 10.0
@@ -138,4 +138,4 @@ fun isValidRouteProvider(routeName: String): Boolean {
     }
 
     return elevation + rand
-}*/
+}

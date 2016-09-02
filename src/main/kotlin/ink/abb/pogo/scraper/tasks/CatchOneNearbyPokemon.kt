@@ -18,6 +18,7 @@ import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.pokemon.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -48,7 +49,7 @@ class CatchOneNearbyPokemon : Task {
             }
             Log.green("Found pokemon ${catchablePokemon.pokemonId}")
 
-            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get())
+            ctx.api.setLocation(ctx.lat.get(), ctx.lng.get(), getAltitude(ctx.lat.get(), ctx.lng.get(), ctx))
 
             val encounter = catchablePokemon.encounter()
             val encounterResult = encounter.toBlocking().first().response

@@ -38,12 +38,12 @@ class Bot(val api: PoGoApi, val settings: Settings) {
     private var runningLatch = CountDownLatch(0)
     var prepareWalkBack = AtomicBoolean(false)
     var walkBackLock = AtomicBoolean(true)
-    /*var altitudeCache: MutableMap<String, Double> =
+    var altitudeCache: MutableMap<String, Double> =
             try {
                 ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
             } catch (ex: Exception) {
                 mutableMapOf()
-            }*/
+            }
 
     lateinit private var phaser: Phaser
     var ctx = Context(
@@ -61,7 +61,7 @@ class Bot(val api: PoGoApi, val settings: Settings) {
             SocketServer(),
             AtomicBoolean(false),
             settings.restApiPassword,
-            //altitudeCache,
+            altitudeCache,
             geoApiContext = if (settings.followStreets.contains(RouteProviderEnum.GOOGLE) && settings.googleApiKey.startsWith("AIza")) {
                 GeoApiContext().setApiKey(settings.googleApiKey)
             } else {

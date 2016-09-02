@@ -47,23 +47,24 @@ class ReleasePokemon : Task {
                         if (shouldRelease) {
                             Log.yellow("Going to transfer ${pokemon.pokemonData.pokemonId.name} with " +
                                     "CP ${pokemon.pokemonData.cp} and IV $ivPercentage%; reason: $reason")
-                            bot.api.queueRequest(ink.abb.pogo.api.request.ReleasePokemon().withPokemonId(pokemon.pokemonData.id)).subscribe {
-                                val result = it.response
+                            val result = bot.api.queueRequest(ink.abb.pogo.api.request.ReleasePokemon().withPokemonId(pokemon.pokemonData.id)).toBlocking().first().response
 
-                                if (result.result == Result.SUCCESS) {
-                                    if (ctx.pokemonInventoryFullStatus.get()) {
-                                        // Just released a pokemon so the inventory is not full anymore
-                                        ctx.pokemonInventoryFullStatus.set(false)
-                                        if (settings.catchPokemon)
-                                            Log.green("Inventory freed, enabling catching of pokemon")
-                                    }
-                                    ctx.pokemonStats.second.andIncrement
-                                    ctx.server.releasePokemon(pokemon.pokemonData.id)
-                                    ctx.server.sendProfile()
-                                } else {
-                                    Log.red("Failed to transfer ${pokemon.pokemonData.pokemonId.name}: ${result.result}")
+                            if (result.result == Result.SUCCESS) {
+                                Log.green("Successfully transfered ${pokemon.pokemonData.pokemonId.name} with " +
+                                        "CP ${pokemon.pokemonData.cp} and IV $ivPercentage%")
+                                if (ctx.pokemonInventoryFullStatus.get()) {
+                                    // Just released a pokemon so the inventory is not full anymore
+                                    ctx.pokemonInventoryFullStatus.set(false)
+                                    if (settings.catchPokemon)
+                                        Log.green("Inventory freed, enabling catching of pokemon")
                                 }
+                                ctx.pokemonStats.second.andIncrement
+                                ctx.server.releasePokemon(pokemon.pokemonData.id)
+                                ctx.server.sendProfile()
+                            } else {
+                                Log.red("Failed to transfer ${pokemon.pokemonData.pokemonId.name}: ${result.result}")
                             }
+
                         }
                     }
                 }
