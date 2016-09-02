@@ -20,10 +20,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
-import java.net.Proxy
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
-
 
 @SpringBootApplication
 open class PokemonGoBotApplication {
@@ -62,7 +60,6 @@ open class PokemonGoBotApplication {
         }
     }
 
-
     @Component
     open class BotRunner : CommandLineRunner {
         @Autowired
@@ -71,18 +68,17 @@ open class PokemonGoBotApplication {
         @Autowired
         lateinit var botRunService: BotService
 
-
-
         override fun run(vararg args: String?) {
-            val names = botRunService.getSaveNames()
-            if (names.size < 1) {
+            val JSONConfigBotNames = botRunService.getJSONConfigBotNames()
+
+            if (JSONConfigBotNames.size < 1) {
                 thread(name = "default") {
                     startDefaultBot(http, botRunService)
                 }
             } else {
-                names.forEach {
+                JSONConfigBotNames.forEach {
                     thread(name = it) {
-                        botRunService.submitBot(botRunService.load(it))
+                        botRunService.submitBot(it)
                     }
                 }
             }

@@ -30,7 +30,6 @@ class SettingsParser(val properties: Properties) {
         val defaults = Settings(name = "", credentials = GoogleCredentials(), latitude = 0.0, longitude = 0.0)
         val dropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.dropItems, String::toBoolean)
 
-
         return Settings(
                 name = "default",
                 profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
