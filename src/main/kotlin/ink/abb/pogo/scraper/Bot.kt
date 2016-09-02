@@ -16,13 +16,13 @@ import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
-import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
 import ink.abb.pogo.scraper.util.inventory.size
+import ink.abb.pogo.scraper.util.io.SettingsJSONWriter
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.io.File
@@ -244,11 +244,16 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     @Synchronized
     fun stop() {
         if (!isRunning()) return
+
         if (settings.saveLocationOnShutdown) {
             Log.normal("Saving current location (${ctx.lat.get()}, ${ctx.lng.get()})")
             settings.savedLatitude = ctx.lat.get()
             settings.savedLongitude = ctx.lng.get()
         }
+
+        val settingsJSONWriter = SettingsJSONWriter()
+        settingsJSONWriter.save(settings)
+
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
@@ -297,10 +302,4 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         }
         return false
     }
-
-    fun terminateApplication() {
-        phaser.forceTermination()
-        ProgramController.stopAllApplications()
-    }
-
 }

@@ -77,10 +77,7 @@ class BotController {
     fun loadBot(@PathVariable name: String): Settings {
         Log.magenta("REST API: Load bot $name")
 
-        val settings = service.load(name)
-        service.submitBot(settings)
-
-        return settings
+        return service.submitBot(name)
     }
 
     @RequestMapping(value = "/bot/{name}/unload", method = arrayOf(RequestMethod.POST))
