@@ -233,7 +233,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
 
     // The speed changes always in the desired range, meaning if you already have a low speed and it goes lower, it will change less
     private fun randomizeSpeed(speed : Double, speedRange: Double, ctx: Context): Double {
-        if(speedRange > speed){
+        if (speedRange > speed) {
             return speed
         }
         var speedDiff: Double = 0.0
@@ -242,12 +242,11 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         // random value between -1 and  +1. There is always a 50:50 chance it will be slower or faster
         // The speedChange is now twice math.random so that it prefers small/slow acceleration, but has still a low chance of abruptly changing (like a human)
         val speedChangeNormalized = (Math.random()*2 -1)*Math.random()
-        if(speedChangeNormalized > 0){
+        if (speedChangeNormalized > 0) {
             speedDiff = maxSpeed - ctx.walkingSpeed.toDouble()
-        } else if(speedChangeNormalized < 0){
+        } else if (speedChangeNormalized < 0) {
             speedDiff = ctx.walkingSpeed.toDouble() - minSpeed
         }
         return ctx.walkingSpeed.toDouble() + speedChangeNormalized*speedDiff
-
     }
 }

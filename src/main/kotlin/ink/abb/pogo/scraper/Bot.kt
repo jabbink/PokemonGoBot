@@ -16,13 +16,13 @@ import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.fort.Pokestop
 import com.pokegoapi.api.player.PlayerProfile
 import com.pokegoapi.api.pokemon.Pokemon
-import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
 import ink.abb.pogo.scraper.util.inventory.size
+import ink.abb.pogo.scraper.util.io.SettingsJSONWriter
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.io.File
@@ -183,7 +183,7 @@ class Bot(val api: PokemonGo, val settings: Settings) {
                 task(process)
             else if (!ctx.walking.get())
                 task(WalkToStartPokestop(process.startPokestop as Pokestop))
-            if(checkForPlannedStop()){
+            if (checkForPlannedStop()) {
                 stop()
             }
         }
@@ -244,11 +244,16 @@ class Bot(val api: PokemonGo, val settings: Settings) {
     @Synchronized
     fun stop() {
         if (!isRunning()) return
+
         if (settings.saveLocationOnShutdown) {
             Log.normal("Saving current location (${ctx.lat.get()}, ${ctx.lng.get()})")
             settings.savedLatitude = ctx.lat.get()
             settings.savedLongitude = ctx.lng.get()
         }
+
+        val settingsJSONWriter = SettingsJSONWriter()
+        settingsJSONWriter.save(settings)
+
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
@@ -285,22 +290,16 @@ class Bot(val api: PokemonGo, val settings: Settings) {
         val pokemonCatched:Int = ctx.pokemonStats.first.get()
         val pokestopsVisited:Int = ctx.pokestops.get()
         //Log.red("time: ${timeDiff}, pokemon: ${pokemonCatched}, pokestops: ${pokestopsVisited}")
-        if(settings.botTimeoutAfterMinutes <= timeDiff && settings.botTimeoutAfterMinutes != -1){
+        if (settings.botTimeoutAfterMinutes <= timeDiff && settings.botTimeoutAfterMinutes != -1) {
             Log.red("Bot timed out as declared in the settings (after ${settings.botTimeoutAfterMinutes} minutes)")
             return true
-        } else if(settings.botTimeoutAfterCatchingPokemon <= pokemonCatched && settings.botTimeoutAfterCatchingPokemon != -1){
+        } else if (settings.botTimeoutAfterCatchingPokemon <= pokemonCatched && settings.botTimeoutAfterCatchingPokemon != -1) {
             Log.red("Bot timed out as declared in the settings (after catching ${settings.botTimeoutAfterCatchingPokemon} pokemon)")
             return true
-        } else if(settings.botTimeoutAfterVisitingPokestops <= pokestopsVisited && settings.botTimeoutAfterVisitingPokestops != -1){
+        } else if (settings.botTimeoutAfterVisitingPokestops <= pokestopsVisited && settings.botTimeoutAfterVisitingPokestops != -1) {
             Log.red("Bot timed out as declared in the settings (after visiting ${settings.botTimeoutAfterVisitingPokestops} pokestops)")
             return true
         }
         return false
     }
-
-    fun terminateApplication(){
-        phaser.forceTermination()
-        ProgramController.stopAllApplications()
-    }
-
 }
