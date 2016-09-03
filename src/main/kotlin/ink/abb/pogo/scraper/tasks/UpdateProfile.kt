@@ -117,8 +117,8 @@ class UpdateProfile : Task {
         } catch (e: Exception) {
             Log.red("Failed to update profile and inventories")
         }
-        if(ctx.api.playerProfile.playerData.team==TeamColor.NEUTRAL && ctx.api.playerProfile.stats.level>=5) {
-            if(settings.autoTeam.toUpperCase().equals("RED") || settings.autoTeam.toUpperCase().equals("BLUE") || settings.autoTeam.toUpperCase().equals("YELLOW")) {
+        if (ctx.api.playerProfile.playerData.team==TeamColor.NEUTRAL && ctx.api.playerProfile.stats.level>=5) {
+            if (settings.autoTeam.toUpperCase().equals("RED") || settings.autoTeam.toUpperCase().equals("BLUE") || settings.autoTeam.toUpperCase().equals("YELLOW")) {
                 val msg = SetPlayerTeamMessage.newBuilder().setTeam(TeamColor.valueOf(settings.autoTeam.toUpperCase())).build()
                 val req = ServerRequest(RequestType.SET_PLAYER_TEAM, msg)
                 ctx.api.getRequestHandler().sendServerRequests(req)
@@ -131,7 +131,7 @@ class UpdateProfile : Task {
                         Log.red("An error occured when trying to set your team")
                     }
                 } catch (e : InvalidProtocolBufferException) {
-	        }
+                }
             }
             else if(!settings.autoTeam.toUpperCase().equals("NEUTRAL")) {
                 Log.red("Unknow team in the config file!")
