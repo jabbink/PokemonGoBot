@@ -49,6 +49,11 @@ class ReleasePokemon : Task {
                                     "CP ${pokemon.pokemonData.cp} and IV $ivPercentage%; reason: $reason")
                             val result = bot.api.queueRequest(ink.abb.pogo.api.request.ReleasePokemon().withPokemonId(pokemon.pokemonData.id)).toBlocking().first().response
 
+                            if (settings.autotransferTimeDelay != (-1).toLong()) {
+                                val transferWaitTime = settings.autotransferTimeDelay / 2 + (Math.random() * settings.autotransferTimeDelay).toLong()
+                                Thread.sleep(transferWaitTime)
+                            }
+
                             if (result.result == Result.SUCCESS) {
                                 Log.green("Successfully transfered ${pokemon.pokemonData.pokemonId.name} with " +
                                         "CP ${pokemon.pokemonData.cp} and IV $ivPercentage%")
