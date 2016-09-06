@@ -71,6 +71,13 @@ class EvolvePokemon : Task {
                         Log.yellow("Evolving ${pokemonData.pokemonId.name} CP ${pokemonData.cp} IV ${pokemonData.getIvPercentage()}%")
                         val evolve = EvolvePokemon().withPokemonId(it.key)
                         val evolveResult = ctx.api.queueRequest(evolve).toBlocking().first().response
+
+                        if (settings.evolveTimeDelay > 300) {
+                            Thread.sleep(settings.evolveTimeDelay / 2 + (Math.random() * settings.evolveTimeDelay).toLong())
+                        } else {
+                            Thread.sleep(300)
+                        }
+
                         if (evolveResult.result == EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result.SUCCESS) {
                             countEvolved++
                             val evolvedPokemon = evolveResult.evolvedPokemonData
@@ -79,7 +86,6 @@ class EvolvePokemon : Task {
                         } else {
                             Log.red("Evolve of ${pokemonData.pokemonId.name} CP ${pokemonData.cp} IV ${pokemonData.getIvPercentage()}% failed: ${evolveResult.result.toString()}")
                         }
-
                     } else {
                         Log.red("Not enough candy (${bot.api.inventory.candies.getOrPut(pokemonMeta.family, { AtomicInteger(0) }).get()}/${pokemonMeta.candyToEvolve}) to evolve ${it.value.pokemonData.pokemonId.name} CP ${it.value.pokemonData.cp} IV ${it.value.pokemonData.getIvPercentage()}%")
                     }

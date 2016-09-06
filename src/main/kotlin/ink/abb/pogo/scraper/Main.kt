@@ -14,7 +14,6 @@ import ink.abb.pogo.api.auth.GoogleAutoCredentialProvider
 import ink.abb.pogo.api.auth.PtcCredentialProvider
 import ink.abb.pogo.api.request.GetPlayerProfile
 import ink.abb.pogo.api.util.SystemTimeImpl
-import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.services.BotService
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
@@ -56,8 +55,7 @@ fun getAuth(settings: Settings, http: OkHttpClient): CredentialProvider {
 fun main(args: Array<String>) {
     LogManager.getLogManager().reset()
     //com.pokegoapi.util.Log.setLevel(com.pokegoapi.util.Log.Level.NONE)
-    val pokemonGoBotApplication: ConfigurableApplicationContext = SpringApplication.run(PokemonGoBotApplication::class.java, *args)
-    ProgramController.addApplication(pokemonGoBotApplication)
+    SpringApplication.run(PokemonGoBotApplication::class.java, *args)
 }
 
 fun loadProperties(filename: String): Properties {
@@ -126,7 +124,7 @@ fun startBot(settings: Settings, http: OkHttpClient): Bot {
     var proxyHttp: OkHttpClient? = null
 
     if (!settings.proxyServer.equals("") && settings.proxyPort > 0) {
-        Log.normal("Setting up proxy server for bot " + settings.name + ": " + settings.proxyServer + ":" + settings.proxyPort)
+        Log.normal("Setting up proxy server for bot ${settings.name}: ${settings.proxyServer}:${settings.proxyPort}")
 
         val proxyType: Proxy.Type
         if (settings.proxyType.equals("HTTP"))
@@ -145,7 +143,6 @@ fun startBot(settings: Settings, http: OkHttpClient): Bot {
                 }
                 .build()
     }
-
 
     Log.normal("Logging in to game server...")
 
@@ -175,7 +172,6 @@ fun startBot(settings: Settings, http: OkHttpClient): Bot {
     Thread.sleep(1000)
 
     val bot = Bot(api, settings)
-
     bot.start()
 
     return bot

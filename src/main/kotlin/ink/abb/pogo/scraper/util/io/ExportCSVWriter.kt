@@ -13,7 +13,7 @@ import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.util.*
 
-class CSVWriter(val filename: String = "export.csv", val delimiter: String = ",") {
+class ExportCSVWriter(val filename: String = "export.csv", val delimiter: String = ",") {
     fun write(profile: Map<String, String>, eggs: ArrayList<Map<String, String>>, items: ArrayList<Map<String, String>>, pokemons: ArrayList<Map<String, String>>) {
         // UTF-8 with BOM to fix borked UTF-8 chars in MS Excel (for nickname output)
         // https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
