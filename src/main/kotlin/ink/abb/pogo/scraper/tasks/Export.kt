@@ -23,8 +23,8 @@ import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.inventory.size
-import ink.abb.pogo.scraper.util.io.CSVWriter
-import ink.abb.pogo.scraper.util.io.JSONWriter
+import ink.abb.pogo.scraper.util.io.ExportCSVWriter
+import ink.abb.pogo.scraper.util.io.ExportJSONWriter
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.text.SimpleDateFormat
@@ -170,22 +170,22 @@ class Export : Task {
 
             when (settings.export) {
                 "CSV" -> {
-                    val filename = "export_" + settings.name + ".csv"
-                    val writer = CSVWriter(filename)
+                    val filename = "export_${settings.name}.csv"
+                    val writer = ExportCSVWriter(filename)
                     writer.write(profile, eggs, items, pokemons)
 
                     Log.normal("Wrote export $filename.")
                 }
                 "DSV" -> {
-                    val filename = "export_" + settings.name + ".csv"
-                    val writer = CSVWriter(filename, ";")
+                    val filename = "export_${settings.name}.csv"
+                    val writer = ExportCSVWriter(filename, ";")
                     writer.write(profile, eggs, items, pokemons)
 
                     Log.normal("Wrote export $filename.")
                 }
                 "JSON" -> {
-                    val filename = "export_" + settings.name + ".json"
-                    val writer = JSONWriter(filename)
+                    val filename = "export_${settings.name}.json"
+                    val writer = ExportJSONWriter(filename)
                     writer.write(profile, eggs, items, pokemons)
 
                     Log.normal("Wrote export $filename.")
@@ -195,7 +195,7 @@ class Export : Task {
                 }
             }
         } catch (e: Exception) {
-            Log.red("Error writing export: " + e.message)
+            Log.red("Error writing export: ${e.message}")
         }
     }
 
@@ -212,6 +212,6 @@ class Export : Task {
     // Don't concat 2nd pokemon type "NONE"
     private fun formatType(type1: String, type2: String): String {
         if (type2.equals("NONE")) return type1
-        return type1 + "/" + type2
+        return "$type1/$type2"
     }
 }
