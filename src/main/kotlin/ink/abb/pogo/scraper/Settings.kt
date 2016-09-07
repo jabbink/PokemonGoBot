@@ -1,4 +1,4 @@
-/**
+/*
  * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
@@ -29,6 +29,7 @@ class SettingsParser(val properties: Properties) {
     fun createSettingsFromProperties(): Settings {
         val defaults = Settings(name = "", credentials = GoogleCredentials(), latitude = 0.0, longitude = 0.0)
         val dropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.dropItems, String::toBoolean)
+
 
         return Settings(
                 name = "default",

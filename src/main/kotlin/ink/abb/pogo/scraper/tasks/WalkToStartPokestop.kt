@@ -1,4 +1,4 @@
-/**
+/*
  * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
@@ -23,6 +23,7 @@ class WalkToStartPokestop(val startPokeStop: Pokestop) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
         if (settings.followStreets.isNotEmpty()) walkRoute(bot, ctx, settings)
         else walk(bot, ctx, settings)
+
     }
 
     fun walk(bot: Bot, ctx: Context, settings: Settings) {
