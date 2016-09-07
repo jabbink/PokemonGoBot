@@ -1,4 +1,4 @@
-/**
+/*
  * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
@@ -7,6 +7,7 @@
  */
 
 package ink.abb.pogo.scraper.controllers
+
 
 import POGOProtos.Data.PokedexEntryOuterClass
 import POGOProtos.Enums.PokemonIdOuterClass
@@ -27,12 +28,10 @@ import ink.abb.pogo.scraper.util.data.*
 import ink.abb.pogo.scraper.util.pokemon.candyCostsForPowerup
 import ink.abb.pogo.scraper.util.pokemon.getStatsFormatted
 import ink.abb.pogo.scraper.util.pokemon.meta
-import ink.abb.pogo.scraper.util.pokemon.stardustCostsForPowerup
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
-import javax.servlet.http.HttpServletResponse
 
 @RestController
 @CrossOrigin
@@ -53,42 +52,34 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/auth", method = arrayOf(RequestMethod.POST))
     fun auth(
             @PathVariable name: String,
-            @RequestBody pass: String,
-            httpResponse: HttpServletResponse
+            @RequestBody pass: String
     ): String {
+
         val ctx = service.getBotContext(name)
 
         if (ctx.restApiPassword.equals("")) {
-            Log.red("REST API: There is no REST API password set in the configuration for bot $name, generating one now...")
-
+            Log.red("WARNING : REST API password isn't set. Generating one.")
             authProvider.generateRestPassword(name)
-
-            return "REST API password generated for bot $name, check your console output!"
+            return "Password generated. See in your console output"
         }
 
         authProvider.generateAuthToken(name)
 
-        if (!pass.equals(ctx.restApiPassword))
-        {
-            httpResponse.status = HttpServletResponse.SC_UNAUTHORIZED
-
-            return "Your authentication request ($pass) does not match the REST API password from the bot $name configuration!"
-        }
-
-        return ctx.restApiToken
+        if (pass.equals(ctx.restApiPassword))
+            return ctx.restApiToken
+        else
+            return "Unauthorized"
     }
 
     @RequestMapping(value = "/bot/{name}/load", method = arrayOf(RequestMethod.POST))
     fun loadBot(@PathVariable name: String): Settings {
-        Log.magenta("REST API: Load bot $name")
-
-        return service.submitBot(name)
+        val settings = service.load(name)
+        service.submitBot(settings)
+        return settings
     }
 
     @RequestMapping(value = "/bot/{name}/unload", method = arrayOf(RequestMethod.POST))
     fun unloadBot(@PathVariable name: String): String {
-        Log.magenta("REST API: Unload bot $name")
-
         return service.doWithBot(name) {
             it.stop()
             service.removeBot(it)
@@ -97,8 +88,6 @@ class BotController {
 
     @RequestMapping(value = "/bot/{name}/reload", method = arrayOf(RequestMethod.POST))
     fun reloadBot(@PathVariable name: String): Settings {
-        Log.magenta("REST API: Reload bot $name")
-
         if (unloadBot(name).equals("false")) // return default settings
             return Settings(
                     credentials = GoogleAutoCredentials(),
@@ -111,15 +100,11 @@ class BotController {
 
     @RequestMapping(value = "/bot/{name}/start", method = arrayOf(RequestMethod.POST))
     fun startBot(@PathVariable name: String): String {
-        Log.magenta("REST API: Starting bot $name")
-
         return service.doWithBot(name) { it.start() }.toString()
     }
 
     @RequestMapping(value = "/bot/{name}/stop", method = arrayOf(RequestMethod.POST))
     fun stopBot(@PathVariable name: String): String {
-        Log.magenta("REST API: Stopping bot $name")
-
         return service.doWithBot(name) { it.stop() }.toString()
     }
 
@@ -139,7 +124,7 @@ class BotController {
         val pokemon: BagPokemon? = getPokemonById(service.getBotContext(name), id)
 
         val release = ReleasePokemon().withPokemonId(pokemon!!.pokemonData.id)
-        Log.magenta("REST API: Transferring pokemon ${pokemon.pokemonData.pokemonId.name} with stats (${pokemon.pokemonData.getStatsFormatted()} CP: ${pokemon.pokemonData.cp})")
+        Log.magenta("REST API :transferring pokemon " + pokemon.pokemonData.pokemonId.name + " with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ")")
 
         val result = service.getBotContext(name).api.queueRequest(release).toBlocking().first().response
 
@@ -152,8 +137,7 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/evolve", method = arrayOf(RequestMethod.POST))
     fun evolvePokemon(
             @PathVariable name: String,
-            @PathVariable id: Long,
-            httpResponse: HttpServletResponse
+            @PathVariable id: Long
     ): String {
         val result: String
         val pokemon: BagPokemon? = getPokemonById(service.getBotContext(name), id)
@@ -162,16 +146,14 @@ class BotController {
         val candy = service.getBotContext(name).api.inventory.candies.getOrPut(pokemon.pokemonData.meta.family, { AtomicInteger(0) }).get()
 
         if (requiredCandy > candy) {
-            httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-
-            result = "Not enough candies to evolve: $candy/$requiredCandy"
+            result = "Not enough candies $requiredCandy > $candy"
         } else {
             val evolve = EvolvePokemon().withPokemonId(pokemon.pokemonData.id)
             val evolutionResult = service.getBotContext(name).api.queueRequest(evolve).toBlocking().first().response
             val evolved = evolutionResult.evolvedPokemonData
 
-            Log.magenta("REST API: Evolved pokemon ${pokemon.pokemonData.pokemonId.name} with stats (${pokemon.pokemonData.getStatsFormatted()} CP: ${pokemon.pokemonData.cp})"
-                    + " to pokemon ${evolved.pokemonId.name} with stats (${evolved.getStatsFormatted()} CP: ${evolved.cp})")
+            Log.magenta("REST API : evolved pokemon " + pokemon.pokemonData.pokemonId.name + " with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ")"
+                    + "To pokemon " + evolved.pokemonId.name + "with stats (" + evolved.getStatsFormatted() + " CP : " + evolved.cp + ")")
 
             result = evolutionResult.result.toString()
         }
@@ -185,29 +167,20 @@ class BotController {
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/powerup", method = arrayOf(RequestMethod.POST))
     fun powerUpPokemon(
             @PathVariable name: String,
-            @PathVariable id: Long,
-            httpResponse: HttpServletResponse
+            @PathVariable id: Long
     ): String {
-        val result: String
+
         val pokemon = getPokemonById(service.getBotContext(name), id)
 
         val candy = service.getBotContext(name).api.inventory.candies.getOrPut(pokemon!!.pokemonData.meta.family, { AtomicInteger(0) }).get()
-        val stardust = service.getBotContext(name).api.inventory.currencies.getOrPut("STARDUST", { AtomicInteger(0) }).get()
-        if (pokemon.pokemonData.candyCostsForPowerup > candy) {
-            httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-
-            result = "Not enough candies to powerup: $candy/${pokemon.pokemonData.candyCostsForPowerup}"
-        } else if (pokemon.pokemonData.stardustCostsForPowerup > stardust) {
-            httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-
-            result = "Not enough stardust to powerup: $stardust/${pokemon.pokemonData.stardustCostsForPowerup}"
+        val result = if (pokemon.pokemonData.candyCostsForPowerup > candy) {
+            "Not enough candies" + pokemon.pokemonData.candyCostsForPowerup + " " + candy
         } else {
-            Log.magenta("REST API: Powering up pokemon ${pokemon.pokemonData.pokemonId.name} with stats (${pokemon.pokemonData.getStatsFormatted()} CP: ${pokemon.pokemonData.cp})")
-
+            Log.magenta("REST API : powering up pokemon " + pokemon.pokemonData.pokemonId.name + "with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ")")
             val upgrade = UpgradePokemon().withPokemonId(pokemon.pokemonData.id)
 
-            Log.magenta("REST API: Pokemon new CP ${pokemon.pokemonData.cp}")
-            result = service.getBotContext(name).api.queueRequest(upgrade).toBlocking().first().response.result.toString()
+            Log.magenta("REST API : pokemon new CP " + pokemon.pokemonData.cp)
+            service.getBotContext(name).api.queueRequest(upgrade).toBlocking().first().response.result.toString()
         }
 
         // Update GUI
@@ -227,8 +200,8 @@ class BotController {
         val result = service.getBotContext(name).api.queueRequest(setFav).toBlocking().first().response.result
         if (result == SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse.Result.SUCCESS) {
             when (pokemon.pokemonData.favorite > 0) {
-                false -> Log.magenta("REST API: Pokemon ${pokemon.pokemonData.pokemonId.name} with stats (${pokemon.pokemonData.getStatsFormatted()} CP: ${pokemon.pokemonData.cp}) is favorited")
-                true -> Log.magenta("REST API: Pokemon ${pokemon.pokemonData.pokemonId.name} with stats (${pokemon.pokemonData.getStatsFormatted()} CP: ${pokemon.pokemonData.cp}) is now unfavorited")
+                false -> Log.magenta("REST API : pokemon " + pokemon.pokemonData.pokemonId.name + "with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ") is favorited")
+                true -> Log.magenta("REST API : pokemon " + pokemon.pokemonData.pokemonId.name + "with stats (" + pokemon.pokemonData.getStatsFormatted() + " CP : " + pokemon.pokemonData.cp + ") is now unfavorited")
             }
         }
 
@@ -248,8 +221,6 @@ class BotController {
         val rename = NicknamePokemon().withNickname(newName).withPokemonId(pokemon!!.pokemonData.id)
         val result = service.getBotContext(name).api.queueRequest(rename).toBlocking().first().response.result.toString()
 
-        Log.magenta("REST API: Renamed pokemon ${pokemon.pokemonData.pokemonId.name} with stats (${pokemon.pokemonData.getStatsFormatted()} CP: ${pokemon.pokemonData.cp}) to $newName")
-
         return result
     }
 
@@ -265,19 +236,15 @@ class BotController {
     fun dropItem(
             @PathVariable name: String,
             @PathVariable id: Int,
-            @PathVariable quantity: Int,
-            httpResponse: HttpServletResponse
+            @PathVariable quantity: Int
     ): String {
         val itemBag = service.getBotContext(name).api.inventory.items
         val itemId = ItemIdOuterClass.ItemId.forNumber(id)
         val item = itemBag.getOrPut(itemId, { AtomicInteger(0) })
         if (quantity > item.get()) {
-            httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-
-            return "Not enough items to drop ${item.get()}"
+            return "Not enough items to drop " + item.get()
         } else {
-            Log.magenta("REST API: Dropping $quantity ${itemId.name}")
-
+            Log.magenta("REST API : dropping " + quantity + " " + itemId.name)
             val recycle = RecycleInventoryItem().withCount(quantity).withItemId(itemId)
             val result = service.getBotContext(name).api.queueRequest(recycle).toBlocking().first().response.result.toString()
 
@@ -286,44 +253,28 @@ class BotController {
     }
 
     @RequestMapping(value = "/bot/{name}/useIncense", method = arrayOf(RequestMethod.POST))
-    fun useIncense(
-            @PathVariable name: String,
-            httpResponse: HttpServletResponse
-    ): String {
+    fun useIncense(@PathVariable name: String): String {
         val itemBag = service.getBotContext(name).api.inventory.items
         val count = itemBag.getOrPut(ItemIdOuterClass.ItemId.ITEM_INCENSE_ORDINARY, { AtomicInteger(0) }).get()
-
         if (count == 0) {
-            httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-
-            return "Not enough incenses"
+            return "Not enough incense"
         } else {
             val useIncense = UseIncense().withIncenseType(ItemIdOuterClass.ItemId.ITEM_INCENSE_ORDINARY)
             val result = service.getBotContext(name).api.queueRequest(useIncense).toBlocking().first().response.result.toString()
-
-            Log.magenta("REST API: Used incense")
 
             return result
         }
     }
 
     @RequestMapping(value = "/bot/{name}/useLuckyEgg", method = arrayOf(RequestMethod.POST))
-    fun useLuckyEgg(
-            @PathVariable name: String,
-            httpResponse: HttpServletResponse
-    ): String {
+    fun useLuckyEgg(@PathVariable name: String): String {
         val itemBag = service.getBotContext(name).api.inventory.items
         val count = itemBag.getOrPut(ItemIdOuterClass.ItemId.ITEM_LUCKY_EGG, { AtomicInteger(0) }).get()
-
         if (count == 0) {
-            httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-
             return "Not enough lucky eggs"
         } else {
             val useEgg = UseItemXpBoost().withItemId(ItemIdOuterClass.ItemId.ITEM_LUCKY_EGG)
             val result = service.getBotContext(name).api.queueRequest(useEgg).toBlocking().first().response.result.toString()
-
-            Log.magenta("REST API: Used lucky egg")
 
             return result
         }
@@ -341,22 +292,18 @@ class BotController {
     fun changeLocation(
             @PathVariable name: String,
             @PathVariable latitude: Double,
-            @PathVariable longitude: Double,
-            httpResponse: HttpServletResponse
+            @PathVariable longitude: Double
     ): String {
+
         val ctx: Context = service.getBotContext(name)
 
         if (!latitude.isNaN() && !longitude.isNaN()) {
             ctx.server.coordinatesToGoTo.add(S2LatLng.fromDegrees(latitude, longitude))
-
-            Log.magenta("REST API: Added ToGoTo coordinates $latitude $longitude")
-
             return "SUCCESS"
         } else {
-            httpResponse.status = HttpServletResponse.SC_BAD_REQUEST
-
             return "FAIL"
         }
+
     }
 
     @RequestMapping(value = "/bot/{name}/profile", method = arrayOf(RequestMethod.GET))
@@ -366,10 +313,13 @@ class BotController {
 
     @RequestMapping(value = "/bot/{name}/pokedex", method = arrayOf(RequestMethod.GET))
     fun getPokedex(@PathVariable name: String): List<PokedexEntry> {
+
         val pokedex = mutableListOf<PokedexEntry>()
         val api = service.getBotContext(name).api
+        var i: Int = 1
 
-        for (i in 0..151) {
+        while (i < 151) {
+            i++
             val entry: PokedexEntryOuterClass.PokedexEntry? = api.inventory.pokedex.get(PokemonIdOuterClass.PokemonId.forNumber(i))
             entry ?: continue
 
@@ -390,4 +340,5 @@ class BotController {
     fun getPokemonById(ctx: Context, id: Long): BagPokemon? {
         return ctx.api.inventory.pokemon[id]
     }
+
 }
