@@ -30,12 +30,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         if (!ctx.walking.compareAndSet(false, true)) {
             return
         }
-
+        
         if (ctx.server.coordinatesToGoTo.size > 0) {
             val coordinates = ctx.server.coordinatesToGoTo.first()
             ctx.server.coordinatesToGoTo.removeAt(0)
+            Log.normal("Using supplied coordinate, number of remaining points : " + ctx.coordinatesToGoTo.size)
             Log.normal("Walking to ${coordinates.latDegrees()}, ${coordinates.lngDegrees()}")
-
+            
             walk(bot, ctx, settings, coordinates, settings.speed, true, null)
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {

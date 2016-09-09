@@ -137,6 +137,10 @@ class SettingsParser(val properties: Properties) {
 
                 guiPortSocket = getPropertyIfSet("Port where the socketserver should listen", "gui_port_socket", defaults.guiPortSocket, String::toInt),
 
+                gpxFile = getPropertyIfSet("GPX file that the bot will follow", "gpx_file", defaults.gpxFile, String::toString),
+
+                gpxRepeat = getPropertyIfSet("Number of time that the GPX file will be repeated", "gpx_repeat", defaults.gpxRepeat, String::toInt),
+
                 restApiPassword = getPropertyIfSet("REST API password for the bot", "rest_api_password", defaults.restApiPassword, String::toString),
 
                 initialMapSize = getPropertyIfSet("Initial map size (S2 tiles) to fetch", "initial_map_size", defaults.initialMapSize, String::toInt),
@@ -288,6 +292,9 @@ data class Settings(
         var restApiPassword: String = "",
 
         var initialMapSize: Int = 9,
+
+        var gpxFile: String = "",
+        var gpxRepeat: Int = -1,
 
         val version: String = Settings.version,
 

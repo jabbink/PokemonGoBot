@@ -29,7 +29,6 @@ class SocketServer {
     private var ctx: Context? = null
     private var server: SocketIOServer? = null
 
-    val coordinatesToGoTo = mutableListOf<S2LatLng>()
 
     fun start(ctx: Context, port: Int) {
         val config = Configuration()

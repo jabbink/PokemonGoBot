@@ -77,6 +77,8 @@
   "evolveTimeDelay" : 300,
   "export" : "",
   "guiPortSocket" : 8001,
+  "gpxFile": "",
+  "gpxRepeat": -1,
   "initialMapSize" : 9,
   "waitChance" : 0.0,
   "waitTimeMin" : 0,
