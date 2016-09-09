@@ -22,6 +22,7 @@ apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'application'
 apply plugin: 'spring-boot'
+apply plugin: 'checkstyle'
 
 mainClassName = 'ink.abb.pogo.scraper.MainKt'
 
@@ -48,6 +49,14 @@ sourceSets {
     }
 }
 
+checkstyle {
+    toolVersion = "7.1"
+    checkstyleMain.configFile = new File(rootDir, "checkstyle.xml")
+    checkstyleMain.source = "src/main/kotlin"
+    checkstyleMain.ignoreFailures = false
+    checkstyleMain.showViolations = true
+}
+
 configurations {
     compile.exclude module: "spring-boot-starter-tomcat"
 }
@@ -55,8 +64,7 @@ configurations {
 dependencies {
     //compile files('../PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar')
 
-    // TODO: Wait for jitpack to fix itself...
-    compile 'com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:7e4d86efb6'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"

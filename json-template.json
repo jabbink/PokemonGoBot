@@ -2,6 +2,8 @@
   "latitude" : 0,
   "longitude" : 0,
   "saveLocationOnShutdown" : true,
+  "savedLatitude" : 0,
+  "savedLongitude" : 0,
   "credentials" : {
     "type" : "ptc",
     "username" : "",
@@ -20,6 +22,7 @@
   "googleApiKey" : "",
   "groupItemsByType" : false,
   "dropItems" : true,
+  "itemDropDelay" : -1,
   "uselessItems" : {
     "ITEM_REVIVE" : 20,
     "ITEM_MAX_REVIVE" : 10,
@@ -43,6 +46,7 @@
   "desiredCatchProbability" : 0.4,
   "desiredCatchProbabilityUnwanted" : 0.0,
   "autotransfer" : true,
+  "autotransferTimeDelay" : -1,
   "randomBallThrows" : false,
   "waitBetweenThrows" : false,
   "keepPokemonAmount" : 1,
@@ -67,8 +71,10 @@
   "ignoredPokemon" : [ "EEVEE", "MEWTWO", "CHARMANDER" ],
   "obligatoryTransfer" : [ "DODUO", "RATTATA", "CATERPIE", "PIDGEY" ],
   "evolveBeforeTransfer" : [ "CATERPIE", "RATTATA", "WEEDLE", "PIDGEY" ],
+  "neverCatchPokemon" : [],
   "evolveStackLimit" : 100,
   "useLuckyEgg" : 1,
+  "evolveTimeDelay" : 300,
   "export" : "",
   "guiPortSocket" : 8001,
   "gpxFile": "",
@@ -76,5 +82,9 @@
   "initialMapSize" : 9,
   "waitChance" : 0.0,
   "waitTimeMin" : 0,
-  "waitTimeMax" : 0
+  "waitTimeMax" : 0,
+  "botTimeoutAfterMinutes" : -1,
+  "botTimeoutAfterCatchingPokemon" : -1,
+  "botTimeoutAfterVisitingPokestops" : -1
 }
+

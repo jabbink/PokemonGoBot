@@ -58,7 +58,7 @@ class ProcessPokestops(var pokestops: MutableCollection<Pokestop>) : Task {
                 ctx.pauseWalking.set(false)
             }
         }
-        if (settings.campLurePokestop > 0 && settings.catchPokemon) {
+        if (settings.campLurePokestop > 0 && !ctx.pokemonInventoryFullStatus.get() && settings.catchPokemon) {
             val luresInRange = sortedPokestops.filter {
                 it.inRangeForLuredPokemon() && it.fortData.hasLureInfo()
             }.size

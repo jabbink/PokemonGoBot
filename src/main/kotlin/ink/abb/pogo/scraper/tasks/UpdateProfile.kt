@@ -84,7 +84,7 @@ class UpdateProfile : Task {
                 0
             }
             val nextLevel: String = if (xpPerHour != 0L) {
-				"${DecimalFormat("#0").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())}h${Math.round(((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())%1*60)}m"
+                "${DecimalFormat("#0").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())}h${Math.round(((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())%1*60)}m"
             } else {
                 "Unknown"
             }
@@ -98,8 +98,15 @@ class UpdateProfile : Task {
             Log.magenta("Pokebank ${inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; " +
                     "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
                     "Inventory ${inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}"
-
             )
+            if (inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size < ctx.profile.playerData.maxPokemonStorage && ctx.pokemonInventoryFullStatus.get())
+                ctx.pokemonInventoryFullStatus.set(false)
+            else if (inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size >= ctx.profile.playerData.maxPokemonStorage && !ctx.pokemonInventoryFullStatus.get())
+                ctx.pokemonInventoryFullStatus.set(true)
+
+            if (settings.catchPokemon && ctx.pokemonInventoryFullStatus.get())
+                Log.red("Pokemon inventory is full, not catching!")
+
             ctx.server.sendProfile()
         } catch (e: Exception) {
             Log.red("Failed to update profile and inventories")

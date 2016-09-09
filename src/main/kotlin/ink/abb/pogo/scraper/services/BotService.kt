@@ -1,4 +1,4 @@
-/*
+/**
  * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
@@ -8,18 +8,15 @@
 
 package ink.abb.pogo.scraper.services
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.startBot
-import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
+import ink.abb.pogo.scraper.util.io.SettingsJSONWriter
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.io.File
 import java.util.concurrent.CountDownLatch
 import javax.annotation.PreDestroy
 import kotlin.concurrent.thread
@@ -31,16 +28,16 @@ class BotService {
     lateinit var http: OkHttpClient
 
     private val bots: MutableList<Bot> = mutableListOf()
-    val mapper: ObjectMapper = ObjectMapper().registerKotlinModule()
-    val root = File("./bot-settings").absoluteFile!!
+    val settingsJSONWriter = SettingsJSONWriter()
 
-    init {
-        root.mkdirs()
-    }
+    fun submitBot(name: String): Settings {
+        val settings = settingsJSONWriter.load(name)
 
-    fun submitBot(settings: Settings) {
         addBot(startBot(settings, http))
-        save(settings)
+
+        settingsJSONWriter.save(settings) // Is this needed after starting?
+
+        return settings
     }
 
     @Synchronized
@@ -53,24 +50,8 @@ class BotService {
         bots.remove(bot)
     }
 
-    fun save(settings: Settings) {
-        Log.normal("Saving settings for " + settings.name)
-        File(root, "${settings.name}.json").bufferedWriter().use {
-            it.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(settings))
-        }
-    }
-
-    fun load(name: String): Settings {
-        val save = File(root, "$name.json")
-        if (!save.isFile) {
-            throw IllegalArgumentException("No save file found for name: $name")
-        }
-
-        return mapper.readValue(save, Settings::class.java).withName(name)
-    }
-
-    fun getSaveNames(): List<String> {
-        return root.list().filter { it.endsWith(".json") }.map { it.replace(Regex("\\.json$"), "") }
+    fun getJSONConfigBotNames(): List<String> {
+        return settingsJSONWriter.getJSONConfigBotNames()
     }
 
     fun getBotContext(name: String): Context {
@@ -100,7 +81,6 @@ class BotService {
         val latch = CountDownLatch(bots.size)
         bots.forEach {
             thread {
-                save(it.settings)
                 it.stop()
                 latch.countDown()
             }

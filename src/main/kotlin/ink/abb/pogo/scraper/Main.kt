@@ -159,7 +159,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     var proxyHttp: OkHttpClient? = null
 
     if (!settings.proxyServer.equals("") && settings.proxyPort > 0) {
-        Log.normal("Setting up proxy server for bot " + settings.name + ": " + settings.proxyServer + ":" + settings.proxyPort)
+        Log.normal("Setting up proxy server for bot ${settings.name}: ${settings.proxyServer}:${settings.proxyPort}")
 
         val proxyType: Proxy.Type
         if (settings.proxyType.equals("HTTP"))
@@ -178,7 +178,6 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
                 }
                 .build()
     }
-
 
     Log.normal("Logging in to game server...")
 
@@ -328,7 +327,6 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     api.setDeviceInfo(deviceInfo)
 
     val bot = Bot(api, settings)
-
     bot.start()
 
     return bot

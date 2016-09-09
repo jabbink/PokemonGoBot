@@ -1,4 +1,4 @@
-/*
+/**
  * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
@@ -30,7 +30,6 @@ class SettingsParser(val properties: Properties) {
         val defaults = Settings(name = "", credentials = GoogleCredentials(), latitude = 0.0, longitude = 0.0)
         val dropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.dropItems, String::toBoolean)
 
-
         return Settings(
                 name = "default",
                 profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
@@ -38,6 +37,8 @@ class SettingsParser(val properties: Properties) {
                 latitude = getPropertyOrDie("Starting Latitude", "latitude", String::toDouble),
                 longitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
                 saveLocationOnShutdown = getPropertyIfSet("Save last location when the bot stop", "save_location_on_shutdown", defaults.saveLocationOnShutdown, String::toBoolean),
+                savedLatitude = getPropertyIfSet("Saved start Latitude", "saved_latitude", defaults.savedLatitude, String::toDouble),
+                savedLongitude = getPropertyIfSet("Saved start Longitude", "saved_longitude",  defaults.savedLongitude, String::toDouble),
 
                 credentials = if (properties.getProperty("username", "").isEmpty()) {
                     GoogleCredentials(properties.getProperty("token", ""))
@@ -59,6 +60,7 @@ class SettingsParser(val properties: Properties) {
                 mapzenApiKey = getPropertyIfSet("If you use MAPZEN as route provider, you can use a Mapzen Turn by Turn API key", "mapzen_api_key", defaults.mapzenApiKey, String::toString),
                 googleApiKey = getPropertyIfSet("If you use GOOGLE as route provider, you must use a Google API key", "google_api_key", defaults.googleApiKey, String::toString),
                 dropItems = dropItems,
+                itemDropDelay = getPropertyIfSet("Delay between each drop of items","item_drop_delay",defaults.itemDropDelay, String::toLong),
                 groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
 
                 uselessItems = mapOf(
@@ -85,6 +87,7 @@ class SettingsParser(val properties: Properties) {
                 randomBallThrows = getPropertyIfSet("Randomize Ball Throwing", "random_ball_throws", defaults.randomBallThrows, String::toBoolean),
                 waitBetweenThrows = getPropertyIfSet("Waiting between throws", "wait_between_throws", defaults.waitBetweenThrows, String::toBoolean),
                 autotransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.autotransfer, String::toBoolean),
+                autotransferTimeDelay = getPropertyIfSet("Delay between each transfer","autotransfer_time_delay", defaults.autotransferTimeDelay, String::toLong),
                 keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", defaults.keepPokemonAmount, String::toInt),
                 maxPokemonAmount = getPropertyIfSet("maximum keep pokemon amount", "max_pokemon_amount", defaults.maxPokemonAmount, String::toInt),
                 displayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", defaults.displayKeepalive, String::toBoolean),
@@ -120,11 +123,15 @@ class SettingsParser(val properties: Properties) {
 
                 obligatoryTransfer = getPropertyIfSet("list of pokemon you always want to transfer regardless of CP", "obligatory_transfer", defaults.obligatoryTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
-                evolveBeforeTransfer = getPropertyIfSet("list of pokemon you always want to evolve before transfer to maximize XP", "evolve_before_transfer", defaults.obligatoryTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
+                evolveBeforeTransfer = getPropertyIfSet("list of pokemon you always want to evolve before transfer to maximize XP", "evolve_before_transfer", defaults.evolveBeforeTransfer.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
+
+                neverCatchPokemon = getPropertyIfSet("list of pokemon you NEVER want to catch", "never_catch_pokemon", defaults.neverCatchPokemon.map { it.name }.joinToString(","), String::toString).split(",").filter { it.isNotBlank() }.map { PokemonId.valueOf(it) },
 
                 evolveStackLimit = getPropertyIfSet("The stack of evolves needed to pop lucky egg and evolve all", "evolve_stack_limit", defaults.evolveStackLimit, String::toInt),
 
                 useLuckyEgg = getPropertyIfSet("Use lucky egg before evolves", "use_lucky_egg", defaults.useLuckyEgg, String::toInt),
+
+                evolveTimeDelay =  getPropertyIfSet("Set time delay between evolutions", "evolve_time_delay", defaults.evolveTimeDelay, String::toLong),
 
                 export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
 
@@ -142,7 +149,11 @@ class SettingsParser(val properties: Properties) {
 
                 waitTimeMin = getPropertyIfSet("Minimal time to wait", "wait_time_min", defaults.waitTimeMin, String::toInt),
 
-                waitTimeMax = getPropertyIfSet("Maximal time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt)
+                waitTimeMax = getPropertyIfSet("Maximum time to wait", "wait_time_max", defaults.waitTimeMax, String::toInt),
+
+                botTimeoutAfterMinutes = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_minutes", defaults.botTimeoutAfterMinutes, String::toInt),
+                botTimeoutAfterCatchingPokemon = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_catching_pokemon", defaults.botTimeoutAfterCatchingPokemon, String::toInt),
+                botTimeoutAfterVisitingPokestops = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_visiting_pokestops", defaults.botTimeoutAfterVisitingPokestops, String::toInt)
         )
     }
 
@@ -193,6 +204,8 @@ data class Settings(
 
         var latitude: Double,
         var longitude: Double,
+        var savedLatitude: Double = 0.0,
+        var savedLongitude: Double = 0.0,
         val saveLocationOnShutdown: Boolean = true,
 
         val startingLocation: S2LatLng = S2LatLng.fromDegrees(latitude, longitude),
@@ -211,6 +224,7 @@ data class Settings(
         val googleApiKey: String = "",
         val groupItemsByType: Boolean = false,
         val dropItems: Boolean = true,
+        val itemDropDelay: Long = -1,
         val uselessItems: Map<ItemId, Int> = mapOf(
                 Pair(ItemId.ITEM_REVIVE, 20),
                 Pair(ItemId.ITEM_MAX_REVIVE, 10),
@@ -236,6 +250,7 @@ data class Settings(
         val desiredCatchProbability: Double = 0.4,
         val desiredCatchProbabilityUnwanted: Double = 0.0,
         val autotransfer: Boolean = true,
+        val autotransferTimeDelay: Long = -1,
         val randomBallThrows: Boolean = false,
         val waitBetweenThrows: Boolean = false,
         val keepPokemonAmount: Int = 1,
@@ -265,8 +280,10 @@ data class Settings(
         val obligatoryTransfer: List<PokemonId> = listOf(PokemonId.DODUO, PokemonId.RATTATA, PokemonId.CATERPIE, PokemonId.PIDGEY),
 
         val evolveBeforeTransfer: List<PokemonId> = listOf(PokemonId.CATERPIE, PokemonId.RATTATA, PokemonId.WEEDLE, PokemonId.PIDGEY),
+        val neverCatchPokemon: List<PokemonId> = listOf(),
         val evolveStackLimit: Int = 100,
         val useLuckyEgg: Int = 1,
+        val evolveTimeDelay: Long = 300,
 
         val export: String = "",
 
@@ -283,7 +300,11 @@ data class Settings(
 
         val waitChance: Double = 0.0,
         val waitTimeMin: Int = 0,
-        val waitTimeMax: Int = 0
+        val waitTimeMax: Int = 0,
+
+        val botTimeoutAfterMinutes: Int = -1,
+        val botTimeoutAfterCatchingPokemon:Int = -1,
+        val botTimeoutAfterVisitingPokestops:Int = -1
 ) {
     fun withName(name: String): Settings {
         this.name = name

@@ -81,3 +81,5 @@ export_*.*
 
 bot-settings/
 logs/
+
+altitude_cache.json
