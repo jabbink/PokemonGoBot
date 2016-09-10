@@ -206,13 +206,15 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
 
     retries = retryCount
 
+    val seed = "PokemonGoBot-${settings.credentials.hashCode().toLong()}".hashCode().toLong()
+
     var api: PokemonGo? = null
     do {
         try {
             if (proxyHttp == null)
-                api = PokemonGo(auth, http, time)
+                api = PokemonGo(http, time, seed)
             else
-                api = PokemonGo(auth, proxyHttp, time)
+                api = PokemonGo(proxyHttp, time, seed)
         } catch (e: LoginFailedException) {
             throw IllegalStateException("Server refused your login credentials. Are they correct?")
         } catch (e: RemoteServerException) {
@@ -227,6 +229,8 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
     if (api == null) {
         throw IllegalStateException("Failed to login. Stopping")
     }
+
+    api.login(auth)
 
     Log.normal("Logged in successfully")
 
@@ -307,7 +311,7 @@ fun startBot(settings: Settings, http: OkHttpClient, writeToken: (String) -> Uni
             "9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4")
 
     // try to create unique identifier
-    val random = Random("PokemonGoBot-${settings.credentials.hashCode().toLong()}".hashCode().toLong())
+    val random = Random(seed)
     val deviceInfo = DeviceInfo()
 
     val deviceId = ByteArray(16)
