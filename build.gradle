@@ -64,7 +64,7 @@ configurations {
 dependencies {
     //compile files('../PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar')
 
-    compile 'com.github.Grover-c13:PokeGOAPI-Java:7e4d86efb6'
+    compile 'com.github.Grover-c13:PokeGOAPI-Java:3c8a56fd18'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"

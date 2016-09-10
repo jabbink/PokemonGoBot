@@ -10,6 +10,7 @@ package ink.abb.pogo.scraper.util
 
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.inventory.Inventories
+import java.util.*
 
 private var _inventories: Inventories? = null
 
