@@ -19,6 +19,12 @@ import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.reflect.jvm.internal.impl.protobuf.InvalidProtocolBufferException
+import POGOProtos.Enums.TeamColorOuterClass.TeamColor
+import POGOProtos.Networking.Requests.Messages.SetPlayerTeamMessageOuterClass.SetPlayerTeamMessage
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType
+import com.pokegoapi.main.ServerRequest
+import POGOProtos.Networking.Responses.SetPlayerTeamResponseOuterClass
 
 class UpdateProfile : Task {
     var lastLevelCheck: Int = 1
@@ -110,6 +116,26 @@ class UpdateProfile : Task {
             ctx.server.sendProfile()
         } catch (e: Exception) {
             Log.red("Failed to update profile and inventories")
+        }
+        if (ctx.api.playerProfile.playerData.team==TeamColor.NEUTRAL && ctx.api.playerProfile.stats.level>=5) {
+            if (settings.autoTeam.toUpperCase().equals("RED") || settings.autoTeam.toUpperCase().equals("BLUE") || settings.autoTeam.toUpperCase().equals("YELLOW")) {
+                val msg = SetPlayerTeamMessage.newBuilder().setTeam(TeamColor.valueOf(settings.autoTeam.toUpperCase())).build()
+                val req = ServerRequest(RequestType.SET_PLAYER_TEAM, msg)
+                ctx.api.getRequestHandler().sendServerRequests(req)
+                try {
+                    val response = SetPlayerTeamResponseOuterClass.SetPlayerTeamResponse.parseFrom(req.data)
+                    if (response.status == SetPlayerTeamResponseOuterClass.SetPlayerTeamResponse.Status.SUCCESS) {
+                        Log.green("You are now in the ${settings.autoTeam.toUpperCase()} team!")
+                    }
+                    else {
+                        Log.red("An error occured when trying to set your team")
+                    }
+                } catch (e : InvalidProtocolBufferException) {
+                }
+            }
+            else if(!settings.autoTeam.toUpperCase().equals("NEUTRAL")) {
+                Log.red("Unknow team in the config file!")
+            }
         }
     }
 }
