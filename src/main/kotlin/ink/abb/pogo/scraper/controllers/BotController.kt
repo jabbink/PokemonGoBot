@@ -357,7 +357,7 @@ class BotController {
         val pokedex = mutableListOf<PokedexEntry>()
         val api = service.getBotContext(name).api
 
-        for (i in 1..150) {
+        for (i in 0..151) {
             val entry: PokedexEntryOuterClass.PokedexEntry? = api.inventories.pokedex.getPokedexEntry(PokemonIdOuterClass.PokemonId.forNumber(i))
             entry ?: continue
 
