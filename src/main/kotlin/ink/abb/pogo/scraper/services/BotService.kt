@@ -22,10 +22,8 @@ import javax.annotation.PreDestroy
 import kotlin.concurrent.thread
 
 @Service
-class BotService {
+class BotService (val http: OkHttpClient) {
 
-    @Autowired
-    lateinit var http: OkHttpClient
 
     private val bots: MutableList<Bot> = mutableListOf()
     val settingsJSONWriter = SettingsJSONWriter()
