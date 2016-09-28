@@ -14,11 +14,11 @@ Before opening an issue or explaining your problem on Discord, please refer to t
 
 [Click here to view how to use this bot](./USAGE.md)
 
-### Screenshot
+### Screenshot.
 
 [![GUI Screenshot](http://ui.pogobot.club/img/gui-screenshot-01.png)](https://github.com/jabbink/PokemonGoBot/blob/gh-pages/README.md)
 
-## Features
+## Features.
 
 * Login with Google and Pokemon Trainer Club
 * Walk (while following roads (optional)) from Pokestop to Pokestop (highly configurable)
