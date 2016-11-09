@@ -71,8 +71,8 @@ class UpdateProfile : Task {
             bot.api.queueRequest(LevelUpRewards().withLevel(i)).subscribe {
                 val result = it.response
                 if (result.result == LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.Result.AWARDED_ALREADY) {
-                    Log.magenta("Already accepted awards for level ${i}, updating $lastLevelCheck = $i")
                     if (i > lastLevelCheck) {
+                        Log.magenta("Already accepted awards for level ${i}, updating $lastLevelCheck = $i")
                         lastLevelCheck = i
                     }
                     return@subscribe
