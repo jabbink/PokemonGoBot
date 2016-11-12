@@ -36,7 +36,10 @@ class ReleasePokemon : Task {
             }
             for ((index, pokemon) in sorted.withIndex()) {
                 // don't drop favorited, deployed, or nicknamed pokemon
-                val isFavourite = pokemon.pokemonData.nickname.isNotBlank() || pokemon.pokemonData.favorite != 0 || !pokemon.pokemonData.deployedFortId.isEmpty()
+                val isFavourite = pokemon.pokemonData.nickname.isNotBlank() ||
+                        pokemon.pokemonData.favorite != 0 ||
+                        !pokemon.pokemonData.deployedFortId.isEmpty() ||
+                        (ctx.api.playerData.hasBuddyPokemon() && ctx.api.playerData.buddyPokemon.id == pokemon.pokemonData.id)
                 if (!isFavourite) {
                     val ivPercentage = pokemon.pokemonData.getIvPercentage()
                     // never transfer highest rated Pokemon (except for obligatory transfer)

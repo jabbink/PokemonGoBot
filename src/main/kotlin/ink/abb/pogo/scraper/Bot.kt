@@ -109,6 +109,7 @@ class Bot(val api: PoGoApi, val settings: Settings) {
         val drop = DropUselessItems()
         val profile = UpdateProfile()
         val catch = CatchOneNearbyPokemon()
+        val buddy = SetBuddyPokemon()
         val release = ReleasePokemon()
         val evolve = EvolvePokemon()
         val hatchEggs = HatchEggs()
@@ -147,6 +148,9 @@ class Bot(val api: PoGoApi, val settings: Settings) {
                     // might have errored and paused walking
                     ctx.pauseWalking.set(false)
                 }
+            }
+            if (settings.buddyPokemon.isNotBlank()) {
+                task(buddy)
             }
             if (settings.dropItems)
                 task(drop)
