@@ -62,17 +62,13 @@ class ProcessPokestops(var pokestops: List<Pokestop>) : Task {
             }
         }
 
-        val luresInRange = sortedPokestops.filter {
-            it.inRangeForLuredPokemon() && it.fortData.hasLureInfo()
-        }
-        //luresInRange.forEach { Log.normal("Lure ${it.id} in range") }
         if (settings.campLurePokestop > 0 && !ctx.pokemonInventoryFullStatus.get() && settings.catchPokemon) {
             val luresInRange = sortedPokestops.filter {
                 it.inRangeForLuredPokemon() && it.fortData.hasLureInfo()
             }
             if (luresInRange.size >= settings.campLurePokestop) {
                 if (writeCampStatus) {
-                    Log.green("$luresInRange lure(s) in range, pausing")
+                    Log.green("${luresInRange.size} lure(s) in range, pausing")
                 }
                 return
             }
