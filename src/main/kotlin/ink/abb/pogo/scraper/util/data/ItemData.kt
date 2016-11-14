@@ -8,17 +8,17 @@
 
 package ink.abb.pogo.scraper.util.data
 
-import com.pokegoapi.api.inventory.Item
+import POGOProtos.Inventory.Item.ItemIdOuterClass
 
 data class ItemData(
-    var itemId: Int? = null,
-    var itemName: String? = null,
-    var count: Int? = null
+        var itemId: Int? = null,
+        var itemName: String? = null,
+        var count: Int? = null
 ) {
-    fun buildFromItem(item: Item): ItemData {
-        this.itemId = item.itemId.number
-        this.itemName = item.itemId.name
-        this.count = item.count
+    fun buildFromItem(item: ItemIdOuterClass.ItemId, count: Int): ItemData {
+        this.itemId = item.number
+        this.itemName = item.name
+        this.count = count
         return this
     }
 }
