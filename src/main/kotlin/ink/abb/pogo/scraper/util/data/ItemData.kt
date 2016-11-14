@@ -11,9 +11,9 @@ package ink.abb.pogo.scraper.util.data
 import POGOProtos.Inventory.Item.ItemIdOuterClass
 
 data class ItemData(
-    var itemId: Int? = null,
-    var itemName: String? = null,
-    var count: Int? = null
+        var itemId: Int? = null,
+        var itemName: String? = null,
+        var count: Int? = null
 ) {
     fun buildFromItem(item: ItemIdOuterClass.ItemId, count: Int): ItemData {
         this.itemId = item.number

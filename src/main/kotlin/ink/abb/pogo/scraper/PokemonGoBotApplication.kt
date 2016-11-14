@@ -1,4 +1,4 @@
-/*
+/**
  * Pokemon Go Bot  Copyright (C) 2016  PokemonGoBot-authors (see authors.md for more information)
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions.
@@ -20,7 +20,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
-import java.net.Proxy
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -72,17 +71,17 @@ open class PokemonGoBotApplication {
         lateinit var botRunService: BotService
 
 
-
         override fun run(vararg args: String?) {
-            val names = botRunService.getSaveNames()
-            if (names.size < 1) {
+            val JSONConfigBotNames = botRunService.getJSONConfigBotNames()
+
+            if (JSONConfigBotNames.size < 1) {
                 thread(name = "default") {
                     startDefaultBot(http, botRunService)
                 }
             } else {
-                names.forEach {
+                JSONConfigBotNames.forEach {
                     thread(name = it) {
-                        botRunService.submitBot(botRunService.load(it))
+                        botRunService.submitBot(it)
                     }
                 }
             }

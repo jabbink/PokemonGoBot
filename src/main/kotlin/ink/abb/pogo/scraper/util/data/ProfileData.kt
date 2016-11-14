@@ -11,7 +11,7 @@ package ink.abb.pogo.scraper.util.data
 import ink.abb.pogo.api.PoGoApi
 import java.util.concurrent.atomic.AtomicInteger
 
-data class ProfileData (
+data class ProfileData(
 
         var name: String? = null,
         var level: Int? = null,
@@ -26,7 +26,7 @@ data class ProfileData (
         var coin: Int? = null
 
 ) {
-    fun buildFromApi(api: PoGoApi) : ProfileData {
+    fun buildFromApi(api: PoGoApi): ProfileData {
         this.name = api.playerData.username
         this.level = api.inventory.playerStats.level
         this.exp = api.inventory.playerStats.experience

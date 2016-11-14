@@ -14,11 +14,11 @@ import com.google.maps.GeoApiContext
 import ink.abb.pogo.api.PoGoApi
 import ink.abb.pogo.api.cache.BagPokemon
 import ink.abb.pogo.api.cache.Pokestop
-import ink.abb.pogo.scraper.controllers.ProgramController
 import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
+import ink.abb.pogo.scraper.util.io.SettingsJSONWriter
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
 import java.io.File
@@ -229,6 +229,10 @@ class Bot(val api: PoGoApi, val settings: Settings) {
             settings.savedLatitude = ctx.lat.get()
             settings.savedLongitude = ctx.lng.get()
         }
+
+        val settingsJSONWriter = SettingsJSONWriter()
+        settingsJSONWriter.save(settings)
+
         val socketServerStopLatch = CountDownLatch(1)
         thread {
             Log.red("Stopping SocketServer...")
@@ -277,10 +281,4 @@ class Bot(val api: PoGoApi, val settings: Settings) {
         }
         return false
     }
-
-    fun terminateApplication() {
-        phaser.forceTermination()
-        ProgramController.stopAllApplications()
-    }
-
 }
