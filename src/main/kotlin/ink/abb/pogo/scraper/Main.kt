@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper
 
+import com.google.common.util.concurrent.AtomicDouble
 import ink.abb.pogo.api.PoGoApiImpl
 import ink.abb.pogo.api.auth.CredentialProvider
 import ink.abb.pogo.api.auth.GoogleAutoCredentialProvider
@@ -18,6 +19,7 @@ import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.credentials.GoogleCredentials
 import ink.abb.pogo.scraper.util.credentials.PtcCredentials
+import ink.abb.pogo.scraper.util.directions.getAltitude
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import org.springframework.boot.SpringApplication
@@ -156,6 +158,18 @@ fun startBot(settings: Settings, http: OkHttpClient): Bot {
                 PoGoApiImpl(http, auth, time)
             else
                 PoGoApiImpl(proxyHttp, auth, time)
+
+
+    val lat = AtomicDouble(settings.latitude)
+    val lng = AtomicDouble(settings.longitude)
+
+    if (settings.saveLocationOnShutdown && settings.savedLatitude != 0.0 && settings.savedLongitude != 0.0) {
+        lat.set(settings.savedLatitude)
+        lng.set(settings.savedLongitude)
+        Log.normal("Loaded last saved location (${settings.savedLatitude}, ${settings.savedLongitude})")
+    }
+
+    api.setLocation(lat.get(), lng.get(), 0.0)
 
     api.start()
 

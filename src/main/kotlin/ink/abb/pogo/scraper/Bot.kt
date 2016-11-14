@@ -18,6 +18,7 @@ import ink.abb.pogo.scraper.gui.SocketServer
 import ink.abb.pogo.scraper.tasks.*
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.directions.RouteProviderEnum
+import ink.abb.pogo.scraper.util.directions.getAltitude
 import ink.abb.pogo.scraper.util.io.SettingsJSONWriter
 import ink.abb.pogo.scraper.util.pokemon.getIv
 import ink.abb.pogo.scraper.util.pokemon.getIvPercentage
@@ -73,12 +74,6 @@ class Bot(val api: PoGoApi, val settings: Settings) {
     @Synchronized
     fun start() {
         if (isRunning()) return
-
-        if (settings.saveLocationOnShutdown && settings.savedLatitude != 0.0 && settings.savedLongitude != 0.0) {
-            ctx.lat.set(settings.savedLatitude)
-            ctx.lng.set(settings.savedLongitude)
-            Log.normal("Loaded last saved location (${settings.savedLatitude}, ${settings.savedLongitude})")
-        }
 
         ctx.walking.set(false)
 
