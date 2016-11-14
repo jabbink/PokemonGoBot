@@ -8,20 +8,17 @@
 
 package ink.abb.pogo.scraper.tasks
 
+import com.google.common.geometry.S2LatLng
 import com.google.common.util.concurrent.AtomicDouble
-import com.google.maps.GeoApiContext
-import com.pokegoapi.api.map.fort.Pokestop
-import com.pokegoapi.google.common.geometry.S2LatLng
+import ink.abb.pogo.api.cache.Pokestop
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.cachedInventories
 import ink.abb.pogo.scraper.util.directions.getRouteCoordinates
-import ink.abb.pogo.scraper.util.inventory.hasPokeballs
 import ink.abb.pogo.scraper.util.map.canLoot
-import ink.abb.pogo.scraper.util.map.getCatchablePokemon
+import ink.abb.pogo.scraper.util.pokemon.inRange
 import java.text.DecimalFormat
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -39,11 +36,11 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             walk(bot, ctx, settings, coordinates, settings.speed, true, null)
         } else {
             val nearestUnused: List<Pokestop> = sortedPokestops.filter {
-                val canLoot = it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts, api = ctx.api)
+                val canLoot = it.canLoot(ignoreDistance = true, lootTimeouts = lootTimeouts)
                 if (settings.spawnRadius == -1) {
                     canLoot
                 } else {
-                    val distanceToStart = settings.startingLocation.getEarthDistance(S2LatLng.fromDegrees(it.latitude, it.longitude))
+                    val distanceToStart = settings.startingLocation.getEarthDistance(S2LatLng.fromDegrees(it.fortData.latitude, it.fortData.longitude))
                     canLoot && distanceToStart < settings.spawnRadius
                 }
             }
@@ -55,14 +52,10 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                 ctx.server.sendPokestop(chosenPokestop)
 
                 if (settings.displayPokestopName) {
-                    try {
-                        Log.normal("Walking to pokestop \"${chosenPokestop.details.name}\"")
-                    } catch (e: Exception) {
-                        Log.normal("Walking to pokestop \"${chosenPokestop.id}\"")
-                    }
+                    Log.normal("Walking to pokestop \"${chosenPokestop.name}\"")
                 }
 
-                walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.latitude, chosenPokestop.longitude), settings.speed, false, chosenPokestop)
+                walk(bot, ctx, settings, S2LatLng.fromDegrees(chosenPokestop.fortData.latitude, chosenPokestop.fortData.longitude), settings.speed, false, chosenPokestop)
             }
         }
     }
@@ -136,9 +129,9 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
                     }
 
                     // Destination reached, if we follow streets, but the pokestop is not on a available from street, go directly
-                    if (pokestop != null && settings.followStreets.isNotEmpty() && pokestop.canLoot(true) && !pokestop.canLoot(false)) {
+                    if (pokestop != null && settings.followStreets.isNotEmpty() && pokestop.canLoot(true, lootTimeouts) && !pokestop.canLoot(false, lootTimeouts)) {
                         Log.normal("Pokestop is too far using street, go directly!")
-                        walkDirectly(bot, ctx, settings, S2LatLng.fromDegrees(pokestop.latitude, pokestop.longitude), speed, false)
+                        walkDirectly(bot, ctx, settings, S2LatLng.fromDegrees(pokestop.fortData.latitude, pokestop.fortData.longitude), speed, false)
                     } else {
                         ctx.walking.set(false)
                     }
@@ -165,7 +158,9 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             if (pauseWalk.get()) {
                 Thread.sleep(timeout * 2)
                 pauseCounter--
-                if (!(ctx.api.cachedInventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && !ctx.pokemonInventoryFullStatus.get() && settings.catchPokemon)) {
+                if (!(ctx.api.inventory.hasPokeballs && bot.api.map.getPokemon(bot.api.latitude, bot.api.longitude, 3).filter {
+                    !ctx.blacklistedEncounters.contains(it.encounterId) && it.inRange
+                }.size > 0 && settings.catchPokemon)) {
                     // api break free
                     pauseWalk.set(false)
                     pauseCounter = 0
@@ -179,7 +174,9 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
             }
             // don't run away when there are still Pokemon around
             if (remainingSteps.toInt().mod(20) == 0 && pauseCounter > 0) {
-                if (ctx.api.cachedInventories.itemBag.hasPokeballs() && bot.api.map.getCatchablePokemon(ctx.blacklistedEncounters).size > 0 && !ctx.pokemonInventoryFullStatus.get() && settings.catchPokemon) {
+                if (ctx.api.inventory.hasPokeballs && bot.api.map.getPokemon(bot.api.latitude, bot.api.longitude, 3).filter {
+                    !ctx.blacklistedEncounters.contains(it.encounterId) && it.inRange
+                }.size > 0 && settings.catchPokemon) {
                     // Stop walking
                     Log.normal("Pausing to catch pokemon...")
                     pauseCounter = 2
@@ -208,7 +205,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         val currentPosition = S2LatLng.fromDegrees(ctx.lat.get(), ctx.lng.get())
 
         val distances = pokestops.map {
-            val end = S2LatLng.fromDegrees(it.latitude, it.longitude)
+            val end = S2LatLng.fromDegrees(it.fortData.latitude, it.fortData.longitude)
             currentPosition.getEarthDistance(end)
         }
         val totalDistance = distances.sum()
@@ -232,7 +229,7 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
     }
 
     // The speed changes always in the desired range, meaning if you already have a low speed and it goes lower, it will change less
-    private fun randomizeSpeed(speed : Double, speedRange: Double, ctx: Context): Double {
+    private fun randomizeSpeed(speed: Double, speedRange: Double, ctx: Context): Double {
         if (speedRange > speed) {
             return speed
         }
@@ -241,12 +238,13 @@ class Walk(val sortedPokestops: List<Pokestop>, val lootTimeouts: Map<String, Lo
         val maxSpeed = speed + speedRange
         // random value between -1 and  +1. There is always a 50:50 chance it will be slower or faster
         // The speedChange is now twice math.random so that it prefers small/slow acceleration, but has still a low chance of abruptly changing (like a human)
-        val speedChangeNormalized = (Math.random()*2 -1)*Math.random()
+        val speedChangeNormalized = (Math.random() * 2 - 1) * Math.random()
         if (speedChangeNormalized > 0) {
             speedDiff = maxSpeed - ctx.walkingSpeed.toDouble()
         } else if (speedChangeNormalized < 0) {
             speedDiff = ctx.walkingSpeed.toDouble() - minSpeed
         }
-        return ctx.walkingSpeed.toDouble() + speedChangeNormalized*speedDiff
+        return ctx.walkingSpeed.toDouble() + speedChangeNormalized * speedDiff
+
     }
 }

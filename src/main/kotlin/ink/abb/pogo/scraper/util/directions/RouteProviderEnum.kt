@@ -9,11 +9,11 @@
 package ink.abb.pogo.scraper.util.directions
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.geometry.S1Angle
+import com.google.common.geometry.S2LatLng
 import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
 import com.google.maps.model.TravelMode
-import com.pokegoapi.google.common.geometry.S1Angle
-import com.pokegoapi.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.Settings
 import java.util.*
 import java.util.regex.Pattern

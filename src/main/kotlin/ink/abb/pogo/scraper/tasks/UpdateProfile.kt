@@ -8,108 +8,108 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import com.pokegoapi.api.player.PlayerLevelUpRewards
-import com.pokegoapi.api.player.PlayerProfile
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass
+import ink.abb.pogo.api.request.CheckAwardedBadges
+import ink.abb.pogo.api.request.GetInventory
+import ink.abb.pogo.api.request.LevelUpRewards
 import ink.abb.pogo.scraper.*
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.cachedInventories
-import ink.abb.pogo.scraper.util.inventory.size
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class UpdateProfile : Task {
-    var lastLevelCheck: Int = 1
+    var lastLevelCheck: Int = 0
 
     override fun run(bot: Bot, ctx: Context, settings: Settings) {
-        val player = ctx.api.playerProfile
-        ctx.api.inventories.updateInventories(true)
-
-        for (i in lastLevelCheck..player.stats.level)
-        {
-            val msg = ctx.api.playerProfile.acceptLevelUpRewards(i)
-
-            if (msg.status == PlayerLevelUpRewards.Status.ALREADY_ACCEPTED)
-            {
-                continue
-            }
-
-            var message = "Accepting rewards for level $i"
-
-            val sb_rewards = StringJoiner(", ")
-            for (reward in msg.rewards) {
-                sb_rewards.add("${reward.itemCount}x ${reward.itemId.name}")
-            }
-            message += "; Rewards: [$sb_rewards]"
-
-            if (msg.unlockedItems.size > 0) {
-                val sb_unlocks = StringJoiner(", ")
-                for (item in msg.unlockedItems) {
-                    sb_unlocks.add("${item.name}")
-                }
-                message += "; Unlocks: [$sb_unlocks]"
-            }
-
-            Log.magenta(message)
-
-            lastLevelCheck = i
-
-            if (lastLevelCheck != player.stats.level) Thread.sleep(500)
-        }
-
-        // No messages to show? Booo!
-        try {
-            ctx.api.playerProfile.checkAndEquipBadges()
-        } catch (e: Exception) {
-            Log.red("Failed to check and equip badges")
-        }
-
-        try {
-            // update km walked, mainly
-            val inventories = ctx.api.cachedInventories
-            player.updateProfile()
-            val curLevelXP = player.stats.experience - requiredXp[player.stats.level - 1]
-            val nextXP = if (player.stats.level == requiredXp.size) {
+        bot.api.queueRequest(GetInventory().withLastTimestampMs(0)).subscribe {
+            val curLevelXP = bot.api.inventory.playerStats.experience - requiredXp[bot.api.inventory.playerStats.level - 1]
+            val nextXP = if (bot.api.inventory.playerStats.level == requiredXp.size) {
                 curLevelXP
             } else {
-                (requiredXp[player.stats.level] - requiredXp[player.stats.level - 1]).toLong()
+                (requiredXp[bot.api.inventory.playerStats.level] - requiredXp[bot.api.inventory.playerStats.level - 1]).toLong()
             }
             val ratio = DecimalFormat("#0.00").format(curLevelXP.toDouble() / nextXP.toDouble() * 100.0)
             val timeDiff = ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())
             val xpPerHour: Long = if (timeDiff != 0L) {
-                (player.stats.experience - ctx.startXp.get()) / timeDiff * 60
+                (bot.api.inventory.playerStats.experience - ctx.startXp.get()) / timeDiff * 60
             } else {
                 0
             }
             val nextLevel: String = if (xpPerHour != 0L) {
-                "${DecimalFormat("#0").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())}h${Math.round(((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())%1*60)}m"
+                "${DecimalFormat("#0").format((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble())}h${Math.round(((nextXP.toDouble() - curLevelXP.toDouble()) / xpPerHour.toDouble()) % 1 * 60)}m"
             } else {
                 "Unknown"
             }
 
-            Log.magenta("Profile update: ${player.stats.experience} XP on LVL ${player.stats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${player.stats.level + 1}")
-            Log.magenta("XP gain: ${NumberFormat.getInstance().format(player.stats.experience - ctx.startXp.get())} XP in ${ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())} mins; " +
+            Log.magenta("Profile update: ${bot.api.inventory.playerStats.experience} XP on LVL ${bot.api.inventory.playerStats.level}; $curLevelXP/$nextXP ($ratio%) to LVL ${bot.api.inventory.playerStats.level + 1}")
+            Log.magenta("XP gain: ${NumberFormat.getInstance().format(bot.api.inventory.playerStats.experience - ctx.startXp.get())} XP in ${ChronoUnit.MINUTES.between(ctx.startTime, LocalDateTime.now())} mins; " +
                     "XP rate: ${NumberFormat.getInstance().format(xpPerHour)}/hr; Next level in: $nextLevel")
             Log.magenta("Pokemon caught/transferred: ${ctx.pokemonStats.first.get()}/${ctx.pokemonStats.second.get()}; " +
                     "Pokemon caught from lures: ${ctx.luredPokemonStats.get()}; " +
                     "Items caught/dropped: ${ctx.itemStats.first.get()}/${ctx.itemStats.second.get()};")
-            Log.magenta("Pokebank ${inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size}/${ctx.profile.playerData.maxPokemonStorage}; " +
-                    "Stardust ${ctx.profile.currencies[PlayerProfile.Currency.STARDUST]}; " +
-                    "Inventory ${inventories.itemBag.size()}/${ctx.profile.playerData.maxItemStorage}"
+            Log.magenta("Pokebank ${bot.api.inventory.pokemon.size + bot.api.inventory.eggs.size}/${bot.api.playerData.maxPokemonStorage}; " +
+                    "Stardust ${bot.api.inventory.currencies.getOrPut("STARDUST", { AtomicInteger(0) }).get()}; " +
+                    "Inventory ${bot.api.inventory.size}/${bot.api.playerData.maxItemStorage}"
             )
-            if (inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size < ctx.profile.playerData.maxPokemonStorage && ctx.pokemonInventoryFullStatus.get())
+            if (bot.api.inventory.pokemon.size + bot.api.inventory.eggs.size < bot.api.playerData.maxPokemonStorage && ctx.pokemonInventoryFullStatus.get())
                 ctx.pokemonInventoryFullStatus.set(false)
-            else if (inventories.pokebank.pokemons.size + inventories.hatchery.eggs.size >= ctx.profile.playerData.maxPokemonStorage && !ctx.pokemonInventoryFullStatus.get())
+            else if (bot.api.inventory.pokemon.size + bot.api.inventory.eggs.size >= bot.api.playerData.maxPokemonStorage && !ctx.pokemonInventoryFullStatus.get())
                 ctx.pokemonInventoryFullStatus.set(true)
 
             if (settings.catchPokemon && ctx.pokemonInventoryFullStatus.get())
                 Log.red("Pokemon inventory is full, not catching!")
 
             ctx.server.sendProfile()
-        } catch (e: Exception) {
-            Log.red("Failed to update profile and inventories")
+        }
+
+        for (i in (lastLevelCheck + 1)..bot.api.inventory.playerStats.level) {
+            Log.magenta("Accepting rewards for level $i...")
+            bot.api.queueRequest(LevelUpRewards().withLevel(i)).subscribe {
+                val result = it.response
+                if (result.result == LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.Result.AWARDED_ALREADY) {
+                    if (i > lastLevelCheck) {
+                        Log.magenta("Already accepted awards for level ${i}, updating $lastLevelCheck = $i")
+                        lastLevelCheck = i
+                    }
+                    return@subscribe
+                }
+
+                var message = "Accepting rewards for level $i"
+
+                val sb_rewards = StringJoiner(", ")
+                for (reward in result.itemsAwardedList) {
+                    sb_rewards.add("${reward.itemCount}x ${reward.itemId.name}")
+                }
+                message += "; Rewards: [$sb_rewards]"
+
+                if (result.itemsUnlockedCount > 0) {
+                    val sb_unlocks = StringJoiner(", ")
+                    for (item in result.itemsUnlockedList) {
+                        sb_unlocks.add("${item.name}")
+                    }
+                    message += "; Unlocks: [$sb_unlocks]"
+                }
+
+                Log.magenta(message)
+
+                if (i > lastLevelCheck) {
+                    lastLevelCheck = i
+                }
+            }
+        }
+
+        bot.api.queueRequest(CheckAwardedBadges()).subscribe {
+            val result = it.response
+            result.awardedBadgesList.forEach {
+                // TODO: Does not work?!
+                /*bot.api.queueRequest(EquipBadge().withBadgeType(it)).subscribe {
+                    println(it.response.toString())
+                }*/
+            }
         }
     }
 }

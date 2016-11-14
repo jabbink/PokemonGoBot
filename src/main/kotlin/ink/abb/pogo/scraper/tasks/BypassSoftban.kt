@@ -8,12 +8,13 @@
 
 package ink.abb.pogo.scraper.tasks
 
-import com.pokegoapi.api.map.fort.Pokestop
+import ink.abb.pogo.api.cache.Pokestop
 import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.Task
 import ink.abb.pogo.scraper.util.Log
+import ink.abb.pogo.scraper.util.map.loot
 
 class BypassSoftban(val pokestop: Pokestop) : Task {
     override fun run(bot: Bot, ctx: Context, settings: Settings) {

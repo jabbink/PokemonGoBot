@@ -8,7 +8,7 @@
 
 package ink.abb.pogo.scraper.util.data
 
-data class LocationData (
+data class LocationData(
         val latitude: Double? = null,
         val longitude: Double? = null
 )

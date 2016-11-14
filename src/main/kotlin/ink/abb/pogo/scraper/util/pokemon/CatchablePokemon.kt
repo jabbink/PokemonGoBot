@@ -11,54 +11,55 @@ package ink.abb.pogo.scraper.util.pokemon
 import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus
-import com.pokegoapi.api.inventory.ItemBag
-import com.pokegoapi.api.inventory.Pokeball
-import com.pokegoapi.api.map.pokemon.CatchResult
-import com.pokegoapi.api.map.pokemon.CatchablePokemon
+import ink.abb.pogo.api.cache.Inventory
+import ink.abb.pogo.api.cache.MapPokemon
+import ink.abb.pogo.api.request.CatchPokemon
+import ink.abb.pogo.api.request.UseItemCapture
 import ink.abb.pogo.scraper.util.Log
-import ink.abb.pogo.scraper.util.inventory.hasPokeballs
-import java.text.DecimalFormat
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Extension function to make the code more readable in the CatchOneNearbyPokemon task
  */
-fun CatchablePokemon.catch(normalizedHitPosition: Double = 1.0,
-                           normalizedReticleSize: Double = 1.95 + Math.random() * 0.05,
-                           spinModifier: Double = 0.85 + Math.random() * 0.15,
-                           ballType: Pokeball? = Pokeball.POKEBALL, amount: Int = -1, razzBerryAmount: Int = -1): CatchResult? {
-    return this.catchPokemon(normalizedHitPosition, normalizedReticleSize, spinModifier, ballType, amount, razzBerryAmount)
+fun MapPokemon.catch(normalizedHitPosition: Double = 1.0,
+                     normalizedReticleSize: Double = 1.95 + Math.random() * 0.05,
+                     spinModifier: Double = 0.85 + Math.random() * 0.15,
+                     ballType: ItemId = ItemId.ITEM_POKE_BALL): rx.Observable<CatchPokemon> {
+    return poGoApi.queueRequest(CatchPokemon()
+            .withEncounterId(encounterId)
+            .withHitPokemon(true)
+            .withNormalizedHitPosition(normalizedHitPosition)
+            .withNormalizedReticleSize(normalizedReticleSize)
+            .withPokeball(ballType)
+            .withSpinModifier(spinModifier)
+            .withSpawnPointId(spawnPointId))
 }
 
-// unfortunately necessary because of the shitty `Pokeball` class...
-val itemToPokeball = mapOf(
-        Pair(ItemId.ITEM_POKE_BALL, Pokeball.POKEBALL),
-        Pair(ItemId.ITEM_GREAT_BALL, Pokeball.GREATBALL),
-        Pair(ItemId.ITEM_ULTRA_BALL, Pokeball.ULTRABALL),
-        Pair(ItemId.ITEM_MASTER_BALL, Pokeball.MASTERBALL)
-)
-
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false, waitBetweenThrows:Boolean = false, amount: Int): CatchResult? {
-    var result: CatchResult?
+fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventory, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false, waitBetweenThrows: Boolean = false, amount: Int): rx.Observable<CatchPokemon> {
+    var catch: rx.Observable<CatchPokemon>
     var numThrows = 0
     do {
-        result = catch(captureProbability, itemBag, desiredCatchProbability, alwaysCurve, allowBerries, randomBallThrows)
+        catch = catch(captureProbability, inventory, desiredCatchProbability, alwaysCurve, allowBerries, randomBallThrows)
+        val first = catch.toBlocking().first()
+        if (first != null) {
+            val result = first.response
+            if (result.status != CatchStatus.CATCH_ESCAPE && result.status != CatchStatus.CATCH_MISSED) {
+                break
+            }
 
-        if (result == null ||
-                (result.status != CatchStatus.CATCH_ESCAPE && result.status != CatchStatus.CATCH_MISSED)) {
-            break
+            if (waitBetweenThrows) {
+                val waitTime = (Math.random() * 2900 + 100)
+                Log.blue("Pokemon got out of the ball. Waiting for ca. ${Math.round(waitTime / 1000)} second(s) until next throw")
+                Thread.sleep(waitTime.toLong())
+            }
+            numThrows++
         }
-        if (waitBetweenThrows) {
-            val waitTime = (Math.random()*2900 + 100)
-            Log.blue("Pokemon got out of the ball. Waiting for ca. ${Math.round(waitTime/1000)} second(s) until next throw")
-            Thread.sleep(waitTime.toLong())
-        }
-        numThrows++
     } while (amount < 0 || numThrows < amount)
 
-    return result
+    return catch
 }
 
-fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: ItemBag, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false): CatchResult? {
+fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventory, desiredCatchProbability: Double, alwaysCurve: Boolean = false, allowBerries: Boolean = false, randomBallThrows: Boolean = false): rx.Observable<CatchPokemon> {
     val ballTypes = captureProbability.pokeballTypeList
     val probabilities = captureProbability.captureProbabilityList
     //Log.yellow(probabilities.toString())
@@ -70,7 +71,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
 
     for ((index, ballType) in ballTypes.withIndex()) {
         val probability = probabilities.get(index)
-        val ballAmount = itemBag.getItem(ballType).count
+        val ballAmount = inventory.items.getOrPut(ballType, { AtomicInteger(0) }).get()
         if (ballAmount == 0) {
             //Log.yellow("Don't have any ${ballType}")
             continue
@@ -100,7 +101,7 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     if (highestAvailable == null) {
         /*Log.red("No pokeballs?!")
         Log.red("Has pokeballs: ${itemBag.hasPokeballs()}")*/
-        return null
+        return rx.Observable.just(null)
     }
 
     if (ball == null) {
@@ -111,21 +112,19 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
     }
 
     var logMessage = "Using ${ball.name}"
-    itemBag.getItem(ball).count--
 
-    val razzBerryCount = itemBag.getItem(ItemId.ITEM_RAZZ_BERRY).count
+    val razzBerryCount = inventory.items.getOrPut(ItemId.ITEM_RAZZ_BERRY, { AtomicInteger(0) }).get()
     if (allowBerries && razzBerryCount > 0 && needRazzBerry) {
         logMessage += "; Using Razz Berry"
-        useItem(ItemId.ITEM_RAZZ_BERRY)
-        itemBag.getItem(ItemId.ITEM_RAZZ_BERRY).count--
+        poGoApi.queueRequest(UseItemCapture().withEncounterId(encounterId).withItemId(ItemId.ITEM_RAZZ_BERRY).withSpawnPointId(spawnPointId)).toBlocking()
     }
     if (needCurve) {
         logMessage += "; Using curve"
     }
-    logMessage += "; achieved catch probability: ${Math.round(catchProbability*100.0)}%, desired: ${Math.round(desiredCatchProbability*100.0)}%"
+    logMessage += "; achieved catch probability: ${Math.round(catchProbability * 100.0)}%, desired: ${Math.round(desiredCatchProbability * 100.0)}%"
     Log.yellow(logMessage)
     //excellent throw value
-    var recticleSize = 1.7 + Math.random()*0.3
+    var recticleSize = 1.7 + Math.random() * 0.3
 
     if (randomBallThrows) {
         //excellent throw if capture probability is still less then desired
@@ -135,10 +134,13 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
         //if catch probability is too high...
         else {
             // we substract the difference from the recticle size, the lower this size, the worse the ball
-            recticleSize = 1 + Math.random() - (catchProbability - desiredCatchProbability)*0.5
+            recticleSize = 1 + Math.random() - (catchProbability - desiredCatchProbability) * 0.5
 
-            if (recticleSize > 2) { recticleSize = 2.0 }
-            else if (recticleSize < 0) { recticleSize = 0.01 }
+            if (recticleSize > 2) {
+                recticleSize = 2.0
+            } else if (recticleSize < 0) {
+                recticleSize = 0.01
+            }
 
             if (recticleSize < 1) {
                 Log.blue("Your trainer threw a normal ball, no xp/catching bonus, good for pretending to be not a bot however")
@@ -156,8 +158,6 @@ fun CatchablePokemon.catch(captureProbability: CaptureProbability, itemBag: Item
             normalizedHitPosition = 1.0,
             normalizedReticleSize = recticleSize,
             spinModifier = if (needCurve) 0.85 + Math.random() * 0.15 else Math.random() * 0.10,
-            ballType = itemToPokeball.get(ball),
-            amount = 0,
-            razzBerryAmount = 0
+            ballType = ball
     )
 }

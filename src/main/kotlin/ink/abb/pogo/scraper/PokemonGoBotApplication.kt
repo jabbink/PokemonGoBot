@@ -23,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
+
 @SpringBootApplication
 open class PokemonGoBotApplication {
 
@@ -60,6 +61,7 @@ open class PokemonGoBotApplication {
         }
     }
 
+
     @Component
     open class BotRunner : CommandLineRunner {
         @Autowired
@@ -67,6 +69,7 @@ open class PokemonGoBotApplication {
 
         @Autowired
         lateinit var botRunService: BotService
+
 
         override fun run(vararg args: String?) {
             val JSONConfigBotNames = botRunService.getJSONConfigBotNames()
