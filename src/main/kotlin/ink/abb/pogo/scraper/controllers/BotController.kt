@@ -244,7 +244,7 @@ class BotController {
         val pokemon = getPokemonById(service.getBotContext(name), id)
         val rename = NicknamePokemon().withNickname(newName).withPokemonId(pokemon!!.pokemonData.id)
         val result = service.getBotContext(name).api.queueRequest(rename).toBlocking().first().response.result.toString()
-        Log.magenta("REST API: Renamed pokemon ${pokemon!!.pokemonData.pokemonId.name} with stats (${pokemon.pokemonData.getStatsFormatted()} CP: ${pokemon.pokemonData.cp}) to $newName")
+        Log.magenta("REST API: Renamed pokemon ${pokemon.pokemonData.pokemonId.name} with stats (${pokemon.pokemonData.getStatsFormatted()} CP: ${pokemon.pokemonData.cp}) to $newName")
         return result
     }
 
@@ -363,7 +363,6 @@ class BotController {
 
         val pokedex = mutableListOf<PokedexEntry>()
         val api = service.getBotContext(name).api
-        var i: Int = 1
 
         for (i in 0..151) {
             val entry: PokedexEntryOuterClass.PokedexEntry? = api.inventory.pokedex.get(PokemonIdOuterClass.PokemonId.forNumber(i))

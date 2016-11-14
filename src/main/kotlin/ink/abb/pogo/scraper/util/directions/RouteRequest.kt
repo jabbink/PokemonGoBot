@@ -120,7 +120,8 @@ fun getAltitude(latitude: Double, longitude: Double, ctx: Context): Double {
                 inp.setLength(0)
                 val altitudeReload: MutableMap<String, Double> =
                         try {
-                            ObjectMapper().readValue(altitudeReloadStr, MutableMap::class.java) as MutableMap<String, Double>
+                            @Suppress("UNCHECKED_CAST")
+                            (ObjectMapper().readValue(altitudeReloadStr, MutableMap::class.java) as MutableMap<String, Double>)
                         } catch (ex: Exception) {
                             mutableMapOf()
                         }

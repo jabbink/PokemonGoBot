@@ -40,7 +40,8 @@ class Bot(val api: PoGoApi, val settings: Settings) {
     var walkBackLock = AtomicBoolean(true)
     var altitudeCache: MutableMap<String, Double> =
             try {
-                ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>
+                @Suppress("UNCHECKED_CAST")
+                (ObjectMapper().readValue(File("altitude_cache.json").readText(), MutableMap::class.java) as MutableMap<String, Double>)
             } catch (ex: Exception) {
                 mutableMapOf()
             }
