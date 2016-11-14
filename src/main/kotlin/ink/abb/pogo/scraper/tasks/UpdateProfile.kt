@@ -67,12 +67,12 @@ class UpdateProfile : Task {
         }
 
         for (i in (lastLevelCheck + 1)..bot.api.inventory.playerStats.level) {
-            Log.magenta("Accepting rewards for level $i...")
+            //Log.magenta("Accepting rewards for level $i...")
             bot.api.queueRequest(LevelUpRewards().withLevel(i)).subscribe {
                 val result = it.response
                 if (result.result == LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.Result.AWARDED_ALREADY) {
                     if (i > lastLevelCheck) {
-                        Log.magenta("Already accepted awards for level ${i}, updating $lastLevelCheck = $i")
+                        //Log.magenta("Already accepted awards for level ${i}, updating $lastLevelCheck = $i")
                         lastLevelCheck = i
                     }
                     return@subscribe
