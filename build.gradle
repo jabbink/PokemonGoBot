@@ -1,5 +1,5 @@
 group 'ink.abb'
-version '0.8.0'
+version '0.8.1'
 
 buildscript {
     ext {
@@ -64,7 +64,7 @@ configurations {
 dependencies {
     //compile files('../PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar')
 
-    compile files('lib/api-0.0.4.jar')
+    compile files('lib/api-0.0.5.jar')
 
     // TODO: Wait for jitpack to fix itself...
     //compile 'com.github.Grover-c13:PokeGOAPI-Java:Development-SNAPSHOT'
