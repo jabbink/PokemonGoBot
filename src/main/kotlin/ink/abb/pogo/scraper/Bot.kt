@@ -75,6 +75,11 @@ class Bot(val api: PoGoApi, val settings: Settings) {
     fun start() {
         if (isRunning()) return
 
+        if (settings.saveLocationOnShutdown && settings.savedLatitude != 0.0 && settings.savedLongitude != 0.0) {
+            ctx.lat.set(settings.savedLatitude)
+            ctx.lng.set(settings.savedLongitude)
+        }
+
         ctx.walking.set(false)
 
         Log.normal("Name: ${api.playerData.username} - Team: ${api.playerData.team.name}")
