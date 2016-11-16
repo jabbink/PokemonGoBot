@@ -143,12 +143,18 @@ class CatchOneNearbyPokemon : Task {
             } else {
                 if (encounterResult is DiskEncounterResponseOuterClass.DiskEncounterResponse) {
                     Log.red("Encounter failed with result: ${encounterResult.result}")
+                    if (encounterResult.result == DiskEncounterResponseOuterClass.DiskEncounterResponse.Result.ENCOUNTER_ALREADY_FINISHED) {
+                        ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    }
                 } else if (encounterResult is EncounterResponseOuterClass.EncounterResponse) {
                     Log.red("Encounter failed with result: ${encounterResult.status}")
+                    if (encounterResult.status == Status.ENCOUNTER_CLOSED) {
+                        ctx.blacklistedEncounters.add(catchablePokemon.encounterId)
+                    }
                 }
                 if ((encounterResult is DiskEncounterResponseOuterClass.DiskEncounterResponse && encounterResult.result == DiskEncounterResponseOuterClass.DiskEncounterResponse.Result.POKEMON_INVENTORY_FULL) ||
                         (encounterResult is EncounterResponseOuterClass.EncounterResponse && encounterResult.status == Status.POKEMON_INVENTORY_FULL)) {
-                    Log.red("Inventory fillup, disabling catching of pokemon")
+                    Log.red("Inventory is full, temporarily disabling catching of pokemon")
 
                     ctx.pokemonInventoryFullStatus.set(true)
                 }

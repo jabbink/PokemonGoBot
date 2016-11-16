@@ -8,6 +8,7 @@
 
 package ink.abb.pogo.scraper.util.pokemon
 
+import POGOProtos.Data.PokemonDataOuterClass
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData
 import POGOProtos.Enums.PokemonIdOuterClass
 import ink.abb.pogo.api.PoGoApi
@@ -17,12 +18,12 @@ import ink.abb.pogo.api.util.PokemonMetaRegistry
 import ink.abb.pogo.scraper.Settings
 import java.util.concurrent.atomic.AtomicInteger
 
-fun PokemonData.getIv(): Int {
+fun PokemonDataOuterClass.PokemonDataOrBuilder.getIv(): Int {
     val iv = individualAttack + individualDefense + individualStamina
     return iv
 }
 
-fun PokemonData.getIvPercentage(): Int {
+fun PokemonDataOuterClass.PokemonDataOrBuilder.getIvPercentage(): Int {
     val iv = getIv()
     val ivPercentage = (iv * 100) / 45
     return ivPercentage
@@ -33,20 +34,20 @@ fun PokemonData.getIvPercentage(): Int {
 //    return -1
 //}
 
-fun PokemonData.getStatsFormatted(): String {
+fun PokemonDataOuterClass.PokemonDataOrBuilder.getStatsFormatted(): String {
     val details = "Stamina: $individualStamina | Attack: $individualAttack | Defense: $individualDefense"
     return details + " | IV: ${getIv()} (${(getIvPercentage())}%)"
 }
 
-val PokemonData.maxCpForPlayer: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.maxCpForPlayer: Int
         // TODO!!!
     get() = 0
 
-fun PokemonData.getCpPercentageToPlayer(): Int {
+fun PokemonDataOuterClass.PokemonDataOrBuilder.getCpPercentageToPlayer(): Int {
     return (cp.toDouble() / maxCpForPlayer.toDouble() * 100).toInt()
 }
 
-fun PokemonData.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String, Int>, candies: AtomicInteger): Pair<Boolean, String> {
+fun PokemonDataOuterClass.PokemonDataOrBuilder.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<String, Int>, candies: AtomicInteger): Pair<Boolean, String> {
     val obligatoryTransfer = settings.obligatoryTransfer
     val ignoredPokemon = settings.ignoredPokemon
     val ivPercentage = getIvPercentage()
@@ -105,7 +106,7 @@ fun PokemonData.shouldTransfer(settings: Settings, pokemonCounts: MutableMap<Str
     return Pair(shouldRelease, reason)
 }
 
-fun PokemonData.eggKmWalked(poGoApi: PoGoApi): Double {
+fun PokemonDataOuterClass.PokemonDataOrBuilder.eggKmWalked(poGoApi: PoGoApi): Double {
     if (!incubated) {
         return 0.0
     }
@@ -121,25 +122,25 @@ fun PokemonData.eggKmWalked(poGoApi: PoGoApi): Double {
     }
 }
 
-val PokemonData.incubated: Boolean
+val PokemonDataOuterClass.PokemonDataOrBuilder.incubated: Boolean
     get() {
         return eggIncubatorId.isNotBlank()
     }
 
-val PokemonData.injured: Boolean
+val PokemonDataOuterClass.PokemonDataOrBuilder.injured: Boolean
     get() {
         return !fainted && stamina < staminaMax
     }
 
-val PokemonData.fainted: Boolean
+val PokemonDataOuterClass.PokemonDataOrBuilder.fainted: Boolean
     get() {
         return stamina == 0
     }
 
-val PokemonData.meta: PokemonMeta
+val PokemonDataOuterClass.PokemonDataOrBuilder.meta: PokemonMeta
     get() = PokemonMetaRegistry.getMeta(this.getPokemonId())
 
-val PokemonData.maxCp: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.maxCp: Int
     get() {
         val pokemonMeta = meta
         val attack = getIndividualAttack() + pokemonMeta.baseAttack
@@ -148,7 +149,7 @@ val PokemonData.maxCp: Int
         return PokemonCpUtils.getMaxCp(attack, defense, stamina)
     }
 
-fun PokemonData.getMaxCpForLevel(level: Int): Int {
+fun PokemonDataOuterClass.PokemonDataOrBuilder.getMaxCpForLevel(level: Int): Int {
     val pokemonMeta = meta
     val attack = getIndividualAttack() + pokemonMeta.baseAttack
     val defense = getIndividualDefense() + pokemonMeta.baseDefense
@@ -157,17 +158,17 @@ fun PokemonData.getMaxCpForLevel(level: Int): Int {
     return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel)
 }
 
-val PokemonData.absoluteMaxCp: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.absoluteMaxCp: Int
     get() = PokemonCpUtils.getAbsoluteMaxCp(pokemonId)
 
-val PokemonData.cpFullEvolveAndPowerup: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.cpFullEvolveAndPowerup: Int
     get() = getMaxCpFullEvolveAndPowerup(40)
 
-fun PokemonData.getMaxCpFullEvolveAndPowerupForLevel(level: Int): Int {
+fun PokemonDataOuterClass.PokemonDataOrBuilder.getMaxCpFullEvolveAndPowerupForLevel(level: Int): Int {
     return getMaxCpFullEvolveAndPowerup(level)
 }
 
-private fun PokemonData.getMaxCpFullEvolveAndPowerup(playerLevel: Int): Int {
+private fun PokemonDataOuterClass.PokemonDataOrBuilder.getMaxCpFullEvolveAndPowerup(playerLevel: Int): Int {
     val highestUpgradedFamily: PokemonIdOuterClass.PokemonId
     if (arrayListOf(PokemonIdOuterClass.PokemonId.VAPOREON, PokemonIdOuterClass.PokemonId.JOLTEON, PokemonIdOuterClass.PokemonId.FLAREON).contains(pokemonId)) {
         highestUpgradedFamily = pokemonId
@@ -183,10 +184,10 @@ private fun PokemonData.getMaxCpFullEvolveAndPowerup(playerLevel: Int): Int {
     return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel)
 }
 
-val PokemonData.combinedCpMultiplier: Float
+val PokemonDataOuterClass.PokemonDataOrBuilder.combinedCpMultiplier: Float
     get() = cpMultiplier + additionalCpMultiplier
 
-val PokemonData.cpAfterEvolve: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.cpAfterEvolve: Int
     get() {
         if (arrayListOf(PokemonIdOuterClass.PokemonId.VAPOREON, PokemonIdOuterClass.PokemonId.JOLTEON, PokemonIdOuterClass.PokemonId.FLAREON).contains(pokemonId)) {
             return cp
@@ -210,7 +211,7 @@ val PokemonData.cpAfterEvolve: Int
         return PokemonCpUtils.getCp(attack, defense, stamina, combinedCpMultiplier)
     }
 
-val PokemonData.cpAfterFullEvolve: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.cpAfterFullEvolve: Int
     get() {
         if (arrayListOf(PokemonIdOuterClass.PokemonId.VAPOREON, PokemonIdOuterClass.PokemonId.JOLTEON, PokemonIdOuterClass.PokemonId.FLAREON).contains(pokemonId)) {
             return cp
@@ -227,14 +228,14 @@ val PokemonData.cpAfterFullEvolve: Int
         return PokemonCpUtils.getCp(attack, defense, stamina, combinedCpMultiplier)
     }
 
-val PokemonData.cpAfterPowerup: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.cpAfterPowerup: Int
     get() = PokemonCpUtils.getCpAfterPowerup(cp, combinedCpMultiplier)
 
-val PokemonData.candyCostsForPowerup: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.candyCostsForPowerup: Int
     get() = PokemonCpUtils.getCandyCostsForPowerup(combinedCpMultiplier, numUpgrades)
 
-val PokemonData.stardustCostsForPowerup: Int
+val PokemonDataOuterClass.PokemonDataOrBuilder.stardustCostsForPowerup: Int
     get() = PokemonCpUtils.getStartdustCostsForPowerup(combinedCpMultiplier, numUpgrades)
 
-val PokemonData.level: Float
+val PokemonDataOuterClass.PokemonDataOrBuilder.level: Float
     get() = PokemonCpUtils.getLevelFromCpMultiplier(combinedCpMultiplier)
