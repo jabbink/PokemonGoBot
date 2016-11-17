@@ -101,7 +101,7 @@ If that is not the case, you are either trying to run multiple bots by running J
 
 To change the socket ports, change `guiPortSocket` (`gui_port_socket` in `config.properties`) to another port, or disable the GUI by setting this to `0`.
 
-Also the management API for multiple bots requires a port. By default `8080` is used. To change this, run the bot as `java -jar PokemonGoBot.jar --server-port=XXXX`. If you don't need that interface, run the bot as `java -jar PokemonGoBot.jar --spring.main.web-environment=false`!
+Also the management API for multiple bots requires a port. By default `8080` is used. To change this, run the bot as `java -jar PokemonGoBot.jar --server.port=XXXX`. If you don't need that interface, run the bot as `java -jar PokemonGoBot.jar --spring.main.web-environment=false`!
 
 ## I get JsonMappingException "Can not deserialize instance of java.util.ArrayList out of VALUE_FALSE token"
 
