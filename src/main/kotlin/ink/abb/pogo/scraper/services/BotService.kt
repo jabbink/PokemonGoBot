@@ -12,11 +12,13 @@ import ink.abb.pogo.scraper.Bot
 import ink.abb.pogo.scraper.Context
 import ink.abb.pogo.scraper.Settings
 import ink.abb.pogo.scraper.startBot
+import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
 import ink.abb.pogo.scraper.util.io.SettingsJSONWriter
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.io.File
 import java.util.concurrent.CountDownLatch
 import javax.annotation.PreDestroy
 import kotlin.concurrent.thread
@@ -32,7 +34,6 @@ class BotService {
 
     fun submitBot(name: String): Settings {
         val settings = settingsJSONWriter.load(name)
-
         addBot(startBot(settings, http))
 
         settingsJSONWriter.save(settings) // Is this needed after starting?

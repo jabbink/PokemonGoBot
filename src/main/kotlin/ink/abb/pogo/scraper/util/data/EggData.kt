@@ -8,18 +8,19 @@
 
 package ink.abb.pogo.scraper.util.data
 
-import com.pokegoapi.api.pokemon.EggPokemon
+import ink.abb.pogo.api.cache.BagPokemon
+import ink.abb.pogo.scraper.util.pokemon.eggKmWalked
+import ink.abb.pogo.scraper.util.pokemon.incubated
 
-data class EggData (
+data class EggData(
         var isIncubate: Boolean? = null,
         var kmWalked: Double? = null,
         var kmTarget: Double? = null
 ) {
-    fun buildFromEggPokemon(egg: EggPokemon): EggData {
-
-        this.isIncubate = egg.isIncubate
-        this.kmWalked = egg.eggKmWalked
-        this.kmTarget = egg.eggKmWalkedTarget
+    fun buildFromEggPokemon(egg: BagPokemon): EggData {
+        this.isIncubate = egg.pokemonData.incubated
+        this.kmWalked = egg.pokemonData.eggKmWalked(egg.poGoApi)
+        this.kmTarget = egg.pokemonData.eggKmWalkedTarget
 
         return this
     }

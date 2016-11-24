@@ -11,7 +11,7 @@ package ink.abb.pogo.scraper
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.pokegoapi.google.common.geometry.S2LatLng
+import com.google.common.geometry.S2LatLng
 import ink.abb.pogo.scraper.util.Log
 import ink.abb.pogo.scraper.util.credentials.Credentials
 import ink.abb.pogo.scraper.util.credentials.GoogleAutoCredentials
@@ -30,6 +30,7 @@ class SettingsParser(val properties: Properties) {
         val defaults = Settings(name = "", credentials = GoogleCredentials(), latitude = 0.0, longitude = 0.0)
         val dropItems = getPropertyIfSet("Item Drop", "drop_items", defaults.dropItems, String::toBoolean)
 
+
         return Settings(
                 name = "default",
                 profileUpdateTimer = getPropertyIfSet("Set Profile Update Timer", "profile_update_timer", defaults.profileUpdateTimer, String::toLong),
@@ -38,7 +39,7 @@ class SettingsParser(val properties: Properties) {
                 longitude = getPropertyOrDie("Starting Longitude", "longitude", String::toDouble),
                 saveLocationOnShutdown = getPropertyIfSet("Save last location when the bot stop", "save_location_on_shutdown", defaults.saveLocationOnShutdown, String::toBoolean),
                 savedLatitude = getPropertyIfSet("Saved start Latitude", "saved_latitude", defaults.savedLatitude, String::toDouble),
-                savedLongitude = getPropertyIfSet("Saved start Longitude", "saved_longitude",  defaults.savedLongitude, String::toDouble),
+                savedLongitude = getPropertyIfSet("Saved start Longitude", "saved_longitude", defaults.savedLongitude, String::toDouble),
 
                 credentials = if (properties.getProperty("username", "").isEmpty()) {
                     GoogleCredentials(properties.getProperty("token", ""))
@@ -60,7 +61,7 @@ class SettingsParser(val properties: Properties) {
                 mapzenApiKey = getPropertyIfSet("If you use MAPZEN as route provider, you can use a Mapzen Turn by Turn API key", "mapzen_api_key", defaults.mapzenApiKey, String::toString),
                 googleApiKey = getPropertyIfSet("If you use GOOGLE as route provider, you must use a Google API key", "google_api_key", defaults.googleApiKey, String::toString),
                 dropItems = dropItems,
-                itemDropDelay = getPropertyIfSet("Delay between each drop of items","item_drop_delay",defaults.itemDropDelay, String::toLong),
+                itemDropDelay = getPropertyIfSet("Delay between each drop of items", "item_drop_delay", defaults.itemDropDelay, String::toLong),
                 groupItemsByType = getPropertyIfSet("Should the items that are kept be grouped by type (keep best from same type)", "group_items_by_type", defaults.groupItemsByType, String::toBoolean),
 
                 uselessItems = mapOf(
@@ -87,7 +88,7 @@ class SettingsParser(val properties: Properties) {
                 randomBallThrows = getPropertyIfSet("Randomize Ball Throwing", "random_ball_throws", defaults.randomBallThrows, String::toBoolean),
                 waitBetweenThrows = getPropertyIfSet("Waiting between throws", "wait_between_throws", defaults.waitBetweenThrows, String::toBoolean),
                 autotransfer = getPropertyIfSet("Autotransfer", "autotransfer", defaults.autotransfer, String::toBoolean),
-                autotransferTimeDelay = getPropertyIfSet("Delay between each transfer","autotransfer_time_delay", defaults.autotransferTimeDelay, String::toLong),
+                autotransferTimeDelay = getPropertyIfSet("Delay between each transfer", "autotransfer_time_delay", defaults.autotransferTimeDelay, String::toLong),
                 keepPokemonAmount = getPropertyIfSet("minimum keep pokemon amount", "keep_pokemon_amount", defaults.keepPokemonAmount, String::toInt),
                 maxPokemonAmount = getPropertyIfSet("maximum keep pokemon amount", "max_pokemon_amount", defaults.maxPokemonAmount, String::toInt),
                 displayKeepalive = getPropertyIfSet("Display Keepalive Coordinates", "display_keepalive", defaults.displayKeepalive, String::toBoolean),
@@ -131,7 +132,7 @@ class SettingsParser(val properties: Properties) {
 
                 useLuckyEgg = getPropertyIfSet("Use lucky egg before evolves", "use_lucky_egg", defaults.useLuckyEgg, String::toInt),
 
-                evolveTimeDelay =  getPropertyIfSet("Set time delay between evolutions", "evolve_time_delay", defaults.evolveTimeDelay, String::toLong),
+                evolveTimeDelay = getPropertyIfSet("Set time delay between evolutions", "evolve_time_delay", defaults.evolveTimeDelay, String::toLong),
 
                 export = getPropertyIfSet("Export on Profile Update", "export", defaults.export, String::toString),
 
@@ -149,7 +150,9 @@ class SettingsParser(val properties: Properties) {
 
                 botTimeoutAfterMinutes = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_minutes", defaults.botTimeoutAfterMinutes, String::toInt),
                 botTimeoutAfterCatchingPokemon = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_catching_pokemon", defaults.botTimeoutAfterCatchingPokemon, String::toInt),
-                botTimeoutAfterVisitingPokestops = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_visiting_pokestops", defaults.botTimeoutAfterVisitingPokestops, String::toInt)
+                botTimeoutAfterVisitingPokestops = getPropertyIfSet("Bot times out after X minutes and waits", "bot_timeout_after_visiting_pokestops", defaults.botTimeoutAfterVisitingPokestops, String::toInt),
+
+                buddyPokemon = getPropertyIfSet("Desired buddy pokemon", "buddy_pokemon", defaults.buddyPokemon, String::toString)
         )
     }
 
@@ -236,7 +239,6 @@ data class Settings(
                 Pair(ItemId.ITEM_LUCKY_EGG, -1),
                 Pair(ItemId.ITEM_INCENSE_ORDINARY, -1),
                 Pair(ItemId.ITEM_TROY_DISK, -1)
-
         ),
 
         val profileUpdateTimer: Long = 60,
@@ -296,8 +298,10 @@ data class Settings(
         val waitTimeMax: Int = 0,
 
         val botTimeoutAfterMinutes: Int = -1,
-        val botTimeoutAfterCatchingPokemon:Int = -1,
-        val botTimeoutAfterVisitingPokestops:Int = -1
+        val botTimeoutAfterCatchingPokemon: Int = -1,
+        val botTimeoutAfterVisitingPokestops: Int = -1,
+
+        val buddyPokemon: String = ""
 ) {
     fun withName(name: String): Settings {
         this.name = name
@@ -338,13 +342,13 @@ data class Settings(
 
         init {
             val versionProperties = Properties()
-            try {
+            version = try {
                 SettingsParser::class.java.getResourceAsStream("version.properties").use {
                     versionProperties.load(it)
                 }
-                version = versionProperties["version"].toString()
+                versionProperties["version"].toString()
             } catch (e: Exception) {
-                version = ""
+                ""
             }
         }
     }

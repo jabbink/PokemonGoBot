@@ -28,7 +28,7 @@ open class ApiAuthProvider : HandlerInterceptorAdapter() {
 
     @Throws(Exception::class)
     override fun preHandle(request: HttpServletRequest,
-                  response: HttpServletResponse, handler: Any): Boolean {
+                           response: HttpServletResponse, handler: Any): Boolean {
 
         if (request.method.equals("OPTIONS"))
             return true // Allow preflight calls

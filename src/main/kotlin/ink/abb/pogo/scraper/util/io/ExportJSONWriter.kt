@@ -10,7 +10,7 @@ package ink.abb.pogo.scraper.util.io
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.File
-import java.util.ArrayList
+import java.util.*
 
 class ExportJSONWriter(val filename: String = "export.json") {
     fun write(profile: Map<String, String>, eggs: ArrayList<Map<String, String>>, items: ArrayList<Map<String, String>>, pokemons: ArrayList<Map<String, String>>) {

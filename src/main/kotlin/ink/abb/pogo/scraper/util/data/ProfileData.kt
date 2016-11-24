@@ -8,10 +8,10 @@
 
 package ink.abb.pogo.scraper.util.data
 
-import com.pokegoapi.api.PokemonGo
-import com.pokegoapi.api.player.PlayerProfile
+import ink.abb.pogo.api.PoGoApi
+import java.util.concurrent.atomic.AtomicInteger
 
-data class ProfileData (
+data class ProfileData(
 
         var name: String? = null,
         var level: Int? = null,
@@ -26,21 +26,18 @@ data class ProfileData (
         var coin: Int? = null
 
 ) {
-    fun buildFromApi(api: PokemonGo) : ProfileData {
-
-        val profile = api.playerProfile
-
-        this.name = profile.playerData.username
-        this.level = profile.stats.level
-        this.exp = profile.stats.experience
-        this.expToNextLevel = profile.stats.nextLevelXp
-        this.stardust = profile.currencies.get(PlayerProfile.Currency.STARDUST)
-        this.team = profile.playerData.team.name
-        this.pokebankLimit = profile.playerData.maxPokemonStorage
-        this.pokebankUsage = api.inventories.pokebank.pokemons.size
-        this.backpackLimit = profile.playerData.maxItemStorage
-        this.backpackUsage = api.inventories.itemBag.itemsCount
-        this.coin = profile.currencies.get(PlayerProfile.Currency.POKECOIN)
+    fun buildFromApi(api: PoGoApi): ProfileData {
+        this.name = api.playerData.username
+        this.level = api.inventory.playerStats.level
+        this.exp = api.inventory.playerStats.experience
+        this.expToNextLevel = api.inventory.playerStats.nextLevelXp
+        this.stardust = api.inventory.currencies.getOrPut("STARDUST", { AtomicInteger(0) }).get()
+        this.team = api.playerData.team.name
+        this.pokebankLimit = api.playerData.maxPokemonStorage
+        this.pokebankUsage = api.inventory.pokemon.size
+        this.backpackLimit = api.playerData.maxItemStorage
+        this.backpackUsage = api.inventory.size
+        this.coin = api.inventory.currencies.getOrPut("POKECOIN", { AtomicInteger(0) }).get()
 
         return this
     }
