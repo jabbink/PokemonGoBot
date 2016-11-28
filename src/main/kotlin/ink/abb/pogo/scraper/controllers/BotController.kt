@@ -44,11 +44,13 @@ class BotController {
     @Autowired
     lateinit var authProvider: ApiAuthProvider
 
+    @CrossOrigin
     @RequestMapping("/bots")
     fun bots(): List<Settings> {
         return service.getAllBotSettings()
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/auth", method = arrayOf(RequestMethod.POST))
     fun auth(
             @PathVariable name: String,
@@ -74,6 +76,7 @@ class BotController {
         return ctx.restApiToken
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/load", method = arrayOf(RequestMethod.POST))
     fun loadBot(@PathVariable name: String): Settings {
         Log.magenta("REST API: Load bot $name")
@@ -81,6 +84,7 @@ class BotController {
         return service.submitBot(name)
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/unload", method = arrayOf(RequestMethod.POST))
     fun unloadBot(@PathVariable name: String): String {
         Log.magenta("REST API: Unload bot $name")
@@ -91,6 +95,7 @@ class BotController {
         }.toString()
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/reload", method = arrayOf(RequestMethod.POST))
     fun reloadBot(@PathVariable name: String): Settings {
         Log.magenta("REST API: Reload bot $name")
@@ -105,6 +110,7 @@ class BotController {
         return loadBot(name)
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/start", method = arrayOf(RequestMethod.POST))
     fun startBot(@PathVariable name: String): String {
         Log.magenta("REST API: Starting bot $name")
@@ -112,6 +118,7 @@ class BotController {
         return service.doWithBot(name) { it.start() }.toString()
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/stop", method = arrayOf(RequestMethod.POST))
     fun stopBot(@PathVariable name: String): String {
         Log.magenta("REST API: Stopping bot $name")
@@ -119,11 +126,13 @@ class BotController {
         return service.doWithBot(name) { it.stop() }.toString()
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/pokemons", method = arrayOf(RequestMethod.GET))
     fun listPokemons(@PathVariable name: String): List<PokemonData> {
         return service.getBotContext(name).api.inventory.pokemon.map { PokemonData().buildFromPokemon(it.value) }
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/transfer", method = arrayOf(RequestMethod.POST))
     fun transferPokemon(
             @PathVariable name: String,
@@ -142,6 +151,7 @@ class BotController {
         return result.result.toString()
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/evolve", method = arrayOf(RequestMethod.POST))
     fun evolvePokemon(
             @PathVariable name: String,
@@ -175,6 +185,7 @@ class BotController {
         return result
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/powerup", method = arrayOf(RequestMethod.POST))
     fun powerUpPokemon(
             @PathVariable name: String,
@@ -213,6 +224,7 @@ class BotController {
         return result
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/favorite", method = arrayOf(RequestMethod.POST))
     fun togglePokemonFavorite(
             @PathVariable name: String,
@@ -235,6 +247,7 @@ class BotController {
         return result.toString()
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/pokemon/{id}/rename", method = arrayOf(RequestMethod.POST))
     fun renamePokemon(
             @PathVariable name: String,
@@ -248,11 +261,13 @@ class BotController {
         return result
     }
 
+    @CrossOrigin
     @RequestMapping("/bot/{name}/items")
     fun listItems(@PathVariable name: String): List<ItemData> {
         return service.getBotContext(name).api.inventory.items.map { ItemData().buildFromItem(it.key, it.value.get()) }
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/item/{id}/drop/{quantity}", method = arrayOf(RequestMethod.DELETE))
     fun dropItem(
             @PathVariable name: String,
@@ -277,6 +292,7 @@ class BotController {
         }
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/useIncense", method = arrayOf(RequestMethod.POST))
     fun useIncense(
             @PathVariable name: String,
@@ -299,6 +315,7 @@ class BotController {
         }
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/useLuckyEgg", method = arrayOf(RequestMethod.POST))
     fun useLuckyEgg(
             @PathVariable name: String,
@@ -321,6 +338,7 @@ class BotController {
         }
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/location", method = arrayOf(RequestMethod.GET))
     fun getLocation(@PathVariable name: String): LocationData {
         return LocationData(
@@ -329,6 +347,7 @@ class BotController {
         )
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/location/{latitude}/{longitude}", method = arrayOf(RequestMethod.POST))
     fun changeLocation(
             @PathVariable name: String,
@@ -353,11 +372,13 @@ class BotController {
 
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/profile", method = arrayOf(RequestMethod.GET))
     fun getProfile(@PathVariable name: String): ProfileData {
         return ProfileData().buildFromApi(service.getBotContext(name).api)
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/pokedex", method = arrayOf(RequestMethod.GET))
     fun getPokedex(@PathVariable name: String): List<PokedexEntry> {
 
@@ -374,6 +395,7 @@ class BotController {
         return pokedex
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/bot/{name}/eggs", method = arrayOf(RequestMethod.GET))
     fun getEggs(@PathVariable name: String): List<EggData> {
 
