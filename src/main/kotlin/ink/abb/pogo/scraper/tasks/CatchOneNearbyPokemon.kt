@@ -65,7 +65,7 @@ class CatchOneNearbyPokemon : Task {
                     null
                 }!!
                 Log.green("Encountered pokemon ${catchablePokemon.pokemonId} " +
-                        "with CP ${pokemonData.cp} and IV ${pokemonData.getIvPercentage()}%")
+                        "with CP ${pokemonData.cp}, LEVEL ${pokemonData.level} and IV ${pokemonData.getIvPercentage()}%")
                 // TODO wrong parameters
                 val (shouldRelease, reason) = pokemonData.shouldTransfer(settings, hashMapOf<String, Int>(), AtomicInteger(0))
                 val desiredCatchProbability = if (shouldRelease) {
@@ -124,7 +124,7 @@ class CatchOneNearbyPokemon : Task {
                         else
                             message += "wild "
                     }
-                    message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp} and IV" +
+                    message += "${catchablePokemon.pokemonId} with CP ${pokemonData.cp}, LEVEL ${pokemonData.level} and IV" +
                             " (${pokemonData.individualAttack}-${pokemonData.individualDefense}-${pokemonData.individualStamina}) ${pokemonData.getIvPercentage()}%"
                     if (settings.displayPokemonCatchRewards) {
                         message += ": [${result.captureAward.xpList.sum()}x XP, ${result.captureAward.candyList.sum()}x " +
