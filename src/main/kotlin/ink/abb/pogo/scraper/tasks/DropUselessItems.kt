@@ -75,11 +75,12 @@ class DropUselessItems : Task {
     val groupFilters = arrayOf(
             arrayOf(ItemId.ITEM_REVIVE, ItemId.ITEM_MAX_REVIVE),
             arrayOf(ItemId.ITEM_POTION, ItemId.ITEM_SUPER_POTION, ItemId.ITEM_HYPER_POTION, ItemId.ITEM_MAX_POTION),
-            arrayOf(ItemId.ITEM_POKE_BALL, ItemId.ITEM_GREAT_BALL, ItemId.ITEM_ULTRA_BALL, ItemId.ITEM_MASTER_BALL)
+            arrayOf(ItemId.ITEM_POKE_BALL, ItemId.ITEM_GREAT_BALL, ItemId.ITEM_ULTRA_BALL, ItemId.ITEM_MASTER_BALL),
+            arrayOf(ItemId.ITEM_RAZZ_BERRY, ItemId.ITEM_NANAB_BERRY, ItemId.ITEM_PINAP_BERRY)
     )
 
     // Items that cant be grouped
-    val singlesFilter = arrayOf(ItemId.ITEM_RAZZ_BERRY, ItemId.ITEM_LUCKY_EGG, ItemId.ITEM_INCENSE_ORDINARY, ItemId.ITEM_TROY_DISK)
+    val singlesFilter = arrayOf(ItemId.ITEM_LUCKY_EGG, ItemId.ITEM_INCENSE_ORDINARY, ItemId.ITEM_TROY_DISK)
 
     /**
      * Drops the excess items by item
