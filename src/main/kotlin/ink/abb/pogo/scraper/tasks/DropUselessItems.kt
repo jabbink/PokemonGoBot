@@ -76,7 +76,8 @@ class DropUselessItems : Task {
             arrayOf(ItemId.ITEM_REVIVE, ItemId.ITEM_MAX_REVIVE),
             arrayOf(ItemId.ITEM_POTION, ItemId.ITEM_SUPER_POTION, ItemId.ITEM_HYPER_POTION, ItemId.ITEM_MAX_POTION),
             arrayOf(ItemId.ITEM_POKE_BALL, ItemId.ITEM_GREAT_BALL, ItemId.ITEM_ULTRA_BALL, ItemId.ITEM_MASTER_BALL),
-            arrayOf(ItemId.ITEM_RAZZ_BERRY, ItemId.ITEM_NANAB_BERRY, ItemId.ITEM_PINAP_BERRY)
+            arrayOf(ItemId.ITEM_RAZZ_BERRY, ItemId.ITEM_NANAB_BERRY, ItemId.ITEM_PINAP_BERRY),
+            arrayOf(ItemId.ITEM_SUN_STONE, ItemId.ITEM_DRAGON_SCALE, ItemId.ITEM_KINGS_ROCK, ItemId.ITEM_METAL_COAT, ItemId.ITEM_UP_GRADE)
     )
 
     // Items that cant be grouped
