@@ -67,7 +67,10 @@ class ReleasePokemon : Task {
                             } else {
                                 Log.red("Failed to transfer ${pokemon.pokemonData.pokemonId.name}: ${result.result}")
                             }
-
+                            if (settings.autotransferTimeDelay != (-1).toLong()) {
+                                val autotransferTimeDelay = settings.autotransferTimeDelay / 2 + (Math.random() * settings.autotransferTimeDelay).toLong()
+                                Thread.sleep(autotransferTimeDelay)
+                            }
                         }
                     }
                 }

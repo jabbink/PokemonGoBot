@@ -79,7 +79,11 @@ class EvolvePokemon : Task {
                         } else {
                             Log.red("Evolve of ${pokemonData.pokemonId.name} CP ${pokemonData.cp} IV ${pokemonData.getIvPercentage()}% failed: ${evolveResult.result.toString()}")
                         }
-
+                        if (settings.evolveTimeDelay != (-1).toLong()) {
+                            Log.yellow("Waiting ${settings.evolveTimeDelay}ms before next evolution")
+                            val evolveTimeDelay = settings.evolveTimeDelay / 2 + (Math.random() * settings.evolveTimeDelay).toLong()
+                            Thread.sleep(evolveTimeDelay)
+                        }
                     } else {
                         Log.red("Not enough candy (${bot.api.inventory.candies.getOrPut(pokemonMeta.family, { AtomicInteger(0) }).get()}/${pokemonMeta.candyToEvolve}) to evolve ${it.value.pokemonData.pokemonId.name} CP ${it.value.pokemonData.cp} IV ${it.value.pokemonData.getIvPercentage()}%")
                     }
