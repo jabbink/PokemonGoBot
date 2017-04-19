@@ -89,7 +89,7 @@ fun MapPokemon.catch(captureProbability: CaptureProbability, inventory: Inventor
             needCurve = true
             catchProbability = probability + 0.1f
             break
-        } else if (probability >= desiredCatchProbability - 0.2) {
+        } else if (probability >= desiredCatchProbability - 0.2 && ball != Pokeball.POKEBALL) {
             ball = ballType
             needCurve = true
             needRazzBerry = true
