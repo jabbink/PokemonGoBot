@@ -1,10 +1,12 @@
+# THIS BOT IS DEFUNCT AND NOT MAINTAINED
+
+## DO NOT ATTEMPT TO USE IT, ARCHIVE ONLY
+
 # Pokemon Go Bot
 
 [![Build Status](https://travis-ci.org/jabbink/PokemonGoBot.svg?branch=develop)](https://travis-ci.org/jabbink/PokemonGoBot)
 
 ## Welcome to _the_ Pokemon Go Bot
-
-[Join our Discord](https://discord.gg/7Dr84MT)
 
 ## FAQ
 
