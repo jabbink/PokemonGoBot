@@ -1,8 +1,8 @@
 # PTC/Google login credentials
-username=
+username=xlxSnorbashxlx
 
 # Choose plaintext or base64'd password
-password=
+password=437892MID
 base64_password=
 
 # Proxy server and port to be used by the bot. Only HTTP proxy are supported at the moment
@@ -23,8 +23,8 @@ longitude=
 
 # Do you want the bot so start from the location when you shut it down?
 save_location_on_shutdown=true
-saved_latitude=
-saved_longitude=
+saved_latitude=43.6403954
+saved_longitude=-79.3778599
 
 # Desired probability to catch Pokemon with 1 throw
 desired_catch_probability=0.4
