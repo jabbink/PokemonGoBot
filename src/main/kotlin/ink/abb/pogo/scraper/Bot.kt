@@ -138,6 +138,8 @@ class Bot(val api: PoGoApi, val settings: Settings) {
                 task(export)
             if (settings.evolveStackLimit > 0)
                 task(evolve)
+            if (settings.autotransfer)
+                task(release)
         }
 
         runLoop(TimeUnit.SECONDS.toMillis(5), "BotLoop") {
@@ -155,8 +157,6 @@ class Bot(val api: PoGoApi, val settings: Settings) {
             }
             if (settings.dropItems)
                 task(drop)
-            if (settings.autotransfer)
-                task(release)
         }
 
         runLoop(500, "PokestopLoop") {
