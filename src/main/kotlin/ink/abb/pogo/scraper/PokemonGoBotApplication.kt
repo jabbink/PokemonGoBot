@@ -27,9 +27,6 @@ import kotlin.concurrent.thread
 @SpringBootApplication
 open class PokemonGoBotApplication {
 
-    @Autowired
-    lateinit var authProvider: ApiAuthProvider
-
     @Bean
     open fun httpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
@@ -51,7 +48,7 @@ open class PokemonGoBotApplication {
     }
 
     @Bean
-    open fun interceptorConfigurer(): WebMvcConfigurer {
+    open fun interceptorConfigurer(authProvider: ApiAuthProvider): WebMvcConfigurer {
         return object : WebMvcConfigurerAdapter() {
             override fun addInterceptors(registry: InterceptorRegistry) {
                 registry.addInterceptor(authProvider)
@@ -63,12 +60,8 @@ open class PokemonGoBotApplication {
 
 
     @Component
-    open class BotRunner : CommandLineRunner {
-        @Autowired
-        lateinit var http: OkHttpClient
+    open class BotRunner(val http: OkHttpClient, val botRunService: BotService) : CommandLineRunner {
 
-        @Autowired
-        lateinit var botRunService: BotService
 
 
         override fun run(vararg args: String?) {

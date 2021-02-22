@@ -19,10 +19,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
-open class ApiAuthProvider : HandlerInterceptorAdapter() {
-
-    @Autowired
-    lateinit var service: BotService
+open class ApiAuthProvider (val service: BotService) : HandlerInterceptorAdapter() {
 
     val random: SecureRandom = SecureRandom()
 

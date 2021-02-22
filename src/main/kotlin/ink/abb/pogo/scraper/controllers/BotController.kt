@@ -36,13 +36,7 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 @CrossOrigin
 @RequestMapping("/api")
-class BotController {
-
-    @Autowired
-    lateinit var service: BotService
-
-    @Autowired
-    lateinit var authProvider: ApiAuthProvider
+class BotController (val service: BotService, val authProvider: ApiAuthProvider) {
 
     @RequestMapping("/bots")
     fun bots(): List<Settings> {
