@@ -138,7 +138,7 @@ display_keepalive=true
 display_pokestop_name=false
 
 ## Pokemon Transfer
-# Should the bot auto transfer duplicate pokemon
+# Should the bot auto transfer pokemon at all?
 autotransfer=true
 
 # Should the bot wait between each transfer and how long? -1 to disable, time to wait in milliseconds (it will be randomized alittle around the given value)
